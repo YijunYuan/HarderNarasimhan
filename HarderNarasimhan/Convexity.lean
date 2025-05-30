@@ -8,10 +8,10 @@ lemma lem2d4I (ℒ : Type) [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   (I : ℒ × ℒ) (h : I.1 < I.2)
   (μ : ℒ × ℒ → S) (hμcvx : IsConvexI (I.1 , I.2) h μ)
   (x : ℒ) (hxI : I.1 < x ∧ x ≤ I.2)
-  (w : ℒ) (hwI : I.1 < x ∧ x ≤ I.2)
+  (w : ℒ) (hwI : I.1 < w ∧ w ≤ I.2)
   (hxw : ¬ x ≤ w)
-  (u : ℒ) (huI : I.1 ≤ u ∧ u ≤ I.2)
-  (t : ℒ) (huI : I.1 ≤ t ∧ t ≤ I.2)
+  (u : ℒ) (huI : InInterval I u)
+  (t : ℒ) (huI : InInterval I t)
   (hut : u < t)
   (huxw : u ≤ x ⊓ w)
   (hxwt : x ⊔ w ≤ t) :
@@ -24,7 +24,7 @@ lemma lem2d4 (ℒ : Type) [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   (S : Type) [CompleteLattice S]
   (μ : ℒ × ℒ → S) (hμcvx : IsConvexI (⊥ , ⊤) bot_lt_top μ)
   (x : ℒ) (hx : x ≠ ⊥)
-  (w : ℒ) (_ : w ≠ ⊥)
+  (w : ℒ) (hw : w ≠ ⊥)
   (hxw : ¬ x ≤ w)
   (u : ℒ) (t : ℒ) (hut : u < t)
   (huxw : u ≤ x ⊓ w)
@@ -33,7 +33,7 @@ lemma lem2d4 (ℒ : Type) [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   μmax μ (x ⊓ w , x) ≤ μmax μ (w , t) ∧
   μA μ (u , x) ≤ μA μ (w , t) :=
   lem2d4I ℒ S (⊥ , ⊤) bot_lt_top μ hμcvx x ⟨bot_lt_iff_ne_bot.2 hx, le_top⟩ w
-    ⟨bot_lt_iff_ne_bot.2 hx, le_top⟩ hxw u ⟨bot_le, le_top⟩ t ⟨bot_le, le_top⟩ hut huxw hxwt
+    ⟨bot_lt_iff_ne_bot.2 hw, le_top⟩ hxw u ⟨bot_le, le_top⟩ t ⟨bot_le, le_top⟩ hut huxw hxwt
 
 lemma u_lt_x {ℒ : Type} [Lattice ℒ]
   (x : ℒ) (w : ℒ) (u : ℒ)

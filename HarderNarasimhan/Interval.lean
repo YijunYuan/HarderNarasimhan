@@ -39,3 +39,9 @@ variable (a : Interval ℒ x y h) (b : Interval ℒ x y h)
 #check a ≤ b
 #check OrderTop (Interval ℒ x y h)
 #check Interval.mk
+
+
+
+
+def InInterval {ℒ: Type} [PartialOrder ℒ] (I : ℒ × ℒ) (x : ℒ) : Prop :=
+  I.1 ≤ x ∧ x ≤ I.2
