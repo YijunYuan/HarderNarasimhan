@@ -3,8 +3,8 @@ import HarderNarasimhan.Basic
 def IsConvexI {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S]
 (I : {p : ℒ × ℒ // p.1 < p.2})
-(μ : ℒ × ℒ → S) : Prop :=
-∀ x : ℒ, ∀ y : ℒ, InInterval I x ∧ InInterval I y ∧ ¬ x ≤ y → μ (x ⊓ y,x) ≤ μ (y,x ⊔ y)
+(μ : {p :ℒ × ℒ // p.1 < p.2} → S) : Prop :=
+∀ x : ℒ, ∀ y : ℒ, InInterval I x → InInterval I y → (h : ¬ x ≤ y) → μ ⟨(x ⊓ y , x) , inf_lt_left.mpr h⟩ ≤ μ ⟨(y,x ⊔ y) , right_lt_sup.mpr h⟩
 
 lemma u_lt_x {ℒ : Type} [Lattice ℒ]
   (x : ℒ) (w : ℒ) (u : ℒ)
@@ -29,7 +29,7 @@ lemma w_lt_t {ℒ : Type} [Lattice ℒ]
 lemma lem2d4I (ℒ : Type) [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   (S : Type) [CompleteLattice S]
   (I : {p : ℒ × ℒ // p.1 < p.2})
-  (μ : ℒ × ℒ → S) (hμcvx : IsConvexI I μ)
+  (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : IsConvexI I μ)
   (x : ℒ) (hxI : InInterval I x) (hx : x ≠ I.val.1)
   (w : ℒ) (hwI : InInterval I w) (hw : w ≠ I.val.1)
   (hxw : ¬ x ≤ w)
@@ -45,7 +45,7 @@ lemma lem2d4I (ℒ : Type) [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 
 lemma lem2d4 (ℒ : Type) [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   (S : Type) [CompleteLattice S]
-  (μ : ℒ × ℒ → S) (hμcvx : IsConvexI ⟨(⊥ , ⊤) , bot_lt_top⟩ μ)
+  (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : IsConvexI ⟨(⊥ , ⊤) , bot_lt_top⟩ μ)
   (x : ℒ) (hx : x ≠ ⊥)
   (w : ℒ) (hw : w ≠ ⊥)
   (hxw : ¬ x ≤ w)
@@ -57,25 +57,25 @@ lemma lem2d4 (ℒ : Type) [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   μA μ ⟨(u , x) , u_lt_x x w u hxw huxw⟩ ≤ μA μ ⟨(w , t) , w_lt_t x w t hxw hxwt⟩ :=
   lem2d4I ℒ S ⟨(⊥ , ⊤) , bot_lt_top⟩ μ hμcvx x ⟨bot_le,le_top⟩ hx w ⟨bot_le,le_top⟩ hw hxw u ⟨bot_le, le_top⟩ t ⟨bot_le, le_top⟩ hut huxw hxwt
 
-/-
+
 lemma rmk2d5a (ℒ : Type) [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   (S : Type) [CompleteLattice S]
   (I : {p : ℒ × ℒ // p.1 < p.2})
-  (μ : ℒ × ℒ → S) (hμcvx : IsConvexI I μ) :
+  (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : IsConvexI I μ) :
   IsConvexI I (μmax μ)  :=
   sorry
 
 lemma rmk2d5b (ℒ : Type) [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   (S : Type) [CompleteLattice S]
   (I : {p : ℒ × ℒ // p.1 < p.2})
-  (μ : ℒ × ℒ → S) (hμcvx : IsConvexI I μ) :
+  (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : IsConvexI I μ) :
   μmax μ I = μmax (μmax μ) I :=
   sorry
--/
+
 
 lemma prop2d6main (ℒ : Type) [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   (S : Type) [CompleteLattice S]
-  (μ : ℒ × ℒ → S)
+  (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
   (x : ℒ) (y : ℒ) (z : ℒ)
   (h : x < y ∧ y < z) :
   μA μ ⟨(y , z) , h.right⟩ ≥ μA μ ⟨(x , z) , lt_trans h.left h.right⟩ :=
@@ -84,7 +84,7 @@ lemma prop2d6main (ℒ : Type) [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 lemma prop2d6a (ℒ : Type) [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   (S : Type) [CompleteLattice S]
   (I : {p : ℒ × ℒ // p.1 < p.2})
-  (μ : ℒ × ℒ → S) (hμcvx : IsConvexI I μ)
+  (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : IsConvexI I μ)
   (x : ℒ) (hxI : InInterval I x)
   (y : ℒ) (hyI : InInterval I y)
   (z : ℒ) (hzI : InInterval I z)
@@ -95,7 +95,7 @@ lemma prop2d6a (ℒ : Type) [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 lemma prop2d6b1 (ℒ : Type) [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   (S : Type) [CompleteLattice S]
   (I : {p : ℒ × ℒ // p.1 < p.2})
-  (μ : ℒ × ℒ → S) (hμcvx : IsConvexI I μ)
+  (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : IsConvexI I μ)
   (x : ℒ) (hxI : InInterval I x)
   (y : ℒ) (hyI : InInterval I y)
   (z : ℒ) (hzI : InInterval I z)
@@ -107,7 +107,7 @@ lemma prop2d6b1 (ℒ : Type) [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 lemma prop2d6b2 (ℒ : Type) [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   (S : Type) [CompleteLattice S]
   (I : {p : ℒ × ℒ // p.1 < p.2})
-  (μ : ℒ × ℒ → S) (hμcvx : IsConvexI I μ)
+  (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : IsConvexI I μ)
   (x : ℒ) (hxI : InInterval I x)
   (y : ℒ) (hyI : InInterval I y)
   (z : ℒ) (hzI : InInterval I z)
@@ -120,7 +120,7 @@ lemma prop2d6b2 (ℒ : Type) [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 lemma prop2d6c (ℒ : Type) [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   (S : Type) [CompleteLattice S]
   (I : {p : ℒ × ℒ // p.1 < p.2})
-  (μ : ℒ × ℒ → S)  (hμcvx : IsConvexI I μ)
+  (μ : {p :ℒ × ℒ // p.1 < p.2} → S)  (hμcvx : IsConvexI I μ)
   (x : ℒ) (hxI : InInterval I x)
   (y : ℒ) (hyI : InInterval I y)
   (z : ℒ) (hzI : InInterval I z)
@@ -135,7 +135,7 @@ lemma prop2d6c (ℒ : Type) [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 
 lemma rmk2d7 (ℒ : Type) [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   (S : Type) [CompleteLattice S] [LinearOrder S]
-  (μ : ℒ × ℒ → S) (hμcvx : IsConvexI ⟨(⊥ , ⊤) , bot_lt_top⟩ μ)
+  (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : IsConvexI ⟨(⊥ , ⊤) , bot_lt_top⟩ μ)
   (x : ℒ) (h : ⊥ < x ∧ x < ⊤)
   (h' : μA μ ⟨(⊥ , x) , h.left⟩ > μA μ ⟨(⊥ , ⊤) , bot_lt_top⟩) :
   μA μ ⟨(x , ⊤) , h.right⟩ = μA μ ⟨(⊥ , ⊤) , bot_lt_top⟩ :=
@@ -144,7 +144,7 @@ lemma rmk2d7 (ℒ : Type) [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 lemma prop2d8a (ℒ : Type) [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   (S : Type) [CompleteLattice S]
   (I : {p : ℒ × ℒ // p.1 < p.2})
-  (μ : ℒ × ℒ → S) (hμcvx : IsConvexI I μ)
+  (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : IsConvexI I μ)
   (x : ℒ) (hxI : InInterval I x)
   (y : ℒ) (hyI : InInterval I y)
   (u : ℒ) (huI : InInterval I u)
@@ -155,7 +155,7 @@ lemma prop2d8a (ℒ : Type) [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 lemma prop2d8b (ℒ : Type) [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   (S : Type) [CompleteLattice S]
   (I : {p : ℒ × ℒ // p.1 < p.2})
-  (μ : ℒ × ℒ → S)  (hμcvx : IsConvexI I μ)
+  (μ : {p :ℒ × ℒ // p.1 < p.2} → S)  (hμcvx : IsConvexI I μ)
   (x : ℒ) (hxI : InInterval I x)
   (y : ℒ) (hyI : InInterval I y)
   (u : ℒ) (huI : InInterval I u)
