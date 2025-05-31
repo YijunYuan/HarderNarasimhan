@@ -4,25 +4,68 @@ def ACCondI (ℒ : Type) [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] (I : 
 def ACCond (ℒ : Type) [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] : Prop := ACCondI ℒ (⊥ , ⊤) bot_lt_top
 
 def μDCCondI (ℒ : Type) [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] {S : Type} [CompleteLattice S] (μ : ℒ × ℒ → S) (I : ℒ × ℒ) (_ : I.1 < I.2) : Prop :=
-  ∀ a : ℒ, ∀ f : ℕ → ℒ, (InInterval I a) → (∀ n : ℕ, InInterval I (f n)) → (∀ n : ℕ, f n ≥ f (n + 1)) → (∀ n : ℕ, f n > a) → (∀ n : ℕ, μA μ (a, f n) < μA μ (a, f (n+1))) → ∃ m : ℕ, ∀ n : ℕ, m ≤ n → f n = f m
+  ∀ a : ℒ, ∀ f : ℕ → ℒ, (InInterval I a) → (∀ n : ℕ, InInterval I (f n)) → (∀ n : ℕ, f n ≥ f (n + 1)) → (hlta : ∀ n : ℕ, f n > a) → (∀ n : ℕ, μA μ (a, f n) (hlta n) < μA μ (a, f (n+1)) (hlta (n + 1))) → ∃ m : ℕ, ∀ n : ℕ, m ≤ n → f n = f m
 
 def μDCCond (ℒ : Type) [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] {S : Type} [CompleteLattice S] (μ : ℒ × ℒ → S) : Prop :=
   μDCCondI ℒ μ (⊥ , ⊤) bot_lt_top
 
 lemma clearly (ℒ : Type) [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] (S : Type) [CompleteLattice S] (μ : ℒ × ℒ → S) (I : ℒ × ℒ) (_ : I.1 < I.2) (h : μDCCond ℒ μ) (x : ℒ) (hx : x ≠ ⊤) : μDCCondI ℒ μ (x , ⊤) (lt_top_iff_ne_top.2 hx) := sorry
 
-lemma prop3d2 (ℒ : Type) [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] (S : Type) [CompleteLattice S] (μ : ℒ × ℒ → S) (I : ℒ × ℒ) (_ : I.1 < I.2) (h : μDCCond ℒ μ) (x : ℒ) (z : ℒ) (h : I.1 ≤ x ∧ x < z ∧ z ≤ I.2) (h' : μA μ (x , z) = ⊤) (a : ℒ) (ha : I.1 < a ∧ a < x) : μA μ (a , x) ≤ μA μ (a , z)  := sorry
+lemma prop3d2 (ℒ : Type) [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+(S : Type) [CompleteLattice S]
+(μ : ℒ × ℒ → S)
+(I : ℒ × ℒ) (_ : I.1 < I.2)
+--(h : μDCCond ℒ μ)
+(x : ℒ) (hxI : InInterval I x)
+(z : ℒ) (hzI : InInterval I z)
+(h : x < z)
+(h' : μA μ (x , z) h = ⊤)
+(a : ℒ) (haI : InInterval I a) (hax : a < x):
+μA μ (a , x) hax ≤ μA μ (a , z) (lt_trans hax h) :=
+sorry
 
-lemma cor3d3 (ℒ : Type) [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] (S : Type) [CompleteLattice S] (μ : ℒ × ℒ → S) (I : ℒ × ℒ) (hI : I.1 < I.2) (f : ℕ → ℒ) (hfI : ∀ n : ℕ, InInterval I (f n)) (hfm : ∀ n : ℕ, f n > f (n + 1)) (h : ∃ N : ℕ, μA μ (f (N + 1) , f N) = ⊤) : μDCCondI ℒ μ I hI := sorry
+lemma cor3d3 (ℒ : Type) [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+(S : Type) [CompleteLattice S]
+(μ : ℒ × ℒ → S)
+(I : ℒ × ℒ) (hI : I.1 < I.2)
+(f : ℕ → ℒ)
+(hfI : ∀ n : ℕ, InInterval I (f n))
+(hfm : ∀ n : ℕ, f (n + 1) < f n)
+(h : ∃ N : ℕ, μA μ (f (N + 1) , f N) (hfm N) = ⊤) : μDCCondI ℒ μ I hI := sorry
 
 
 
-def S₁I {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] {S : Type} [CompleteLattice S] (μ : ℒ × ℒ → S) (I : ℒ × ℒ) (_ : I.1 < I.2) (x : ℒ) (_ : InInterval I x) : Prop := ∀ y : ℒ, InInterval I y → y ≠ I.1 → ¬ μA μ (I.1 , y) > μA μ (I.1 , x)
+def S₁I {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+{S : Type} [CompleteLattice S]
+(μ : ℒ × ℒ → S)
+(I : ℒ × ℒ) (_ : I.1 < I.2)
+(x : ℒ) (hxI : InInterval I x) (hx : x ≠ I.1): Prop := ∀ y : ℒ, (hyI : InInterval I y) → (hy : y ≠ I.1) → ¬ μA μ (I.1 , y) (lt_of_le_of_ne hyI.left (hy.symm)) > μA μ (I.1 , x) (lt_of_le_of_ne hxI.left (hx.symm)) → y ≤ x
 
-def S₂I {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] {S : Type} [CompleteLattice S] (μ : ℒ × ℒ → S) (I : ℒ × ℒ) (_ : I.1 < I.2) (x : ℒ) (_ : InInterval I x) : Prop := ∀ y : ℒ, InInterval I y → y ≠ I.1 → μA μ (I.1 , y) = μA μ (I.1 , x) → y ≤ x
+def S₂I {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+{S : Type} [CompleteLattice S]
+(μ : ℒ × ℒ → S)
+(I : ℒ × ℒ) (hI : I.1 < I.2)
+(x : ℒ) (hxI : InInterval I x)  (hx : x ≠ I.1): Prop := ∀ y : ℒ, (hyI : InInterval I y) → (hy : y ≠ I.1) → μA μ (I.1 , y) (lt_of_le_of_ne hyI.left (hy.symm)) = μA μ (I.1 , x) (lt_of_le_of_ne hxI.left (hx.symm)) → y ≤ x
 
-lemma prop3d4 (ℒ : Type) [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] (S : Type) [CompleteLattice S] (μ : ℒ × ℒ → S) (I : ℒ × ℒ) (hI : I.1 < I.2) (hACC : ACCondI ℒ I hI) (hμDCC : μDCCondI ℒ μ I hI) : ∃ x : ℒ, ∃ hxI : InInterval I x,  (x ≠ I.1) ∧ (S₁I μ I hI x hxI) ∧ (S₂I μ I hI x hxI) := sorry
+lemma prop3d4 (ℒ : Type) [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+(S : Type) [CompleteLattice S]
+(μ : ℒ × ℒ → S)
+(I : ℒ × ℒ) (hI : I.1 < I.2)
+(hACC : ACCondI ℒ I hI)
+(hμDCC : μDCCondI ℒ μ I hI) : ∃ x : ℒ, ∃ hxI : InInterval I x,  ∃ hx : x ≠ I.1, (S₁I μ I hI x hxI hx) ∧ (S₂I μ I hI x hxI hx) := sorry
 
-lemma rmk3d5 (ℒ : Type) [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] (S : Type) [CompleteLattice S] [LinearOrder S] (μ : ℒ × ℒ → S) (I : ℒ × ℒ) (hI : I.1 < I.2) (x : ℒ) (hxI : InInterval I x) (hxS₁ : S₁I μ I hI x hxI) (hxS₂ : S₂I μ I hI x hxI) (y : ℒ) (hyI : InInterval I y) (hyS₁ : S₁I μ I hI y hyI) (hyS₂ : S₂I μ I hI y hyI) : x = y := sorry
+lemma rmk3d5 (ℒ : Type) [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+(S : Type) [CompleteLattice S] [LinearOrder S]
+(μ : ℒ × ℒ → S)
+(I : ℒ × ℒ) (hI : I.1 < I.2)
+(x : ℒ) (hxI : InInterval I x) (hx : x ≠ I.1)
+(hxS₁ : S₁I μ I hI x hxI hx)
+(hxS₂ : S₂I μ I hI x hxI hx)
+(y : ℒ) (hyI : InInterval I y) (hy : y ≠ I.1)
+(hyS₁ : S₁I μ I hI y hyI hy)
+(hyS₂ : S₂I μ I hI y hyI hy) : x = y := sorry
 
-def semistable {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] {S : Type} [CompleteLattice S] (μ : ℒ × ℒ → S) (I : ℒ × ℒ) (hI : I.1 < I.2) : Prop :=  S₁I μ I hI I.2 ⟨le_of_lt hI, le_rfl⟩ ∧ S₂I μ I hI I.2 ⟨le_of_lt hI, le_rfl⟩
+def semistable {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+{S : Type} [CompleteLattice S]
+(μ : ℒ × ℒ → S)
+(I : ℒ × ℒ) (hI : I.1 < I.2) : Prop :=  S₁I μ I hI I.2 ⟨le_of_lt hI, le_rfl⟩ (ne_of_lt hI).symm ∧ S₂I μ I hI I.2 ⟨le_of_lt hI, le_rfl⟩ (ne_of_lt hI).symm
