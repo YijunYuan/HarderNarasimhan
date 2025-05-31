@@ -17,8 +17,12 @@ lemma cor3d3 (ℒ : Type) [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] (S :
 
 
 
-def S₁I {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] {S : Type} [CompleteLattice S] (μ : ℒ × ℒ → S) (I : ℒ × ℒ) (_ : I.1 < I.2) (x : ℒ) (_ : InInterval I x) : Prop := ∀ y : ℒ, y ≠ ⊥ → ¬ μA μ (I.1 , y) > μA μ (I.1 , x)
+def S₁I {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] {S : Type} [CompleteLattice S] (μ : ℒ × ℒ → S) (I : ℒ × ℒ) (_ : I.1 < I.2) (x : ℒ) (_ : InInterval I x) : Prop := ∀ y : ℒ, InInterval I y → y ≠ I.1 → ¬ μA μ (I.1 , y) > μA μ (I.1 , x)
 
-def S₂I {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] {S : Type} [CompleteLattice S] (μ : ℒ × ℒ → S) (I : ℒ × ℒ) (_ : I.1 < I.2) (x : ℒ) (_ : InInterval I x) : Prop := ∀ y : ℒ, y ≠ ⊥ → μA μ (I.1 , y) = μA μ (I.1 , x) → y ≤ x
+def S₂I {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] {S : Type} [CompleteLattice S] (μ : ℒ × ℒ → S) (I : ℒ × ℒ) (_ : I.1 < I.2) (x : ℒ) (_ : InInterval I x) : Prop := ∀ y : ℒ, InInterval I y → y ≠ I.1 → μA μ (I.1 , y) = μA μ (I.1 , x) → y ≤ x
 
 lemma prop3d4 (ℒ : Type) [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] (S : Type) [CompleteLattice S] (μ : ℒ × ℒ → S) (I : ℒ × ℒ) (hI : I.1 < I.2) (hACC : ACCondI ℒ I hI) (hμDCC : μDCCondI ℒ μ I hI) : ∃ x : ℒ, ∃ hxI : InInterval I x,  (x ≠ I.1) ∧ (S₁I μ I hI x hxI) ∧ (S₂I μ I hI x hxI) := sorry
+
+lemma rmk3d5 (ℒ : Type) [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] (S : Type) [CompleteLattice S] [LinearOrder S] (μ : ℒ × ℒ → S) (I : ℒ × ℒ) (hI : I.1 < I.2) (x : ℒ) (hxI : InInterval I x) (hxS₁ : S₁I μ I hI x hxI) (hxS₂ : S₂I μ I hI x hxI) (y : ℒ) (hyI : InInterval I y) (hyS₁ : S₁I μ I hI y hyI) (hyS₂ : S₂I μ I hI y hyI) : x = y := sorry
+
+def semistable {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] {S : Type} [CompleteLattice S] (μ : ℒ × ℒ → S) (I : ℒ × ℒ) (hI : I.1 < I.2) : Prop :=  S₁I μ I hI I.2 ⟨le_of_lt hI, le_rfl⟩ ∧ S₂I μ I hI I.2 ⟨le_of_lt hI, le_rfl⟩
