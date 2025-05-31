@@ -43,5 +43,7 @@ variable (a : Interval ℒ x y h) (b : Interval ℒ x y h)
 
 
 
-def InInterval {ℒ: Type} [PartialOrder ℒ] (I : ℒ × ℒ) (x : ℒ) : Prop :=
-  I.1 ≤ x ∧ x ≤ I.2
+def InInterval {ℒ: Type} [PartialOrder ℒ]
+(I : {p : ℒ × ℒ // p.1 < p.2})
+(x : ℒ) : Prop :=
+  I.val.1 ≤ x ∧ x ≤ I.val.2
