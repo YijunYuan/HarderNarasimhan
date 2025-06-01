@@ -4,7 +4,7 @@ def IsConvexI {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S]
 (I : {p : ℒ × ℒ // p.1 < p.2})
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) : Prop :=
-∀ x : ℒ, ∀ y : ℒ, InInterval I x → InInterval I y → (h : ¬ x ≤ y) → μ ⟨(x ⊓ y , x) , inf_lt_left.mpr h⟩ ≤ μ ⟨(y,x ⊔ y) , right_lt_sup.mpr h⟩
+∀ x : ℒ, ∀ y : ℒ, InInterval I x → InInterval I y → (h : ¬ x ≤ y) → μ ⟨(x ⊓ y , x) , inf_lt_left.2 h⟩ ≤ μ ⟨(y,x ⊔ y) , right_lt_sup.2 h⟩
 
 lemma u_lt_x {ℒ : Type} [Lattice ℒ]
   (x : ℒ) (w : ℒ) (u : ℒ)
@@ -166,8 +166,3 @@ lemma prop2d8b (ℒ : Type) [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   μA μ ⟨(u , x ⊔ y) , lt_sup_of_lt_left h.left⟩ ≥ μA μ ⟨(u , x) , h.left⟩ ∨
   μA μ ⟨(u , x ⊔ y) , lt_sup_of_lt_left h.left⟩ ≥ μA μ ⟨(u , x) , h.left⟩ :=
   sorry
-
--------------------------------- `Test`
-variable (ℒ : Type) [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-
-#check (⟨(⊥,⊤),bot_lt_top⟩ : {p : ℒ × ℒ // p.1 < p.2} )

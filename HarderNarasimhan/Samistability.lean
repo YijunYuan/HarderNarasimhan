@@ -76,8 +76,41 @@ lemma rmk3d5 (ℒ : Type) [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 (hyS₁ : S₁I μ I y hyI hy)
 (hyS₂ : S₂I μ I y hyI hy) : x = y := sorry
 
-def semistable {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+def StI {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+{S : Type} [CompleteLattice S]
+(μ : {p :ℒ × ℒ // p.1 < p.2} → S)
+(I : {p : ℒ × ℒ // p.1 < p.2})
+(x : ℒ) (hxI : InInterval I x) : Prop :=
+  ∃ hx : x ≠ I.val.1, (S₁I μ I x hxI hx) ∧ (S₂I μ I x hxI hx)
+
+def semistableI {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
 (I : {p : ℒ × ℒ // p.1 < p.2}) : Prop :=
-S₁I μ I I.val.2 ⟨le_of_lt I.prop, le_rfl⟩ (ne_of_lt I.prop).symm ∧ S₂I μ I I.val.2 ⟨le_of_lt I.prop, le_rfl⟩ (ne_of_lt I.prop).symm
+StI μ I I.val.2 ⟨le_of_lt I.prop, le_rfl⟩
+--S₁I μ I I.val.2 ⟨le_of_lt I.prop, le_rfl⟩ (ne_of_lt I.prop).symm ∧ S₂I μ I I.val.2 ⟨le_of_lt I.prop, le_rfl⟩ (ne_of_lt I.prop).symm
+
+def stableI {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+{S : Type} [CompleteLattice S]
+(μ : {p :ℒ × ℒ // p.1 < p.2} → S)
+(I : {p : ℒ × ℒ // p.1 < p.2}) : Prop :=
+semistableI μ I ∧ ∀ x : ℒ, (hxI : InInterval I x) → (hx : x ≠ I.val.1) → μA μ ⟨(I.val.1 , x) , lt_of_le_of_ne hxI.left hx.symm⟩ ≠ μA μ ⟨(I.val.1 , I.val.2) , I.prop⟩
+
+lemma prop3d7 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+{S : Type} [CompleteLattice S]
+(μ : {p :ℒ × ℒ // p.1 < p.2} → S)
+(I : {p : ℒ × ℒ // p.1 < p.2})
+(x : ℒ) (hxI : InInterval I x)
+(hx : I.val.1 ≠ x ∧ x ≠ I.val.2)
+(hxSt : StI μ I x hxI) :
+semistableI μ ⟨(I.val.1 , x), lt_of_le_of_ne hxI.left hx.left⟩ ∧
+∀ y : ℒ, (hyI : InInterval I y) → (hy : y > x) → ¬ μA μ ⟨(I.val.1 , x) , lt_of_le_of_ne hxI.left hx.left⟩ ≤ μA μ ⟨(x, y), hy⟩ := sorry
+
+lemma prop3d8 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+{S : Type} [CompleteLattice S]
+(μ : {p :ℒ × ℒ // p.1 < p.2} → S)
+(I : {p : ℒ × ℒ // p.1 < p.2})
+(h : (∀ a : S, ∀ b : S, a ≥ b ∨ b ≥ a) ∨
+     ∀ z : ℒ, (hzI : InInterval I z) → (hz : I.val.1 ≠ z) → ∃ u : S, u = μA μ ⟨(I.val.1 , z) , lt_of_le_of_ne hzI.left hz⟩) :
+(∀ x : ℒ, ∀ y : ℒ, (hxI : InInterval I x) → (hyI : InInterval I y) → StI μ I x hxI → StI μ I y hyI → (x ≥ y ∨ y ≥ x)) ∧
+(∀ x : ℒ, ∀ y : ℒ, (hxI : InInterval I x) → (hyI : InInterval I y) → StI μ I x hxI → (hxy : x < y) → μA μ ⟨(I.val.1 , y), lt_of_le_of_lt hxI.left hxy⟩ = μA μ ⟨(x , y), hxy⟩) := sorry
