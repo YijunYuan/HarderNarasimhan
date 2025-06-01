@@ -6,55 +6,55 @@ def IsConvexI {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) : Prop :=
 ∀ x : ℒ, ∀ y : ℒ, InInterval I x → InInterval I y → (h : ¬ x ≤ y) → μ ⟨(x ⊓ y , x) , inf_lt_left.2 h⟩ ≤ μ ⟨(y,x ⊔ y) , right_lt_sup.2 h⟩
 
-lemma u_lt_x {ℒ : Type} [Lattice ℒ]
-  (x : ℒ) (w : ℒ) (u : ℒ)
-  (hxw : ¬ x ≤ w) (huxw : u ≤ x ⊓ w) :
-  u < x :=
-  lt_of_le_of_lt huxw (inf_lt_left.2 hxw)
-
-lemma x_inf_w_lt_x {ℒ : Type} [Lattice ℒ]
-  (x : ℒ) (w : ℒ)
-  (hxw : ¬ x ≤ w) :
-  x ⊓ w < x :=
-  inf_lt_left.2 hxw
-
-lemma w_lt_t {ℒ : Type} [Lattice ℒ]
-  (x : ℒ) (w : ℒ) (t : ℒ)
-  (h₁ : ¬ x ≤ w) (h₂ : x ⊔ w ≤ t) :
-  w < t :=
-  lt_iff_le_and_ne.2
-    ⟨ le_trans le_sup_right h₂,
-      fun a ↦ Eq.mp (congrArg (fun _a ↦ ¬x ≤ _a) a) h₁ (sup_le_iff.1 h₂).left⟩
 
 lemma lem2d4I (ℒ : Type) [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   (S : Type) [CompleteLattice S]
   (I : {p : ℒ × ℒ // p.1 < p.2})
   (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : IsConvexI I μ)
-  (x : ℒ) (hxI : InInterval I x) (hx : x ≠ I.val.1)
-  (w : ℒ) (hwI : InInterval I w) (hw : w ≠ I.val.1)
+  (x : ℒ) (hxI : InInterval I x) (hx : I.val.1 ≠ x)
+  (w : ℒ) (hwI : InInterval I w) (hw : I.val.1 ≠ w)
   (hxw : ¬ x ≤ w)
   (u : ℒ) (huI : InInterval I u)
   (t : ℒ) (huI : InInterval I t)
   (hut : u < t)
   (huxw : u ≤ x ⊓ w)
   (hxwt : x ⊔ w ≤ t) :
-  μA μ ⟨(u , x) , u_lt_x x w u hxw huxw⟩ ≤ μmax μ ⟨(x ⊓ w , x) , x_inf_w_lt_x x w hxw⟩ ∧
-  μmax μ ⟨(x ⊓ w , x) , x_inf_w_lt_x x w hxw⟩ ≤ μmax μ ⟨(w , t) , w_lt_t x w t hxw hxwt⟩ ∧
-  μA μ ⟨(u , x) , u_lt_x x w u hxw huxw⟩ ≤ μA μ ⟨(w , t) , w_lt_t x w t hxw hxwt⟩ :=
-  sorry
+  μA μ ⟨(u , x) , lt_of_le_of_lt huxw (inf_lt_left.2 hxw)⟩ ≤ μmax μ ⟨(x ⊓ w , x) , inf_lt_left.2 hxw⟩ ∧
+  μmax μ ⟨(x ⊓ w , x) , inf_lt_left.2 hxw⟩ ≤ μmax μ ⟨(w , t) , gt_of_ge_of_gt hxwt <| right_lt_sup.2 hxw⟩ ∧
+  μA μ ⟨(u , x) , lt_of_le_of_lt huxw (inf_lt_left.2 hxw)⟩ ≤ μA μ ⟨(w , t) , gt_of_ge_of_gt hxwt <| right_lt_sup.2 hxw⟩ := by
+  constructor
+  · have h1 : μA μ ⟨(u , x) , lt_of_le_of_lt huxw (inf_lt_left.2 hxw)⟩ ≤ μA μ ⟨(x ⊓ w , x) , inf_lt_left.2 hxw⟩ := by
+      apply sInf_le_sInf
+      intro t ht
+      rcases ht with ⟨a, ha, _⟩
+      use a , ⟨⟨le_trans huxw ha.1.left,ha.1.2⟩, ha.2⟩
+    have h2 : μA μ ⟨(x ⊓ w , x) , inf_lt_left.2 hxw⟩ ≤ μmax μ ⟨(x ⊓ w , x) , inf_lt_left.2 hxw⟩ := by
+      apply sInf_le
+      use x ⊓ w, ⟨⟨le_rfl,le_of_lt (inf_lt_left.2 hxw)⟩ ,ne_of_lt (inf_lt_left.2 hxw)⟩
+    exact le_trans h1 h2
+  · constructor
+    · have h : ∀ b : ℒ, (h' : x ⊓ w < b ∧ b ≤ x) →
+        μ ⟨(x ⊓ w , b) , h'.1⟩ ≤ μmax μ ⟨(w , t) , gt_of_ge_of_gt hxwt <| right_lt_sup.2 hxw⟩ := by sorry
+      apply sSup_le
+      rintro b ⟨_,⟨hf₁,hf₂⟩⟩
+      rw [hf₂.symm]
+      apply h
+      exact ⟨lt_of_le_of_ne hf₁.1.1 hf₁.2, hf₁.1.2⟩
+    · sorry
+
 
 lemma lem2d4 (ℒ : Type) [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   (S : Type) [CompleteLattice S]
   (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : IsConvexI ⟨(⊥ , ⊤) , bot_lt_top⟩ μ)
-  (x : ℒ) (hx : x ≠ ⊥)
-  (w : ℒ) (hw : w ≠ ⊥)
+  (x : ℒ) (hx : ⊥ ≠ x)
+  (w : ℒ) (hw : ⊥ ≠ w)
   (hxw : ¬ x ≤ w)
   (u : ℒ) (t : ℒ) (hut : u < t)
   (huxw : u ≤ x ⊓ w)
   (hxwt : x ⊔ w ≤ t) :
-  μA μ ⟨(u , x) , u_lt_x x w u hxw huxw⟩ ≤ μmax μ ⟨(x ⊓ w , x) , x_inf_w_lt_x x w hxw⟩ ∧
-  μmax μ ⟨(x ⊓ w , x) , x_inf_w_lt_x x w hxw⟩ ≤ μmax μ ⟨(w , t) , w_lt_t x w t hxw hxwt⟩ ∧
-  μA μ ⟨(u , x) , u_lt_x x w u hxw huxw⟩ ≤ μA μ ⟨(w , t) , w_lt_t x w t hxw hxwt⟩ :=
+  μA μ ⟨(u , x) , lt_of_le_of_lt huxw (inf_lt_left.2 hxw)⟩ ≤ μmax μ ⟨(x ⊓ w , x) , inf_lt_left.2 hxw⟩ ∧
+  μmax μ ⟨(x ⊓ w , x) , inf_lt_left.2 hxw⟩ ≤ μmax μ ⟨(w , t) , gt_of_ge_of_gt hxwt <| right_lt_sup.2 hxw⟩ ∧
+  μA μ ⟨(u , x) , lt_of_le_of_lt huxw (inf_lt_left.2 hxw)⟩ ≤ μA μ ⟨(w , t) , gt_of_ge_of_gt hxwt <| right_lt_sup.2 hxw⟩ :=
   lem2d4I ℒ S ⟨(⊥ , ⊤) , bot_lt_top⟩ μ hμcvx x ⟨bot_le,le_top⟩ hx w ⟨bot_le,le_top⟩ hw hxw u ⟨bot_le, le_top⟩ t ⟨bot_le, le_top⟩ hut huxw hxwt
 
 

@@ -4,17 +4,11 @@ import Mathlib.Algebra.Group.Subgroup.Defs
 
 import HarderNarasimhan.Interval
 
-def VAI {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
-{S : Type} [CompleteLattice S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S)
-(I : {p : ℒ × ℒ // p.1 < p.2}) (x : ℒ) : Set S :=
-μ '' {p : {q : ℒ × ℒ // q.1 < q.2} | p.val.1 = x ∧ InInterval I x ∧ InInterval I p.val.2 ∧ x < p.val.2}
-
 def μmax {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
 (I : {p : ℒ × ℒ // p.1 < p.2}) : S :=
-sSup (VAI μ ⟨(⊥ , I.val.2),lt_of_le_of_lt bot_le I.prop⟩ I.val.1)
+sSup {μ ⟨(I.val.1 , u), lt_of_le_of_ne h.1.1 h.2⟩ | (u : ℒ) (h : InInterval I u ∧ I.val.1 ≠ u) }
 
 def μA {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S]
