@@ -14,7 +14,7 @@ def μA {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
 (I : {p : ℒ × ℒ // p.1 < p.2}): S :=
-sInf {μmax μ ⟨(a , I.val.2),(lt_of_le_of_ne ha.left.right ha.2)⟩ | (a : ℒ) (ha : InInterval I a ∧ a ≠ I.val.2)}
+sInf {μmax μ ⟨(a , I.val.2),(lt_of_le_of_ne ha.1.2 ha.2)⟩ | (a : ℒ) (ha : InInterval I a ∧ a ≠ I.val.2)}
 
 def μAstar (ℒ : Type) [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 (S : Type) [CompleteLattice S]
