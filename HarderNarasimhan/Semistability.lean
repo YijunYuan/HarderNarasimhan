@@ -134,10 +134,3 @@ lemma prop3d8₂ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] 
 (y : ℒ) (hyI : InInterval I y)
 (hxy : x < y) :
 μA μ ⟨(I.val.1 , y), lt_of_le_of_lt hxSt.out.choose.1 hxy⟩ = μA μ ⟨(x , y), hxy⟩ := sorry
-
-def ItrFunc {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
-{S : Type} [CompleteLattice S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : IsConvexI ⟨(⊥,⊤),bot_lt_top⟩ μ) (hμ : μDCC μ)
-(h : (IsTotal S (· ≤ ·)) ∨
-     ∀ I : {p :ℒ × ℒ // p.1 < p.2}, ∃ u : S, u = μA μ I) :
-{s : ℒ // s ≠ ⊤} → ℒ := by sorry
