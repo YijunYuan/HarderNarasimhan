@@ -29,8 +29,7 @@ lemma HNfiltration_defprop {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedO
   intro n h'
   simp only [HNfiltration]
   simp [h']
-  exact (HNfiltration._proof_5 μ hμ hμcvx h n
-  (Eq.mpr_not (Eq.refl (HNfiltration μ hμ hμcvx h n = ⊤)) (of_eq_false (eq_false h')))).choose_spec
+  exact (HNfiltration._proof_5 μ hμ hμcvx h n h').choose_spec
 
 
 lemma HNfiltration_strict_increasing {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ] [DecidableEq ℒ]
@@ -38,31 +37,24 @@ lemma HNfiltration_strict_increasing {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : μDCC μ) (hμcvx : IsConvexI ⟨(⊥ ,⊤) , bot_lt_top⟩ μ)
 (h : (IsTotal S (· ≤ ·)) ∨
      ∀ I : {p : ℒ × ℒ // p.1 < p.2},  ∃ u : S, u = μA μ I) :
-∀ n : Nat, HNfiltration μ hμ hμcvx h n ≠ ⊤ → HNfiltration μ hμ hμcvx h n < HNfiltration μ hμ hμcvx h (n + 1) := by
-  intro n hn
-  sorry
+∀ n : Nat, HNfiltration μ hμ hμcvx h n ≠ ⊤ → HNfiltration μ hμ hμcvx h n < HNfiltration μ hμ hμcvx h (n + 1) := fun
+    n hn ↦ lt_of_le_of_ne (HNfiltration_defprop μ hμ hμcvx h n hn).1.1.1 (HNfiltration_defprop μ hμ hμcvx h n hn).1.2.1
 
 
-
-lemma finite_length {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ] [DecidableEq ℒ]
+lemma HNfiltration_finite_length {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ] [DecidableEq ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : μDCC μ) (hμcvx : IsConvexI ⟨(⊥ ,⊤) , bot_lt_top⟩ μ)
 (h : (IsTotal S (· ≤ ·)) ∨
      ∀ I : {p : ℒ × ℒ // p.1 < p.2},  ∃ u : S, u = μA μ I)
 : ∃ N : Nat, HNfiltration μ hμ hμcvx h N = ⊤ := by
-  sorry
+  by_contra!
+  expose_names
+  exact (WellFounded.wellFounded_iff_no_descending_seq.1 inst_3.wf).elim ⟨fun n => HNfiltration μ hμ hμcvx h n, fun n => HNfiltration_strict_increasing μ hμ hμcvx h n (this n)⟩
 
 
-noncomputable def length {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ] [DecidableEq ℒ]
+noncomputable def HNfiltration_length {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ] [DecidableEq ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : μDCC μ) (hμcvx : IsConvexI ⟨(⊥ ,⊤) , bot_lt_top⟩ μ)
 (h : (IsTotal S (· ≤ ·)) ∨
      ∀ I : {p : ℒ × ℒ // p.1 < p.2},  ∃ u : S, u = μA μ I) : Nat :=
-Nat.find (finite_length μ hμ hμcvx h)
-
-
-lemma HNfiltration_prop {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ] [DecidableEq ℒ]
-{S : Type} [CompleteLattice S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : μDCC μ) (hμcvx : IsConvexI ⟨(⊥ ,⊤) , bot_lt_top⟩ μ)
-(h : (IsTotal S (· ≤ ·)) ∨
-     ∀ I : {p : ℒ × ℒ // p.1 < p.2},  ∃ u : S, u = μA μ I) : True := sorry
+Nat.find (HNfiltration_finite_length μ hμ hμcvx h)
