@@ -14,10 +14,10 @@ noncomputable def HNfiltration {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [Boun
     if htop : prev_term = ⊤ then
       ⊤
     else
-      let I' := (⟨(prev_term,⊤),lt_top_iff_ne_top.2 htop⟩ : {p : ℒ × ℒ // p.1 < p.2})
+      let I' := (⟨(prev_term , ⊤) , lt_top_iff_ne_top.2 htop⟩ : {p : ℒ × ℒ // p.1 < p.2})
       (prop3d8₁' μ hμ I' (Or.casesOn
        h (fun h ↦ Or.inl h) fun h ↦
-       Or.inr fun z hzI hz ↦ h ⟨(I'.val.1, z), lt_of_le_of_ne hzI.left hz⟩)).choose
+       Or.inr fun z hzI hz ↦ h ⟨(I'.val.1 , z) ,  lt_of_le_of_ne hzI.left hz⟩)).choose
 
 
 lemma HNfiltration_defprop {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ] [DecidableEq ℒ]
