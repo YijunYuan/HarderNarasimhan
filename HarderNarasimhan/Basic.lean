@@ -20,3 +20,12 @@ def μAstar (ℒ : Type) [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 (S : Type) [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) : S :=
 μA μ ⟨(⊥,⊤) , bot_lt_top⟩
+
+def IsComparable {ℒ : Type} [PartialOrder ℒ] : (x : ℒ) → (y : ℒ) → Prop :=
+  fun x y => x ≤ y ∨ y ≤ x
+
+def IsAttainable {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
+{S : Type} [CompleteLattice S]
+(μ : {p :ℒ × ℒ // p.1 < p.2} → S)
+(I : {p : ℒ × ℒ // p.1 < p.2}) : Prop :=
+  ∃ (a : ℒ) (haI : InInterval I a) (ha : a ≠ I.val.2), μmax μ ⟨(a , I.val.2) , lt_of_le_of_ne haI.2 ha⟩ = μA μ I
