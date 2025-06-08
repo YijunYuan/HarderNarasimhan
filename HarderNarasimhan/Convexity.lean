@@ -90,12 +90,12 @@ lemma lem2d4I (ℒ : Type) [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   (S : Type) [CompleteLattice S]
   (I : {p : ℒ × ℒ // p.1 < p.2})
   (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : IsConvexI I μ)
-  (x : ℒ) (hxI : InInterval I x) (hx : I.val.1 ≠ x)
-  (w : ℒ) (hwI : InInterval I w) (hw : I.val.1 ≠ w)
+  (x : ℒ) (hxI : InInterval I x) --(hx : I.val.1 ≠ x)
+  (w : ℒ) (hwI : InInterval I w) --(hw : I.val.1 ≠ w)
   (hxw : ¬ x ≤ w)
-  (u : ℒ) (huI : InInterval I u)
-  (t : ℒ) (htI : InInterval I t)
-  (hut : u ≤ t)
+  (u : ℒ) --(huI : InInterval I u)
+  (t : ℒ) --(htI : InInterval I t)
+  --(hut : u ≤ t)
   (huxw : u ≤ x ⊓ w)
   (hxwt : x ⊔ w ≤ t) :
   μA μ ⟨(u, x), lt_of_le_of_lt huxw (inf_lt_left.2 hxw)⟩ ≤ μmax μ ⟨(x ⊓ w, x), inf_lt_left.2 hxw⟩ ∧
@@ -203,7 +203,10 @@ lemma prop2d6₂2 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   μA μ ⟨(x, z), lt_trans h.1 h.2⟩ ≤ μA μ ⟨(y, z), h.2⟩ := ⟨le_of_eq_of_le (inf_eq_left.mpr (le_of_lt h')).symm (prop2d6₁ I μ hμcvx x hxI y hyI z hzI h), prop2d6₀ μ x y z h⟩
 
 
-lemma comparable_iff {L : Type} [PartialOrder L] (x : L) (y : L) (h : IsComparable x y) : x < y ∨ y ≤ x := by
+lemma comparable_iff {L : Type} [PartialOrder L]
+(x : L) (y : L)
+(h : IsComparable x y) :
+x < y ∨ y ≤ x := by
   simp [IsComparable] at h
   rw [le_iff_eq_or_lt, le_iff_eq_or_lt] at h
   nth_rw 2 [or_comm] at h
@@ -265,28 +268,65 @@ lemma rmk2d7 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
     · exact Classical.byContradiction fun x_1 ↦ not_le_of_lt h' h₃.left
 
 
-lemma prop2d8a (ℒ : Type) [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-  (S : Type) [CompleteLattice S]
+lemma prop2d8₀ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+  {S : Type} [CompleteLattice S]
+  (I : {p : ℒ × ℒ // p.1 < p.2})
+  (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : IsConvexI I μ)
+  (x : ℒ) (hxI : InInterval I x)
+  (y : ℒ) (hyI : InInterval I y)
+  (u : ℒ) (h : u < x ∧ u < y)
+  (w : ℒ) (hwI : InInterval I w)
+  (hw : u ≤ w ∧ w < x ⊔ y) :
+  μA μ ⟨(u, x), h.1⟩ ≤ μmax μ ⟨(w, x ⊔ y), hw.2⟩ ∨
+  μA μ ⟨(u, y), h.2⟩ ≤ μmax μ ⟨(w, x ⊔ y), hw.2⟩ := by
+  have h' : ¬ x ≤ w ∨ ¬ y ≤ w := by
+    apply not_and_or.1
+    rw [← sup_le_iff]
+    apply not_le_of_lt hw.2
+  cases' h' with h₁ h₂
+  · left
+    exact le_trans (lem2d4₁ μ x w h₁ u <| le_inf (le_of_lt h.1) hw.1) <| lem2d4₂I I μ hμcvx x hxI w hwI h₁ (x ⊔ y) <| sup_le le_sup_left <| le_of_lt hw.2
+  · right
+    exact le_trans (lem2d4₁ μ y w h₂ u <| le_inf (le_of_lt h.2) hw.1) <| lem2d4₂I I μ hμcvx y hyI w hwI h₂ (x ⊔ y) <| sup_le le_sup_right <| le_of_lt hw.2
+
+
+lemma prop2d8₁ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+  {S : Type} [CompleteLattice S]
   (I : {p : ℒ × ℒ // p.1 < p.2})
   (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : IsConvexI I μ)
   (x : ℒ) (hxI : InInterval I x)
   (y : ℒ) (hyI : InInterval I y)
   (u : ℒ) (huI : InInterval I u)
   (h : u < x ∧ u < y) :
-  μA μ ⟨(u, x ⊔ y), lt_sup_of_lt_left h.1⟩ ≥ μA μ ⟨(u, x), h.1⟩ ⊓ μA μ ⟨(u, y), h.2⟩ :=
-  sorry
+  μA μ ⟨(u, x), h.1⟩ ⊓ μA μ ⟨(u, y), h.2⟩ ≤ μA μ ⟨(u, x ⊔ y), lt_sup_of_lt_left h.1⟩ := by
+  apply le_sInf_iff.2
+  rintro d ⟨w, hw, rfl⟩
+  have h' : μA μ ⟨(u, x), h.1⟩ ≤ μmax μ ⟨(w, x ⊔ y), lt_of_le_of_ne hw.1.2 hw.2⟩ ∨
+  μA μ ⟨(u, y), h.2⟩ ≤ μmax μ ⟨(w, x ⊔ y), lt_of_le_of_ne hw.1.2 hw.2⟩ :=
+    prop2d8₀ I μ hμcvx x hxI y hyI u h w ⟨le_trans huI.1 hw.1.1, le_trans hw.1.2 <| sup_le hxI.2 hyI.2⟩ <| ⟨hw.1.1,lt_of_le_of_ne hw.1.2 hw.2⟩
+  cases' h' with h₁ h₂
+  · exact le_trans inf_le_left h₁
+  · exact le_trans inf_le_right h₂
 
-lemma prop2d8b (ℒ : Type) [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-  (S : Type) [CompleteLattice S]
+
+lemma prop2d8₂ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+  {S : Type} [CompleteLattice S]
   (I : {p : ℒ × ℒ // p.1 < p.2})
   (μ : {p :ℒ × ℒ // p.1 < p.2} → S)  (hμcvx : IsConvexI I μ)
   (x : ℒ) (hxI : InInterval I x)
   (y : ℒ) (hyI : InInterval I y)
   (u : ℒ) (huI : InInterval I u)
   (h : u < x ∧ u < y)
-  (hcpb: μA μ ⟨(u, x), h.1⟩ ≤ μA μ ⟨(u, y), h.2⟩ ∨
-         μA μ ⟨(u, x), h.1⟩ ≥ μA μ ⟨(u, y), h.2⟩ ∨
-         (∃ v : S, v = μA μ ⟨(u, x ⊔ y), lt_sup_of_lt_left h.1⟩)) :
-  μA μ ⟨(u, x ⊔ y), lt_sup_of_lt_left h.1⟩ ≥ μA μ ⟨(u, x), h.1⟩ ∨
-  μA μ ⟨(u, x ⊔ y), lt_sup_of_lt_left h.1⟩ ≥ μA μ ⟨(u, x), h.1⟩ :=
-  sorry
+  (hcpb: IsComparable (μA μ ⟨(u, x), h.1⟩) (μA μ ⟨(u, y), h.2⟩) ∨ IsAttainable μ ⟨(u, x ⊔ y), lt_sup_of_lt_left h.1⟩) :
+  μA μ ⟨(u, x), h.1⟩ ≤ μA μ ⟨(u, x ⊔ y), lt_sup_of_lt_left h.1⟩ ∨
+  μA μ ⟨(u, y), h.2⟩ ≤ μA μ ⟨(u, x ⊔ y), lt_sup_of_lt_left h.1⟩ := by
+  cases' hcpb with h₁ h₂
+  · cases' h₁ with h₃ h₄
+    · left
+      exact le_of_eq_of_le (inf_eq_left.2 h₃).symm (prop2d8₁ I μ hμcvx x hxI y hyI u huI h)
+    · right
+      have h' : μA μ ⟨(u, x), h.1⟩ ⊓ μA μ ⟨(u, y), h.2⟩ ≤ μA μ ⟨(u, x ⊔ y), lt_sup_of_lt_left h.1⟩ := prop2d8₁ I μ hμcvx x hxI y hyI u huI h
+      rw [inf_comm] at h'
+      exact le_of_eq_of_le (inf_eq_left.2 h₄).symm h'
+  · rcases h₂ with ⟨a, ha, ⟨ha',ha''⟩⟩
+    exact ha'' ▸ (prop2d8₀ I μ hμcvx x hxI y hyI u h a ⟨le_trans huI.1 ha.1, le_trans ha.2 <| sup_le hxI.2 hyI.2⟩ <| ⟨ha.1,lt_of_le_of_ne ha.2 ha'⟩)
