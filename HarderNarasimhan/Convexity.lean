@@ -251,13 +251,19 @@ lemma prop2d6₃ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 
 
 lemma rmk2d7 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-  {S : Type} [CompleteLattice S] [LinearOrder S]
+  {S : Type} [CompleteLinearOrder S]
   (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : IsConvexI ⟨(⊥, ⊤), bot_lt_top⟩ μ)
   (x : ℒ) (h : ⊥ < x ∧ x < ⊤)
   (h' : μA μ ⟨(⊥, x), h.1⟩ > μA μ ⟨(⊥, ⊤), bot_lt_top⟩) :
   μA μ ⟨(x, ⊤), h.2⟩ = μA μ ⟨(⊥, ⊤), bot_lt_top⟩ := by
+    have h₁ : μA μ ⟨(x, ⊤), h.2⟩ = μA μ ⟨(⊥, ⊤), bot_lt_top⟩ ∨ (μA μ ⟨(⊥, x), h.1⟩ ≤ μA μ ⟨(⊥, ⊤), bot_lt_top⟩ ∧ μA μ ⟨(⊥, ⊤), bot_lt_top⟩ < μA μ ⟨(x, ⊤), h.2⟩) := by
+      apply prop2d6₃ ⟨(⊥, ⊤), bot_lt_top⟩ μ hμcvx ⊥ ⟨le_rfl, le_of_lt bot_lt_top⟩ x ⟨le_of_lt h.1, le_top⟩ ⊤ ⟨le_of_lt bot_lt_top, le_rfl⟩ h
+      left
+      exact le_total (μA μ ⟨(⊥, x), h.1⟩) (μA μ ⟨(x, ⊤), h.2⟩)
+    cases' h₁ with h₂ h₃
+    · exact h₂
+    · exact Classical.byContradiction fun x_1 ↦ not_le_of_lt h' h₃.left
 
-  sorry
 
 lemma prop2d8a (ℒ : Type) [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   (S : Type) [CompleteLattice S]
