@@ -15,7 +15,7 @@ lemma lem2d4₁ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
     use a, ⟨⟨le_trans huxw ha.1.1, ha.1.2⟩, ha.2⟩
   have h2 : μA μ ⟨(x ⊓ w, x), inf_lt_left.2 hxw⟩ ≤ μmax μ ⟨(x ⊓ w, x), inf_lt_left.2 hxw⟩ := by
     apply sInf_le
-    use x ⊓ w, ⟨⟨le_rfl, le_of_lt (inf_lt_left.2 hxw)⟩, ne_of_lt (inf_lt_left.2 hxw)⟩
+    use x ⊓ w, ⟨⟨le_rfl, le_of_lt <| inf_lt_left.2 hxw⟩, ne_of_lt <| inf_lt_left.2 hxw⟩
   exact le_trans h1 h2
 
 
@@ -41,9 +41,9 @@ lemma lem2d4₂I {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
       simp [hh]
       have hbnlew : ¬ b ≤ w := inf_lt_left.mp
         ((congrArg (fun _a ↦ _a < b) (hh.symm)) ▸ hb.1)
-      have hfinal : μ ⟨(w, b ⊔ w), IsConvexI._proof_2 b w hbnlew⟩ ≤ μmax μ ⟨(w, t), gt_of_ge_of_gt hxwt (right_lt_sup.mpr hxw)⟩ := by
+      have hfinal : μ ⟨(w, b ⊔ w), IsConvexI._proof_2 b w hbnlew⟩ ≤ μmax μ ⟨(w, t), gt_of_ge_of_gt hxwt (right_lt_sup.2 hxw)⟩ := by
         apply le_sSup
-        use b ⊔ w, ⟨⟨le_sup_right, le_trans (sup_le_sup_right hb.2 w) hxwt⟩, (mt right_eq_sup.1) <| inf_lt_left.1 <| lt_of_eq_of_lt hh.symm hb.1⟩
+        use b ⊔ w, ⟨⟨le_sup_right, le_trans (sup_le_sup_right hb.2 w) hxwt⟩, (mt right_eq_sup.1) <| inf_lt_left.1 <| hh.symm ▸ hb.1⟩
       apply le_trans (hμcvx b w ⟨le_of_lt (lt_of_le_of_lt (le_inf hxI.1 hwI.1) hb.1), le_trans hb.2 hxI.2⟩ hwI hbnlew) hfinal
     apply sSup_le
     rintro b ⟨_, ⟨hf₁, hf₂⟩⟩
@@ -60,16 +60,16 @@ lemma lem2d4₃I {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   (w : ℒ) (hwI : InIntvl I w)
   (hxw : ¬ x ≤ w)
   (u : ℒ) (huxw : u ≤ x ⊓ w):
-  μA μ ⟨(u, x), lt_of_le_of_lt huxw (inf_lt_left.2 hxw)⟩ ≤ μA μ ⟨(w, x ⊔ w), right_lt_sup.2 hxw⟩ := by
+  μA μ ⟨(u, x), lt_of_le_of_lt huxw <| inf_lt_left.2 hxw⟩ ≤ μA μ ⟨(w, x ⊔ w), right_lt_sup.2 hxw⟩ := by
   apply le_sInf
   rintro imy ⟨y, ⟨hy₁, hy₂⟩⟩
   rw [← hy₂]
   have h₁ : ¬ x ≤ y := by
     by_contra h
-    exact lt_irrefl (x ⊔ w) (lt_of_le_of_lt (sup_le_sup_right h w) (lt_of_eq_of_lt (sup_eq_left.2 hy₁.1.1) (lt_of_le_of_ne hy₁.1.2 hy₁.2)))
+    exact lt_irrefl (x ⊔ w) <| lt_of_le_of_lt (sup_le_sup_right h w) <| (sup_eq_left.2 hy₁.1.1).symm ▸ lt_of_le_of_ne hy₁.1.2 hy₁.2
   apply le_trans
-  · apply lem2d4₁ μ x y h₁ u (le_trans huxw <| inf_le_inf_left x hy₁.1.1)
-  · apply lem2d4₂I I μ hμcvx x hxI y ⟨le_trans hwI.1 hy₁.1.1, le_trans hy₁.1.2 <| sup_le hxI.2 hwI.2⟩ h₁ (x ⊔ w) (sup_le le_sup_left hy₁.1.2)
+  · apply lem2d4₁ μ x y h₁ u <| le_trans huxw <| inf_le_inf_left x hy₁.1.1
+  · apply lem2d4₂I I μ hμcvx x hxI y ⟨le_trans hwI.1 hy₁.1.1, le_trans hy₁.1.2 <| sup_le hxI.2 hwI.2⟩ h₁ (x ⊔ w) <| sup_le le_sup_left hy₁.1.2
 
 
 lemma lem2d4I (ℒ : Type) [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
@@ -84,9 +84,9 @@ lemma lem2d4I (ℒ : Type) [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   --(hut : u ≤ t)
   (huxw : u ≤ x ⊓ w)
   (hxwt : x ⊔ w ≤ t) :
-  μA μ ⟨(u, x), lt_of_le_of_lt huxw (inf_lt_left.2 hxw)⟩ ≤ μmax μ ⟨(x ⊓ w, x), inf_lt_left.2 hxw⟩ ∧
+  μA μ ⟨(u, x), lt_of_le_of_lt huxw <|inf_lt_left.2 hxw⟩ ≤ μmax μ ⟨(x ⊓ w, x), inf_lt_left.2 hxw⟩ ∧
   μmax μ ⟨(x ⊓ w, x), inf_lt_left.2 hxw⟩ ≤ μmax μ ⟨(w, t), gt_of_ge_of_gt hxwt <| right_lt_sup.2 hxw⟩ ∧
-  μA μ ⟨(u, x), lt_of_le_of_lt huxw (inf_lt_left.2 hxw)⟩ ≤ μA μ ⟨(w, x ⊔ w), right_lt_sup.2 hxw⟩ :=
+  μA μ ⟨(u, x), lt_of_le_of_lt huxw <| inf_lt_left.2 hxw⟩ ≤ μA μ ⟨(w, x ⊔ w), right_lt_sup.2 hxw⟩ :=
   ⟨lem2d4₁ μ x w hxw u huxw, ⟨lem2d4₂I I μ hμcvx x hxI w hwI hxw t hxwt, lem2d4₃I I μ hμcvx x hxI w hwI hxw u huxw⟩⟩
 
 
@@ -109,8 +109,8 @@ lemma rmk2d5₂ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
     simp
     intro b v hv res
     rw [← res]
-    have h : μmax μ ⟨(v ⊓ I.val.1, v), inf_lt_left.2 (not_le_of_gt (lt_of_le_of_ne hv.1.1 hv.2))⟩ ≤ μmax μ ⟨(I.val.1, I.val.2), gt_of_ge_of_gt (le_of_eq_of_le (sup_eq_left.2 hv.1.1) hv.1.2) (right_lt_sup.2 (not_le_of_gt (lt_of_le_of_ne hv.1.1 hv.2)))⟩ :=
-      lem2d4₂I I μ hμcvx v hv.1 I.val.1 ⟨le_rfl, le_of_lt I.prop⟩ (not_le_of_gt (lt_of_le_of_ne hv.1.1 hv.2)) I.val.2 (le_of_eq_of_le (sup_eq_left.2 hv.1.1) hv.1.2)
+    have h : μmax μ ⟨(v ⊓ I.val.1, v), inf_lt_left.2 (not_le_of_gt (lt_of_le_of_ne hv.1.1 hv.2))⟩ ≤ μmax μ ⟨(I.val.1, I.val.2), gt_of_ge_of_gt ((sup_eq_left.2 hv.1.1).symm ▸ hv.1.2) <| right_lt_sup.2 <| not_le_of_gt <| lt_of_le_of_ne hv.1.1 hv.2⟩ :=
+      lem2d4₂I I μ hμcvx v hv.1 I.val.1 ⟨le_rfl, le_of_lt I.prop⟩ (not_le_of_gt <| lt_of_le_of_ne hv.1.1 hv.2) I.val.2 <| (sup_eq_left.2 hv.1.1).symm ▸ hv.1.2
     simp only [inf_eq_right.2 hv.1.1] at h
     exact h
 
@@ -143,7 +143,7 @@ lemma prop2d6₀ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   simp
   intro u v hv hu
   rw [← hu]
-  use v, ⟨⟨le_of_lt (lt_of_lt_of_le h.1 hv.1.1), hv.1.2⟩, hv.2⟩
+  use v, ⟨⟨le_of_lt <| lt_of_lt_of_le h.1 hv.1.1, hv.1.2⟩, hv.2⟩
 
 
 lemma prop2d6₁I {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
@@ -161,7 +161,7 @@ lemma prop2d6₁I {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   · apply le_trans inf_le_right
     apply sInf_le
     use a, ⟨⟨hya, ha.1.2⟩, ha.2⟩
-  · exact le_trans inf_le_left <| le_trans (lem2d4₁ μ y a hya x <| le_inf (le_of_lt h.1) ha.1.1) (lem2d4₂I I μ hμcvx y hyI a ⟨le_trans hxI.1 ha.1.1, le_trans ha.1.2 hzI.2⟩ hya z <| sup_le (le_of_lt h.2) ha.1.2)
+  · exact le_trans inf_le_left <| le_trans (lem2d4₁ μ y a hya x <| le_inf (le_of_lt h.1) ha.1.1) <| lem2d4₂I I μ hμcvx y hyI a ⟨le_trans hxI.1 ha.1.1, le_trans ha.1.2 hzI.2⟩ hya z <| sup_le (le_of_lt h.2) ha.1.2
 
 
 lemma prop2d6₂I₁ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
@@ -173,7 +173,7 @@ lemma prop2d6₂I₁ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
   (z : ℒ) (hzI : InIntvl I z)
   (h : x < y ∧ y < z)
   (h' : μA μ ⟨(x, y), h.1⟩ ≥ μA μ ⟨(y, z), h.2⟩) :
-  μA μ ⟨(y, z), h.2⟩ = μA μ ⟨(x, z), lt_trans h.1 h.2⟩ := le_antisymm (le_of_eq_of_le (inf_eq_right.2 h').symm (prop2d6₁I I μ hμcvx x hxI y hyI z hzI h)) (prop2d6₀ μ x y z h)
+  μA μ ⟨(y, z), h.2⟩ = μA μ ⟨(x, z), lt_trans h.1 h.2⟩ := le_antisymm ((inf_eq_right.2 h').symm ▸ prop2d6₁I I μ hμcvx x hxI y hyI z hzI h) <| prop2d6₀ μ x y z h
 
 
 lemma prop2d6₂I₂ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
@@ -186,7 +186,7 @@ lemma prop2d6₂I₂ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
   (h : x < y ∧ y < z)
   (h' : μA μ ⟨(x, y), h.1⟩ < μA μ ⟨(y, z), h.2⟩) :
   μA μ ⟨(x, y), h.1⟩ ≤ μA μ ⟨(x, z), lt_trans h.1 h.2⟩ ∧
-  μA μ ⟨(x, z), lt_trans h.1 h.2⟩ ≤ μA μ ⟨(y, z), h.2⟩ := ⟨le_of_eq_of_le (inf_eq_left.mpr (le_of_lt h')).symm (prop2d6₁I I μ hμcvx x hxI y hyI z hzI h), prop2d6₀ μ x y z h⟩
+  μA μ ⟨(x, z), lt_trans h.1 h.2⟩ ≤ μA μ ⟨(y, z), h.2⟩ := ⟨(inf_eq_left.2 <| le_of_lt h').symm ▸ prop2d6₁I I μ hμcvx x hxI y hyI z hzI h, prop2d6₀ μ x y z h⟩
 
 
 lemma comparable_iff {L : Type} [PartialOrder L]
@@ -232,10 +232,10 @@ lemma prop2d6₃I {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
         have h''' : μA μ ⟨(y, z), h.2⟩ ≤ μmax μ ⟨(a, z), lt_of_le_of_ne ha₁.2 ha₂⟩ := by
           apply sInf_le
           use a , ⟨⟨hcontra, ha₁.2⟩, ha₂⟩
-        exact eq_of_le_of_le (le_of_le_of_eq h''' hres) (prop2d6₀ μ x y z h)
+        exact eq_of_le_of_le (hres ▸ h''') (prop2d6₀ μ x y z h)
       exact hnot h''
     constructor
-    · exact le_of_le_of_eq (le_trans (lem2d4₁ μ y a h' x (le_inf (le_of_lt h.1) ha₁.1)) <| lem2d4₂I I μ hμcvx y hyI a ⟨le_trans hxI.1 ha₁.1, le_trans ha₁.2 hzI.2⟩ h' z <| sup_le (le_of_lt h.2) ha₁.2) hres
+    · exact hres ▸ (le_trans (lem2d4₁ μ y a h' x (le_inf (le_of_lt h.1) ha₁.1)) <| lem2d4₂I I μ hμcvx y hyI a ⟨le_trans hxI.1 ha₁.1, le_trans ha₁.2 hzI.2⟩ h' z <| sup_le (le_of_lt h.2) ha₁.2)
     · exact lt_of_le_of_ne (prop2d6₀ μ x y z h) <| Ne.symm hnot
 
 
@@ -309,11 +309,11 @@ lemma prop2d8₂I {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   cases' hcpb with h₁ h₂
   · cases' h₁ with h₃ h₄
     · left
-      exact le_of_eq_of_le (inf_eq_left.2 h₃).symm (prop2d8₁I I μ hμcvx x hxI y hyI u huI h)
+      exact (inf_eq_left.2 h₃).symm ▸ (prop2d8₁I I μ hμcvx x hxI y hyI u huI h)
     · right
       have h' : μA μ ⟨(u, x), h.1⟩ ⊓ μA μ ⟨(u, y), h.2⟩ ≤ μA μ ⟨(u, x ⊔ y), lt_sup_of_lt_left h.1⟩ := prop2d8₁I I μ hμcvx x hxI y hyI u huI h
       rw [inf_comm] at h'
-      exact le_of_eq_of_le (inf_eq_left.2 h₄).symm h'
+      exact (inf_eq_left.2 h₄).symm ▸ h'
   · rcases h₂ with ⟨a, ha, ⟨ha',ha''⟩⟩
     exact ha'' ▸ (prop2d8₀I I μ hμcvx x hxI y hyI u h a ⟨le_trans huI.1 ha.1, le_trans ha.2 <| sup_le hxI.2 hyI.2⟩ <| ⟨ha.1,lt_of_le_of_ne ha.2 ha'⟩)
 

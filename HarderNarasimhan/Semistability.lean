@@ -18,7 +18,7 @@ lemma prop3d2 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 (h' : μA μ ⟨(x , z) , h⟩ = ⊤)
 (a : ℒ) (haI : InIntvl I a) (hax : a < x):
 μA μ ⟨(a , x) , hax⟩ ≤ μA μ ⟨(a , z) , lt_trans hax h⟩ := by
-  have h'' : μA μ ⟨(a , x) , hax⟩ ⊓ μA μ ⟨(x , z) , h⟩ ≤ μA μ ⟨(a,z),lt_trans hax h⟩ :=  by exact impl.prop2d6₁I I μ hμcvx a haI x hxI z hzI ⟨hax,h⟩
+  have h'' : μA μ ⟨(a , x) , hax⟩ ⊓ μA μ ⟨(x , z) , h⟩ ≤ μA μ ⟨(a,z),lt_trans hax h⟩ := impl.prop2d6₁I I μ hμcvx a haI x hxI z hzI ⟨hax,h⟩
   rw [h', inf_top_eq] at h''
   exact h''
 
