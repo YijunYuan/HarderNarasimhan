@@ -2,5 +2,6 @@
 -- Import modules here that should be built as part of the library.
 import HarderNarasimhan.Basic
 import HarderNarasimhan.Interval
-import HarderNarasimhan.Convexity
-import HarderNarasimhan.Semistability
+import HarderNarasimhan.Convexity.Defs
+import HarderNarasimhan.Convexity.Impl
+import HarderNarasimhan.Convexity.Results

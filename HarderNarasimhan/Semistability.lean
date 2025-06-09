@@ -1,4 +1,4 @@
-import HarderNarasimhan.Convexity
+import HarderNarasimhan.Convexity.Defs
 
 
 def μDCC {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
@@ -12,11 +12,11 @@ lemma prop3d2 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
 (I : {p : ℒ × ℒ // p.1 < p.2})
 --(h : μDCC ℒ μ)
-(x : ℒ) (hxI : InInterval I x)
-(z : ℒ) (hzI : InInterval I z)
+(x : ℒ) (hxI : InIntvl I x)
+(z : ℒ) (hzI : InIntvl I z)
 (h : x < z)
 (h' : μA μ ⟨(x , z) , h⟩ = ⊤)
-(a : ℒ) (haI : InInterval I a) (hax : a < x):
+(a : ℒ) (haI : InIntvl I a) (hax : a < x):
 μA μ ⟨(a , x) , hax⟩ ≤ μA μ ⟨(a , z) , lt_trans hax h⟩ :=
 sorry
 
@@ -34,21 +34,21 @@ def S₁I {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
 (I : {p : ℒ × ℒ // p.1 < p.2})
-(x : ℒ) (hxI : InInterval I x) (hx : I.val.1 ≠ x): Prop := ∀ y : ℒ, (hyI : InInterval I y) → (hy : I.val.1 ≠ y) → ¬ μA μ ⟨(I.val.1 , y) , lt_of_le_of_ne hyI.left hy⟩ > μA μ ⟨(I.val.1 , x) , lt_of_le_of_ne hxI.left hx⟩ → y ≤ x
+(x : ℒ) (hxI : InIntvl I x) (hx : I.val.1 ≠ x): Prop := ∀ y : ℒ, (hyI : InIntvl I y) → (hy : I.val.1 ≠ y) → ¬ μA μ ⟨(I.val.1 , y) , lt_of_le_of_ne hyI.left hy⟩ > μA μ ⟨(I.val.1 , x) , lt_of_le_of_ne hxI.left hx⟩ → y ≤ x
 
 
 def S₂I {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
 (I : {p : ℒ × ℒ // p.1 < p.2})
-(x : ℒ) (hxI : InInterval I x)  (hx : I.val.1 ≠ x): Prop := ∀ y : ℒ, (hyI : InInterval I y) → (hy : I.val.1 ≠ y) → μA μ ⟨(I.val.1 , y) , lt_of_le_of_ne hyI.left hy⟩ = μA μ ⟨(I.val.1 , x) , lt_of_le_of_ne hxI.left hx⟩ → y ≤ x
+(x : ℒ) (hxI : InIntvl I x)  (hx : I.val.1 ≠ x): Prop := ∀ y : ℒ, (hyI : InIntvl I y) → (hy : I.val.1 ≠ y) → μA μ ⟨(I.val.1 , y) , lt_of_le_of_ne hyI.left hy⟩ = μA μ ⟨(I.val.1 , x) , lt_of_le_of_ne hxI.left hx⟩ → y ≤ x
 
 
 def St {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
 (I : {p : ℒ × ℒ // p.1 < p.2}) : Set ℒ :=
-{l : ℒ | ∃ hlI : InInterval I l , ∃ hl : I.val.1 ≠ l ,  (S₁I μ I l hlI hl) ∧ (S₂I μ I l hlI hl)}
+{l : ℒ | ∃ hlI : InIntvl I l , ∃ hl : I.val.1 ≠ l ,  (S₁I μ I l hlI hl) ∧ (S₂I μ I l hlI hl)}
 
 
 lemma prop3d4 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ] -- The ascending chain condition. Actually we only need this condition on the Interval I, but to make the life easy, we require it on the whole ℒ.
@@ -63,10 +63,10 @@ lemma rmk3d5 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [Wel
 {S : Type} [CompleteLattice S] [LinearOrder S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
 (I : {p : ℒ × ℒ // p.1 < p.2})
-(x : ℒ) (hxI : InInterval I x) (hx : I.val.1 ≠ x)
+(x : ℒ) (hxI : InIntvl I x) (hx : I.val.1 ≠ x)
 (hxS₁ : S₁I μ I x hxI hx)
 (hxS₂ : S₂I μ I x hxI hx)
-(y : ℒ) (hyI : InInterval I y) (hy : I.val.1 ≠ y)
+(y : ℒ) (hyI : InIntvl I y) (hy : I.val.1 ≠ y)
 (hyS₁ : S₁I μ I y hyI hy)
 (hyS₂ : S₂I μ I y hyI hy) : x = y := sorry
 
@@ -81,7 +81,7 @@ def stableI {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
 (I : {p : ℒ × ℒ // p.1 < p.2}) : Prop :=
-semistableI μ I ∧ ∀ x : ℒ, (hxI : InInterval I x) → (hx : x ≠ I.val.1) → μA μ ⟨(I.val.1 , x) , lt_of_le_of_ne hxI.left hx.symm⟩ ≠ μA μ ⟨(I.val.1 , I.val.2) , I.prop⟩
+semistableI μ I ∧ ∀ x : ℒ, (hxI : InIntvl I x) → (hx : x ≠ I.val.1) → μA μ ⟨(I.val.1 , x) , lt_of_le_of_ne hxI.left hx.symm⟩ ≠ μA μ ⟨(I.val.1 , I.val.2) , I.prop⟩
 
 
 lemma prop3d7 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
@@ -91,7 +91,7 @@ lemma prop3d7 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 (x : ℒ) (hx : x ≠ I.val.2)
 (hxSt : x ∈ St μ I) :
 semistableI μ ⟨(I.val.1 , x), lt_of_le_of_ne hxSt.out.choose.1 hxSt.out.choose_spec.choose⟩ ∧
-∀ y : ℒ, (hyI : InInterval I y) → (hy : y > x) → ¬ μA μ ⟨(I.val.1 , x) , lt_of_le_of_ne hxSt.out.choose.1 hxSt.out.choose_spec.choose⟩ ≤ μA μ ⟨(x, y), hy⟩ := sorry
+∀ y : ℒ, (hyI : InIntvl I y) → (hy : y > x) → ¬ μA μ ⟨(I.val.1 , x) , lt_of_le_of_ne hxSt.out.choose.1 hxSt.out.choose_spec.choose⟩ ≤ μA μ ⟨(x, y), hy⟩ := sorry
 
 
 lemma prop3d8₁ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
@@ -99,7 +99,7 @@ lemma prop3d8₁ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] 
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : μDCC μ)
 (I : {p : ℒ × ℒ // p.1 < p.2})
 (h : (IsTotal S (· ≤ ·)) ∨
-     ∀ z : ℒ, (hzI : InInterval I z) → (hz : I.val.1 ≠ z) → ∃ u : S, u = μA μ ⟨(I.val.1 , z) , lt_of_le_of_ne hzI.left hz⟩) :
+     ∀ z : ℒ, (hzI : InIntvl I z) → (hz : I.val.1 ≠ z) → ∃ u : S, u = μA μ ⟨(I.val.1 , z) , lt_of_le_of_ne hzI.left hz⟩) :
 IsTotal (St μ I) (· ≤ ·) := sorry
 
 
@@ -108,7 +108,7 @@ lemma prop3d8₁' {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ]  [BoundedOrder ℒ
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : μDCC μ)
 (I : {p : ℒ × ℒ // p.1 < p.2})
 (h : (IsTotal S (· ≤ ·)) ∨
-     ∀ z : ℒ, (hzI : InInterval I z) → (hz : I.val.1 ≠ z) → ∃ u : S, u = μA μ ⟨(I.val.1 , z) , lt_of_le_of_ne hzI.left hz⟩) :
+     ∀ z : ℒ, (hzI : InIntvl I z) → (hz : I.val.1 ≠ z) → ∃ u : S, u = μA μ ⟨(I.val.1 , z) , lt_of_le_of_ne hzI.left hz⟩) :
 ∃ s : ℒ, IsGreatest (St μ I) s := by
 expose_names
 rcases inst_3.wf.has_min (St μ I) (prop3d4 μ I hμ) with ⟨M,hM⟩
@@ -129,8 +129,8 @@ lemma prop3d8₂ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] 
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : μDCC μ)
 (I : {p : ℒ × ℒ // p.1 < p.2})
 (h : (IsTotal S (· ≤ ·)) ∨
-     ∀ z : ℒ, (hzI : InInterval I z) → (hz : I.val.1 ≠ z) → ∃ u : S, u = μA μ ⟨(I.val.1 , z) , lt_of_le_of_ne hzI.left hz⟩)
+     ∀ z : ℒ, (hzI : InIntvl I z) → (hz : I.val.1 ≠ z) → ∃ u : S, u = μA μ ⟨(I.val.1 , z) , lt_of_le_of_ne hzI.left hz⟩)
 (x : ℒ) (hxSt : x ∈ St μ I)
-(y : ℒ) (hyI : InInterval I y)
+(y : ℒ) (hyI : InIntvl I y)
 (hxy : x < y) :
 μA μ ⟨(I.val.1 , y), lt_of_le_of_lt hxSt.out.choose.1 hxy⟩ = μA μ ⟨(x , y), hxy⟩ := sorry
