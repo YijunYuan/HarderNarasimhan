@@ -1,33 +1,37 @@
 import HarderNarasimhan.Convexity.Defs
+import HarderNarasimhan.Convexity.Impl
 
 
 def μDCC {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) : Prop :=
-  ∀ a : ℒ, ∀ f : ℕ → ℒ, (∀ n : ℕ, f n ≥ f (n + 1)) → (hlta : ∀ n : ℕ, f n > a) → (∀ n : ℕ, μA μ ⟨(a, f n) , hlta n⟩ < μA μ ⟨(a, f (n+1)) , hlta (n + 1)⟩) → ∃ m : ℕ, ∀ n : ℕ, m ≤ n → f n = f m
+  ∀ a : ℒ, ∀ f : ℕ → ℒ, (h₁ : ∀ n : ℕ, f n > a) → (h₂ : ∀ n : ℕ, f n > f (n + 1)) →  ∃ N : ℕ, μA μ ⟨(a, f <| N + 1), h₁ <| N + 1⟩ ≤ μA μ ⟨(a, f N), h₁ N⟩
 
 
 lemma prop3d2 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-(S : Type) [CompleteLattice S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S)
+{S : Type} [CompleteLattice S]
 (I : {p : ℒ × ℒ // p.1 < p.2})
---(h : μDCC ℒ μ)
+(μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : IsConvexI I μ)
 (x : ℒ) (hxI : InIntvl I x)
 (z : ℒ) (hzI : InIntvl I z)
 (h : x < z)
 (h' : μA μ ⟨(x , z) , h⟩ = ⊤)
 (a : ℒ) (haI : InIntvl I a) (hax : a < x):
-μA μ ⟨(a , x) , hax⟩ ≤ μA μ ⟨(a , z) , lt_trans hax h⟩ :=
-sorry
+μA μ ⟨(a , x) , hax⟩ ≤ μA μ ⟨(a , z) , lt_trans hax h⟩ := by
+  have h'' : μA μ ⟨(a , x) , hax⟩ ⊓ μA μ ⟨(x , z) , h⟩ ≤ μA μ ⟨(a,z),lt_trans hax h⟩ :=  by exact impl.prop2d6₁I I μ hμcvx a haI x hxI z hzI ⟨hax,h⟩
+  rw [h', inf_top_eq] at h''
+  exact h''
 
 
 lemma cor3d3 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 (S : Type) [CompleteLattice S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S)
-(f : ℕ → ℒ)
-(hfm : ∀ n : ℕ, f (n + 1) < f n)
-(h : ∃ N : ℕ, μA μ ⟨(f (N + 1) , f N) , hfm N⟩ = ⊤) : μDCC μ := sorry
-
+(μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : IsConvex μ)
+(h : ∀ f : ℕ → ℒ, (h : ∀ n : ℕ, f n > f (n + 1)) →  ∃N : ℕ, μA μ ⟨(f <| N + 1, f N),h N⟩ = ⊤)
+: μDCC μ := by
+  intro a f h₁ h₂
+  rcases (h f h₂) with ⟨N, hN⟩
+  use N
+  exact prop3d2 TotIntvl μ hμcvx (f <| N + 1) (in_TotIntvl <| f <| N + 1) (f N) (in_TotIntvl <| f N) (h₂ N) hN a (in_TotIntvl <| a) (h₁ <| N + 1)
 
 
 def S₁I {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
