@@ -232,7 +232,7 @@ lemma prop2d6₃I {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
         have h''' : μA μ ⟨(y, z), h.2⟩ ≤ μmax μ ⟨(a, z), lt_of_le_of_ne ha₁.2 ha₂⟩ := by
           apply sInf_le
           use a , ⟨⟨hcontra, ha₁.2⟩, ha₂⟩
-        exact eq_of_le_of_le (hres ▸ h''') (prop2d6₀ μ x y z h)
+        exact eq_of_le_of_le (hres ▸ h''') <| prop2d6₀ μ x y z h
       exact hnot h''
     constructor
     · exact hres ▸ (le_trans (lem2d4₁ μ y a h' x (le_inf (le_of_lt h.1) ha₁.1)) <| lem2d4₂I I μ hμcvx y hyI a ⟨le_trans hxI.1 ha₁.1, le_trans ha₁.2 hzI.2⟩ h' z <| sup_le (le_of_lt h.2) ha₁.2)

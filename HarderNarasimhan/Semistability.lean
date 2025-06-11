@@ -45,7 +45,7 @@ def S₂I {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
 (I : {p : ℒ × ℒ // p.1 < p.2})
-(x : ℒ) (hxI : InIntvl I x)  (hx : I.val.1 ≠ x): Prop := ∀ y : ℒ, (hyI : InIntvl I y) → (hy : I.val.1 ≠ y) → μA μ ⟨(I.val.1 , y) , lt_of_le_of_ne hyI.left hy⟩ = μA μ ⟨(I.val.1 , x) , lt_of_le_of_ne hxI.left hx⟩ → y ≤ x
+(x : ℒ) (hxI : InIntvl I x)  (hx : I.val.1 ≠ x): Prop := ∀ y : ℒ, (hyI : InIntvl I y) → (hy : I.val.1 ≠ y) → μA μ ⟨(I.val.1 , y) , lt_of_le_of_ne hyI.left hy⟩ = μA μ ⟨(I.val.1 , x) , lt_of_le_of_ne hxI.1 hx⟩ → y ≤ x
 
 
 def St {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
@@ -55,12 +55,151 @@ def St {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {l : ℒ | ∃ hlI : InIntvl I l , ∃ hl : I.val.1 ≠ l ,  (S₁I μ I l hlI hl) ∧ (S₂I μ I l hlI hl)}
 
 
+def ℒₛ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
+{S : Type} [CompleteLattice S]
+(μ : {p :ℒ × ℒ // p.1 < p.2} → S)
+(I : {p : ℒ × ℒ // p.1 < p.2})
+(x : {p : ℒ // InIntvl I p}) (hx : I.val.1 ≠ x) : Set ℒ :=
+{p : ℒ | ∃ h₁ : InIntvl I p, ∃ h₂ : I.val.1 ≠ p ∧ p < x, μA μ ⟨(I.val.1,p),lt_of_le_of_ne h₁.1 h₂.1⟩ > μA μ ⟨(I.val.1 , x.val) , lt_of_le_of_ne x.prop.1 hx⟩}
+
+
+noncomputable def prop3d4₀func {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
+{S : Type} [CompleteLattice S]
+(μ : {p :ℒ × ℒ // p.1 < p.2} → S)
+(I : {p : ℒ × ℒ // p.1 < p.2})
+(k : ℕ) : {p : ℒ // InIntvl I p} :=
+  letI := Classical.propDecidable
+  match k with
+  | 0 => ⟨I.val.2, ⟨le_of_lt I.prop, le_rfl⟩⟩
+  | n+1 =>
+    let prev := prop3d4₀func μ I n
+    if hbot : I.val.1 = prev.val then
+      ⟨I.val.1, ⟨le_rfl,le_of_lt I.prop⟩⟩
+    else
+      if hne : (ℒₛ μ I prev hbot).Nonempty then
+        have h: WellFoundedGT ℒ := by
+          expose_names
+          exact inst_3
+        let res := h.wf.has_min (ℒₛ μ I prev hbot) hne
+        ⟨(res).choose,res.choose_spec.1.out.choose⟩
+      else
+        ⟨I.val.1, ⟨le_rfl,le_of_lt I.prop⟩⟩
+
+
+lemma prop3d4₀func_helper {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
+{S : Type} [CompleteLattice S]
+(μ : {p :ℒ × ℒ // p.1 < p.2} → S)
+(I : {p : ℒ × ℒ // p.1 < p.2})
+(i : ℕ) (hi : I.val.1 ≠ (prop3d4₀func μ I (i+1)).val ) :
+I.val.1 ≠ (prop3d4₀func μ I i).val := by
+  by_contra hcontra
+  simp only [prop3d4₀func] at hi
+  simp only [hcontra] at hi
+  exact hi rfl
+
+
+lemma prop3d4₀func_defprop1 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
+{S : Type} [CompleteLattice S]
+(μ : {p :ℒ × ℒ // p.1 < p.2} → S)
+(I : {p : ℒ × ℒ // p.1 < p.2})
+(i : ℕ) (hi : I.val.1 ≠ (prop3d4₀func μ I (i+1)).val ) :
+μA μ ⟨(I.val.1 , (prop3d4₀func μ I (i+1)).val) , lt_of_le_of_ne (prop3d4₀func μ I (i+1)).prop.1 hi⟩ > μA μ ⟨(I.val.1 , (prop3d4₀func μ I i).val) , lt_of_le_of_ne ((prop3d4₀func μ I i)).prop.1 <| prop3d4₀func_helper μ I i hi⟩ := by
+  expose_names
+  simp only [prop3d4₀func, prop3d4₀func_helper μ I i hi]
+  have hne : (ℒₛ μ I (prop3d4₀func μ I i) <| prop3d4₀func_helper μ I i hi).Nonempty := by
+    by_contra hcontra
+    simp only [prop3d4₀func, prop3d4₀func_helper μ I i hi] at hi
+    simp only [hcontra] at hi
+    simp at hi
+  simp only [hne]
+  exact (inst_3.wf.has_min (ℒₛ μ I (prop3d4₀func μ I i) <| prop3d4₀func_helper μ I i hi) hne).choose_spec.1.out.choose_spec.choose_spec
+
+
+lemma prop3d4₀func_defprop2 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
+{S : Type} [CompleteLattice S]
+(μ : {p :ℒ × ℒ // p.1 < p.2} → S)
+(I : {p : ℒ × ℒ // p.1 < p.2})
+(i : ℕ) (hi : I.val.1 ≠ (prop3d4₀func μ I (i+1)).val ) :
+∀ z : ℒ, (hz : (prop3d4₀func μ I (i+1)).val < z ∧ z ≤ (prop3d4₀func μ I i).val) →
+    ¬ μA μ ⟨(I.val.1, z),lt_of_le_of_lt (prop3d4₀func μ I (i+1)).prop.1 hz.1⟩ ≥ μA μ ⟨(I.val.1 , (prop3d4₀func μ I (i+1)).val) , lt_of_le_of_ne (prop3d4₀func μ I (i+1)).prop.1 hi⟩ := by
+  expose_names
+  intro z hz
+  simp only [prop3d4₀func, prop3d4₀func_helper μ I i hi]
+  simp
+  have hne : (ℒₛ μ I (prop3d4₀func μ I i) <| prop3d4₀func_helper μ I i hi).Nonempty := by
+    by_contra hcontra
+    simp only [prop3d4₀func, prop3d4₀func_helper μ I i hi] at hi
+    simp only [hcontra] at hi
+    simp at hi
+  simp only [hne]
+  by_contra hcontra
+  have h' : z ∈ (ℒₛ μ I (prop3d4₀func μ I i) <| prop3d4₀func_helper μ I i hi) := by
+    use ⟨le_of_lt <| lt_of_le_of_lt (prop3d4₀func μ I (i + 1)).prop.1 hz.1,le_trans hz.2 (prop3d4₀func μ I i).prop.2⟩
+    have h'' : z < (prop3d4₀func μ I i).val := by
+      apply lt_of_le_of_ne hz.2
+      by_contra hcontra'
+      simp [hcontra'] at hcontra
+      exact (inst_3.wf.has_min (ℒₛ μ I (prop3d4₀func μ I i) <| prop3d4₀func_helper μ I i hi) hne).choose_spec.1.out.choose_spec.choose_spec.not_le hcontra
+    use ⟨ne_of_lt <| lt_of_le_of_lt (prop3d4₀func μ I (i+1)).prop.1 hz.1,h''⟩
+    exact gt_of_ge_of_gt hcontra.ge (inst_3.wf.has_min (ℒₛ μ I (prop3d4₀func μ I i) <| prop3d4₀func_helper μ I i hi) hne).choose_spec.1.out.choose_spec.choose_spec
+  simp only [prop3d4₀func, prop3d4₀func_helper μ I i hi] at hz
+  simp [hne] at hz
+  exact (inst_3.wf.has_min (ℒₛ μ I (prop3d4₀func μ I i) <| prop3d4₀func_helper μ I i hi) hne).choose_spec.2 z h' hz.1
+
+
+lemma prop3d4₀func_strict_decreasing {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
+{S : Type} [CompleteLattice S]
+(μ : {p :ℒ × ℒ // p.1 < p.2} → S)
+(I : {p : ℒ × ℒ // p.1 < p.2}) :
+∀ i : ℕ, I.val.1 ≠ (prop3d4₀func μ I i).val →
+(prop3d4₀func μ I i).val > (prop3d4₀func μ I (i+1)).val := by
+  intro i hi
+  expose_names
+  by_cases h: I.val.1 = (prop3d4₀func μ I (i+1)).val
+  · simp [prop3d4₀func, hi] at h
+    by_cases hne : (ℒₛ μ I (prop3d4₀func μ I i) hi).Nonempty
+    · simp [hne] at h
+      exact False.elim ((inst_3.wf.has_min (ℒₛ μ I (prop3d4₀func μ I i) hi) hne).choose_spec.1.out.choose_spec.choose.1 h)
+    · simp only [prop3d4₀func, hi, hne]
+      exact lt_of_le_of_ne (prop3d4₀func μ I i).prop.1 hi
+  · simp only [prop3d4₀func, hi]
+    have hne : (ℒₛ μ I (prop3d4₀func μ I i) <| prop3d4₀func_helper μ I i h).Nonempty := by
+      by_contra hcontra
+      simp only [prop3d4₀func, prop3d4₀func_helper μ I i h, hcontra] at h
+      simp at h
+    simp only [hne]
+    exact (inst_3.wf.has_min (ℒₛ μ I (prop3d4₀func μ I i) hi) hne).choose_spec.1.out.choose_spec.choose.2
+
+
+lemma prop3d4₀func_fin_len  {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
+{S : Type} [CompleteLattice S]
+(μ : {p :ℒ × ℒ // p.1 < p.2} → S)
+(I : {p : ℒ × ℒ // p.1 < p.2})
+(hμDCC : μDCC μ) :
+∃ i : ℕ, (prop3d4₀func μ I i).val = I.val.1 := by
+  by_contra!
+  let func := fun m : ℕ => (prop3d4₀func μ I m).val
+  have h₀ : ∀ i : ℕ, func i > I.val.1 := by
+    intro i
+    rw [gt_iff_lt]
+    exact Ne.lt_of_le (this i).symm  (prop3d4₀func μ I i).prop.1
+  have h₁ : ∀ i : ℕ, func i > func (i+1) :=
+    fun t ↦ prop3d4₀func_strict_decreasing μ I t (this t).symm
+  have h₂ : ∀ i : ℕ,
+    μA μ ⟨(I.val.1 , func (i+1)) , h₀ (i+1)⟩ >
+    μA μ ⟨(I.val.1 , func i) , h₀ i⟩ :=
+      fun t ↦ prop3d4₀func_defprop1 μ I t (this (t + 1)).symm
+  rcases (hμDCC I.val.1 func h₀ h₁) with ⟨N, hN⟩
+  exact not_le_of_gt (h₂ N) hN
+
+
 lemma prop3d4 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ] -- The ascending chain condition. Actually we only need this condition on the Interval I, but to make the life easy, we require it on the whole ℒ.
 -- This actually does `NOT` make the statement any weaker, since if we take I to be (⊥,⊤), then we can "apply" this global version to I itself, which is also a sublattice of ℒ.
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
 (I : {p : ℒ × ℒ // p.1 < p.2})
-(hμDCC : μDCC μ) : (St μ I).Nonempty := sorry
+(hμDCC : μDCC μ) : (St μ I).Nonempty := by
+  sorry
 
 
 lemma rmk3d5 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
