@@ -193,6 +193,70 @@ lemma prop3d4₀func_fin_len  {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [Bound
   exact not_le_of_gt (h₂ N) hN
 
 
+noncomputable def prop3d4₀func_len  {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
+{S : Type} [CompleteLattice S]
+(μ : {p :ℒ × ℒ // p.1 < p.2} → S)
+(I : {p : ℒ × ℒ // p.1 < p.2})
+(hμDCC : μDCC μ) : ℕ := by
+  letI := Classical.propDecidable
+  exact Nat.find (prop3d4₀func_fin_len μ I hμDCC)
+
+
+lemma prop3d4₀func_len_nonzero {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
+{S : Type} [CompleteLattice S]
+(μ : {p :ℒ × ℒ // p.1 < p.2} → S)
+(I : {p : ℒ × ℒ // p.1 < p.2}) (hμDCC : μDCC μ) :
+prop3d4₀func_len μ I hμDCC ≠ 0 := by
+  letI := Classical.propDecidable
+  by_contra hcontra
+  have h : (prop3d4₀func μ I (prop3d4₀func_len μ I hμDCC)).val = I.val.1 := Nat.find_spec (prop3d4₀func_fin_len μ I hμDCC)
+  simp only [hcontra, prop3d4₀func] at h
+  exact (lt_self_iff_false I.val.1).1 (h ▸ I.prop)
+
+
+lemma prop3d4₀func_defprop3₀ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
+{S : Type} [CompleteLattice S]
+(μ : {p :ℒ × ℒ // p.1 < p.2} → S)
+(I : {p : ℒ × ℒ // p.1 < p.2}) (hμDCC : μDCC μ)
+(i : ℕ) (hi : i < (prop3d4₀func_len μ I hμDCC)) :
+I.val.1 < (prop3d4₀func μ I i).val := by
+  letI := Classical.propDecidable
+  apply ((Nat.find_min (prop3d4₀func_fin_len μ I hμDCC)) hi).decidable_imp_symm
+  intro hcontra
+  apply (eq_of_le_of_not_lt (prop3d4₀func μ I i).prop.1 hcontra).symm
+
+
+lemma prop3d4₀func_defprop3 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
+{S : Type} [CompleteLattice S]
+(μ : {p :ℒ × ℒ // p.1 < p.2} → S)
+(I : {p : ℒ × ℒ // p.1 < p.2}) (hμDCC : μDCC μ)
+(y: ℒ) (hy : I.val.1 < y ∧ y ≤ (prop3d4₀func μ I <| (prop3d4₀func_len μ I hμDCC) - 1).val) :
+¬ μA μ ⟨(I.val.1,y),hy.1⟩ >
+  μA μ ⟨(I.val.1 , (prop3d4₀func μ I <| (prop3d4₀func_len μ I hμDCC) - 1).val) , prop3d4₀func_defprop3₀ μ I hμDCC ((prop3d4₀func_len μ I hμDCC) - 1) <| Nat.sub_one_lt <| prop3d4₀func_len_nonzero μ I hμDCC⟩ := by
+  letI := Classical.propDecidable
+  expose_names
+  let len := prop3d4₀func_len μ I hμDCC
+  by_contra hcontra
+  by_cases hcases : y < ↑(prop3d4₀func μ I (len - 1))
+  · have h₁ : (ℒₛ μ I (prop3d4₀func μ I <| len - 1) (ne_of_lt <| prop3d4₀func_defprop3₀ μ I hμDCC (len - 1) (Nat.sub_one_lt <| prop3d4₀func_len_nonzero μ I hμDCC))).Nonempty := by
+      use y
+      use ⟨le_of_lt hy.1,le_trans hy.2 (prop3d4₀func μ I (prop3d4₀func_len μ I hμDCC - 1)).prop.2⟩
+      use ⟨ne_of_lt hy.1,hcases⟩
+    have h₂ : (prop3d4₀func μ I len).val = I.val.1 := Nat.find_spec (prop3d4₀func_fin_len μ I hμDCC)
+    have h₃ : ¬ (ℒₛ μ I (prop3d4₀func μ I <| len - 1) (ne_of_lt <| prop3d4₀func_defprop3₀ μ I hμDCC (len - 1) (Nat.sub_one_lt <| prop3d4₀func_len_nonzero μ I hμDCC))).Nonempty := by
+      by_contra hcontra'
+      have triv : len - 1 + 1 = len := by
+         exact Nat.sub_one_add_one <| prop3d4₀func_len_nonzero μ I hμDCC
+      rw [← triv] at h₂
+      simp only [prop3d4₀func] at h₂
+      simp only [ne_of_lt <| prop3d4₀func_defprop3₀ μ I hμDCC (len - 1) (Nat.sub_one_lt <| prop3d4₀func_len_nonzero μ I hμDCC)] at h₂
+      simp [hcontra'] at h₂
+      apply (inst_3.wf.has_min (ℒₛ μ I (prop3d4₀func μ I (len-1)) (ne_of_lt <| prop3d4₀func_defprop3₀ μ I hμDCC (len - 1) (Nat.sub_one_lt <| prop3d4₀func_len_nonzero μ I hμDCC))) hcontra').choose_spec.1.out.choose_spec.choose.1 h₂.symm
+    exact h₃ h₁
+  · simp only [eq_of_le_of_not_lt hy.2 hcases] at hcontra
+    exact (lt_self_iff_false <| μA μ ⟨(I.val.1 , (prop3d4₀func μ I <| len - 1).val) , prop3d4₀func_defprop3₀ μ I hμDCC (len - 1) <| Nat.sub_one_lt <| prop3d4₀func_len_nonzero μ I hμDCC⟩).1 hcontra
+
+
 lemma prop3d4 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ] -- The ascending chain condition. Actually we only need this condition on the Interval I, but to make the life easy, we require it on the whole ℒ.
 -- This actually does `NOT` make the statement any weaker, since if we take I to be (⊥,⊤), then we can "apply" this global version to I itself, which is also a sublattice of ℒ.
 {S : Type} [CompleteLattice S]
