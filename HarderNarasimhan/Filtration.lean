@@ -15,7 +15,7 @@ noncomputable def HNfiltration {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [Boun
       ⊤
     else
       let I' := (⟨(prev_term , ⊤) , lt_top_iff_ne_top.2 htop⟩ : {p : ℒ × ℒ // p.1 < p.2})
-      (prop3d8₁' μ hμ I' (Or.casesOn
+      (prop3d8₁' μ hμ I' (Convex_of_Convex_large ⟨(⊥ ,⊤) , bot_lt_top⟩ I' ⟨bot_le,le_top⟩ μ hμcvx) (Or.casesOn
        h (fun h ↦ Or.inl h) fun h ↦
        Or.inr fun z hzI hz ↦ h ⟨(I'.val.1 , z) ,  lt_of_le_of_ne hzI.left hz⟩)).choose
 

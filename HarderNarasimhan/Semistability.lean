@@ -1,6 +1,6 @@
 import HarderNarasimhan.Convexity.Defs
 import HarderNarasimhan.Convexity.Impl
-
+import Mathlib.Tactic
 
 def μDCC {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S]
@@ -38,7 +38,7 @@ def S₁I {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
 (I : {p : ℒ × ℒ // p.1 < p.2})
-(x : ℒ) (hxI : InIntvl I x) (hx : I.val.1 ≠ x): Prop := ∀ y : ℒ, (hyI : InIntvl I y) → (hy : I.val.1 ≠ y) → ¬ μA μ ⟨(I.val.1 , y) , lt_of_le_of_ne hyI.left hy⟩ > μA μ ⟨(I.val.1 , x) , lt_of_le_of_ne hxI.left hx⟩ → y ≤ x
+(x : ℒ) (hxI : InIntvl I x) (hx : I.val.1 ≠ x): Prop := ∀ y : ℒ, (hyI : InIntvl I y) → (hy : I.val.1 ≠ y) → ¬ μA μ ⟨(I.val.1 , y) , lt_of_le_of_ne hyI.left hy⟩ > μA μ ⟨(I.val.1 , x) , lt_of_le_of_ne hxI.left hx⟩
 
 
 def S₂I {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
@@ -260,10 +260,124 @@ lemma prop3d4₀func_defprop3 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [Bound
 lemma prop3d4 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ] -- The ascending chain condition. Actually we only need this condition on the Interval I, but to make the life easy, we require it on the whole ℒ.
 -- This actually does `NOT` make the statement any weaker, since if we take I to be (⊥,⊤), then we can "apply" this global version to I itself, which is also a sublattice of ℒ.
 {S : Type} [CompleteLattice S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S)
-(I : {p : ℒ × ℒ // p.1 < p.2})
-(hμDCC : μDCC μ) : (St μ I).Nonempty := by
-  sorry
+(μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμDCC : μDCC μ)
+(I : {p : ℒ × ℒ // p.1 < p.2}) (hμcvx : IsConvexI I μ)
+: (St μ I).Nonempty := by
+  letI := Classical.propDecidable
+  let len := prop3d4₀func_len μ I hμDCC
+  let func:= prop3d4₀func μ I
+  by_cases h : len = 1
+  · use I.val.2, ⟨le_of_lt I.prop, le_rfl⟩, ne_of_lt I.prop
+    constructor
+    · intro y hyI hy
+      have h' : func (len - 1) = I.val.2 := by
+        rw [h]
+        simp only [func, prop3d4₀func]
+      have h'' : ¬ μA μ ⟨(I.val.1, y)
+                     , lt_of_le_of_ne hyI.1 hy⟩ >
+                   μA μ ⟨(I.val.1, (func (len-1)).val)
+                     , prop3d4₀func_defprop3₀ μ I hμDCC (len - 1)
+                        <| Nat.sub_one_lt <| prop3d4₀func_len_nonzero μ I hμDCC⟩
+        := prop3d4₀func_defprop3 μ I hμDCC y ⟨lt_of_le_of_ne hyI.left hy,h' ▸ hyI.2⟩
+      simp [h'] at h''
+      exact h''
+    · exact fun _ hyI _ _ ↦ hyI.2
+  · have h₀ : 0 < len := Nat.zero_lt_of_ne_zero <| prop3d4₀func_len_nonzero μ I hμDCC
+    have h₁ : len - 1 ≥ 1 := by
+      apply (Nat.le_sub_one_iff_lt h₀).2
+      exact Nat.lt_of_le_of_ne h₀ fun a ↦ h (id a.symm)
+    have h₂ : ∀ i : ℕ, i ≤ len -1 → I.val.1 ≠ (func i).val := by
+      intro i hi
+      by_contra!
+      exact (Nat.find_min (prop3d4₀func_fin_len μ I hμDCC) <| Nat.lt_of_le_sub_one h₀ hi) this.symm
+    have h₃ : ∀ i : ℕ, (hi : 1 ≤ i ∧ i ≤ len -1) → (∀ y : ℒ, (hyI : InIntvl I y) → (hy : I.val.1 ≠ y) →
+      (y < func (i-1) ∧
+        μA μ ⟨(I.val.1, y)
+          , lt_of_le_of_ne hyI.1 hy⟩ ≥
+        μA μ ⟨(I.val.1, (func i).val)
+          , lt_of_le_of_ne (func i).prop.1 <| (h₂ i hi.2)⟩)
+      → y ≤ (func i).val) := by
+      intro i hi y hyI hy hy'
+      by_contra!
+      have h₃' : (func i).val < y ⊔ (func i).val ∧ y ⊔ (func i).val ≤ (func (i-1)).val := by
+        constructor
+        · exact right_lt_sup.2 this
+        · refine sup_le_iff.2 ?_
+          constructor
+          · exact le_of_lt hy'.1
+          · have h₃'' :  (prop3d4₀func μ I (i - 1)).val > (prop3d4₀func μ I (i - 1 + 1)).val :=
+              prop3d4₀func_strict_decreasing μ I (i-1) (h₂ (i-1) <| le_trans (le_of_lt <| Nat.sub_one_lt <| Nat.one_le_iff_ne_zero.1 hi.1) hi.2)
+            rw [Nat.sub_one_add_one] at h₃''
+            apply le_of_lt h₃''
+            apply Nat.one_le_iff_ne_zero.1 hi.1
+      have h₃fuck : i - 1 + 1 = i :=
+        Nat.sub_one_add_one <| Nat.one_le_iff_ne_zero.1 hi.1
+      have h₃''' : ∀ (hi' : I.val.1 ≠ (func i).val) (z : ℒ) (hz : (func i).val < z ∧ z ≤ (func (i - 1)).val),
+        ¬ μA μ ⟨(I.val.1, z)
+            , lt_of_le_of_lt (func i).prop.1 hz.1⟩ ≥
+          μA μ ⟨(I.val.1, (func (i - 1 + 1)).val)
+            , lt_of_le_of_ne ((func (i - 1 + 1)).prop).1 (h₃fuck ▸ h₂ i hi.2)⟩ :=
+        fun hi' z hz ↦ prop3d4₀func_defprop2 μ I (i - 1) ( h₃fuck ▸ h₂ i hi.2) z (h₃fuck ▸ hz)
+      simp [*] at h₃'''
+      refine (h₃''' (y ⊔ func i) h₃') ?_
+      exact inf_eq_right.2 hy'.2 ▸
+        impl.prop2d8₁I I μ hμcvx y hyI (func i) (func i).prop I.val.1 ⟨le_rfl,le_of_lt I.prop⟩  ⟨lt_of_le_of_ne hyI.1 hy,lt_of_le_of_ne (func i).prop.1 <| h₂ i hi.2⟩
+    have h₄ : ∀ y : ℒ, (hyI : InIntvl I y) → (hy : I.val.1 ≠ y) →
+      μA μ ⟨(I.val.1, y)
+        , lt_of_le_of_ne hyI.1 hy⟩ ≥
+      μA μ ⟨(I.val.1, (func (len - 1)).val)
+        , lt_of_le_of_ne (func (len - 1)).prop.1 <| h₂ (len - 1) le_rfl⟩
+        → (∀ i : ℕ, i ≤ len - 1 → y ≤ (func i).val) := by
+      intro y hyI hy hy'
+      intro i hi
+      induction' i with i hi'
+      · simp only [func,prop3d4₀func]
+        exact hyI.2
+      · have hfinal : ∀ j : ℕ, (hj : j ≤ len - 1) →
+          μA μ ⟨(I.val.1, (func (len - 1)).val)
+            , lt_of_le_of_ne ((func (len - 1)).prop).1 (h₂ (len - 1) le_rfl)⟩ ≥
+          μA μ ⟨(I.val.1, func j)
+            , prop3d4₀func_defprop3₀ μ I hμDCC j <| lt_of_le_of_lt hj <| Nat.sub_one_lt <| ne_of_gt h₀⟩
+         := by
+          apply Nat.decreasingInduction
+          · intro k hk hk'
+            apply le_of_lt
+            refine lt_of_lt_of_le (prop3d4₀func_defprop1 μ I k <| ne_of_lt ?_) hk'
+            exact prop3d4₀func_defprop3₀ μ I hμDCC (k+1) <| Nat.add_lt_of_lt_sub hk
+          · exact le_rfl
+        have hh : y < func i := by
+          refine lt_of_le_of_ne (hi' ?_) ?_
+          linarith
+          by_contra!
+          have hhh : μA μ ⟨(I.val.1, y)
+                       , lt_of_le_of_ne hyI.1 hy⟩ >
+                     μA μ ⟨(I.val.1, func i)
+                       , lt_of_le_of_ne (func i).prop.1 <| h₂ i <| by linarith⟩
+            :=  gt_of_ge_of_gt hy'
+              <| gt_of_ge_of_gt (hfinal (i+1) hi)
+              <| prop3d4₀func_defprop1 μ I i
+                (ne_of_lt
+                  <| prop3d4₀func_defprop3₀ μ I hμDCC (i+1)
+                  <| lt_of_le_of_lt hi <| Nat.sub_one_lt <| ne_of_gt h₀)
+          simp only [this] at hhh
+          exact irrefl _ hhh
+        exact h₃ (i+1) ⟨by linarith,hi⟩ y hyI hy ⟨hh,ge_trans hy' (hfinal (i+1) hi)⟩
+    have h₄' : ∀ y : ℒ, (hyI : InIntvl I y) → (hy : I.val.1 ≠ y) →
+      μA μ ⟨(I.val.1, y)
+        , lt_of_le_of_ne hyI.1 hy⟩ ≥
+      μA μ ⟨(I.val.1, (func (len - 1)).val)
+        , lt_of_le_of_ne (func (len - 1)).prop.1 <| h₂ (len - 1) le_rfl⟩ → y ≤ (func (len - 1)).val
+      := fun y hyI hy h ↦ h₄ y hyI hy h (len - 1) le_rfl
+    use (func (len - 1)).val
+    constructor
+    · use h₂ (len - 1) le_rfl
+      constructor
+      · intro y hyI hy
+        by_contra!
+        exact prop3d4₀func_defprop3 μ I hμDCC y ⟨lt_of_le_of_ne hyI.1 hy,h₄' y hyI hy <| le_of_lt this⟩ this
+      · intro y hyI hy hy'
+        exact h₄' y hyI hy <| ge_of_eq hy'
+    · exact (func (len - 1)).prop
 
 
 lemma rmk3d5 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
@@ -304,7 +418,7 @@ semistableI μ ⟨(I.val.1 , x), lt_of_le_of_ne hxSt.out.choose.1 hxSt.out.choos
 lemma prop3d8₁ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : μDCC μ)
-(I : {p : ℒ × ℒ // p.1 < p.2})
+(I : {p : ℒ × ℒ // p.1 < p.2}) (hμcvx : IsConvexI I μ)
 (h : (IsTotal S (· ≤ ·)) ∨
      ∀ z : ℒ, (hzI : InIntvl I z) → (hz : I.val.1 ≠ z) → ∃ u : S, u = μA μ ⟨(I.val.1 , z) , lt_of_le_of_ne hzI.left hz⟩) :
 IsTotal (St μ I) (· ≤ ·) := sorry
@@ -313,18 +427,18 @@ IsTotal (St μ I) (· ≤ ·) := sorry
 lemma prop3d8₁' {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ]  [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : μDCC μ)
-(I : {p : ℒ × ℒ // p.1 < p.2})
+(I : {p : ℒ × ℒ // p.1 < p.2}) (hμcvx : IsConvexI I μ)
 (h : (IsTotal S (· ≤ ·)) ∨
      ∀ z : ℒ, (hzI : InIntvl I z) → (hz : I.val.1 ≠ z) → ∃ u : S, u = μA μ ⟨(I.val.1 , z) , lt_of_le_of_ne hzI.left hz⟩) :
 ∃ s : ℒ, IsGreatest (St μ I) s := by
 expose_names
-rcases inst_3.wf.has_min (St μ I) (prop3d4 μ I hμ) with ⟨M,hM⟩
+rcases inst_3.wf.has_min (St μ I) (prop3d4 μ hμ I hμcvx) with ⟨M,hM⟩
 use M
 constructor
 exact hM.1
 refine mem_upperBounds.2 ?_
 intro x hx
-cases' (prop3d8₁ μ hμ I h).total ⟨x, hx⟩ ⟨M, hM.1⟩ with c1 c2
+cases' (prop3d8₁ μ hμ I hμcvx h).total ⟨x, hx⟩ ⟨M, hM.1⟩ with c1 c2
 · exact c1
 · simp at c2
   apply le_of_eq
