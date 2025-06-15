@@ -25,7 +25,7 @@ lemma HNfiltration_defprop {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedO
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : μDCC μ) (hμcvx : IsConvexI ⟨(⊥ ,⊤) , bot_lt_top⟩ μ)
 (h : (IsTotal S (· ≤ ·)) ∨
      ∀ I : {p : ℒ × ℒ // p.1 < p.2},  IsAttained μ I) :
-∀ n : Nat, (h' : HNfiltration μ hμ hμcvx h n ≠ ⊤) → IsGreatest (St μ ⟨(HNfiltration μ hμ hμcvx h n , ⊤), lt_top_iff_ne_top.2 h'⟩) (HNfiltration μ hμ hμcvx h (n + 1)) := by
+∀ n : Nat, (h' : HNfiltration μ hμ hμcvx h n ≠ ⊤) → IsGreatest (StI μ ⟨(HNfiltration μ hμ hμcvx h n , ⊤), lt_top_iff_ne_top.2 h'⟩) (HNfiltration μ hμ hμcvx h (n + 1)) := by
   intro n h'
   simp only [HNfiltration]
   simp [h']
