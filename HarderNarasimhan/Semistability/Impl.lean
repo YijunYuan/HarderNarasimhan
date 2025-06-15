@@ -1,12 +1,10 @@
 import HarderNarasimhan.Convexity.Defs
 import HarderNarasimhan.Convexity.Impl
+import HarderNarasimhan.Semistability.Defs
 import Mathlib.Tactic.Linarith
 
-def μDCC {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-{S : Type} [CompleteLattice S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S) : Prop :=
-  ∀ a : ℒ, ∀ f : ℕ → ℒ, (h₁ : ∀ n : ℕ, f n > a) → (h₂ : ∀ n : ℕ, f n > f (n + 1)) →  ∃ N : ℕ, μA μ ⟨(a, f <| N + 1), h₁ <| N + 1⟩ ≤ μA μ ⟨(a, f N), h₁ N⟩
 
+namespace impl
 
 lemma prop3d2 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S]
@@ -32,27 +30,6 @@ lemma cor3d3 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   rcases (h f h₂) with ⟨N, hN⟩
   use N
   exact prop3d2 TotIntvl μ hμcvx (f <| N + 1) (in_TotIntvl <| f <| N + 1) (f N) (in_TotIntvl <| f N) (h₂ N) hN a (in_TotIntvl <| a) (h₁ <| N + 1)
-
-
-def S₁I {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-{S : Type} [CompleteLattice S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S)
-(I : {p : ℒ × ℒ // p.1 < p.2})
-(x : ℒ) (hxI : InIntvl I x) (hx : I.val.1 ≠ x): Prop := ∀ y : ℒ, (hyI : InIntvl I y) → (hy : I.val.1 ≠ y) → ¬ μA μ ⟨(I.val.1 , y) , lt_of_le_of_ne hyI.left hy⟩ > μA μ ⟨(I.val.1 , x) , lt_of_le_of_ne hxI.left hx⟩
-
-
-def S₂I {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-{S : Type} [CompleteLattice S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S)
-(I : {p : ℒ × ℒ // p.1 < p.2})
-(x : ℒ) (hxI : InIntvl I x)  (hx : I.val.1 ≠ x): Prop := ∀ y : ℒ, (hyI : InIntvl I y) → (hy : I.val.1 ≠ y) → μA μ ⟨(I.val.1 , y) , lt_of_le_of_ne hyI.left hy⟩ = μA μ ⟨(I.val.1 , x) , lt_of_le_of_ne hxI.1 hx⟩ → y ≤ x
-
-
-def St {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-{S : Type} [CompleteLattice S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S)
-(I : {p : ℒ × ℒ // p.1 < p.2}) : Set ℒ :=
-{l : ℒ | ∃ hlI : InIntvl I l , ∃ hl : I.val.1 ≠ l ,  (S₁I μ I l hlI hl) ∧ (S₂I μ I l hlI hl)}
 
 
 def ℒₛ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
@@ -251,7 +228,7 @@ lemma prop3d4 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [We
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμDCC : μDCC μ)
 (I : {p : ℒ × ℒ // p.1 < p.2}) (hμcvx : IsConvexI I μ)
-: (St μ I).Nonempty := by
+: (StI μ I).Nonempty := by
   letI := Classical.propDecidable
   let len := prop3d4₀func_len μ I hμDCC
   let func:= prop3d4₀func μ I
@@ -328,31 +305,18 @@ lemma rmk3d5 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [Wel
 {S : Type} [CompleteLinearOrder S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
 (I : {p : ℒ × ℒ // p.1 < p.2})
-(x : ℒ) (hxSt : x ∈ St μ I)
-(y : ℒ) (hySt : y ∈ St μ I) : x = y := by
+(x : ℒ) (hxSt : x ∈ StI μ I)
+(y : ℒ) (hySt : y ∈ StI μ I) : x = y := by
   rcases hxSt with ⟨hxI,⟨hx,⟨hxS₁,hxS₂⟩⟩⟩
   rcases hySt with ⟨hyI,⟨hy,⟨hyS₁,hyS₂⟩⟩⟩
   exact eq_of_le_of_le (hyS₂ x hxI hx (eq_of_le_of_le (le_of_not_gt <| hxS₁ y hyI hy) (le_of_not_gt <| hyS₁ x hxI hx)).symm) (hxS₂ y hyI hy <| eq_of_le_of_le (le_of_not_gt <| hxS₁ y hyI hy) (le_of_not_gt <| hyS₁ x hxI hx))
-
-
-def semistableI {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-{S : Type} [CompleteLattice S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S)
-(I : {p : ℒ × ℒ // p.1 < p.2}) : Prop := I.val.2 ∈ St μ I
-
-
-def stableI {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-{S : Type} [CompleteLattice S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S)
-(I : {p : ℒ × ℒ // p.1 < p.2}) : Prop :=
-semistableI μ I ∧ ∀ x : ℒ, (hxI : InIntvl I x) → (hx : x ≠ I.val.1) → μA μ ⟨(I.val.1 , x) , lt_of_le_of_ne hxI.left hx.symm⟩ ≠ μA μ ⟨(I.val.1 , I.val.2) , I.prop⟩
 
 
 lemma prop3d7₁ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
 (I : {p : ℒ × ℒ // p.1 < p.2})
-(x : ℒ) (hxSt : x ∈ St μ I) :
+(x : ℒ) (hxSt : x ∈ StI μ I) :
 semistableI μ ⟨(I.val.1 , x), lt_of_le_of_ne hxSt.out.choose.1 hxSt.out.choose_spec.choose⟩ := by
   rcases hxSt with ⟨hxI,⟨hx',⟨hx'',hxS₂I⟩⟩⟩
   use ⟨hxI.1,le_rfl⟩, hx'
@@ -363,7 +327,7 @@ lemma prop3d7₂ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
 (I : {p : ℒ × ℒ // p.1 < p.2}) (hμcvx : IsConvexI I μ)
-(x : ℒ) (hxSt : x ∈ St μ I) :
+(x : ℒ) (hxSt : x ∈ StI μ I) :
 ∀ y : ℒ, (hyI : InIntvl I y) → (hy : y > x) → ¬ μA μ ⟨(I.val.1 , x) , lt_of_le_of_ne hxSt.out.choose.1 hxSt.out.choose_spec.choose⟩ ≤ μA μ ⟨(x, y), hy⟩ := by
   by_contra!
   rcases this with ⟨y,⟨hyI,⟨hy,hy'⟩⟩⟩
@@ -376,7 +340,7 @@ lemma prop3d8₁ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] 
 (I : {p : ℒ × ℒ // p.1 < p.2}) (hμcvx : IsConvexI I μ)
 (h : (IsTotal S (· ≤ ·)) ∨
      ∀ z : ℒ, (hzI : InIntvl I z) → (hz : I.val.1 ≠ z) → IsAttained μ ⟨(I.val.1 , z) , lt_of_le_of_ne hzI.left hz⟩) :
-IsTotal (St μ I) (· ≤ ·) := by
+IsTotal (StI μ I) (· ≤ ·) := by
   refine { total := ?_ }
   rintro ⟨x,hx⟩ ⟨x',hx'⟩
   have h₁ : IsComparable (μA μ ⟨(I.val.1,x),lt_of_le_of_ne hx.out.choose.1 hx.out.choose_spec.choose⟩) (μA μ ⟨(I.val.1,x'),lt_of_le_of_ne hx'.out.choose.1 hx'.out.choose_spec.choose⟩) ∨ IsAttained μ ⟨(I.val.1 , x ⊔ x') , lt_sup_of_lt_right <| lt_of_le_of_ne hx'.out.choose.1 hx'.out.choose_spec.choose⟩:= by
@@ -402,9 +366,9 @@ lemma prop3d8₁' {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ]  [BoundedOrder ℒ
 (I : {p : ℒ × ℒ // p.1 < p.2}) (hμcvx : IsConvexI I μ)
 (h : (IsTotal S (· ≤ ·)) ∨
      ∀ z : ℒ, (hzI : InIntvl I z) → (hz : I.val.1 ≠ z) → IsAttained μ ⟨(I.val.1 , z) , lt_of_le_of_ne hzI.left hz⟩)  :
-∃ s : ℒ, IsGreatest (St μ I) s := by
+∃ s : ℒ, IsGreatest (StI μ I) s := by
   expose_names
-  rcases inst_3.wf.has_min (St μ I) (prop3d4 μ hμ I hμcvx) with ⟨M,hM⟩
+  rcases inst_3.wf.has_min (StI μ I) (prop3d4 μ hμ I hμcvx) with ⟨M,hM⟩
   use M
   constructor
   exact hM.1
@@ -421,7 +385,7 @@ lemma prop3d8₂ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] 
 (I : {p : ℒ × ℒ // p.1 < p.2}) (hμcvx : IsConvexI I μ)
 (h : (IsTotal S (· ≤ ·)) ∨
      ∀ z : ℒ, (hzI : InIntvl I z) → (hz : I.val.1 ≠ z) → IsAttained μ ⟨(I.val.1 , z) , lt_of_le_of_ne hzI.left hz⟩)
-(x : ℒ) (hxSt : x ∈ St μ I)
+(x : ℒ) (hxSt : x ∈ StI μ I)
 (y : ℒ) (hyI : InIntvl I y)
 (hxy : x < y) :
 μA μ ⟨(I.val.1 , y), lt_of_le_of_lt hxSt.out.choose.1 hxy⟩ = μA μ ⟨(x , y), hxy⟩ := by
@@ -432,3 +396,5 @@ lemma prop3d8₂ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] 
   cases' (impl.prop2d6₃I I μ hμcvx I.val.1 ⟨le_rfl,le_of_lt I.prop⟩ x hxSt.out.choose y hyI ⟨lt_of_le_of_ne hxSt.out.choose.1 hxSt.out.choose_spec.choose,hxy⟩ h) with c1 c2
   · exact c1.symm
   · exact False.elim  ((not_lt_of_le <| hxSt.out.choose_spec.choose_spec.2 y hyI  (ne_of_lt <| lt_of_le_of_lt hxSt.out.choose.1 hxy) <| eq_of_ge_of_not_gt c2.1 (hxSt.out.choose_spec.choose_spec.1 y hyI <| ne_of_lt <| lt_of_le_of_lt hxSt.out.choose.1 hxy)) hxy)
+
+end impl
