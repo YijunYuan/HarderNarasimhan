@@ -5,7 +5,7 @@ noncomputable def HNfiltration {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [Boun
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : μDCC μ) (hμcvx : IsConvexI ⟨(⊥ ,⊤) , bot_lt_top⟩ μ)
 (h : (IsTotal S (· ≤ ·)) ∨
-     ∀ I : {p : ℒ × ℒ // p.1 < p.2},  ∃ u : S, u = μA μ I)
+     ∀ I : {p : ℒ × ℒ // p.1 < p.2},  IsAttained μ I)
 (k : Nat) : ℒ :=
   match k with
   | 0 => ⊥
@@ -24,7 +24,7 @@ lemma HNfiltration_defprop {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedO
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : μDCC μ) (hμcvx : IsConvexI ⟨(⊥ ,⊤) , bot_lt_top⟩ μ)
 (h : (IsTotal S (· ≤ ·)) ∨
-     ∀ I : {p : ℒ × ℒ // p.1 < p.2},  ∃ u : S, u = μA μ I) :
+     ∀ I : {p : ℒ × ℒ // p.1 < p.2},  IsAttained μ I) :
 ∀ n : Nat, (h' : HNfiltration μ hμ hμcvx h n ≠ ⊤) → IsGreatest (St μ ⟨(HNfiltration μ hμ hμcvx h n , ⊤), lt_top_iff_ne_top.2 h'⟩) (HNfiltration μ hμ hμcvx h (n + 1)) := by
   intro n h'
   simp only [HNfiltration]
@@ -36,7 +36,7 @@ lemma HNfiltration_strict_increasing {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : μDCC μ) (hμcvx : IsConvexI ⟨(⊥ ,⊤) , bot_lt_top⟩ μ)
 (h : (IsTotal S (· ≤ ·)) ∨
-     ∀ I : {p : ℒ × ℒ // p.1 < p.2},  ∃ u : S, u = μA μ I) :
+     ∀ I : {p : ℒ × ℒ // p.1 < p.2},  IsAttained μ I) :
 ∀ n : Nat, HNfiltration μ hμ hμcvx h n ≠ ⊤ → HNfiltration μ hμ hμcvx h n < HNfiltration μ hμ hμcvx h (n + 1) := fun
     n hn ↦ lt_of_le_of_ne (HNfiltration_defprop μ hμ hμcvx h n hn).1.1.1 (HNfiltration_defprop μ hμ hμcvx h n hn).1.2.1
 
@@ -45,7 +45,7 @@ lemma HNfiltration_finite_length {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [Bo
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : μDCC μ) (hμcvx : IsConvexI ⟨(⊥ ,⊤) , bot_lt_top⟩ μ)
 (h : (IsTotal S (· ≤ ·)) ∨
-     ∀ I : {p : ℒ × ℒ // p.1 < p.2},  ∃ u : S, u = μA μ I)
+     ∀ I : {p : ℒ × ℒ // p.1 < p.2},  IsAttained μ I)
 : ∃ N : Nat, HNfiltration μ hμ hμcvx h N = ⊤ := by
   by_contra!
   expose_names
@@ -56,5 +56,5 @@ noncomputable def HNfiltration_length {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : μDCC μ) (hμcvx : IsConvexI ⟨(⊥ ,⊤) , bot_lt_top⟩ μ)
 (h : (IsTotal S (· ≤ ·)) ∨
-     ∀ I : {p : ℒ × ℒ // p.1 < p.2},  ∃ u : S, u = μA μ I) : Nat :=
+     ∀ I : {p : ℒ × ℒ // p.1 < p.2},  IsAttained μ I) : Nat :=
 Nat.find (HNfiltration_finite_length μ hμ hμcvx h)
