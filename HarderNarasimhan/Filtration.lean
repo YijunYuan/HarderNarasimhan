@@ -83,7 +83,7 @@ lemma ne_top_iff_lt_len {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrde
 
 open Classical
 
-theorem thm3d10  {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]-- [DecidableEq ℒ]
+theorem theorem_3_10  {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]-- [DecidableEq ℒ]
 {S : Type} [CompleteLinearOrder S] (hS : IsTotal S (· ≤ ·))
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : μDCC μ) (hμcvx : IsConvex μ)
 (f : ℕ → ℒ) (hf0 : f 0 = ⊥)
@@ -101,43 +101,38 @@ theorem thm3d10  {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] 
   · by_cases h₁ : n + 1 ≤ Nat.find hffin
     · have h₂ : ∃ N : ℕ, N ≥ (n+1) ∧ HNFilt (n+1) ≤ f N := by
         use (Nat.find hffin)
-        constructor
-        · exact h₁
-        · simp [ffst]
+        exact ⟨h₁, by simp [ffst]⟩
       let i : ℕ := Nat.find h₂
       have h₃ : HNFil μ hμ hμcvx (Or.inl hS) n < HNFil μ hμ hμcvx (Or.inl hS) (n + 1)
             := (is_srtrict_mono μ hμ hμcvx (Or.inl hS) n <| Nat.find_min (of_finite_len μ hμ hμcvx (Or.inl hS)) <| lt_of_lt_of_le (lt_add_one n) <| Nat.add_one_le_iff.2 ((ne_top_iff_lt_len μ hμ hμcvx (Or.inl hS) n).mp (Eq.rec (motive := fun x h ↦ n < Nat.find hffin → ¬x = ⊤) (Nat.find_min hffin) hn (lt_of_lt_of_le (lt_add_one n) h₁))))
+      have h₁₅ : i ≥ n + 1 := (Nat.find_spec h₂).1
       have h₄ : ¬ HNFilt (n+1) ≤ f (i-1) := by
-        have h₅ : ¬(Nat.find h₂ - 1 ≥ n + 1 ∧ HNFilt (n + 1) ≤ f (Nat.find h₂ - 1)) := Nat.find_min h₂ (Nat.sub_one_lt <| ne_of_gt <| lt_of_lt_of_le (Nat.add_one_pos n) (Nat.find_spec h₂).1 )
+        have h₅ : ¬(Nat.find h₂ - 1 ≥ n + 1 ∧ HNFilt (n + 1) ≤ f (Nat.find h₂ - 1)) := Nat.find_min h₂ (Nat.sub_one_lt <| ne_of_gt <| lt_of_lt_of_le (Nat.add_one_pos n) h₁₅ )
         apply not_and_or.1 at h₅
         cases' h₅ with h₅ h₅
         · simp at h₅
           apply not_le_of_lt
           rw [← hn] at h₃
-          nth_rw 1 [← eq_of_le_of_le (Nat.le_of_lt_add_one h₅) (Nat.sub_le_sub_right (Nat.find_spec h₂).1 1)] at h₃
+          nth_rw 1 [← eq_of_le_of_le (Nat.le_of_lt_add_one h₅) (Nat.sub_le_sub_right h₁₅ 1)] at h₃
           exact h₃
         · exact h₅
       have h₁₃ : HNFilt n ≤ f (i - 1) := by
         simp only [HNFilt]
         rw [← hn]
-        have : i ≥ n + 1 := (Nat.find_spec h₂).1
         have h₁₄ : n ≤ i - 1 := by omega
         rw [le_iff_eq_or_lt] at h₁₄
         cases' h₁₄ with h₁₄ h₁₄
         · rw [h₁₄]
         · apply le_of_lt
-          refine hfsi n (i-1) h₁₄ ?_
           have : i ≤ Nat.find hffin := by
             by_contra!
             cases' not_and_or.1 <| Nat.find_min h₂ this with c₁ c₂
             · exact c₁ h₁
             · simp [Nat.find_spec hffin] at c₂
-          omega
+          exact hfsi n (i-1) h₁₄ (by omega)
       have h₆ : μA μ ⟨(HNFilt n, HNFilt (n+1)), h₃⟩ ≤ μA μ ⟨(f (i-1), (HNFilt (n+1)) ⊔ (f (i-1))), right_lt_sup.2 h₄⟩ := by
         apply impl.lem2d4₃I TotIntvl μ hμcvx (HNFilt (n + 1)) (in_TotIntvl (HNFilt (n + 1))) (f (i - 1)) (in_TotIntvl (f (i - 1))) h₄ (HNFilt n) <| le_inf (le_of_lt h₃) h₁₃
-      have h₉ : i > 0 := by
-          have : i ≥ n + 1 := (Nat.find_spec h₂).1
-          omega
+      have h₉ : i > 0 := by omega
       have h₈ : i - 1 < Nat.find hffin := by
         apply Nat.sub_one_lt_of_le h₉
         by_contra!
@@ -150,7 +145,7 @@ theorem thm3d10  {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] 
         simp [Nat.sub_one_add_one <| ne_of_gt h₉] at h₁₁
         exact le_trans h₆ <| le_of_not_gt (h₁₁.out.choose_spec.2.1 (HNFilt (n + 1) ⊔ f (i - 1)) ⟨le_sup_right,sup_le_iff.2 ⟨(Nat.find_spec h₂).2,le_of_lt h₇⟩⟩ <| ne_of_lt <|right_lt_sup.2 h₄)
       have h₁₂ : i = n + 1 := by
-        refine eq_of_ge_of_not_gt (Nat.find_spec h₂).1 ?_
+        refine eq_of_ge_of_not_gt h₁₅ ?_
         by_contra!
         have : HNFilt n < f (n+1):= by
           simp only [HNFilt, ← hn]
@@ -162,19 +157,17 @@ theorem thm3d10  {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] 
           exact h₁₃
         exact ((HNFil_defprop μ hμ hμcvx (Or.inl hS) n <| ne_of_lt <| lt_of_lt_of_le this le_top).1.out.choose_spec.choose_spec.1 (f (n+1)) ⟨le_of_lt this,le_top⟩ <| ne_of_lt this) h₁₂
       have h₁₄ : HNFilt (n+1) ≤ f (n+1) := le_of_le_of_eq (Nat.find_spec h₂).2 (congrArg f h₁₂)
-      have h₁₅ : μA μ ⟨(HNFilt n, HNFilt (n + 1)), h₃⟩ ≤ μA μ ⟨(HNFilt n, f (n+1)),(congrArg (fun x ↦ x < f (n + 1)) (Eq.trans (congrArg f (add_tsub_cancel_right n 1)) hn)) ▸ ((congrArg (fun _a ↦ f (_a - 1) < f _a) h₁₂) ▸ h₇)⟩ := by
-        have h₁₆ : f n < HNFilt (n + 1):= by
-          rw [hn]
-          exact is_srtrict_mono μ hμ hμcvx (Or.inl hS) n (ne_of_lt <| lt_of_lt_of_le h₃ le_top)
-        have h₁₇ : μA μ ⟨(f n, HNFilt (n + 1)), h₁₆⟩ ≤ μA μ ⟨(f n, f (n + 1)), hfsi n (n+1) (lt_add_one n) h₁⟩ := le_of_not_gt <| (hss n (by omega)).out.choose_spec.choose_spec.1 (HNFilt (n+1)) ⟨le_of_lt h₁₆,h₁₄⟩ <| ne_of_lt h₁₆
-        simp only [hn] at h₁₇
-        exact h₁₇
       have h₁₉ : HNFilt n < f (n+1) := by
           simp [HNFilt]
           rw [← hn, ← h₁₂]
           nth_rw 1 [h₁₂] at h₇
           exact h₇
-      exact eq_of_le_of_le ((HNFil_defprop μ hμ hμcvx (Or.inl hS) n <| ne_of_lt <| lt_of_lt_of_le h₃ le_top).1.out.choose_spec.choose_spec.2 (f (n+1)) ⟨le_of_lt h₁₉,le_top⟩ (ne_of_lt h₁₉) (eq_of_le_of_not_lt h₁₅ <| (HNFil_defprop μ hμ hμcvx (Or.inl hS) n <| ne_of_lt <| lt_of_lt_of_le h₃ le_top).1.out.choose_spec.choose_spec.1 (f (n+1)) ⟨le_of_lt h₁₉,le_top⟩ <| ne_of_lt h₁₉).symm) h₁₄
+      have h₁₆ : f n < HNFilt (n + 1):= by
+          rw [hn]
+          exact is_srtrict_mono μ hμ hμcvx (Or.inl hS) n (ne_of_lt <| lt_of_lt_of_le h₃ le_top)
+      have h₁₇ : μA μ ⟨(f n, HNFilt (n + 1)), h₁₆⟩ ≤ μA μ ⟨(f n, f (n + 1)), hfsi n (n+1) (lt_add_one n) h₁⟩ := le_of_not_gt <| (hss n (by omega)).out.choose_spec.choose_spec.1 (HNFilt (n+1)) ⟨le_of_lt h₁₆,h₁₄⟩ <| ne_of_lt h₁₆
+      simp only [hn] at h₁₇
+      exact eq_of_le_of_le ((HNFil_defprop μ hμ hμcvx (Or.inl hS) n <| ne_of_lt <| lt_of_lt_of_le h₃ le_top).1.out.choose_spec.choose_spec.2 (f (n+1)) ⟨le_of_lt h₁₉,le_top⟩ (ne_of_lt h₁₉) (eq_of_le_of_not_lt h₁₇ <| (HNFil_defprop μ hμ hμcvx (Or.inl hS) n <| ne_of_lt <| lt_of_lt_of_le h₃ le_top).1.out.choose_spec.choose_spec.1 (f (n+1)) ⟨le_of_lt h₁₉,le_top⟩ <| ne_of_lt h₁₉).symm) h₁₄
     · apply Nat.gt_of_not_le at h₁
       rw [ffst (n+1) (by omega),eq_comm]
       rw [ffst n (by omega)] at hn
