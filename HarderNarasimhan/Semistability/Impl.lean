@@ -28,8 +28,7 @@ lemma cor3d3 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 : μDCC μ := by
   intro a f h₁ h₂
   rcases (h f h₂) with ⟨N, hN⟩
-  use N
-  exact prop3d2 TotIntvl μ hμcvx (f <| N + 1) (in_TotIntvl <| f <| N + 1) (f N) (in_TotIntvl <| f N) (h₂ N) hN a (in_TotIntvl <| a) (h₁ <| N + 1)
+  exact ⟨N,prop3d2 TotIntvl μ hμcvx (f <| N + 1) (in_TotIntvl <| f <| N + 1) (f N) (in_TotIntvl <| f N) (h₂ N) hN a (in_TotIntvl <| a) (h₁ <| N + 1)⟩
 
 
 def ℒₛ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
@@ -192,9 +191,7 @@ lemma prop3d4₀func_defprop3₀ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [Bo
 (i : ℕ) (hi : i < (prop3d4₀func_len μ I hμDCC)) :
 I.val.1 < (prop3d4₀func μ I i).val := by
   letI := Classical.propDecidable
-  apply ((Nat.find_min (prop3d4₀func_fin_len μ I hμDCC)) hi).decidable_imp_symm
-  intro hcontra
-  apply (eq_of_le_of_not_lt (prop3d4₀func μ I i).prop.1 hcontra).symm
+  exact ((Nat.find_min (prop3d4₀func_fin_len μ I hμDCC)) hi).decidable_imp_symm fun hcontra ↦ (eq_of_le_of_not_lt (prop3d4₀func μ I i).prop.1 hcontra).symm
 
 
 lemma prop3d4₀func_defprop3 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
@@ -233,15 +230,13 @@ lemma prop3d4 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [We
   let len := prop3d4₀func_len μ I hμDCC
   let func:= prop3d4₀func μ I
   by_cases h : len = 1
-  · use I.val.2, ⟨le_of_lt I.prop, le_rfl⟩, ne_of_lt I.prop
-    constructor
-    · intro y hyI hy
-      have h' : func (len - 1) = I.val.2 := Eq.mpr (id (congrArg (fun _a ↦ (func (_a - 1)).val = I.val.2) h)) (of_eq_true (eq_self I.val.2))
-      have h'' : ¬ μA μ ⟨(I.val.1, y), lt_of_le_of_ne hyI.1 hy⟩ > μA μ ⟨(I.val.1, (func (len-1)).val), prop3d4₀func_defprop3₀ μ I hμDCC (len - 1) <| Nat.sub_one_lt <| prop3d4₀func_len_nonzero μ I hμDCC⟩
+  · refine ⟨I.val.2, ⟨le_of_lt I.prop, le_rfl⟩, ne_of_lt I.prop,⟨?_,fun _ hyI _ _ ↦ hyI.2⟩⟩
+    intro y hyI hy
+    have h' : func (len - 1) = I.val.2 := (congrArg (fun _a ↦ (func (_a - 1)).val = I.val.2) h) ▸ (of_eq_true (eq_self I.val.2))
+    have h'' : ¬ μA μ ⟨(I.val.1, y), lt_of_le_of_ne hyI.1 hy⟩ > μA μ ⟨(I.val.1, (func (len-1)).val), prop3d4₀func_defprop3₀ μ I hμDCC (len - 1) <| Nat.sub_one_lt <| prop3d4₀func_len_nonzero μ I hμDCC⟩
         := prop3d4₀func_defprop3 μ I hμDCC y ⟨lt_of_le_of_ne hyI.left hy,h' ▸ hyI.2⟩
-      simp [h'] at h''
-      exact h''
-    · exact fun _ hyI _ _ ↦ hyI.2
+    simp [h'] at h''
+    exact h''
   · have h₂ : ∀ i : ℕ, i ≤ len -1 → I.val.1 ≠ (func i).val := by
       intro i hi
       by_contra!
@@ -250,29 +245,18 @@ lemma prop3d4 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [We
       intro i hi y hyI hy hy'
       by_contra!
       have h₃' : (func i).val < y ⊔ (func i).val ∧ y ⊔ (func i).val ≤ (func (i-1)).val := by
-        constructor
-        · exact right_lt_sup.2 this
-        · refine sup_le_iff.2 ?_
-          constructor
-          · exact le_of_lt hy'.1
-          · have h₃'' : (prop3d4₀func μ I (i - 1)).val > (prop3d4₀func μ I (i - 1 + 1)).val :=
-              prop3d4₀func_strict_decreasing μ I (i-1) (h₂ (i-1) <| le_trans (le_of_lt <| Nat.sub_one_lt <| Nat.one_le_iff_ne_zero.1 hi.1) hi.2)
-            rw [Nat.sub_one_add_one] at h₃''
-            apply le_of_lt h₃''
-            apply Nat.one_le_iff_ne_zero.1 hi.1
+        refine ⟨right_lt_sup.2 this, sup_le_iff.2 ⟨le_of_lt hy'.1,?_⟩⟩
+        have h₃'' : (prop3d4₀func μ I (i - 1)).val > (prop3d4₀func μ I (i - 1 + 1)).val :=
+          prop3d4₀func_strict_decreasing μ I (i-1) (h₂ (i-1) <| le_trans (le_of_lt <| Nat.sub_one_lt <| Nat.one_le_iff_ne_zero.1 hi.1) hi.2)
+        rw [Nat.sub_one_add_one] at h₃''
+        apply le_of_lt h₃''
+        exact Nat.one_le_iff_ne_zero.1 hi.1
       have h₃''' : ∀ (hi' : I.val.1 ≠ (func i).val) (z : ℒ) (hz : (func i).val < z ∧ z ≤ (func (i - 1)).val),
         ¬ μA μ ⟨(I.val.1, z), lt_of_le_of_lt (func i).prop.1 hz.1⟩ ≥ μA μ ⟨(I.val.1, (func (i - 1 + 1)).val), lt_of_le_of_ne ((func (i - 1 + 1)).prop).1 ((Nat.sub_one_add_one <| Nat.one_le_iff_ne_zero.1 hi.1) ▸ h₂ i hi.2)⟩ :=
         fun hi' z hz ↦ prop3d4₀func_defprop2 μ I (i - 1) ( (Nat.sub_one_add_one <| Nat.one_le_iff_ne_zero.1 hi.1) ▸ h₂ i hi.2) z ((Nat.sub_one_add_one <| Nat.one_le_iff_ne_zero.1 hi.1) ▸ hz)
       simp [*] at h₃'''
-      refine (h₃''' (y ⊔ func i) h₃') ?_
-      exact inf_eq_right.2 hy'.2 ▸
-        impl.prop2d8₁I I μ hμcvx y hyI (func i) (func i).prop I.val.1 ⟨le_rfl,le_of_lt I.prop⟩  ⟨lt_of_le_of_ne hyI.1 hy,lt_of_le_of_ne (func i).prop.1 <| h₂ i hi.2⟩
-    have h₄ : ∀ y : ℒ, (hyI : InIntvl I y) → (hy : I.val.1 ≠ y) →
-      μA μ ⟨(I.val.1, y)
-        , lt_of_le_of_ne hyI.1 hy⟩ ≥
-      μA μ ⟨(I.val.1, (func (len - 1)).val)
-        , lt_of_le_of_ne (func (len - 1)).prop.1 <| h₂ (len - 1) le_rfl⟩
-        → (∀ i : ℕ, i ≤ len - 1 → y ≤ (func i).val) := by
+      exact (h₃''' (y ⊔ func i) h₃') <| inf_eq_right.2 hy'.2 ▸ impl.prop2d8₁I I μ hμcvx y hyI (func i) (func i).prop I.val.1 ⟨le_rfl,le_of_lt I.prop⟩  ⟨lt_of_le_of_ne hyI.1 hy,lt_of_le_of_ne (func i).prop.1 <| h₂ i hi.2⟩
+    have h₄ : ∀ y : ℒ, (hyI : InIntvl I y) → (hy : I.val.1 ≠ y) → μA μ ⟨(I.val.1, y) , lt_of_le_of_ne hyI.1 hy⟩ ≥ μA μ ⟨(I.val.1, (func (len - 1)).val) , lt_of_le_of_ne (func (len - 1)).prop.1 <| h₂ (len - 1) le_rfl⟩ → (∀ i : ℕ, i ≤ len - 1 → y ≤ (func i).val) := by
       intro y hyI hy hy' i hi
       induction' i with i hi'
       · simp only [func,prop3d4₀func]
@@ -292,12 +276,10 @@ lemma prop3d4 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [We
         exact h₃ (i+1) ⟨by linarith,hi⟩ y hyI hy ⟨hh,ge_trans hy' (hfinal (i+1) hi)⟩
     use (func (len - 1)).val
     constructor
-    · use h₂ (len - 1) le_rfl
-      constructor
-      · intro y hyI hy
-        by_contra!
-        exact prop3d4₀func_defprop3 μ I hμDCC y ⟨lt_of_le_of_ne hyI.1 hy,(fun y hyI hy h ↦ h₄ y hyI hy h (len - 1) le_rfl) y hyI hy <| le_of_lt this⟩ this
-      · exact fun y hyI hy hy' ↦ (fun y hyI hy h ↦ h₄ y hyI hy h (len - 1) le_rfl) y hyI hy <| ge_of_eq hy'
+    · refine ⟨h₂ (len - 1) le_rfl,⟨?_,fun y hyI hy hy' ↦ (fun y hyI hy h ↦ h₄ y hyI hy h (len - 1) le_rfl) y hyI hy <| ge_of_eq hy'⟩⟩
+      intro y hyI hy
+      by_contra!
+      exact prop3d4₀func_defprop3 μ I hμDCC y ⟨lt_of_le_of_ne hyI.1 hy,(fun y hyI hy h ↦ h₄ y hyI hy h (len - 1) le_rfl) y hyI hy <| le_of_lt this⟩ this
     · exact (func (len - 1)).prop
 
 
@@ -319,8 +301,7 @@ lemma prop3d7₁ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 (x : ℒ) (hxSt : x ∈ StI μ I) :
 semistableI μ ⟨(I.val.1 , x), lt_of_le_of_ne hxSt.out.choose.1 hxSt.out.choose_spec.choose⟩ := by
   rcases hxSt with ⟨hxI,⟨hx',⟨hx'',hxS₂I⟩⟩⟩
-  use ⟨hxI.1,le_rfl⟩, hx'
-  exact ⟨fun z hzI hz ↦ hx'' z ⟨hzI.1,le_trans hzI.2 hxI.2⟩ hz,fun z hzI hz hz' ↦ hxS₂I z ⟨hzI.1,le_trans hzI.2 hxI.2⟩ hz hz'⟩
+  exact ⟨⟨hxI.1,le_rfl⟩, hx', ⟨fun z hzI hz ↦ hx'' z ⟨hzI.1,le_trans hzI.2 hxI.2⟩ hz,fun z hzI hz hz' ↦ hxS₂I z ⟨hzI.1,le_trans hzI.2 hxI.2⟩ hz hz'⟩⟩
 
 
 lemma prop3d7₂ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
@@ -369,10 +350,7 @@ lemma prop3d8₁' {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ]  [BoundedOrder ℒ
 ∃ s : ℒ, IsGreatest (StI μ I) s := by
   expose_names
   rcases inst_3.wf.has_min (StI μ I) (prop3d4 μ hμ I hμcvx) with ⟨M,hM⟩
-  use M
-  constructor
-  exact hM.1
-  refine mem_upperBounds.2 ?_
+  refine ⟨M,⟨hM.1,mem_upperBounds.2 ?_⟩⟩
   intro x hx
   cases' (prop3d8₁ μ I hμcvx h).total ⟨x, hx⟩ ⟨M, hM.1⟩ with c1 c2
   · exact c1
