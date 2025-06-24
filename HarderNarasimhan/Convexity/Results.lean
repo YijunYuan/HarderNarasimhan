@@ -71,9 +71,9 @@ lemma remark_2_7 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   {S : Type} [CompleteLinearOrder S]
   (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : IsConvex μ)
   (x : ℒ) (h : ⊥ < x ∧ x < ⊤)
-  (h' : μA μ ⟨(⊥, x), h.1⟩ > μA μ ⟨(⊥, ⊤), bot_lt_top⟩) :
+  (h' : μA μ ⟨(⊥, x), h.1⟩ > μA μ TotIntvl) :
 ------------
-  μA μ ⟨(x, ⊤), h.2⟩ = μA μ ⟨(⊥, ⊤), bot_lt_top⟩
+  μA μ ⟨(x, ⊤), h.2⟩ = μA μ TotIntvl
 ------------
 := impl.rmk2d7 μ hμcvx x h h'
 

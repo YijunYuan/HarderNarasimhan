@@ -279,7 +279,7 @@ lemma prop2d8₁I {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   rintro d ⟨w, hw, rfl⟩
   have h' : μA μ ⟨(u, x), h.1⟩ ≤ μmax μ ⟨(w, x ⊔ y), lt_of_le_of_ne hw.1.2 hw.2⟩ ∨
   μA μ ⟨(u, y), h.2⟩ ≤ μmax μ ⟨(w, x ⊔ y), lt_of_le_of_ne hw.1.2 hw.2⟩ :=
-    prop2d8₀I I μ hμcvx x hxI y hyI u h w ⟨le_trans huI.1 hw.1.1, le_trans hw.1.2 <| sup_le hxI.2 hyI.2⟩ <| ⟨hw.1.1,lt_of_le_of_ne hw.1.2 hw.2⟩
+    prop2d8₀I I μ hμcvx x hxI y hyI u h w ⟨le_trans huI.1 hw.1.1, le_trans hw.1.2 <| sup_le hxI.2 hyI.2⟩ ⟨hw.1.1,lt_of_le_of_ne hw.1.2 hw.2⟩
   cases' h' with h₁ h₂
   · exact le_trans inf_le_left h₁
   · exact le_trans inf_le_right h₂
@@ -303,6 +303,6 @@ lemma prop2d8₂I {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
       rw [inf_comm] at h'
       exact Or.inr <| (inf_eq_left.2 h₄).symm ▸ h'
   · rcases h₂ with ⟨a, ha, ⟨ha',ha''⟩⟩
-    exact ha'' ▸ (prop2d8₀I I μ hμcvx x hxI y hyI u h a ⟨le_trans huI.1 ha.1, le_trans ha.2 <| sup_le hxI.2 hyI.2⟩ <| ⟨ha.1,lt_of_le_of_ne ha.2 ha'⟩)
+    exact ha'' ▸ (prop2d8₀I I μ hμcvx x hxI y hyI u h a ⟨le_trans huI.1 ha.1, le_trans ha.2 <| sup_le hxI.2 hyI.2⟩ ⟨ha.1,lt_of_le_of_ne ha.2 ha'⟩)
 
 end impl

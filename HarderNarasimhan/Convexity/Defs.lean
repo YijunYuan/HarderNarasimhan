@@ -17,4 +17,4 @@ IsConvexI I₁ μ → IsConvexI I₂ μ := fun hμcvx₁ x y hxI hyI hxy ↦ hμ
 def IsConvex {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) : Prop :=
-IsConvexI ⟨(⊥,⊤), bot_lt_top⟩ μ
+IsConvexI TotIntvl μ
