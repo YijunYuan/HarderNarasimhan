@@ -2,8 +2,13 @@ import HarderNarasimhan.Basic
 import HarderNarasimhan.Convexity.Defs
 
 namespace impl
-lemma lem2d4₁ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-  {S : Type} [CompleteLattice S]
+
+section
+
+variable {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+variable {S : Type} [CompleteLattice S]
+
+lemma lem2d4₁
   (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
   (x : ℒ) (w : ℒ) (hxw : ¬ x ≤ w)
   (u : ℒ) (huxw : u ≤ x ⊓ w) :
@@ -19,8 +24,7 @@ lemma lem2d4₁ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   exact le_trans h1 h2
 
 
-lemma lem2d4₂I {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-  {S : Type} [CompleteLattice S]
+lemma lem2d4₂I
   (I : {p : ℒ × ℒ // p.1 < p.2})
   (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : IsConvexI I μ)
   (x : ℒ) (hxI : InIntvl I x)
@@ -51,8 +55,7 @@ lemma lem2d4₂I {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
     exact ⟨lt_of_le_of_ne hf₁.1.1 hf₁.2, hf₁.1.2⟩
 
 
-lemma lem2d4₃I {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-  {S : Type} [CompleteLattice S]
+lemma lem2d4₃I
   (I : {p : ℒ × ℒ // p.1 < p.2})
   (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : IsConvexI I μ)
   (x : ℒ) (hxI : InIntvl I x)
@@ -69,8 +72,7 @@ lemma lem2d4₃I {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   exact le_trans (lem2d4₁ μ x y h₁ u <| le_trans huxw <| inf_le_inf_left x hy₁.1.1) <| lem2d4₂I I μ hμcvx x hxI y ⟨le_trans hwI.1 hy₁.1.1, le_trans hy₁.1.2 <| sup_le hxI.2 hwI.2⟩ h₁ (x ⊔ w) <| sup_le le_sup_left hy₁.1.2
 
 
-lemma lem2d4I (ℒ : Type) [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-  (S : Type) [CompleteLattice S]
+lemma lem2d4I
   (I : {p : ℒ × ℒ // p.1 < p.2})
   (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : IsConvexI I μ)
   (x : ℒ) (hxI : InIntvl I x) --(hx : I.val.1 ≠ x)
@@ -87,15 +89,13 @@ lemma lem2d4I (ℒ : Type) [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   ⟨lem2d4₁ μ x w hxw u huxw, ⟨lem2d4₂I I μ hμcvx x hxI w hwI hxw t hxwt, lem2d4₃I I μ hμcvx x hxI w hwI hxw u huxw⟩⟩
 
 
-lemma rmk2d5₁ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-  {S : Type} [CompleteLattice S]
+lemma rmk2d5₁
   (I : {p : ℒ × ℒ // p.1 < p.2})
   (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : IsConvexI I μ) :
   IsConvexI I (μmax μ)  := fun x y hxI hyI hxy ↦ lem2d4₂I I μ hμcvx x hxI y hyI hxy (x ⊔ y) le_rfl
 
 
-lemma rmk2d5₂ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-  {S : Type} [CompleteLattice S]
+lemma rmk2d5₂
   (I : {p : ℒ × ℒ // p.1 < p.2})
   (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : IsConvexI I μ) :
   μmax μ I = μmax (μmax μ) I := by
@@ -112,8 +112,7 @@ lemma rmk2d5₂ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
     exact h
 
 
-lemma rmk2d5₃ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-  {S : Type} [CompleteLattice S]
+lemma rmk2d5₃
   (I : {p : ℒ × ℒ // p.1 < p.2})
   (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : IsConvexI I μ) :
   μA μ I = μA (μmax μ) I := by
@@ -130,8 +129,7 @@ lemma rmk2d5₃ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
     exact Convex_of_Convex_large I ⟨(a, I.val.2), lt_of_le_of_ne ha.1.2 ha.2⟩ ⟨ha.1.1, le_rfl⟩ μ hμcvx
 
 
-lemma prop2d6₀ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-  {S : Type} [CompleteLattice S]
+lemma prop2d6₀
   (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
   (x : ℒ) (y : ℒ) (z : ℒ)
   (h : x < y ∧ y < z) :
@@ -143,8 +141,7 @@ lemma prop2d6₀ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   use v, ⟨⟨le_of_lt <| lt_of_lt_of_le h.1 hv.1.1, hv.1.2⟩, hv.2⟩
 
 
-lemma prop2d6₁I {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-  {S : Type} [CompleteLattice S]
+lemma prop2d6₁I
   (I : {p : ℒ × ℒ // p.1 < p.2})
   (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : IsConvexI I μ)
   (x : ℒ) (hxI : InIntvl I x)
@@ -161,8 +158,7 @@ lemma prop2d6₁I {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   · exact le_trans inf_le_left <| le_trans (lem2d4₁ μ y a hya x <| le_inf (le_of_lt h.1) ha.1.1) <| lem2d4₂I I μ hμcvx y hyI a ⟨le_trans hxI.1 ha.1.1, le_trans ha.1.2 hzI.2⟩ hya z <| sup_le (le_of_lt h.2) ha.1.2
 
 
-lemma prop2d6₂I₁ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-  {S : Type} [CompleteLattice S]
+lemma prop2d6₂I₁
   (I : {p : ℒ × ℒ // p.1 < p.2})
   (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : IsConvexI I μ)
   (x : ℒ) (hxI : InIntvl I x)
@@ -173,8 +169,7 @@ lemma prop2d6₂I₁ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
   μA μ ⟨(y, z), h.2⟩ = μA μ ⟨(x, z), lt_trans h.1 h.2⟩ := le_antisymm ((inf_eq_right.2 h').symm ▸ prop2d6₁I I μ hμcvx x hxI y hyI z hzI h) <| prop2d6₀ μ x y z h
 
 
-lemma prop2d6₂I₂ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-  {S : Type} [CompleteLattice S]
+lemma prop2d6₂I₂
   (I : {p : ℒ × ℒ // p.1 < p.2})
   (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : IsConvexI I μ)
   (x : ℒ) (hxI : InIntvl I x)
@@ -199,8 +194,7 @@ x < y ∨ y ≤ x := by
   exact h
 
 
-lemma prop2d6₃I {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-  {S : Type} [CompleteLattice S]
+lemma prop2d6₃I
   (I : {p : ℒ × ℒ // p.1 < p.2})
   (μ : {p :ℒ × ℒ // p.1 < p.2} → S)  (hμcvx : IsConvexI I μ)
   (x : ℒ) (hxI : InIntvl I x)
@@ -232,7 +226,7 @@ lemma prop2d6₃I {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
     exact ⟨hres ▸ (le_trans (lem2d4₁ μ y a h' x (le_inf (le_of_lt h.1) ha₁.1)) <| lem2d4₂I I μ hμcvx y hyI a ⟨le_trans hxI.1 ha₁.1, le_trans ha₁.2 hzI.2⟩ h' z <| sup_le (le_of_lt h.2) ha₁.2),lt_of_le_of_ne (prop2d6₀ μ x y z h) <| Ne.symm hnot⟩
 
 
-lemma rmk2d7 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+lemma rmk2d7
   {S : Type} [CompleteLinearOrder S]
   (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : IsConvexI ⟨(⊥, ⊤), bot_lt_top⟩ μ)
   (x : ℒ) (h : ⊥ < x ∧ x < ⊤)
@@ -246,8 +240,7 @@ lemma rmk2d7 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
     · exact Classical.byContradiction fun x_1 ↦ not_le_of_lt h' h₃.left
 
 
-lemma prop2d8₀I {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-  {S : Type} [CompleteLattice S]
+lemma prop2d8₀I
   (I : {p : ℒ × ℒ // p.1 < p.2})
   (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : IsConvexI I μ)
   (x : ℒ) (hxI : InIntvl I x)
@@ -266,8 +259,7 @@ lemma prop2d8₀I {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   · exact Or.inr <| le_trans (lem2d4₁ μ y w h₂ u <| le_inf (le_of_lt h.2) hw.1) <| lem2d4₂I I μ hμcvx y hyI w hwI h₂ (x ⊔ y) <| sup_le le_sup_right <| le_of_lt hw.2
 
 
-lemma prop2d8₁I {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-  {S : Type} [CompleteLattice S]
+lemma prop2d8₁I
   (I : {p : ℒ × ℒ // p.1 < p.2})
   (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : IsConvexI I μ)
   (x : ℒ) (hxI : InIntvl I x)
@@ -285,8 +277,7 @@ lemma prop2d8₁I {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   · exact le_trans inf_le_right h₂
 
 
-lemma prop2d8₂I {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-  {S : Type} [CompleteLattice S]
+lemma prop2d8₂I
   (I : {p : ℒ × ℒ // p.1 < p.2})
   (μ : {p :ℒ × ℒ // p.1 < p.2} → S)  (hμcvx : IsConvexI I μ)
   (x : ℒ) (hxI : InIntvl I x)
@@ -305,4 +296,17 @@ lemma prop2d8₂I {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   · rcases h₂ with ⟨a, ha, ⟨ha',ha''⟩⟩
     exact ha'' ▸ (prop2d8₀I I μ hμcvx x hxI y hyI u h a ⟨le_trans huI.1 ha.1, le_trans ha.2 <| sup_le hxI.2 hyI.2⟩ ⟨ha.1,lt_of_le_of_ne ha.2 ha'⟩)
 
+end
+
 end impl
+
+/-
+class test (z : ℤ) : Prop where
+  is_zero : z = 0
+
+variable (z : ℤ) [h : test z]
+#check h.is_zero
+
+instance : test 0 where
+  is_zero := rfl
+-/
