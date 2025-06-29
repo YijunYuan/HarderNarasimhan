@@ -39,7 +39,7 @@ def ℒₛ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellF
 {p : ℒ | ∃ h₁ : InIntvl I p, ∃ h₂ : I.val.1 ≠ p ∧ p < x, μA μ ⟨(I.val.1,p),lt_of_le_of_ne h₁.1 h₂.1⟩ > μA μ ⟨(I.val.1 , x.val) , lt_of_le_of_ne x.prop.1 hx⟩}
 
 
-noncomputable def prop3d4₀func {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
+noncomputable def prop3d4₀func {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [h :WellFoundedGT ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
 (I : {p : ℒ × ℒ // p.1 < p.2})
@@ -53,9 +53,6 @@ noncomputable def prop3d4₀func {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [Bo
       ⟨I.val.1, ⟨le_rfl,le_of_lt I.prop⟩⟩
     else
       if hne : (ℒₛ μ I prev hbot).Nonempty then
-        have h: WellFoundedGT ℒ := by
-          expose_names
-          exact inst_3
         let res := h.wf.has_min (ℒₛ μ I prev hbot) hne
         ⟨(res).choose,res.choose_spec.1.out.choose⟩
       else
@@ -73,13 +70,12 @@ I.val.1 ≠ (prop3d4₀func μ I i).val := by
   exact hi rfl
 
 
-lemma prop3d4₀func_defprop1 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
+lemma prop3d4₀func_defprop1 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [inst_3 : WellFoundedGT ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
 (I : {p : ℒ × ℒ // p.1 < p.2})
 (i : ℕ) (hi : I.val.1 ≠ (prop3d4₀func μ I (i+1)).val ) :
 μA μ ⟨(I.val.1 , (prop3d4₀func μ I (i+1)).val) , lt_of_le_of_ne (prop3d4₀func μ I (i+1)).prop.1 hi⟩ > μA μ ⟨(I.val.1 , (prop3d4₀func μ I i).val) , lt_of_le_of_ne ((prop3d4₀func μ I i)).prop.1 <| prop3d4₀func_helper μ I i hi⟩ := by
-  expose_names
   simp only [prop3d4₀func, prop3d4₀func_helper μ I i hi]
   have hne : (ℒₛ μ I (prop3d4₀func μ I i) <| prop3d4₀func_helper μ I i hi).Nonempty := by
     by_contra hcontra
@@ -118,14 +114,13 @@ lemma prop3d4₀func_defprop2 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [Bound
   exact (inst_3.wf.has_min (ℒₛ μ I (prop3d4₀func μ I i) <| prop3d4₀func_helper μ I i hi) hne).choose_spec.2 z h' hz.1
 
 
-lemma prop3d4₀func_strict_decreasing {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
+lemma prop3d4₀func_strict_decreasing {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [inst_3 : WellFoundedGT ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
 (I : {p : ℒ × ℒ // p.1 < p.2}) :
 ∀ i : ℕ, I.val.1 ≠ (prop3d4₀func μ I i).val →
 (prop3d4₀func μ I i).val > (prop3d4₀func μ I (i+1)).val := by
   intro i hi
-  expose_names
   by_cases h: I.val.1 = (prop3d4₀func μ I (i+1)).val
   · simp [prop3d4₀func, hi] at h
     by_cases hne : (ℒₛ μ I (prop3d4₀func μ I i) hi).Nonempty
@@ -194,7 +189,7 @@ I.val.1 < (prop3d4₀func μ I i).val := by
   exact ((Nat.find_min (prop3d4₀func_fin_len μ I hμDCC)) hi).decidable_imp_symm fun hcontra ↦ (eq_of_le_of_not_lt (prop3d4₀func μ I i).prop.1 hcontra).symm
 
 
-lemma prop3d4₀func_defprop3 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
+lemma prop3d4₀func_defprop3 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [inst_3 : WellFoundedGT ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
 (I : {p : ℒ × ℒ // p.1 < p.2}) (hμDCC : μDCC μ)
@@ -202,7 +197,6 @@ lemma prop3d4₀func_defprop3 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [Bound
 ¬ μA μ ⟨(I.val.1,y),hy.1⟩ >
   μA μ ⟨(I.val.1 , (prop3d4₀func μ I <| (prop3d4₀func_len μ I hμDCC) - 1).val) , prop3d4₀func_defprop3₀ μ I hμDCC ((prop3d4₀func_len μ I hμDCC) - 1) <| Nat.sub_one_lt <| prop3d4₀func_len_nonzero μ I hμDCC⟩ := by
   letI := Classical.propDecidable
-  expose_names
   let len := prop3d4₀func_len μ I hμDCC
   by_contra hcontra
   by_cases hcases : y < (prop3d4₀func μ I (len - 1)).val
@@ -341,14 +335,13 @@ IsTotal (StI μ I) (· ≤ ·) := by
   · exact Or.inl (sup_le_iff.1 c2).1
 
 
-lemma prop3d8₁' {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ]  [BoundedOrder ℒ] [WellFoundedGT ℒ]
+lemma prop3d8₁' {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ]  [BoundedOrder ℒ] [inst_3 : WellFoundedGT ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : μDCC μ)
 (I : {p : ℒ × ℒ // p.1 < p.2}) (hμcvx : IsConvexI I μ)
 (h : (IsTotal S (· ≤ ·)) ∨
      ∀ z : ℒ, (hzI : InIntvl I z) → (hz : I.val.1 ≠ z) → IsAttained μ ⟨(I.val.1 , z) , lt_of_le_of_ne hzI.left hz⟩)  :
 ∃ s : ℒ, IsGreatest (StI μ I) s := by
-  expose_names
   rcases inst_3.wf.has_min (StI μ I) (prop3d4 μ hμ I hμcvx) with ⟨M,hM⟩
   refine ⟨M,⟨hM.1,mem_upperBounds.2 ?_⟩⟩
   intro x hx

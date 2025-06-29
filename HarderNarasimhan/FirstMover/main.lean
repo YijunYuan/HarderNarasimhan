@@ -16,8 +16,7 @@ noncomputable def seq {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder 
     have h''' := seqkp1.choose_spec.choose_spec
     have h' : seqkp1.choose < ⊤ := by
       by_contra! hcon
-      have : seqkp1.choose = ⊤ := not_lt_top_iff.mp hcon
-      simp [this] at h'''
+      simp [not_lt_top_iff.mp hcon] at h'''
     by_contra!
     simp at this
     rcases this h' with ⟨xA,⟨hxA,hh⟩⟩
@@ -41,8 +40,7 @@ lemma prop4d1 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
     exact (hfinal N) hN
   refine le_antisymm ?_ ?_
   · apply le_sInf
-    intro y hy
-    rcases hy with ⟨yA, hyA, h⟩
+    rintro y ⟨yA, hyA, h⟩
     rw [← h]
     rcases this yA hyA with ⟨xA, hxA, h'⟩
     have : μmax μ ⟨(xA,⊤),hxA⟩ ∈ {μmax μ ⟨(a , ⊤),(lt_of_le_of_ne ha.1.2 ha.2)⟩ | (a : ℒ) (ha : InIntvl TotIntvl a ∧ a ≠ ⊤)} := by
@@ -53,8 +51,7 @@ lemma prop4d1 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
     rw [← hxB']
     exact h' xB (lt_of_le_of_ne hxB.1.1 hxB.2)
   · apply le_sInf
-    intro t ht
-    rcases ht with ⟨x, hx, h⟩
+    rintro t ⟨x, hx, h⟩
     rw [← h]
     have : μ ⟨(x,⊤),lt_top_iff_ne_top.2 hx.2⟩ ∈  {x | ∃ x_1, ∃ (hx : x_1 < ⊤), μ ⟨(x_1, ⊤), hx⟩ = x} := by
       refine Set.mem_setOf.mpr ?_
