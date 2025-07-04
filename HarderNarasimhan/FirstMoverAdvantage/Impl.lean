@@ -2,25 +2,9 @@ import HarderNarasimhan.Semistability.Results
 import Mathlib.Data.Real.Basic
 
 
-def μmin {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
-{S : Type} [CompleteLattice S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S)
-(I : {p : ℒ × ℒ // p.1 < p.2}) : S :=
-sInf {μ ⟨(u, I.val.2), lt_of_le_of_ne h.1.2 h.2⟩ | (u : ℒ) (h : InIntvl I u ∧ u ≠ I.val.2) }
+namespace impl
 
-def μB {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
-{S : Type} [CompleteLattice S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S)
-(I : {p : ℒ × ℒ // p.1 < p.2}): S :=
-sSup {μmin μ ⟨(I.val.1 , a),(lt_of_le_of_ne ha.1.1 ha.2)⟩ | (a : ℒ) (ha : InIntvl I a ∧ I.val.1 ≠ a)}
-
-def μBstar (ℒ : Type) [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
-(S : Type) [CompleteLattice S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S) : S :=
-μB μ ⟨(⊥,⊤) , bot_lt_top⟩
-
-
-noncomputable def seq {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+noncomputable def prop4d1₁_seq {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
 (h₁ : ∀ x : ℕ → ℒ, (smf : StrictMono x) → ∃ N : ℕ, μ ⟨(x N, x (N+1)), smf <| Nat.lt_add_one N⟩ ≤ μ ⟨(x N,⊤), lt_of_lt_of_le (smf <| Nat.lt_add_one N) le_top⟩)
@@ -31,17 +15,17 @@ noncomputable def seq {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder 
   match k with
   | 0 => ⟨h₃.choose,h₃.choose_spec⟩
   | k + 1 => by
-    let seqkp1 := (seq μ h₁ h₂ h₃ k).prop.out.choose_spec (seq μ h₁ h₂ h₃ k) (seq μ h₁ h₂ h₃ k).prop.out.choose
-    use seqkp1.choose
-    have h''' := seqkp1.choose_spec.choose_spec
-    have h' : seqkp1.choose < ⊤ := by
+    let prop4d1₁_seqkp1 := (prop4d1₁_seq μ h₁ h₂ h₃ k).prop.out.choose_spec (prop4d1₁_seq μ h₁ h₂ h₃ k) (prop4d1₁_seq μ h₁ h₂ h₃ k).prop.out.choose
+    use prop4d1₁_seqkp1.choose
+    have h''' := prop4d1₁_seqkp1.choose_spec.choose_spec
+    have h' : prop4d1₁_seqkp1.choose < ⊤ := by
       by_contra! hcon
       simp [not_lt_top_iff.mp hcon] at h'''
     by_contra!
     simp at this
     rcases this h' with ⟨xA,⟨hxA,hh⟩⟩
-    have hhh : ∀ (xB : ℒ) (x_1 : xA < xB), μ ⟨(xA, xB), x_1⟩ ≤ μ ⟨(seq μ h₁ h₂ h₃ k, ⊤), (seq μ h₁ h₂ h₃ k).prop.choose⟩ := fun xB hAB ↦ le_trans (hh xB hAB) <| Or.resolve_left (h₂ ⟨(seq μ h₁ h₂ h₃ k, seqkp1.choose), seqkp1.choose_spec.choose⟩ h') h'''
-    rcases (seq μ h₁ h₂ h₃ k).prop.out.choose_spec xA hxA with ⟨xB,⟨hAB,con⟩⟩
+    have hhh : ∀ (xB : ℒ) (x_1 : xA < xB), μ ⟨(xA, xB), x_1⟩ ≤ μ ⟨(prop4d1₁_seq μ h₁ h₂ h₃ k, ⊤), (prop4d1₁_seq μ h₁ h₂ h₃ k).prop.choose⟩ := fun xB hAB ↦ le_trans (hh xB hAB) <| Or.resolve_left (h₂ ⟨(prop4d1₁_seq μ h₁ h₂ h₃ k, prop4d1₁_seqkp1.choose), prop4d1₁_seqkp1.choose_spec.choose⟩ h') h'''
+    rcases (prop4d1₁_seq μ h₁ h₂ h₃ k).prop.out.choose_spec xA hxA with ⟨xB,⟨hAB,con⟩⟩
     exact con (hhh xB hAB)
 
 
@@ -54,9 +38,9 @@ lemma prop4d1₁ (ℒ : Type) [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   have : ∀ yA : ℒ, (hyA : yA < ⊤) → ∃ xA : ℒ, xA < ⊤ ∧ (∀ xB : ℒ, (hAB : xA < xB) → μ ⟨(xA,xB), hAB⟩ ≤ μ ⟨(yA,⊤), hyA⟩) := by
     by_contra!
     have : {YA : ℒ | ∃ (h : YA < ⊤), ∀ xA < ⊤, ∃ xB, ∃ (hAB : xA < xB), ¬μ ⟨(xA, xB), hAB⟩ ≤ μ ⟨(YA, ⊤), h⟩}.Nonempty := this
-    have hsmf : StrictMono (fun n ↦ seq μ h₁ h₂ this n) := strictMono_nat_of_lt_succ <| fun n ↦ ((seq μ h₁ h₂ this n).prop.out.choose_spec (seq μ h₁ h₂ this n) (seq μ h₁ h₂ this n).prop.out.choose).choose_spec.choose
-    have hfinal : ∀ n : ℕ, ¬ μ ⟨((seq μ h₁ h₂ this n),(seq μ h₁ h₂ this (n+1))),hsmf (Nat.lt_add_one n)⟩ ≤ μ ⟨((seq μ h₁ h₂ this n),⊤),lt_of_lt_of_le (hsmf (Nat.lt_add_one n)) le_top⟩ := fun n ↦ ((seq μ h₁ h₂ this n).prop.out.choose_spec (seq μ h₁ h₂ this n) (seq μ h₁ h₂ this n).prop.out.choose).choose_spec.choose_spec
-    rcases h₁ (fun n ↦ seq μ h₁ h₂ this n) hsmf with ⟨N,hN⟩
+    have hsmf : StrictMono (fun n ↦ prop4d1₁_seq μ h₁ h₂ this n) := strictMono_nat_of_lt_succ <| fun n ↦ ((prop4d1₁_seq μ h₁ h₂ this n).prop.out.choose_spec (prop4d1₁_seq μ h₁ h₂ this n) (prop4d1₁_seq μ h₁ h₂ this n).prop.out.choose).choose_spec.choose
+    have hfinal : ∀ n : ℕ, ¬ μ ⟨((prop4d1₁_seq μ h₁ h₂ this n),(prop4d1₁_seq μ h₁ h₂ this (n+1))),hsmf (Nat.lt_add_one n)⟩ ≤ μ ⟨((prop4d1₁_seq μ h₁ h₂ this n),⊤),lt_of_lt_of_le (hsmf (Nat.lt_add_one n)) le_top⟩ := fun n ↦ ((prop4d1₁_seq μ h₁ h₂ this n).prop.out.choose_spec (prop4d1₁_seq μ h₁ h₂ this n) (prop4d1₁_seq μ h₁ h₂ this n).prop.out.choose).choose_spec.choose_spec
+    rcases h₁ (fun n ↦ prop4d1₁_seq μ h₁ h₂ this n) hsmf with ⟨N,hN⟩
     exact (hfinal N) hN
   refine le_antisymm ?_ ?_
   · apply le_sInf
@@ -129,7 +113,59 @@ lemma h₂_dual_of_h₂ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrde
   exact h₂ z hz
 
 
-lemma prop4d2₁ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+lemma dualμAstar_eq_μBstar {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+{S : Type} [CompleteLattice S]
+(μ : {p :ℒ × ℒ // p.1 < p.2} → S) :
+(μAstar ℒᵒᵈ Sᵒᵈ fun p ↦ μ ⟨(p.val.2, p.val.1), p.prop⟩).ofDual = μBstar ℒ S μ
+:= by
+  simp [*, μBstar, μAstar,μA,μB,sInf]
+  refine congrArg sSup <| Set.ext fun x ↦ ?_
+  constructor
+  · rintro ⟨a, ha, ha'⟩
+    use a, ⟨in_TotIntvl a,Ne.symm ha.2⟩
+    refine ha' ▸ (congrArg sInf <| Set.ext fun r ↦ ?_)
+    constructor
+    · rintro ⟨b, hb, hb'⟩
+      exact ⟨b, ⟨⟨hb.1.2,hb.1.1⟩,Ne.symm hb.2⟩, hb'.symm ▸ rfl⟩
+    · rintro ⟨b, hb, hb'⟩
+      exact ⟨b, ⟨⟨hb.1.2,hb.1.1⟩,Ne.symm hb.2⟩, hb'.symm ▸ rfl⟩
+  · rintro ⟨a, ha, ha'⟩
+    use a, ⟨in_TotIntvl (OrderDual.toDual a),Ne.symm ha.2⟩
+    refine ha' ▸ (congrArg sSup <| Set.ext fun r ↦ ?_)
+    constructor
+    · rintro ⟨b, hb, hb'⟩
+      exact ⟨b, ⟨⟨hb.1.2,hb.1.1⟩,Ne.symm hb.2⟩, hb'.symm ▸ rfl⟩
+    · rintro ⟨b, hb, hb'⟩
+      exact ⟨b, ⟨⟨hb.1.2,hb.1.1⟩,Ne.symm hb.2⟩, hb'.symm ▸ rfl⟩
+
+
+lemma dualμBstar_eq_μAstar {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+{S : Type} [CompleteLattice S]
+(μ : {p :ℒ × ℒ // p.1 < p.2} → S) :
+OrderDual.ofDual (μBstar ℒᵒᵈ Sᵒᵈ fun p ↦ μ ⟨(p.val.2, p.val.1), p.prop⟩) = μAstar ℒ S μ
+:= by
+  simp [μAstar,μBstar,μA,μB,sSup]
+  refine congrArg sInf <| Set.ext fun x ↦ ?_
+  constructor
+  · rintro ⟨a, ha, ha'⟩
+    use a, ⟨in_TotIntvl a,Ne.symm ha.2⟩
+    refine ha' ▸ (congrArg sSup <| Set.ext fun r ↦ ?_)
+    constructor
+    · rintro ⟨b, hb, hb'⟩
+      exact ⟨b, ⟨⟨hb.1.2,hb.1.1⟩,Ne.symm hb.2⟩, hb'.symm ▸ rfl⟩
+    · rintro ⟨b, hb, hb'⟩
+      exact ⟨b, ⟨⟨hb.1.2,hb.1.1⟩,Ne.symm hb.2⟩, hb'.symm ▸ rfl⟩
+  · rintro ⟨a, ha, ha'⟩
+    use a, ⟨in_TotIntvl (OrderDual.toDual a),Ne.symm ha.2⟩
+    refine ha'.symm ▸ (congrArg sInf <| Set.ext fun r ↦ ?_)
+    constructor
+    · rintro ⟨b, hb, hb'⟩
+      exact ⟨b, ⟨⟨hb.1.2,hb.1.1⟩,Ne.symm hb.2⟩, hb'.symm ▸ rfl⟩
+    · rintro ⟨b, hb, hb'⟩
+      exact ⟨b, ⟨⟨hb.1.2,hb.1.1⟩,Ne.symm hb.2⟩, hb'.symm ▸ rfl⟩
+
+
+lemma prop4d3₁ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
 (h₁ : ∀ x : ℕ → ℒ, (saf : StrictAnti x) → ∃ N : ℕ, μ ⟨(⊥ , x N), lt_of_le_of_lt bot_le <| saf <| Nat.lt_add_one N⟩ ≤ μ ⟨(x (N+1), x N), saf <| Nat.lt_add_one N⟩)
@@ -137,27 +173,7 @@ lemma prop4d2₁ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 μBstar ℒ S μ = sSup {μ ⟨(⊥, y),hy⟩ | (y : ℒ) (hy : ⊥ < y) } := by
   have := prop4d1₁ ℒᵒᵈ Sᵒᵈ (↑μ : {p :ℒᵒᵈ × ℒᵒᵈ // p.1 < p.2} → Sᵒᵈ) (h₁_dual_of_h₁ h₁) (h₂_dual_of_h₂ h₂)
   simp [*] at this
-  have h : (μAstar ℒᵒᵈ Sᵒᵈ fun p ↦ μ ⟨(p.val.2, p.val.1), p.prop⟩) = μBstar ℒ S μ := by
-    simp [*, μBstar, μAstar,μA,μB,sInf]
-    refine congrArg sInf <| Set.ext fun x ↦ ?_
-    constructor
-    · rintro ⟨a, ha, ha'⟩
-      use a, ⟨in_TotIntvl a,Ne.symm ha.2⟩
-      refine ha' ▸ (congrArg sInf <| Set.ext fun r ↦ ?_)
-      constructor
-      · rintro ⟨b, hb, hb'⟩
-        exact ⟨b, ⟨⟨hb.1.2,hb.1.1⟩,Ne.symm hb.2⟩, hb'.symm ▸ rfl⟩
-      · rintro ⟨b, hb, hb'⟩
-        exact ⟨b, ⟨⟨hb.1.2,hb.1.1⟩,Ne.symm hb.2⟩, hb'.symm ▸ rfl⟩
-    · rintro ⟨a, ha, ha'⟩
-      use a, ⟨in_TotIntvl (OrderDual.toDual a),Ne.symm ha.2⟩
-      refine ha' ▸ (congrArg sSup <| Set.ext fun r ↦ ?_)
-      constructor
-      · rintro ⟨b, hb, hb'⟩
-        exact ⟨b, ⟨⟨hb.1.2,hb.1.1⟩,Ne.symm hb.2⟩, hb'.symm ▸ rfl⟩
-      · rintro ⟨b, hb, hb'⟩
-        exact ⟨b, ⟨⟨hb.1.2,hb.1.1⟩,Ne.symm hb.2⟩, hb'.symm ▸ rfl⟩
-  rw [← h, this]
+  rw [← dualμAstar_eq_μBstar, this]
   refine congrArg sSup <| Set.ext fun r ↦ ?_
   constructor
   · rintro ⟨a, ha, ha'⟩
@@ -166,53 +182,12 @@ lemma prop4d2₁ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
     use a, ha, ha'
 
 
-lemma prop4d2₂ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+lemma prop4d3₂ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
 (h₁ : ∀ x : ℕ → ℒ, (saf : StrictAnti x) → ∃ N : ℕ, μ ⟨(⊥ , x N), lt_of_le_of_lt bot_le <| saf <| Nat.lt_add_one N⟩ ≤ μ ⟨(x (N+1), x N), saf <| Nat.lt_add_one N⟩)
 (h₂ : ∀ z : {p :ℒ × ℒ // p.1 < p.2}, (hz : ⊥ < z.val.1) → μ ⟨(⊥,z.val.2),lt_trans hz z.prop⟩ ≤ μ z ∨ μ ⟨(⊥,z.val.2),lt_trans hz z.prop⟩ ≤ μ ⟨(⊥,z.val.1),hz⟩) :
-μAstar ℒ S μ ≤ μBstar ℒ S μ := by
-  have ha: OrderDual.ofDual (μAstar ℒᵒᵈ Sᵒᵈ fun p ↦ μ ⟨(p.val.2, p.val.1), p.prop⟩) = μBstar ℒ S μ := by
-    simp [μAstar,μBstar,μA,μB,sInf]
-    refine congrArg sSup <| Set.ext fun x ↦ ?_
-    constructor
-    · rintro ⟨a, ha, ha'⟩
-      use a, ⟨in_TotIntvl a,Ne.symm ha.2⟩
-      refine ha' ▸ (congrArg sInf <| Set.ext fun r ↦ ?_)
-      constructor
-      · rintro ⟨b, hb, hb'⟩
-        exact ⟨b, ⟨⟨hb.1.2,hb.1.1⟩,Ne.symm hb.2⟩, hb'.symm ▸ rfl⟩
-      · rintro ⟨b, hb, hb'⟩
-        exact ⟨b, ⟨⟨hb.1.2,hb.1.1⟩,Ne.symm hb.2⟩, hb'.symm ▸ rfl⟩
-    · rintro ⟨a, ha, ha'⟩
-      use a, ⟨in_TotIntvl (OrderDual.toDual a),Ne.symm ha.2⟩
-      refine ha'.symm ▸ (congrArg sSup <| Set.ext fun r ↦ ?_)
-      constructor
-      · rintro ⟨b, hb, hb'⟩
-        exact ⟨b, ⟨⟨hb.1.2,hb.1.1⟩,Ne.symm hb.2⟩, hb'.symm ▸ rfl⟩
-      · rintro ⟨b, hb, hb'⟩
-        exact ⟨b, ⟨⟨hb.1.2,hb.1.1⟩,Ne.symm hb.2⟩, hb'.symm ▸ rfl⟩
-  have hb: OrderDual.ofDual (μBstar ℒᵒᵈ Sᵒᵈ fun p ↦ μ ⟨(p.val.2, p.val.1), p.prop⟩) = μAstar ℒ S μ := by
-    simp [μAstar,μBstar,μA,μB,sSup]
-    refine congrArg sInf <| Set.ext fun x ↦ ?_
-    constructor
-    · rintro ⟨a, ha, ha'⟩
-      use a, ⟨in_TotIntvl a,Ne.symm ha.2⟩
-      refine ha' ▸ (congrArg sSup <| Set.ext fun r ↦ ?_)
-      constructor
-      · rintro ⟨b, hb, hb'⟩
-        exact ⟨b, ⟨⟨hb.1.2,hb.1.1⟩,Ne.symm hb.2⟩, hb'.symm ▸ rfl⟩
-      · rintro ⟨b, hb, hb'⟩
-        exact ⟨b, ⟨⟨hb.1.2,hb.1.1⟩,Ne.symm hb.2⟩, hb'.symm ▸ rfl⟩
-    · rintro ⟨a, ha, ha'⟩
-      use a, ⟨in_TotIntvl (OrderDual.toDual a),Ne.symm ha.2⟩
-      refine ha'.symm ▸ (congrArg sInf <| Set.ext fun r ↦ ?_)
-      constructor
-      · rintro ⟨b, hb, hb'⟩
-        exact ⟨b, ⟨⟨hb.1.2,hb.1.1⟩,Ne.symm hb.2⟩, hb'.symm ▸ rfl⟩
-      · rintro ⟨b, hb, hb'⟩
-        exact ⟨b, ⟨⟨hb.1.2,hb.1.1⟩,Ne.symm hb.2⟩, hb'.symm ▸ rfl⟩
-  exact ha ▸ hb ▸ prop4d1₂ ℒᵒᵈ Sᵒᵈ (↑μ : {p :ℒᵒᵈ × ℒᵒᵈ // p.1 < p.2} → Sᵒᵈ) (h₁_dual_of_h₁ h₁) (h₂_dual_of_h₂ h₂)
+μAstar ℒ S μ ≤ μBstar ℒ S μ := (dualμAstar_eq_μBstar μ) ▸ (dualμBstar_eq_μAstar μ) ▸ prop4d1₂ ℒᵒᵈ Sᵒᵈ (↑μ : {p :ℒᵒᵈ × ℒᵒᵈ // p.1 < p.2} → Sᵒᵈ) (h₁_dual_of_h₁ h₁) (h₂_dual_of_h₂ h₂)
 
 
 lemma rmk4d4 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
@@ -235,3 +210,5 @@ lemma rmk4d4 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
       use n + 1
     exact eq_of_ge_of_not_gt (hr₁ <| le_of_lt <| saf <| Nat.lt_add_one n) <| (hr₂.wf.has_min W hW).choose_spec.1.out.choose_spec ▸ (hr₂.wf.has_min W hW).choose_spec.2 ⟨r (x (n + 1)),Set.mem_range_self (x (n + 1))⟩ this
   use this.choose, (h ⟨(x (this.choose+1), x this.choose), saf <| Nat.lt_add_one this.choose⟩ this.choose_spec.symm) ▸ le_top
+
+end impl
