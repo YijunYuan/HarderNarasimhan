@@ -1,4 +1,5 @@
 import HarderNarasimhan.Semistability.Results
+import Mathlib.Data.Real.Basic
 
 
 def μmin {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
@@ -212,3 +213,25 @@ lemma prop4d2₂ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
       · rintro ⟨b, hb, hb'⟩
         exact ⟨b, ⟨⟨hb.1.2,hb.1.1⟩,Ne.symm hb.2⟩, hb'.symm ▸ rfl⟩
   exact ha ▸ hb ▸ prop4d1₂ ℒᵒᵈ Sᵒᵈ (↑μ : {p :ℒᵒᵈ × ℒᵒᵈ // p.1 < p.2} → Sᵒᵈ) (h₁_dual_of_h₁ h₁) (h₂_dual_of_h₂ h₂)
+
+
+lemma rmk4d4 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+{S : Type} [CompleteLattice S]
+(μ : {p :ℒ × ℒ // p.1 < p.2} → S)
+(r : ℒ → ℝ) (hr₁ : Monotone r) (hr₂ : IsWellOrder (Set.range r) (· < ·))
+(h : ∀ z : {p :ℒ × ℒ // p.1 < p.2}, r z.val.1 = r z.val.2 → μ z = ⊤) :
+∀ x : ℕ → ℒ, (saf : StrictAnti x) → ∃ N : ℕ, μ ⟨(⊥ , x N), lt_of_le_of_lt bot_le <| saf <| Nat.lt_add_one N⟩ ≤ μ ⟨(x (N+1), x N), saf <| Nat.lt_add_one N⟩ := by
+  intro x saf
+  let W : Set (Set.range r) := {s : Set.range r | ∃ N : ℕ, s = r (x N)}
+  have hW : W.Nonempty := by
+    use ⟨(r (x 0)), Set.mem_range_self (x 0)⟩
+    refine Set.mem_setOf.mpr ?_
+    use 0
+  have : ∃ N : ℕ, r (x N) = r (x (N + 1)) := by
+    let n := (hr₂.wf.has_min W hW).choose_spec.1.out.choose
+    use n
+    have : ⟨r (x (n + 1)),Set.mem_range_self (x (n + 1))⟩ ∈ W := by
+      refine Set.mem_setOf.mpr ?_
+      use n + 1
+    exact eq_of_ge_of_not_gt (hr₁ <| le_of_lt <| saf <| Nat.lt_add_one n) <| (hr₂.wf.has_min W hW).choose_spec.1.out.choose_spec ▸ (hr₂.wf.has_min W hW).choose_spec.2 ⟨r (x (n + 1)),Set.mem_range_self (x (n + 1))⟩ this
+  use this.choose, (h ⟨(x (this.choose+1), x this.choose), saf <| Nat.lt_add_one this.choose⟩ this.choose_spec.symm) ▸ le_top
