@@ -206,11 +206,10 @@ lemma prop2d6₃I
   · apply comparable_iff (μA μ ⟨(x, y), h.1⟩) (μA μ ⟨(y, z), h.2⟩) at h₁
     by_cases h₂ : μA μ ⟨(y, z), h.2⟩ = μA μ ⟨(x, z), lt_trans h.1 h.2⟩
     · exact Or.inl h₂
-    · right
-      have h₃ : μA μ ⟨(x, y), h.1⟩ < μA μ ⟨(y, z), h.2⟩ := Or.resolve_right h₁ (fun hcontra ↦
+    · have h₃ : μA μ ⟨(x, y), h.1⟩ < μA μ ⟨(y, z), h.2⟩ := Or.resolve_right h₁ (fun hcontra ↦
       h₂ (prop2d6₂I₁ I μ hμcvx x hxI y hyI z hzI h hcontra))
       have h₄ : μA μ ⟨(x, y), h.1⟩ ≤ μA μ ⟨(x, z), lt_trans h.1 h.2⟩ ∧ μA μ ⟨(x, z), lt_trans h.1 h.2⟩ ≤ μA μ ⟨(y, z), h.2⟩ := prop2d6₂I₂ I μ hμcvx x hxI y hyI z hzI h h₃
-      exact ⟨h₄.1, lt_of_le_of_ne h₄.2 (Ne.symm h₂)⟩
+      exact Or.inr ⟨h₄.1, lt_of_le_of_ne h₄.2 (Ne.symm h₂)⟩
   · rcases h₂ with ⟨a, ⟨ha₁, ⟨ha₂, hres⟩⟩⟩
     apply or_iff_not_imp_left.2
     intro hnot
