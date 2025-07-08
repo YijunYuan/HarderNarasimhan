@@ -41,14 +41,13 @@ lemma is_strict_mono {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
     n hn ↦ lt_of_le_of_ne (HNFil_prop_of_def μ hμ hμcvx h n hn).1.1.1 (HNFil_prop_of_def μ hμ hμcvx h n hn).1.2.1
 
 
-lemma of_fin_len {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
+lemma of_fin_len {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [inst_3 : WellFoundedGT ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : μDCC μ) (hμcvx : IsConvex μ)
 (h : (IsTotal S (· ≤ ·)) ∨
      ∀ I : {p : ℒ × ℒ // p.1 < p.2},  IsAttained μ I)
 : ∃ N : Nat, HNFil μ hμ hμcvx h N = ⊤ := by
   by_contra!
-  expose_names
   exact (WellFounded.wellFounded_iff_no_descending_seq.1 inst_3.wf).elim ⟨fun n => HNFil μ hμ hμcvx h n, fun n => is_strict_mono μ hμ hμcvx h n (this n)⟩
 
 

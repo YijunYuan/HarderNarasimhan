@@ -9,6 +9,7 @@ def IsConvexI (I : {p : ℒ × ℒ // p.1 < p.2})
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) : Prop :=
 ∀ x : ℒ, ∀ y : ℒ, InIntvl I x → InIntvl I y → (h : ¬ x ≤ y) → μ ⟨(x ⊓ y, x), inf_lt_left.2 h⟩ ≤ μ ⟨(y, x ⊔ y), right_lt_sup.2 h⟩
 
+omit [Nontrivial ℒ] [BoundedOrder ℒ] in
 lemma Convex_of_Convex_large
 (I₁ : {p : ℒ × ℒ // p.1 < p.2})
 (I₂ : {p : ℒ × ℒ // p.1 < p.2})

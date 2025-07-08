@@ -13,3 +13,5 @@ import HarderNarasimhan.Filtration.Defs
 import HarderNarasimhan.Filtration.Results
 
 import HarderNarasimhan.FirstMoverAdvantage.Results
+
+import HarderNarasimhan.DedekindMacNeilleCompletion
