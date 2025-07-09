@@ -62,10 +62,10 @@ SlopeLike μ ↔ ∀ (x y z : ℒ), (h : x < y ∧ y < z) → (
       have : μ ⟨(x, y), h.1⟩ > μ ⟨(x, z), lt_trans h.1 h.2⟩ ∧ μ ⟨(x, z), lt_trans h.1 h.2⟩ > μ ⟨(y, z), h.2⟩ ∨ μ ⟨(x, y), h.1⟩ = μ ⟨(x, z), lt_trans h.1 h.2⟩ ∧ μ ⟨(x, z), lt_trans h.1 h.2⟩ = μ ⟨(y, z), h.2⟩ := by tauto
       cases' this with this this <;> [exact le_of_lt this.1; exact le_of_eq this.1.symm]
 
+
 class TotallyOrderedRealVectorSpace (V : Type) extends AddCommMonoid V, Module ℝ V, LinearOrder V where
   add_le : ∀ {y z : V} (x : V), y ≤ z → x + y ≤ x + z
   scalar_le : ∀ {y z : V} (c : ℝ), c ≥ 0 → c • y ≤ c • z
-
 
 
 noncomputable def μQuotient {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
@@ -73,8 +73,9 @@ noncomputable def μQuotient {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [Bounde
 (r : {p :ℒ × ℒ // p.1 < p.2} → NNReal)
 (d : {p :ℒ × ℒ // p.1 < p.2} → V): {p :ℒ × ℒ // p.1 < p.2} → DedekindMacNeilleCompletion V := fun
     z ↦
-  if _ : r z > 0 then ↑((r z)⁻¹ • d z) else ⊤
-
+  if _ : r z > 0 then
+    ↑((r z)⁻¹ • d z)
+  else ⊤
 
 
 lemma prop4d8 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
@@ -84,9 +85,20 @@ lemma prop4d8 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 (h₁ : ∀ (x y z : ℒ), (h : x < y ∧ y < z) → d ⟨(x, z), lt_trans h.1 h.2⟩ = d ⟨(x, y), h.1⟩ + d ⟨(y, z), h.2⟩ ∧ r ⟨(x, z), lt_trans h.1 h.2⟩ = r ⟨(x, y), h.1⟩ + r ⟨(y, z), h.2⟩)
 (h₂ : ∀ (x y :ℒ), (h : x < y) → r ⟨(x,y),h⟩ = 0 → d ⟨(x,y),h⟩ > 0)
 : SlopeLike (μQuotient r d) := by
+  let μ := μQuotient r d
+  apply (prop4d6 μ).2
   intro x y z h
-  refine ⟨?_,⟨?_,⟨?_,?_⟩⟩⟩
-  · sorry
-  · sorry
-  · sorry
-  · sorry
+  cases' eq_zero_or_pos (r ⟨(x, z), lt_trans h.1 h.2⟩) with h' h'
+  · have : r ⟨(x, y), h.1⟩ = 0 ∧ r ⟨(y, z), h.2⟩ = 0 := add_eq_zero.1 <| (h₁ x y z h).2 ▸ h'
+    have : ¬ r ⟨(y, z), h.2⟩ > 0 ∧ ¬ r ⟨(x,y), h.1⟩ > 0:= by
+      aesop
+    have : μ ⟨(x, z), lt_trans h.1 h.2⟩ = ⊤ ∧ μ ⟨(x, y), h.1⟩ = ⊤ ∧ μ ⟨(y, z), h.2⟩ = ⊤ := by
+      refine ⟨?_,⟨?_,?_⟩⟩
+      · simp [μ,μQuotient, h']
+      · simp [μ,μQuotient,this.2]
+      · simp [μ,μQuotient,this.1]
+    aesop
+  · by_cases h'' : r ⟨(x, y), h.1⟩ > 0 ∧ r ⟨(y, z), h.2⟩ > 0
+    · --have : μ ⟨(x,z), lt_trans h.1 h.2⟩
+      sorry
+    · sorry

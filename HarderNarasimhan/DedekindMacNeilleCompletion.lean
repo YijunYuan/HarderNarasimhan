@@ -77,9 +77,7 @@ def coe' {α : Type} [PartialOrder α] : α ↪o DedekindMacNeilleCompletion α 
 instance {α : Type} [PartialOrder α]: Coe α (DedekindMacNeilleCompletion α) := ⟨coe'.toFun⟩
 
 
-
-
-theorem universal_property {α : Type} [PartialOrder α] (β : Type) [CompleteLattice β] (f : α ↪o β) : ∃ f' : DedekindMacNeilleCompletion α ↪o β, f = f' ∘ coe' := by
+theorem DedekindMacNeilleCompletion_minimality {α : Type} [PartialOrder α] {β : Type} [CompleteLattice β] (f : α ↪o β) : ∃ f' : DedekindMacNeilleCompletion α ↪o β, f = f' ∘ coe' := by
   let g := fun x : DedekindMacNeilleCompletion α ↦ sSup <| lowerBounds <| upperBounds <| f '' x.val
   have : ∀ (A B : DedekindMacNeilleCompletion α), g A ≤ g B ↔ A ≤ B := by
     refine fun A B ↦ ⟨?_,?_⟩
