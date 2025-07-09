@@ -22,11 +22,11 @@ instance {α : Type} [PartialOrder α] (T : ClosureOperator (Set α)): CompleteL
   le_sup_left := by
     intro A B
     nth_rw 1 [Subtype.coe_eq_of_eq_mk (ClosureOperator.IsClosed.closure_eq A.property).symm]
-    exact ClosureOperator.monotone T <| Set.subset_union_left
+    exact ClosureOperator.monotone T Set.subset_union_left
   le_sup_right := by
     intro A B
     nth_rw 1 [Subtype.coe_eq_of_eq_mk (ClosureOperator.IsClosed.closure_eq B.property).symm]
-    exact ClosureOperator.monotone T <| Set.subset_union_right
+    exact ClosureOperator.monotone T Set.subset_union_right
   sInf 𝒮 := by
     refine ⟨⋂ a ∈ 𝒮, a.val,ClosureOperator.isClosed_iff_closure_le.mpr fun x hx ↦ ?_⟩
     simp at *
@@ -81,25 +81,31 @@ instance {α : Type} [PartialOrder α]: Coe α (DedekindMacNeilleCompletion α) 
 
 theorem universal_property {α : Type} [PartialOrder α] (β : Type) [CompleteLattice β] (f : α ↪o β) : ∃ f' : DedekindMacNeilleCompletion α ↪o β, f = f' ∘ coe' := by
   let g := fun x : DedekindMacNeilleCompletion α ↦ sSup <| lowerBounds <| upperBounds <| f '' x.val
-  have : ∀ (a b : DedekindMacNeilleCompletion α), g a ≤ g b ↔ a ≤ b := by
-    intro a b
-    constructor
+  have : ∀ (A B : DedekindMacNeilleCompletion α), g A ≤ g B ↔ A ≤ B := by
+    refine fun A B ↦ ⟨?_,?_⟩
     · intro h
-
-      sorry
+      by_contra!
+      rcases (Set.not_subset.1 this) with ⟨a, haA, haB⟩
+      have : ∃ u ∈ upperBounds B, ¬ a ≤ u := by
+        by_contra!
+        exact haB ((ClosureOperator.IsClosed.closure_eq B.property) ▸ this)
+      refine (fun w ↦ this.choose_spec.2 (f.map_rel_iff'.1 w)) ?_
+      have h₁ : f a ≤ g A := le_sSup fun u hu ↦ hu (Exists.intro a ⟨haA, rfl⟩)
+      have h₂ : g B ≤ f (this.choose) := by
+        refine sSup_le fun y hy ↦ hy ?_
+        simp [upperBounds]
+        exact this.choose_spec.1.out
+      exact le_trans h₁ <| le_trans h h₂
     · intro h
       simp [g,upperBounds]
       exact fun y hy ↦ hy.out fun w hw ↦ le_sSup fun ⦃a⦄ a ↦ a w (h hw)
-  refine ⟨⟨⟨g,?_⟩,?_⟩,?_⟩
-  · exact fun x y h ↦ le_antisymm ((this x y).1 <| (le_antisymm_iff.1 h).1) ((this y x).1 <| (le_antisymm_iff.1 h).2)
+  refine ⟨⟨⟨g,fun x y h ↦ le_antisymm ((this x y).1 <| (le_antisymm_iff.1 h).1) ((this y x).1 <| (le_antisymm_iff.1 h).2)⟩,?_⟩,?_⟩
   · simp
     exact fun x hx y hy ↦ this ⟨x, hx⟩ ⟨y, hy⟩
   · refine funext fun x ↦ ?_
     simp [g,coe']
-    apply le_antisymm
-    · exact le_sSup fun a ha ↦ ha.out <| Set.mem_image_of_mem f Set.right_mem_Iic
-    · refine sSup_le fun _ hb ↦ hb ?_
-      simp [upperBounds]
+    refine le_antisymm (le_sSup fun a ha ↦ ha.out <| Set.mem_image_of_mem f Set.right_mem_Iic) <| sSup_le fun _ hb ↦ hb ?_
+    simp [upperBounds]
 
 --TODO: joint-dense, meet-dense
 end DedekindMacNeille
