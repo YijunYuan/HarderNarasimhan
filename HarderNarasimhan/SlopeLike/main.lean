@@ -141,4 +141,13 @@ lemma prop4d8 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
           have hs' := (eq_sub_of_add_eq this) ▸ (smul_lt_smul_iff_of_pos_left h''.1).2 hs'
           rw [sub_lt_iff_lt_add,add_lt_add_iff_left] at hs'
           exact (smul_lt_smul_iff_of_pos_left h''.2).1 hs'
-    · sorry
+    · by_cases h''' : r ⟨(x, y), h.1⟩ = 0 ∧ r ⟨(y, z), h.2⟩ > 0
+      · sorry
+      · apply not_and_or.1 at h''
+        apply not_and_or.1 at h'''
+        have : ¬ r ⟨(x, y), h.1⟩ = 0 ↔ r ⟨(x, y), h.1⟩ > 0 := pos_iff_ne_zero.symm
+        rw [this] at h'''
+        have : ¬r ⟨(y, z), h.2⟩ > 0 := by tauto
+        have : r ⟨(y, z), h.2⟩ = 0 := by aesop
+        have this' : r ⟨(x, y), h.1⟩ > 0 := (add_zero <| r ⟨(x, y), h.1⟩) ▸ (this ▸ (h₁ x y z h).2) ▸ h'
+        sorry
