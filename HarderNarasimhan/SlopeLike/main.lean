@@ -63,9 +63,11 @@ SlopeLike μ ↔ ∀ (x y z : ℒ), (h : x < y ∧ y < z) → (
       cases' this with this this <;> [exact le_of_lt this.1; exact le_of_eq this.1.symm]
 
 
-class TotallyOrderedRealVectorSpace (V : Type) extends AddCommGroup V, Module ℝ V, LinearOrder V where
-  add_le : ∀ {y z : V} (x : V), y ≤ z → x + y ≤ x + z
-  scalar_le : ∀ {y z : V} (c : ℝ), c ≥ 0 → c • y ≤ c • z
+class TotallyOrderedRealVectorSpace (V : Type) extends AddCommGroup V, Module ℝ V, LinearOrder V, PosSMulStrictMono ℝ V where
+  elim_AddLeftMono : ∀ {y z : V} (x : V), y ≤ z → x + y ≤ x + z
+
+instance {V : Type} [TotallyOrderedRealVectorSpace V] : AddLeftMono V where
+  elim := fun x _ _ h ↦ TotallyOrderedRealVectorSpace.elim_AddLeftMono x h
 
 
 noncomputable def μQuotient {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
@@ -89,16 +91,6 @@ lemma μQuotient_helper {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrde
   · exact smul_inv_smul₀ (by aesop) (d z)
 
 
-noncomputable instance : Group {p : NNReal // p > 0} where
-  one := ⟨⟨1,by linarith⟩, by aesop⟩
-  mul := fun a b ↦ ⟨a.1 * b.1, by aesop⟩
-  inv := fun x ↦ ⟨x⁻¹, by aesop⟩
-  one_mul := fun x ↦ by sorry
-  mul_one := fun x ↦ by sorry
-  mul_assoc := fun x y z ↦ by sorry
-  inv_mul_cancel := fun x ↦ sorry
-
-
 lemma prop4d8 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {V : Type} [TotallyOrderedRealVectorSpace V]
 (r : {p :ℒ × ℒ // p.1 < p.2} → NNReal)
@@ -120,28 +112,33 @@ lemma prop4d8 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
       · simp [μ,μQuotient,this.1]
     aesop
   · by_cases h'' : r ⟨(x, y), h.1⟩ > 0 ∧ r ⟨(y, z), h.2⟩ > 0
-    · --have : μ ⟨(x,z), lt_trans h.1 h.2⟩
-      rcases μQuotient_helper r d ⟨(x, y), h.1⟩ h''.1 with ⟨μxy,⟨hxy₁,hxy₂⟩⟩
+    · rcases μQuotient_helper r d ⟨(x, y), h.1⟩ h''.1 with ⟨μxy,⟨hxy₁,hxy₂⟩⟩
       rcases μQuotient_helper r d ⟨(y, z), h.2⟩ h''.2 with ⟨μyz,⟨hyz₁,hyz₂⟩⟩
       rcases μQuotient_helper r d ⟨(x, z), lt_trans h.1 h.2⟩ h' with ⟨μxz,⟨hxz₁,hxz₂⟩⟩
       have : r ⟨(x, y), h.1⟩ • μxz + r ⟨(y, z), h.2⟩ • μxz = r ⟨(x, y), h.1⟩ • μxy + r ⟨(y, z), h.2⟩ • μyz := add_smul (r ⟨(x, y), h.1⟩) (r ⟨(y, z), h.2⟩) μxz ▸ (h₁ x y z h).2 ▸ hxy₂ ▸ hyz₂ ▸ hxz₂ ▸ (h₁ x y z h).1
       simp [μ,hxy₁,hyz₁,hxz₁]
       by_cases hs : μxy < μxz
-      · left
-        sorry
+      · refine Or.inl ⟨hs,?_⟩
+        have hs := (eq_sub_of_add_eq this) ▸ (smul_lt_smul_iff_of_pos_left h''.1).2 hs
+        rw [lt_sub_iff_add_lt,add_lt_add_iff_left] at hs
+        exact (smul_lt_smul_iff_of_pos_left h''.2).1 hs
       · by_cases hs' : μxy = μxz
-        · right
-          right
-          refine ⟨hs',?_⟩
+        · refine Or.inr <| Or.inr <| ⟨hs',?_⟩
           simp [hs'] at this
-          have : (r ⟨(y, z), h.2⟩)⁻¹ • (r ⟨(y, z), h.2⟩) • μxz = (r ⟨(y, z), h.2⟩)⁻¹ • (r ⟨(y, z), h.2⟩) • μyz := by
-            exact congrArg (HSMul.hSMul (r ⟨(y, z), h.right⟩)⁻¹) this
-
-          --rw [← smul_assoc] at this
-          --have fuck : r ⟨(x, y), h.1⟩ ≠ 0 := by aesop
-
-          --rw [inv_smul_smul (⟨(r ⟨(y, z), h.2⟩), h''.2⟩:{p : NNReal // p > 0}) μyz] at this
-          --apply NNReal.mul_eq_mul_left
-          sorry
-        · sorry
+          have : (r ⟨(y, z), h.2⟩)⁻¹ • (r ⟨(y, z), h.2⟩) • μxz = (r ⟨(y, z), h.2⟩)⁻¹ • (r ⟨(y, z), h.2⟩) • μyz := congrArg (HSMul.hSMul (r ⟨(y, z), h.right⟩)⁻¹) this
+          rw [← smul_assoc,← smul_assoc] at this
+          simp at this
+          have invt : Invertible (r ⟨(y, z), h.2⟩) := by
+            refine { invOf := ?_, invOf_mul_self := ?_, mul_invOf_self := ?_ }
+            use (r ⟨(y, z), h.2⟩)⁻¹
+            · aesop
+            · exact (mul_eq_one_iff_eq_inv₀ <| ne_of_gt h''.2).2 rfl
+            · exact (mul_eq_one_iff_inv_eq₀ <| ne_of_gt h''.2).2 rfl
+          rw [inv_mul_cancel_of_invertible <| r ⟨(y, z), h.2⟩,one_smul,one_smul] at this
+          exact this
+        · have hs' : μxz < μxy := lt_of_not_le (Eq.mpr (id (congrArg (fun _a ↦ ¬_a) (propext le_iff_eq_or_lt))) (not_or.mpr ⟨hs', hs⟩))
+          refine Or.inr <| Or.inl <| ⟨hs',?_⟩
+          have hs' := (eq_sub_of_add_eq this) ▸ (smul_lt_smul_iff_of_pos_left h''.1).2 hs'
+          rw [sub_lt_iff_lt_add,add_lt_add_iff_left] at hs'
+          exact (smul_lt_smul_iff_of_pos_left h''.2).1 hs'
     · sorry
