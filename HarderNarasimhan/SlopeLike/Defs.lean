@@ -1,0 +1,33 @@
+import HarderNarasimhan.Basic
+import Mathlib.Data.Real.Basic
+import Mathlib.Algebra.Module.Defs
+import Mathlib.Data.NNReal.Basic
+import HarderNarasimhan.DedekindMacNeilleCompletion
+
+def SlopeLike {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+{S : Type} [CompleteLattice S]
+(μ : {p :ℒ × ℒ // p.1 < p.2} → S) : Prop := ∀ (x y z : ℒ), (h : x < y ∧ y < z) →
+(
+  μ ⟨(x, y), h.1⟩ ≤ μ ⟨(x, z), lt_trans h.1 h.2⟩ ∨ μ ⟨(y, z), h.2⟩ < μ ⟨(x, z), lt_trans h.1 h.2⟩
+) ∧ (
+  μ ⟨(x, y), h.1⟩ < μ ⟨(x, z), lt_trans h.1 h.2⟩ ∨ μ ⟨(y, z), h.2⟩ ≤ μ ⟨(x, z), lt_trans h.1 h.2⟩
+) ∧ (
+  μ ⟨(x, z), lt_trans h.1 h.2⟩ < μ ⟨(x, y), h.1⟩ ∨ μ ⟨(x, z), lt_trans h.1 h.2⟩ ≤ μ ⟨(y, z), h.2⟩
+) ∧ (
+  μ ⟨(x, z), lt_trans h.1 h.2⟩ ≤ μ ⟨(x, y), h.1⟩ ∨ μ ⟨(x, z), lt_trans h.1 h.2⟩ < μ ⟨(y, z), h.2⟩
+)
+
+
+class TotallyOrderedRealVectorSpace (V : Type) extends AddCommGroup V, Module ℝ V, LinearOrder V, PosSMulStrictMono ℝ V where
+  elim_AddLeftMono : ∀ {y z : V} (x : V), y ≤ z → x + y ≤ x + z
+
+
+instance {V : Type} [TotallyOrderedRealVectorSpace V] : AddLeftMono V where
+  elim := fun x _ _ h ↦ TotallyOrderedRealVectorSpace.elim_AddLeftMono x h
+
+
+noncomputable def μQuotient {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+{V : Type} [TotallyOrderedRealVectorSpace V]
+(r : {p :ℒ × ℒ // p.1 < p.2} → NNReal)
+(d : {p :ℒ × ℒ // p.1 < p.2} → V): {p :ℒ × ℒ // p.1 < p.2} → DedekindMacNeilleCompletion V :=
+  fun z ↦ if _ : r z > 0 then coe' ((r z)⁻¹ • d z) else ⊤

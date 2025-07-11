@@ -1,23 +1,7 @@
-import HarderNarasimhan.Basic
-import Mathlib.Data.Real.Basic
-import Mathlib.Algebra.Module.Defs
-import Mathlib.Data.NNReal.Basic
-import HarderNarasimhan.DedekindMacNeilleCompletion
-
-def SlopeLike {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-{S : Type} [CompleteLattice S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S) : Prop := ∀ (x y z : ℒ), (h : x < y ∧ y < z) →
-(
-  μ ⟨(x, y), h.1⟩ ≤ μ ⟨(x, z), lt_trans h.1 h.2⟩ ∨ μ ⟨(y, z), h.2⟩ < μ ⟨(x, z), lt_trans h.1 h.2⟩
-) ∧ (
-  μ ⟨(x, y), h.1⟩ < μ ⟨(x, z), lt_trans h.1 h.2⟩ ∨ μ ⟨(y, z), h.2⟩ ≤ μ ⟨(x, z), lt_trans h.1 h.2⟩
-) ∧ (
-  μ ⟨(x, z), lt_trans h.1 h.2⟩ < μ ⟨(x, y), h.1⟩ ∨ μ ⟨(x, z), lt_trans h.1 h.2⟩ ≤ μ ⟨(y, z), h.2⟩
-) ∧ (
-  μ ⟨(x, z), lt_trans h.1 h.2⟩ ≤ μ ⟨(x, y), h.1⟩ ∨ μ ⟨(x, z), lt_trans h.1 h.2⟩ < μ ⟨(y, z), h.2⟩
-)
+import HarderNarasimhan.SlopeLike.Defs
 
 
+namespace impl
 lemma prop4d6 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S):
@@ -63,13 +47,6 @@ SlopeLike μ ↔ ∀ (x y z : ℒ), (h : x < y ∧ y < z) → (
       cases' this with this this <;> [exact le_of_lt this.1; exact le_of_eq this.1.symm]
 
 
-class TotallyOrderedRealVectorSpace (V : Type) extends AddCommGroup V, Module ℝ V, LinearOrder V, PosSMulStrictMono ℝ V where
-  elim_AddLeftMono : ∀ {y z : V} (x : V), y ≤ z → x + y ≤ x + z
-
-instance {V : Type} [TotallyOrderedRealVectorSpace V] : AddLeftMono V where
-  elim := fun x _ _ h ↦ TotallyOrderedRealVectorSpace.elim_AddLeftMono x h
-
-
 lemma not_top_of_Nontrivial_TotallyOrderedRealVectorSpace {V : Type} [TotallyOrderedRealVectorSpace V] [hnt: Nontrivial V] : ∀ v : V, coe' v < (⊤ : DedekindMacNeilleCompletion V) := by
   intro v
   rcases hnt.exists_pair_ne with ⟨v₁, v₂, hne⟩
@@ -81,13 +58,6 @@ lemma not_top_of_Nontrivial_TotallyOrderedRealVectorSpace {V : Type} [TotallyOrd
       exact (eq_or_lt_of_not_lt h).resolve_left hne
   by_contra!
   exact not_top_lt <| ((le_iff_eq_or_lt.1 le_top).resolve_right this) ▸ (coe'.lt_iff_lt.2 <| lt_add_of_pos_right v hpos)
-
-
-noncomputable def μQuotient {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-{V : Type} [TotallyOrderedRealVectorSpace V]
-(r : {p :ℒ × ℒ // p.1 < p.2} → NNReal)
-(d : {p :ℒ × ℒ // p.1 < p.2} → V): {p :ℒ × ℒ // p.1 < p.2} → DedekindMacNeilleCompletion V :=
-  fun z ↦ if _ : r z > 0 then coe' ((r z)⁻¹ • d z) else ⊤
 
 
 lemma μQuotient_helper {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
@@ -173,3 +143,4 @@ lemma prop4d8 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
           simp [μ,μQuotient,this',Eq.mpr (id (congrArg (fun _a ↦ _a > 0) h4))]
           rw [← h4]
           exact (smul_lt_smul_iff_of_pos_left <| Right.inv_pos.mpr h').2 <| (h₁ x y z h).1 ▸ lt_add_of_pos_right (d ⟨(x, y), h.1⟩) <| h₂ y z h.2 this
+end impl

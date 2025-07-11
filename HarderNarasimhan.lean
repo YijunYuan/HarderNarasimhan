@@ -15,3 +15,6 @@ import HarderNarasimhan.Filtration.Results
 import HarderNarasimhan.FirstMoverAdvantage.Results
 
 import HarderNarasimhan.DedekindMacNeilleCompletion
+
+import HarderNarasimhan.SlopeLike.Defs
+import HarderNarasimhan.SlopeLike.Impl

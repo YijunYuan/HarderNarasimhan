@@ -294,14 +294,3 @@ lemma prop2d8₂I
 end
 
 end impl
-
-/-
-class test (z : ℤ) : Prop where
-  is_zero : z = 0
-
-variable (z : ℤ) [h : test z]
-#check h.is_zero
-
-instance : test 0 where
-  is_zero := rfl
--/
