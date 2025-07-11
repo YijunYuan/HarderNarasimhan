@@ -80,30 +80,21 @@ lemma not_top_of_Nontrivial_TotallyOrderedRealVectorSpace {V : Type} [TotallyOrd
     · simp [v₀,h]
       exact (eq_or_lt_of_not_lt h).resolve_left hne
   by_contra!
-  have h := (le_iff_eq_or_lt.1 le_top).resolve_right this
-  simp at h
-  exact not_top_lt <| h ▸ (coe'.lt_iff_lt.2 <| lt_add_of_pos_right v hpos)
+  exact not_top_lt <| ((le_iff_eq_or_lt.1 le_top).resolve_right this) ▸ (coe'.lt_iff_lt.2 <| lt_add_of_pos_right v hpos)
 
 
 noncomputable def μQuotient {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {V : Type} [TotallyOrderedRealVectorSpace V]
 (r : {p :ℒ × ℒ // p.1 < p.2} → NNReal)
-(d : {p :ℒ × ℒ // p.1 < p.2} → V): {p :ℒ × ℒ // p.1 < p.2} → DedekindMacNeilleCompletion V := fun
-    z ↦
-  if _ : r z > 0 then
-    coe' ((r z)⁻¹ • d z)
-  else ⊤
+(d : {p :ℒ × ℒ // p.1 < p.2} → V): {p :ℒ × ℒ // p.1 < p.2} → DedekindMacNeilleCompletion V :=
+  fun z ↦ if _ : r z > 0 then coe' ((r z)⁻¹ • d z) else ⊤
 
 
 lemma μQuotient_helper {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {V : Type} [TotallyOrderedRealVectorSpace V]
 (r : {p :ℒ × ℒ // p.1 < p.2} → NNReal)
-(d : {p :ℒ × ℒ // p.1 < p.2} → V): ∀ z : {p :ℒ × ℒ // p.1 < p.2}, r z > 0 → ∃ (μ : V), (μQuotient r d) z = coe' μ ∧ (r z) • μ = (d z) := by
-  intro z h
-  use ((r z)⁻¹ • d z)
-  constructor
-  · simp [μQuotient, coe', h]
-  · exact smul_inv_smul₀ (by aesop) (d z)
+(d : {p :ℒ × ℒ // p.1 < p.2} → V): ∀ z : {p :ℒ × ℒ // p.1 < p.2}, r z > 0 → ∃ (μ : V), (μQuotient r d) z = coe' μ ∧ (r z) • μ = (d z) :=
+  fun z h ↦ ⟨(r z)⁻¹ • d z,⟨by simp [μQuotient, coe', h], smul_inv_smul₀ (by aesop) (d z)⟩⟩
 
 
 lemma prop4d8 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
@@ -117,8 +108,7 @@ lemma prop4d8 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   refine (prop4d6 μ).2 fun x y z h ↦ ?_
   cases' eq_zero_or_pos (r ⟨(x, z), lt_trans h.1 h.2⟩) with h' h'
   · have : r ⟨(x, y), h.1⟩ = 0 ∧ r ⟨(y, z), h.2⟩ = 0 := add_eq_zero.1 <| (h₁ x y z h).2 ▸ h'
-    have : ¬ r ⟨(y, z), h.2⟩ > 0 ∧ ¬ r ⟨(x,y), h.1⟩ > 0:= by
-      aesop
+    have : ¬ r ⟨(y, z), h.2⟩ > 0 ∧ ¬ r ⟨(x,y), h.1⟩ > 0 := by aesop
     have : μ ⟨(x, z), lt_trans h.1 h.2⟩ = ⊤ ∧ μ ⟨(x, y), h.1⟩ = ⊤ ∧ μ ⟨(y, z), h.2⟩ = ⊤ := by
       refine ⟨?_,⟨?_,?_⟩⟩
       · simp [μ,μQuotient, h']
