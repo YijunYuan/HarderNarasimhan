@@ -14,8 +14,7 @@ lemma lem2d4₁
   (u : ℒ) (huxw : u ≤ x ⊓ w) :
   μA μ ⟨(u, x), lt_of_le_of_lt huxw (inf_lt_left.2 hxw)⟩ ≤ μmax μ ⟨(x ⊓ w, x), inf_lt_left.2 hxw⟩ := by
   have h1 : μA μ ⟨(u, x), lt_of_le_of_lt huxw (inf_lt_left.2 hxw)⟩ ≤ μA μ ⟨(x ⊓ w, x), inf_lt_left.2 hxw⟩ := by
-    apply sInf_le_sInf
-    intro t ht
+    refine sInf_le_sInf fun t ht ↦ ?_
     rcases ht with ⟨a, ha, _⟩
     use a, ⟨⟨le_trans huxw ha.1.1, ha.1.2⟩, ha.2⟩
   have h2 : μA μ ⟨(x ⊓ w, x), inf_lt_left.2 hxw⟩ ≤ μmax μ ⟨(x ⊓ w, x), inf_lt_left.2 hxw⟩ := by

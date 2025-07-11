@@ -70,6 +70,21 @@ instance {V : Type} [TotallyOrderedRealVectorSpace V] : AddLeftMono V where
   elim := fun x _ _ h ↦ TotallyOrderedRealVectorSpace.elim_AddLeftMono x h
 
 
+lemma not_top_of_Nontrivial_TotallyOrderedRealVectorSpace {V : Type} [TotallyOrderedRealVectorSpace V] [hnt: Nontrivial V] : ∀ v : V, coe' v < (⊤ : DedekindMacNeilleCompletion V) := by
+  intro v
+  rcases hnt.exists_pair_ne with ⟨v₁, v₂, hne⟩
+  let v₀ := if v₁ < v₂ then v₂ - v₁ else v₁ - v₂
+  have hpos : v₀ > 0 := by
+    by_cases h : v₁ < v₂
+    · simp [v₀,h]
+    · simp [v₀,h]
+      exact (eq_or_lt_of_not_lt h).resolve_left hne
+  by_contra!
+  have h := (le_iff_eq_or_lt.1 le_top).resolve_right this
+  simp at h
+  exact not_top_lt <| h ▸ (coe'.lt_iff_lt.2 <| lt_add_of_pos_right v hpos)
+
+
 noncomputable def μQuotient {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {V : Type} [TotallyOrderedRealVectorSpace V]
 (r : {p :ℒ × ℒ // p.1 < p.2} → NNReal)
@@ -92,15 +107,14 @@ lemma μQuotient_helper {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrde
 
 
 lemma prop4d8 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-{V : Type} [TotallyOrderedRealVectorSpace V]
+{V : Type} [TotallyOrderedRealVectorSpace V] [Nontrivial V]
 (r : {p :ℒ × ℒ // p.1 < p.2} → NNReal)
 (d : {p :ℒ × ℒ // p.1 < p.2} → V)
 (h₁ : ∀ (x y z : ℒ), (h : x < y ∧ y < z) → d ⟨(x, z), lt_trans h.1 h.2⟩ = d ⟨(x, y), h.1⟩ + d ⟨(y, z), h.2⟩ ∧ r ⟨(x, z), lt_trans h.1 h.2⟩ = r ⟨(x, y), h.1⟩ + r ⟨(y, z), h.2⟩)
 (h₂ : ∀ (x y :ℒ), (h : x < y) → r ⟨(x,y),h⟩ = 0 → d ⟨(x,y),h⟩ > 0)
 : SlopeLike (μQuotient r d) := by
   let μ := μQuotient r d
-  apply (prop4d6 μ).2
-  intro x y z h
+  refine (prop4d6 μ).2 fun x y z h ↦ ?_
   cases' eq_zero_or_pos (r ⟨(x, z), lt_trans h.1 h.2⟩) with h' h'
   · have : r ⟨(x, y), h.1⟩ = 0 ∧ r ⟨(y, z), h.2⟩ = 0 := add_eq_zero.1 <| (h₁ x y z h).2 ▸ h'
     have : ¬ r ⟨(y, z), h.2⟩ > 0 ∧ ¬ r ⟨(x,y), h.1⟩ > 0:= by
@@ -144,22 +158,27 @@ lemma prop4d8 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
     · by_cases h''' : r ⟨(x, y), h.1⟩ = 0 ∧ r ⟨(y, z), h.2⟩ > 0
       · have h2 : μ ⟨(x, y), h.1⟩ = ⊤ := by simp [μ, μQuotient, h'''.1]
         have h4 := (zero_add <| r ⟨(y, z), h.2⟩) ▸ h'''.1 ▸ (h₁ x y z h).2
-        cases' le_iff_eq_or_lt.1 (h2 ▸ le_top) with h3 h3
-        · sorry
+        have h3 : μ ⟨(x, z), lt_trans h.1 h.2⟩ ≤ μ ⟨(x, y), h.1⟩ := h2 ▸ le_top
+        cases' le_iff_eq_or_lt.1 h3 with h3 h3
+        · rcases μQuotient_helper r d ⟨(x,z),lt_trans h.1 h.2⟩ (h4 ▸ h'''.2) with ⟨w,⟨hw₁,_⟩⟩
+          simp [μ] at h3; simp [μ] at h2
+          exact False.elim (not_top_lt ((h2 ▸ h3 ▸ hw₁).symm ▸ not_top_of_Nontrivial_TotallyOrderedRealVectorSpace w))
         · refine Or.inr <| Or.inl <| ⟨h3,?_⟩
           simp [μ,μQuotient,Eq.mpr (id (congrArg (fun _a ↦ _a > 0) h4)) h'''.right,h'''.2]
           rw [← h4]
           exact (smul_lt_smul_iff_of_pos_left <| Right.inv_pos.mpr h').2 <| (h₁ x y z h).1 ▸ lt_add_of_pos_left (d ⟨(y, z), h.right⟩) <| h₂ x y h.1 h'''.1
       · apply not_and_or.1 at h''
         apply not_and_or.1 at h'''
-        have : ¬ r ⟨(x, y), h.1⟩ = 0 ↔ r ⟨(x, y), h.1⟩ > 0 := pos_iff_ne_zero.symm
-        rw [this] at h'''
+        simp [pos_iff_ne_zero.symm] at h'''
         have : r ⟨(y, z), h.2⟩ = 0 := by aesop
         have this' := (add_zero <| r ⟨(x, y), h.1⟩) ▸ (this ▸ (h₁ x y z h).2) ▸ h'
         have h2 : μ ⟨(y, z), h.2⟩ = ⊤ := by simp [μ, μQuotient, this]
+        have h3 : μ ⟨(x, z), lt_trans h.1 h.2⟩ ≤ μ ⟨(y, z), h.2⟩ := h2 ▸ le_top
         have h4 := (add_zero <| r ⟨(x, y), h.1⟩) ▸ this ▸ (h₁ x y z h).2
-        cases' le_iff_eq_or_lt.1 (h2 ▸ le_top) with h3 h3
-        · sorry
+        cases' le_iff_eq_or_lt.1 h3 with h3 h3
+        · rcases μQuotient_helper r d ⟨(x,z),lt_trans h.1 h.2⟩ (h4 ▸ this') with ⟨w,hw₁,_⟩
+          simp [μ] at h3; simp [μ] at h2
+          exact False.elim (not_top_lt ((h2 ▸ h3 ▸ hw₁).symm ▸ not_top_of_Nontrivial_TotallyOrderedRealVectorSpace w))
         · refine Or.inl <| ⟨?_,h3⟩
           simp [μ,μQuotient,this',Eq.mpr (id (congrArg (fun _a ↦ _a > 0) h4))]
           rw [← h4]
