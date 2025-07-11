@@ -142,12 +142,25 @@ lemma prop4d8 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
           rw [sub_lt_iff_lt_add,add_lt_add_iff_left] at hs'
           exact (smul_lt_smul_iff_of_pos_left h''.2).1 hs'
     · by_cases h''' : r ⟨(x, y), h.1⟩ = 0 ∧ r ⟨(y, z), h.2⟩ > 0
-      · sorry
+      · have h2 : μ ⟨(x, y), h.1⟩ = ⊤ := by simp [μ, μQuotient, h'''.1]
+        have h4 := (zero_add <| r ⟨(y, z), h.2⟩) ▸ h'''.1 ▸ (h₁ x y z h).2
+        cases' le_iff_eq_or_lt.1 (h2 ▸ le_top) with h3 h3
+        · sorry
+        · refine Or.inr <| Or.inl <| ⟨h3,?_⟩
+          simp [μ,μQuotient,Eq.mpr (id (congrArg (fun _a ↦ _a > 0) h4)) h'''.right,h'''.2]
+          rw [← h4]
+          exact (smul_lt_smul_iff_of_pos_left <| Right.inv_pos.mpr h').2 <| (h₁ x y z h).1 ▸ lt_add_of_pos_left (d ⟨(y, z), h.right⟩) <| h₂ x y h.1 h'''.1
       · apply not_and_or.1 at h''
         apply not_and_or.1 at h'''
         have : ¬ r ⟨(x, y), h.1⟩ = 0 ↔ r ⟨(x, y), h.1⟩ > 0 := pos_iff_ne_zero.symm
         rw [this] at h'''
-        have : ¬r ⟨(y, z), h.2⟩ > 0 := by tauto
         have : r ⟨(y, z), h.2⟩ = 0 := by aesop
-        have this' : r ⟨(x, y), h.1⟩ > 0 := (add_zero <| r ⟨(x, y), h.1⟩) ▸ (this ▸ (h₁ x y z h).2) ▸ h'
-        sorry
+        have this' := (add_zero <| r ⟨(x, y), h.1⟩) ▸ (this ▸ (h₁ x y z h).2) ▸ h'
+        have h2 : μ ⟨(y, z), h.2⟩ = ⊤ := by simp [μ, μQuotient, this]
+        have h4 := (add_zero <| r ⟨(x, y), h.1⟩) ▸ this ▸ (h₁ x y z h).2
+        cases' le_iff_eq_or_lt.1 (h2 ▸ le_top) with h3 h3
+        · sorry
+        · refine Or.inl <| ⟨?_,h3⟩
+          simp [μ,μQuotient,this',Eq.mpr (id (congrArg (fun _a ↦ _a > 0) h4))]
+          rw [← h4]
+          exact (smul_lt_smul_iff_of_pos_left <| Right.inv_pos.mpr h').2 <| (h₁ x y z h).1 ▸ lt_add_of_pos_right (d ⟨(x, y), h.1⟩) <| h₂ y z h.2 this
