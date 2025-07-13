@@ -8,7 +8,7 @@ lemma proposition_4_1 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder 
 (h₂ : ∀ z : {p :ℒ × ℒ // p.1 < p.2}, (hz :z.val.2 < ⊤) → μ z ≤ μ ⟨(z.val.1,⊤),lt_trans z.prop hz⟩ ∨ μ ⟨(z.val.2,⊤),hz⟩ ≤ μ ⟨(z.val.1,⊤),lt_trans z.prop hz⟩) :
 ------------
 (
-  μAstar ℒ S μ = sInf {μ ⟨(x,⊤),hx⟩ | (x : ℒ) (hx : x < ⊤) }
+  μAstar ℒ S μ = μmin μ TotIntvl
 ) ∧ (
   μAstar ℒ S μ ≤ μBstar ℒ S μ
 )
@@ -41,7 +41,7 @@ lemma proposition_4_3 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder 
 (h₂ : ∀ z : {p :ℒ × ℒ // p.1 < p.2}, (hz : ⊥ < z.val.1) → μ ⟨(⊥,z.val.2),lt_trans hz z.prop⟩ ≤ μ z ∨ μ ⟨(⊥,z.val.2),lt_trans hz z.prop⟩ ≤ μ ⟨(⊥,z.val.1),hz⟩) :
 ------------
 (
-  μBstar ℒ S μ = sSup {μ ⟨(⊥, y),hy⟩ | (y : ℒ) (hy : ⊥ < y) }
+  μBstar ℒ S μ = μmax μ TotIntvl
 ) ∧ (
   μAstar ℒ S μ ≤ μBstar ℒ S μ
 )

@@ -29,12 +29,25 @@ noncomputable def prop4d1₁_seq {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [Bo
     exact con (hhh xB hAB)
 
 
+lemma prop4d1_helper {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+{S : Type} [CompleteLattice S]
+(μ : {p :ℒ × ℒ // p.1 < p.2} → S) : sInf {x | ∃ x_1, ∃ (hx : x_1 < ⊤), μ ⟨(x_1, ⊤), hx⟩ = x} = μmin μ TotIntvl := by
+    unfold TotIntvl
+    refine congrArg sInf <| Set.ext fun x ↦ ?_
+    constructor
+    · rintro ⟨w, hw, hw'⟩
+      use w, ⟨in_TotIntvl w, ne_top_of_lt hw⟩
+    · rintro ⟨w,hw,hw'⟩
+      use w, lt_top_iff_ne_top.2 hw.2
+
+
 lemma prop4d1₁ (ℒ : Type) [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 (S : Type) [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
 (h₁ : ∀ x : ℕ → ℒ, (smf : StrictMono x) → ∃ N : ℕ, μ ⟨(x N, x (N+1)), smf <| Nat.lt_add_one N⟩ ≤ μ ⟨(x N,⊤), lt_of_lt_of_le (smf <| Nat.lt_add_one N) le_top⟩)
 (h₂ : ∀ z : {p :ℒ × ℒ // p.1 < p.2}, (hz :z.val.2 < ⊤) → μ z ≤ μ ⟨(z.val.1,⊤),lt_trans z.prop hz⟩ ∨ μ ⟨(z.val.2,⊤),hz⟩ ≤ μ ⟨(z.val.1,⊤),lt_trans z.prop hz⟩) :
-μAstar ℒ S μ = sInf {μ ⟨(x,⊤),hx⟩ | (x : ℒ) (hx : x < ⊤) } := by
+μAstar ℒ S μ = μmin μ TotIntvl := by
+  rw [← prop4d1_helper]
   have : ∀ yA : ℒ, (hyA : yA < ⊤) → ∃ xA : ℒ, xA < ⊤ ∧ (∀ xB : ℒ, (hAB : xA < xB) → μ ⟨(xA,xB), hAB⟩ ≤ μ ⟨(yA,⊤), hyA⟩) := by
     by_contra!
     have : {YA : ℒ | ∃ (h : YA < ⊤), ∀ xA < ⊤, ∃ xB, ∃ (hAB : xA < xB), ¬μ ⟨(xA, xB), hAB⟩ ≤ μ ⟨(YA, ⊤), h⟩}.Nonempty := this
@@ -68,16 +81,10 @@ lemma prop4d1₂ (ℒ : Type) [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 (h₂ : ∀ z : {p :ℒ × ℒ // p.1 < p.2}, (hz :z.val.2 < ⊤) → μ z ≤ μ ⟨(z.val.1,⊤),lt_trans z.prop hz⟩ ∨ μ ⟨(z.val.2,⊤),hz⟩ ≤ μ ⟨(z.val.1,⊤),lt_trans z.prop hz⟩) :
 μAstar ℒ S μ ≤ μBstar ℒ S μ := by
   rw [prop4d1₁ ℒ S μ h₁ h₂]
-  have : sInf {x | ∃ x_1, ∃ (hx : x_1 < ⊤), μ ⟨(x_1, ⊤), hx⟩ = x} = μmin μ ⟨(⊥,⊤),bot_lt_top⟩ := by
-    refine congrArg sInf <| Set.ext fun x ↦ ?_
-    constructor
-    · rintro ⟨w, hw, hw'⟩
-      use w, ⟨in_TotIntvl w, ne_top_of_lt hw⟩
-    · rintro ⟨w,hw,hw'⟩
-      use w, lt_top_iff_ne_top.2 hw.2
-  rw [this]
   apply le_sSup
   use ⊤, ⟨⟨bot_le,le_rfl⟩,ne_of_lt bot_lt_top⟩
+  unfold TotIntvl
+  rfl
 
 
 instance {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] : Coe ({p :ℒ × ℒ // p.1 < p.2}) ({p :ℒᵒᵈ × ℒᵒᵈ // p.1 < p.2}) where
@@ -165,13 +172,27 @@ OrderDual.ofDual (μBstar ℒᵒᵈ Sᵒᵈ fun p ↦ μ ⟨(p.val.2, p.val.1), 
       exact ⟨b, ⟨⟨hb.1.2,hb.1.1⟩,Ne.symm hb.2⟩, hb'.symm ▸ rfl⟩
 
 
+lemma prop4d3_helper {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+{S : Type} [CompleteLattice S]
+(μ : {p :ℒ × ℒ // p.1 < p.2} → S) : sSup {μ ⟨(⊥, y),hy⟩ | (y : ℒ) (hy : ⊥ < y) } = μmax μ TotIntvl := by
+    unfold TotIntvl
+    refine congrArg sSup <| Set.ext fun x ↦ ?_
+    constructor
+    · rintro ⟨w, hw, hw'⟩
+      use w, ⟨in_TotIntvl w, ne_of_lt hw⟩
+    · rintro ⟨w,hw,hw'⟩
+      use w, bot_lt_iff_ne_bot.2 <| Ne.symm hw.2
+
+
 lemma prop4d3₁ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
 (h₁ : ∀ x : ℕ → ℒ, (saf : StrictAnti x) → ∃ N : ℕ, μ ⟨(⊥ , x N), lt_of_le_of_lt bot_le <| saf <| Nat.lt_add_one N⟩ ≤ μ ⟨(x (N+1), x N), saf <| Nat.lt_add_one N⟩)
 (h₂ : ∀ z : {p :ℒ × ℒ // p.1 < p.2}, (hz : ⊥ < z.val.1) → μ ⟨(⊥,z.val.2),lt_trans hz z.prop⟩ ≤ μ z ∨ μ ⟨(⊥,z.val.2),lt_trans hz z.prop⟩ ≤ μ ⟨(⊥,z.val.1),hz⟩) :
-μBstar ℒ S μ = sSup {μ ⟨(⊥, y),hy⟩ | (y : ℒ) (hy : ⊥ < y) } := by
+μBstar ℒ S μ = μmax μ TotIntvl := by
   have := prop4d1₁ ℒᵒᵈ Sᵒᵈ (↑μ : {p :ℒᵒᵈ × ℒᵒᵈ // p.1 < p.2} → Sᵒᵈ) (h₁_dual_of_h₁ h₁) (h₂_dual_of_h₂ h₂)
+  rw [← prop4d1_helper] at this
+  rw [← prop4d3_helper]
   simp [*] at this
   rw [← dualμAstar_eq_μBstar, this]
   refine congrArg sSup <| Set.ext fun r ↦ ?_
