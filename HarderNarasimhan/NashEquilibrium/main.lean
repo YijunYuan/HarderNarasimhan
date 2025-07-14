@@ -1,6 +1,8 @@
 import HarderNarasimhan.Basic
 import HarderNarasimhan.FirstMoverAdvantage.Impl
 import HarderNarasimhan.SlopeLike.Defs
+import Mathlib.Tactic.TFAE
+import Mathlib.Data.List.TFAE
 
 def NashEquilibrium {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S]
@@ -158,3 +160,49 @@ lemma rmk4d13 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 lemma prop4d14 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
+(h : ∀ x : ℒ, (hx : x ≠ ⊥ ∧ x ≠ ⊤) → μ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx.1⟩ ≤ μ TotIntvl ∨ ¬ μ TotIntvl ≤ μ ⟨(x,⊤),lt_top_iff_ne_top.2 hx.2⟩) :
+μmin μ TotIntvl = μ TotIntvl → μmax μ TotIntvl = μmin μ TotIntvl := by
+  refine fun h' ↦ h' ▸ eq_of_le_of_le ?_ (rmk4d10₀ μ TotIntvl).2
+  · apply sSup_le
+    rintro b ⟨hb1,⟨hb2,hb3⟩⟩
+    rw [← hb3]
+    by_cases htop : hb1 = ⊤
+    · simp [htop]
+      exact le_rfl
+    refine Or.resolve_right (h hb1 ⟨by tauto,htop⟩) ?_
+    rw [not_not]
+    refine h' ▸ (sInf_le ?_)
+    use hb1, ⟨in_TotIntvl hb1, htop⟩
+    rfl
+
+
+lemma rmk4d15 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+{S : Type} [CompleteLattice S]
+(μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : SlopeLike μ):
+∀ x : ℒ, (hx : x ≠ ⊥ ∧ x ≠ ⊤) → μ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx.1⟩ ≤ μ TotIntvl ∨ ¬ μ TotIntvl ≤ μ ⟨(x,⊤),lt_top_iff_ne_top.2 hx.2⟩ := by
+  intro x hx
+  have := (hμ ⊥ x ⊤ ⟨bot_lt_iff_ne_bot.2 hx.1,lt_top_iff_ne_top.2 hx.2⟩).1
+  cases' this with this this
+  · exact Or.inl this
+  · exact Or.inr <| not_le_of_lt this
+
+
+lemma prop4d16₁ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+{S : Type} [CompleteLattice S]
+(μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : SlopeLike μ):
+List.TFAE [
+  μmax μ TotIntvl = μ TotIntvl,
+  μmin μ TotIntvl = μ TotIntvl,
+  μmin μ TotIntvl = μmax μ TotIntvl
+  ] := by
+  tfae_have 1 → 3 := prop4d12 μ (rmk4d13 μ hμ)
+  tfae_have 2 → 3 := fun h ↦ (prop4d14 μ (rmk4d15 μ hμ) h).symm
+  tfae_have 3 → 1 := by
+    intro h
+    have := h ▸ rmk4d10₀ μ TotIntvl
+    exact eq_of_le_of_le this.1 this.2
+  tfae_have 3 → 2 := by
+    intro h
+    have := h.symm ▸ rmk4d10₀ μ TotIntvl
+    exact eq_of_le_of_le this.1 this.2
+  tfae_finish
