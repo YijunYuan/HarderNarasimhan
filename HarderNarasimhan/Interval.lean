@@ -45,5 +45,8 @@ instance {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] : Coe �
     coe := fun a ↦ ⟨a,⟨bot_le,le_top⟩⟩
 
 
+def Resμ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] (z : {p : ℒ × ℒ // p.1 < p.2}) {S : Type} [CompleteLattice S] (μ : {p :ℒ × ℒ // p.1 < p.2} → S): {p :(Interval z) × (Interval z) // p.1 < p.2} → S := fun p ↦ μ ⟨(p.val.1.val,p.val.2.val),Subtype.GCongr.coe_lt_coe <| Subtype.mk_lt_mk.2 (lt_iff_le_not_le.mpr p.prop)⟩
+
+
 instance {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] {z : {p : ℒ × ℒ // p.1 < p.2}} {S : Type} [CompleteLattice S] : Coe ({p :ℒ × ℒ // p.1 < p.2} → S) ({p :(Interval z) × (Interval z) // p.1 < p.2} → S) where
-    coe := fun μ ↦ (fun p ↦ μ ⟨(p.val.1.val,p.val.2.val),Subtype.GCongr.coe_lt_coe <| Subtype.mk_lt_mk.2 (lt_iff_le_not_le.mpr p.prop)⟩)
+    coe := Resμ z

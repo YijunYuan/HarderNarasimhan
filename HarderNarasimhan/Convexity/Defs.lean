@@ -1,5 +1,5 @@
 import HarderNarasimhan.Basic
-
+import HarderNarasimhan.Interval
 section
 
 variable {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
@@ -21,4 +21,7 @@ def IsConvex
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) : Prop :=
 IsConvexI TotIntvl μ
 
+
+theorem ConvexI_iff (I : {p : ℒ × ℒ // p.1 < p.2}) (μ : {p :ℒ × ℒ // p.1 < p.2} → S) :
+IsConvexI I μ ↔ IsConvex (Resμ I μ) := ⟨fun h1 h2 h3 h4 h5 => h1 h2 h3 h4 h5,fun h1 h2 h3 h4 h5 h6 ↦ h1 ⟨h2,h4⟩ ⟨h3,h5⟩ (in_TotIntvl _) (in_TotIntvl _) h6⟩
 end

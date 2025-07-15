@@ -51,7 +51,8 @@ lemma helper {α : Type} {a b c d: α} (h : a = b) (h' : b = c) (h'' : c = d) : 
 theorem semistableI_iff {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
-(I : {p : ℒ × ℒ // p.1 < p.2}) : semistableI μ I ↔ semistable (↑μ : {p : (Interval I) × (Interval I) // p.1 < p.2} → S) := by
+(I : {p : ℒ × ℒ // p.1 < p.2}) : semistableI μ I ↔ semistable (Resμ I μ) := by
+  unfold Resμ
   constructor
   · intro h
     simp [semistable,semistableI]
