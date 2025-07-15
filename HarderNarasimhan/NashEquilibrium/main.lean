@@ -1,6 +1,7 @@
 import HarderNarasimhan.Basic
 import HarderNarasimhan.FirstMoverAdvantage.Impl
 import HarderNarasimhan.SlopeLike.Defs
+import HarderNarasimhan.Semistability.Defs
 import Mathlib.Tactic.TFAE
 import Mathlib.Data.List.TFAE
 
@@ -206,3 +207,42 @@ List.TFAE [
     have := h.symm ▸ rmk4d10₀ μ TotIntvl
     exact eq_of_le_of_le this.1 this.2
   tfae_finish
+
+
+lemma prop4d16₂ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+{S : Type} [CompleteLattice S]
+(μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : SlopeLike μ)
+(h₁ : ∀ x : ℕ → ℒ, (smf : StrictMono x) → ∃ N : ℕ, μ ⟨(x N, x (N+1)), smf <| Nat.lt_add_one N⟩ ≤ μ ⟨(x N,⊤), lt_of_lt_of_le (smf <| Nat.lt_add_one N) le_top⟩)
+(h₂ : ∀ x : ℕ → ℒ, (saf : StrictAnti x) → ∃ N : ℕ, μ ⟨(⊥ , x N), lt_of_le_of_lt bot_le <| saf <| Nat.lt_add_one N⟩ ≤ μ ⟨(x (N+1), x N), saf <| Nat.lt_add_one N⟩) :
+μmin μ TotIntvl = μmax μ TotIntvl ↔ NashEquilibrium μ := by
+  have : ∀ (z : { p : ℒ × ℒ // p.1 < p.2 }) (hz : z.val.2 < ⊤), μ z ≤ μ ⟨(z.val.1, ⊤), lt_trans z.prop hz⟩ ∨ μ ⟨(z.val.2, ⊤), hz⟩ ≤ μ ⟨(z.val.1, ⊤), lt_trans z.prop hz⟩ := by
+    intro z hz
+    cases' (hμ z.val.1 z.val.2 ⊤ ⟨z.prop, hz⟩).1 with this this
+    · exact Or.inl this
+    · exact Or.inr <| le_of_lt this
+  refine ⟨fun h ↦ eq_of_le_of_le (impl.prop4d1₂ ℒ S μ h₁ this) <| prop4d11₁ μ h,fun h ↦ prop4d11₂ μ h₁ this h₂ (fun z hz ↦ ?_) h.symm.le⟩
+  cases' (hμ ⊥ z.val.1 z.val.2 ⟨hz,z.prop⟩).2.2.1 with this this
+  · exact Or.inr <| le_of_lt this
+  · exact Or.inl <| this
+
+
+lemma prop4d18₁ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+{S : Type} [CompleteLinearOrder S]
+(μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : semistable μ) : μBstar ℒ S μ ≤ μAstar ℒ S μ := by
+  have : sSup {μA μ ⟨(⊥,x),hx⟩ | (x : ℒ) (hx : ⊥ < x)} ≤ μAstar ℒ S μ := by
+    apply sSup_le
+    rintro b ⟨hb1,⟨hb2,hb3⟩⟩
+    have := hb3 ▸ hμ.out.choose_spec.choose_spec.1 hb1 (in_TotIntvl hb1) (Ne.symm <| bot_lt_iff_ne_bot.1 hb2)
+    aesop
+  refine le_trans (sSup_le_sSup_of_forall_exists_le ?_) this
+  rintro x ⟨hx1,⟨hx2,hx3⟩⟩
+  use μA μ ⟨(⊥,hx1),bot_lt_iff_ne_bot.2 <| Ne.symm hx2.2⟩
+  rw [← hx3]
+  constructor
+  · use hx1, bot_lt_iff_ne_bot.2 <| Ne.symm hx2.2
+  · apply sInf_le_sInf_of_forall_exists_le
+    rintro y ⟨hy1,⟨hy2,hy3⟩⟩
+    use μ ⟨(hy1,hx1) , lt_of_le_of_ne hy2.1.2 hy2.2⟩
+    constructor
+    · use hy1, hy2
+    · exact hy3 ▸ (rmk4d10₀ μ ⟨(hy1,hx1), lt_of_le_of_ne hy2.1.2 hy2.2⟩).2
