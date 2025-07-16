@@ -249,7 +249,7 @@ lemma prop4d18₁ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 
 
 lemma prop4d20 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-{S : Type} [CompleteLinearOrder S]
+{S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
 (h₁ : ∀ x : ℒ, (hx : x ≠ ⊥) → prop_4_1_cond₁ (Resμ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx⟩ μ))
 (h₂ :  ∀ x : ℒ, (hx : x ≠ ⊥) → prop_4_1_cond₂ (Resμ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx⟩ μ)) :
@@ -362,3 +362,33 @@ NashEquilibrium μ → semistable μ := by
     apply le_sSup
     use x, hx
   exact fun x hx ↦ LE.le.not_lt <| this x hx
+
+
+theorem thm4d21 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+{S : Type} [CompleteLinearOrder S]
+(μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : SlopeLike μ)
+(h₁ : prop_4_1_cond₁ μ) (h₂ : prop_4_3_cond₁ μ) :
+List.TFAE [
+  μmax μ TotIntvl = μ TotIntvl,
+  μmin μ TotIntvl = μ TotIntvl,
+  μmin μ TotIntvl = μmax μ TotIntvl,
+  NashEquilibrium μ,
+  semistable μ
+  ] := by
+  have h16 := prop4d16₁ μ hμ
+  tfae_have 1 ↔ 2 := (h16.out 0 1 (by norm_num) (by norm_num))
+  tfae_have 2 ↔ 3 := (h16.out 1 2 (by norm_num) (by norm_num))
+  tfae_have 3 ↔ 4 := prop4d16₂ μ hμ h₁ h₂
+  tfae_have 4 → 5 := by
+    refine fun h ↦ prop4d20 μ ?_ ?_ h
+    · intro x hx
+      simp [prop_4_1_cond₁,Resμ]
+      intro f smf
+      rcases h₁ (fun t ↦ (f t).val) sorry with ⟨h1,h2⟩
+      use h1
+      refine le_trans h2 ?_
+
+      sorry
+    · sorry
+  tfae_have 5 → 4 := sorry
+  tfae_finish
