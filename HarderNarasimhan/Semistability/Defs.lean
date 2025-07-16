@@ -42,20 +42,34 @@ def semistableI {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 
 def semistable {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S) : Prop := semistableI μ TotIntvl
+(μ : {p :ℒ × ℒ // p.1 < p.2} → S) : Prop := ∀x : ℒ, (hx : x ≠ ⊥) → ¬ μA μ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx⟩ > μA μ ⟨(⊥,⊤),bot_lt_top⟩
 
 
-lemma helper {α : Type} {a b c d: α} (h : a = b) (h' : b = c) (h'' : c = d) : a = d := h ▸ h' ▸ h''
+theorem semistable_iff {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+{S : Type} [CompleteLattice S]
+(μ : {p :ℒ × ℒ // p.1 < p.2} → S) :
+  semistable μ ↔ semistableI μ TotIntvl := by
+  simp [semistable, semistableI, TotIntvl,StI,S₁I,S₂I]
+  constructor
+  · intro h
+    use in_TotIntvl _
+    exact fun y hyI hy ↦ h y <| Ne.symm hy
+  · intro h x hx
+    exact h.choose_spec x (in_TotIntvl _) (Ne.symm hx)
+
+
+lemma stupid_helper {α : Type} {a b c d: α} (h : a = b) (h' : b = c) (h'' : c = d) : a = d := h ▸ h' ▸ h''
 
 
 theorem semistableI_iff {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
 (I : {p : ℒ × ℒ // p.1 < p.2}) : semistableI μ I ↔ semistable (Resμ I μ) := by
+  rw [semistable_iff]
   unfold Resμ
   constructor
   · intro h
-    simp [semistable,semistableI]
+    simp [semistableI]
     simp [semistableI] at h
     rcases h.out with ⟨h1,h2,h3,h4⟩
     apply Set.mem_def.2
@@ -135,7 +149,7 @@ theorem semistableI_iff {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrde
             use ⟨b,⟨le_trans ha1.1.1 hb1.1.1,le_trans hb1.1.2 y.prop.2⟩⟩, ⟨hb1.1,Subtype.coe_ne_coe.1 hb1.2⟩
     · simp [S₂I] at *
       intro y hyI hy h
-      refine h4 y hyI (Subtype.coe_ne_coe.2 hy) <| helper ?_ h ?_
+      refine h4 y hyI (Subtype.coe_ne_coe.2 hy) <| stupid_helper ?_ h ?_
       · simp [μA]
         congr 1; ext
         constructor
@@ -204,7 +218,7 @@ theorem semistableI_iff {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrde
             rw [← hb2]
             use ⟨b,⟨le_trans ha1.1.1 hb1.1.1,hb1.1.2⟩⟩, ⟨hb1.1,Subtype.coe_ne_coe.1 hb1.2⟩
   · rintro ⟨h1,⟨h3,⟨h4,h5⟩⟩⟩
-    simp [semistable,semistableI,StI]
+    simp [semistableI,StI]
     use ⟨le_of_lt I.prop,le_rfl⟩, ne_of_lt I.prop
     constructor
     · simp [S₁I] at *
@@ -274,7 +288,7 @@ theorem semistableI_iff {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrde
     · simp [S₂I] at *
       intro y hyI hy h
       refine h5 ⟨y,hyI⟩ (in_TotIntvl _) (Subtype.coe_ne_coe.1 hy) ?_
-      refine helper ?_ h ?_
+      refine stupid_helper ?_ h ?_
       · simp [μA]
         congr 1; ext
         constructor

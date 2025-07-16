@@ -229,6 +229,7 @@ lemma prop4d16₂ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 lemma prop4d18₁ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLinearOrder S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : semistable μ) : μBstar ℒ S μ ≤ μAstar ℒ S μ := by
+  rw [semistable_iff] at hμ
   have : sSup {μA μ ⟨(⊥,x),hx⟩ | (x : ℒ) (hx : ⊥ < x)} ≤ μAstar ℒ S μ := by
     apply sSup_le
     rintro b ⟨hb1,⟨hb2,hb3⟩⟩
@@ -246,3 +247,124 @@ lemma prop4d18₁ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
     constructor
     · use hy1, hy2
     · exact hy3 ▸ (rmk4d10₀ μ ⟨(hy1,hx1), lt_of_le_of_ne hy2.1.2 hy2.2⟩).2
+
+--set_option synthInstance.maxHeartbeats 200000
+
+
+lemma stupid_helper {α : Type} {a b c d: α} (h : a = b) (h' : b = c) (h'' : c = d) : a = d := h ▸ h' ▸ h''
+
+
+lemma prop4d20 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+{S : Type} [CompleteLinearOrder S]
+(μ : {p :ℒ × ℒ // p.1 < p.2} → S)
+(h₁ : ∀ x : ℒ, (hx : x ≠ ⊥) → ∀ s : ℕ → Interval ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx⟩, (smf : StrictMono s) → ∃ N : ℕ, (Resμ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx⟩ μ) ⟨(s N, s (N+1)), smf <| Nat.lt_add_one N⟩ ≤ (Resμ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx⟩ μ) ⟨(s N,⊤), lt_of_lt_of_le (smf <| Nat.lt_add_one N) le_top⟩)
+(h₂ :  ∀ x : ℒ, (hx : x ≠ ⊥) → ∀ z : {p :(Interval ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx⟩) × (Interval ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx⟩) // p.1 < p.2}, (hz :z.val.2 < ⊤) → (Resμ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx⟩ μ) z ≤ (Resμ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx⟩ μ) ⟨(z.val.1,⊤),lt_trans z.prop hz⟩ ∨ (Resμ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx⟩ μ) ⟨(z.val.2,⊤),hz⟩ ≤ (Resμ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx⟩ μ) ⟨(z.val.1,⊤),lt_trans z.prop hz⟩) :
+NashEquilibrium μ → semistable μ := by
+  intro h
+  have : sSup {μA μ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx⟩ | (x : ℒ) (hx : x ≠ ⊥)} = μBstar ℒ S μ := by
+    unfold μBstar μB
+    congr 1; ext
+    constructor
+    · simp
+      intro x hx hx'
+      rw [← hx']
+      use x, ⟨in_TotIntvl _,Ne.symm hx⟩
+      refine stupid_helper ?_ (Eq.symm <| impl.prop4d1₁ (Interval ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx⟩) S (Resμ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx⟩ μ) (h₁ x hx) (h₂ x hx)) ?_
+      · simp [μmin]
+        congr 1; ext
+        constructor
+        · rintro ⟨ha1,⟨ha2,ha3⟩⟩
+          use ⟨ha1,ha2.1⟩, ⟨in_TotIntvl _,Subtype.coe_ne_coe.1 ha2.2⟩
+          rw [← ha3]
+          congr 1
+        · rintro ⟨ha1,⟨ha2,ha3⟩⟩
+          use ha1, ⟨in_TotIntvl ha1,Subtype.coe_ne_coe.2 ha2.2⟩
+          rw [← ha3]
+          congr 1
+      · simp [μAstar,μA]
+        congr 1; ext
+        constructor
+        · rintro ⟨ha1,⟨ha2,ha3⟩⟩
+          use ha1, ⟨in_TotIntvl ha1,Subtype.coe_ne_coe.2 ha2.2⟩
+          rw [← ha3]
+          simp [μmax]
+          congr 1; ext
+          constructor
+          · rintro ⟨hb1,⟨hb2,hb3⟩⟩
+            use ⟨hb1, ⟨bot_le,hb2.1.2⟩⟩, ⟨hb2.1,Subtype.coe_ne_coe.1 hb2.2⟩
+            rw [← hb3]
+            congr 1
+          · rintro ⟨hb1,⟨hb2,hb3⟩⟩
+            use hb1, ⟨hb2.1,Subtype.coe_ne_coe.2 hb2.2⟩
+            rw [← hb3]
+            congr 1
+        · rintro ⟨ha1,⟨ha2,ha3⟩⟩
+          use ⟨ha1,ha2.1⟩, ⟨in_TotIntvl _,Subtype.coe_ne_coe.1 ha2.2⟩
+          rw [← ha3]
+          simp [μmax]
+          congr 1; ext
+          constructor
+          · rintro ⟨hb1,⟨hb2,hb3⟩⟩
+            use hb1, ⟨hb2.1,Subtype.coe_ne_coe.2 hb2.2⟩
+            rw [← hb3]
+            simp [Resμ]
+          · rintro ⟨hb1,⟨hb2,hb3⟩⟩
+            use ⟨hb1,⟨bot_le,hb2.1.2⟩⟩, ⟨hb2.1,Subtype.coe_ne_coe.1 hb2.2⟩
+            rw [← hb3]
+            congr 1
+    · simp
+      intro x hx hx'
+      rw [← hx']
+      use x, Ne.symm hx.2
+      refine stupid_helper ?_ (impl.prop4d1₁ (Interval ⟨(⊥,x),bot_lt_iff_ne_bot.2 <| Ne.symm hx.2⟩) S (Resμ ⟨(⊥,x),bot_lt_iff_ne_bot.2 <| Ne.symm hx.2⟩ μ) (h₁ x <| Ne.symm hx.2) (h₂ x <| Ne.symm hx.2)) ?_
+      · simp [μAstar,μA,Resμ]
+        congr 1; ext
+        constructor
+        · rintro ⟨ha1,⟨ha2,ha3⟩⟩
+          use ⟨ha1,ha2.1⟩, ⟨in_TotIntvl _,Subtype.coe_ne_coe.1 ha2.2⟩
+          rw [← ha3]
+          simp [μmax]
+          congr 1; ext
+          constructor
+          · rintro ⟨hb1,⟨hb2,hb3⟩⟩
+            use hb1, ⟨hb2.1,Subtype.coe_ne_coe.2 hb2.2⟩
+            rw [← hb3]
+            simp [Resμ]
+          · rintro ⟨hb1,⟨hb2,hb3⟩⟩
+            use ⟨hb1,⟨bot_le,hb2.1.2⟩⟩, ⟨hb2.1,Subtype.coe_ne_coe.1 hb2.2⟩
+            rw [← hb3]
+            congr 1
+        · rintro ⟨ha1,⟨ha2,ha3⟩⟩
+          use ha1, ⟨in_TotIntvl ha1,Subtype.coe_ne_coe.2 ha2.2⟩
+          rw [← ha3]
+          simp [μmax]
+          congr 1; ext
+          constructor
+          · rintro ⟨hb1,⟨hb2,hb3⟩⟩
+            use ⟨hb1, ⟨bot_le,hb2.1.2⟩⟩, ⟨hb2.1,Subtype.coe_ne_coe.1 hb2.2⟩
+            rw [← hb3]
+            congr 1
+          · rintro ⟨hb1,⟨hb2,hb3⟩⟩
+            use hb1, ⟨hb2.1,Subtype.coe_ne_coe.2 hb2.2⟩
+            rw [← hb3]
+            congr 1
+      · simp [μmin]
+        congr 1; ext
+        constructor
+        · rintro ⟨ha1,⟨ha2,ha3⟩⟩
+          use ha1, ⟨in_TotIntvl ha1,Subtype.coe_ne_coe.2 ha2.2⟩
+          rw [← ha3]
+          congr 1
+        · rintro ⟨ha1,⟨ha2,ha3⟩⟩
+          use ⟨ha1,ha2.1⟩, ⟨in_TotIntvl _,Subtype.coe_ne_coe.1 ha2.2⟩
+          rw [← ha3]
+          congr 1
+  have : ∀ x : ℒ, (hx : x ≠ ⊥) → μA μ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx⟩ ≤ μA μ TotIntvl := by
+    rw [← h] at this
+    simp [μAstar] at this
+    intro x hx
+    unfold TotIntvl
+    rw [← this]
+    apply le_sSup
+    use x, hx
+  exact fun x hx ↦ LE.le.not_lt <| this x hx
