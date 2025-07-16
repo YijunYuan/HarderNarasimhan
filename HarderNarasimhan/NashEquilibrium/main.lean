@@ -1,7 +1,8 @@
 import HarderNarasimhan.Basic
 import HarderNarasimhan.FirstMoverAdvantage.Impl
+import HarderNarasimhan.FirstMoverAdvantage.Defs
 import HarderNarasimhan.SlopeLike.Defs
-import HarderNarasimhan.Semistability.Defs
+import HarderNarasimhan.Semistability.Translation
 import Mathlib.Tactic.TFAE
 import Mathlib.Data.List.TFAE
 
@@ -45,8 +46,7 @@ lemma rmk4d10₁ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 lemma rmk4d10₂ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
-(h₁ : ∀ x : ℕ → ℒ, (smf : StrictMono x) → ∃ N : ℕ, μ ⟨(x N, x (N+1)), smf <| Nat.lt_add_one N⟩ ≤ μ ⟨(x N,⊤), lt_of_lt_of_le (smf <| Nat.lt_add_one N) le_top⟩)
-(h₂ : ∀ z : {p :ℒ × ℒ // p.1 < p.2}, (hz :z.val.2 < ⊤) → μ z ≤ μ ⟨(z.val.1,⊤),lt_trans z.prop hz⟩ ∨ μ ⟨(z.val.2,⊤),hz⟩ ≤ μ ⟨(z.val.1,⊤),lt_trans z.prop hz⟩):
+(h₁ : prop_4_1_cond₁ μ) (h₂ : prop_4_1_cond₂ μ):
 NashEquilibrium μ ↔ ∀ y : ℒ, (hy : y ≠ ⊥) → μmin μ ⟨(⊥,y),bot_lt_iff_ne_bot.2 hy⟩ ≤ μmin μ TotIntvl := by
   constructor
   · intro h y hy
@@ -73,8 +73,7 @@ NashEquilibrium μ ↔ ∀ y : ℒ, (hy : y ≠ ⊥) → μmin μ ⟨(⊥,y),bot
 lemma rmk4d10₃ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
-(h₁ : ∀ x : ℕ → ℒ, (saf : StrictAnti x) → ∃ N : ℕ, μ ⟨(⊥ , x N), lt_of_le_of_lt bot_le <| saf <| Nat.lt_add_one N⟩ ≤ μ ⟨(x (N+1), x N), saf <| Nat.lt_add_one N⟩)
-(h₂ : ∀ z : {p :ℒ × ℒ // p.1 < p.2}, (hz : ⊥ < z.val.1) → μ ⟨(⊥,z.val.2),lt_trans hz z.prop⟩ ≤ μ z ∨ μ ⟨(⊥,z.val.2),lt_trans hz z.prop⟩ ≤ μ ⟨(⊥,z.val.1),hz⟩):
+(h₁ : prop_4_3_cond₁ μ) (h₂ : prop_4_3_cond₂ μ):
 NashEquilibrium μ ↔ ∀ y : ℒ, (hy : y ≠ ⊤) → μmax μ TotIntvl ≤ μmax μ ⟨(y,⊤),lt_top_iff_ne_top.2 hy⟩ := by
   constructor
   · intro h y hy
@@ -121,10 +120,8 @@ lemma prop4d11₁ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 lemma prop4d11₂ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
-(h₁ : ∀ x : ℕ → ℒ, (smf : StrictMono x) → ∃ N : ℕ, μ ⟨(x N, x (N+1)), smf <| Nat.lt_add_one N⟩ ≤ μ ⟨(x N,⊤), lt_of_lt_of_le (smf <| Nat.lt_add_one N) le_top⟩)
-(h₂ : ∀ z : {p :ℒ × ℒ // p.1 < p.2}, (hz :z.val.2 < ⊤) → μ z ≤ μ ⟨(z.val.1,⊤),lt_trans z.prop hz⟩ ∨ μ ⟨(z.val.2,⊤),hz⟩ ≤ μ ⟨(z.val.1,⊤),lt_trans z.prop hz⟩)
-(h₁' : ∀ x : ℕ → ℒ, (saf : StrictAnti x) → ∃ N : ℕ, μ ⟨(⊥ , x N), lt_of_le_of_lt bot_le <| saf <| Nat.lt_add_one N⟩ ≤ μ ⟨(x (N+1), x N), saf <| Nat.lt_add_one N⟩)
-(h₂' : ∀ z : {p :ℒ × ℒ // p.1 < p.2}, (hz : ⊥ < z.val.1) → μ ⟨(⊥,z.val.2),lt_trans hz z.prop⟩ ≤ μ z ∨ μ ⟨(⊥,z.val.2),lt_trans hz z.prop⟩ ≤ μ ⟨(⊥,z.val.1),hz⟩):
+(h₁ : prop_4_1_cond₁ μ) (h₂ : prop_4_1_cond₂ μ)
+(h₁' : prop_4_3_cond₁ μ) (h₂' : prop_4_3_cond₂ μ):
 μBstar ℒ S μ ≤ μAstar ℒ S μ → μmin μ TotIntvl = μmax μ TotIntvl := fun h ↦ eq_of_le_of_le (le_trans (rmk4d10₀ μ TotIntvl).1 (rmk4d10₀ μ ⟨(⊥,⊤),bot_lt_top⟩).2) <| (impl.prop4d3₁ μ h₁' h₂') ▸ (impl.prop4d1₁ ℒ S μ h₁ h₂) ▸ h
 
 
@@ -212,8 +209,7 @@ List.TFAE [
 lemma prop4d16₂ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : SlopeLike μ)
-(h₁ : ∀ x : ℕ → ℒ, (smf : StrictMono x) → ∃ N : ℕ, μ ⟨(x N, x (N+1)), smf <| Nat.lt_add_one N⟩ ≤ μ ⟨(x N,⊤), lt_of_lt_of_le (smf <| Nat.lt_add_one N) le_top⟩)
-(h₂ : ∀ x : ℕ → ℒ, (saf : StrictAnti x) → ∃ N : ℕ, μ ⟨(⊥ , x N), lt_of_le_of_lt bot_le <| saf <| Nat.lt_add_one N⟩ ≤ μ ⟨(x (N+1), x N), saf <| Nat.lt_add_one N⟩) :
+(h₁ : prop_4_1_cond₁ μ) (h₂ : prop_4_3_cond₁ μ) :
 μmin μ TotIntvl = μmax μ TotIntvl ↔ NashEquilibrium μ := by
   have : ∀ (z : { p : ℒ × ℒ // p.1 < p.2 }) (hz : z.val.2 < ⊤), μ z ≤ μ ⟨(z.val.1, ⊤), lt_trans z.prop hz⟩ ∨ μ ⟨(z.val.2, ⊤), hz⟩ ≤ μ ⟨(z.val.1, ⊤), lt_trans z.prop hz⟩ := by
     intro z hz
@@ -248,17 +244,15 @@ lemma prop4d18₁ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
     · use hy1, hy2
     · exact hy3 ▸ (rmk4d10₀ μ ⟨(hy1,hx1), lt_of_le_of_ne hy2.1.2 hy2.2⟩).2
 
---set_option synthInstance.maxHeartbeats 200000
 
-
-lemma stupid_helper {α : Type} {a b c d: α} (h : a = b) (h' : b = c) (h'' : c = d) : a = d := h ▸ h' ▸ h''
+--`TODO: prop4d18₂`
 
 
 lemma prop4d20 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLinearOrder S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
-(h₁ : ∀ x : ℒ, (hx : x ≠ ⊥) → ∀ s : ℕ → Interval ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx⟩, (smf : StrictMono s) → ∃ N : ℕ, (Resμ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx⟩ μ) ⟨(s N, s (N+1)), smf <| Nat.lt_add_one N⟩ ≤ (Resμ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx⟩ μ) ⟨(s N,⊤), lt_of_lt_of_le (smf <| Nat.lt_add_one N) le_top⟩)
-(h₂ :  ∀ x : ℒ, (hx : x ≠ ⊥) → ∀ z : {p :(Interval ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx⟩) × (Interval ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx⟩) // p.1 < p.2}, (hz :z.val.2 < ⊤) → (Resμ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx⟩ μ) z ≤ (Resμ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx⟩ μ) ⟨(z.val.1,⊤),lt_trans z.prop hz⟩ ∨ (Resμ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx⟩ μ) ⟨(z.val.2,⊤),hz⟩ ≤ (Resμ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx⟩ μ) ⟨(z.val.1,⊤),lt_trans z.prop hz⟩) :
+(h₁ : ∀ x : ℒ, (hx : x ≠ ⊥) → prop_4_1_cond₁ (Resμ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx⟩ μ))
+(h₂ :  ∀ x : ℒ, (hx : x ≠ ⊥) → prop_4_1_cond₂ (Resμ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx⟩ μ)) :
 NashEquilibrium μ → semistable μ := by
   intro h
   have : sSup {μA μ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx⟩ | (x : ℒ) (hx : x ≠ ⊥)} = μBstar ℒ S μ := by
@@ -269,7 +263,7 @@ NashEquilibrium μ → semistable μ := by
       intro x hx hx'
       rw [← hx']
       use x, ⟨in_TotIntvl _,Ne.symm hx⟩
-      refine stupid_helper ?_ (Eq.symm <| impl.prop4d1₁ (Interval ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx⟩) S (Resμ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx⟩ μ) (h₁ x hx) (h₂ x hx)) ?_
+      refine impl.stupid_helper ?_ (Eq.symm <| impl.prop4d1₁ (Interval ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx⟩) S (Resμ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx⟩ μ) (h₁ x hx) (h₂ x hx)) ?_
       · simp [μmin]
         congr 1; ext
         constructor
@@ -316,7 +310,7 @@ NashEquilibrium μ → semistable μ := by
       intro x hx hx'
       rw [← hx']
       use x, Ne.symm hx.2
-      refine stupid_helper ?_ (impl.prop4d1₁ (Interval ⟨(⊥,x),bot_lt_iff_ne_bot.2 <| Ne.symm hx.2⟩) S (Resμ ⟨(⊥,x),bot_lt_iff_ne_bot.2 <| Ne.symm hx.2⟩ μ) (h₁ x <| Ne.symm hx.2) (h₂ x <| Ne.symm hx.2)) ?_
+      refine impl.stupid_helper ?_ (impl.prop4d1₁ (Interval ⟨(⊥,x),bot_lt_iff_ne_bot.2 <| Ne.symm hx.2⟩) S (Resμ ⟨(⊥,x),bot_lt_iff_ne_bot.2 <| Ne.symm hx.2⟩ μ) (h₁ x <| Ne.symm hx.2) (h₂ x <| Ne.symm hx.2)) ?_
       · simp [μAstar,μA,Resμ]
         congr 1; ext
         constructor
