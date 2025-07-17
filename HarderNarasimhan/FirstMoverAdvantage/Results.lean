@@ -7,9 +7,9 @@ lemma proposition_4_1 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder 
 (h₁ : prop_4_1_cond₁ μ) (h₂ : prop_4_1_cond₂ μ) :
 ------------
 (
-  μAstar ℒ S μ = μmin μ TotIntvl
+  μAstar μ = μmin μ TotIntvl
 ) ∧ (
-  μAstar ℒ S μ ≤ μBstar ℒ S μ
+  μAstar μ ≤ μBstar μ
 )
 ------------
 := ⟨impl.prop4d1₁ ℒ S μ h₁ h₂, impl.prop4d1₂ ℒ S μ h₁ h₂⟩
@@ -19,7 +19,7 @@ lemma dualμAstar_eq_μBstar {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [Bounde
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) :
 ------------
-(μAstar ℒᵒᵈ Sᵒᵈ fun p ↦ μ ⟨(p.val.2, p.val.1), p.prop⟩).ofDual = μBstar ℒ S μ
+OrderDual.ofDual <| μAstar (fun (p : {p : ℒᵒᵈ × ℒᵒᵈ // p.1 < p.2}) ↦ OrderDual.toDual <| μ ⟨(p.val.2, p.val.1), p.prop⟩) = μBstar μ
 ------------
 := impl.dualμAstar_eq_μBstar μ
 
@@ -28,7 +28,7 @@ lemma dualμBstar_eq_μAstar {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [Bounde
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) :
 ------------
-OrderDual.ofDual (μBstar ℒᵒᵈ Sᵒᵈ fun p ↦ μ ⟨(p.val.2, p.val.1), p.prop⟩) = μAstar ℒ S μ
+OrderDual.ofDual <| μBstar (fun (p : {p : ℒᵒᵈ × ℒᵒᵈ // p.1 < p.2}) ↦ OrderDual.toDual <| μ ⟨(p.val.2, p.val.1), p.prop⟩) = μAstar μ
 ------------
 := impl.dualμBstar_eq_μAstar μ
 
@@ -39,9 +39,9 @@ lemma proposition_4_3 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder 
 (h₁ : prop_4_3_cond₁ μ) (h₂ : prop_4_3_cond₂ μ) :
 ------------
 (
-  μBstar ℒ S μ = μmax μ TotIntvl
+  μBstar μ = μmax μ TotIntvl
 ) ∧ (
-  μAstar ℒ S μ ≤ μBstar ℒ S μ
+  μAstar μ ≤ μBstar μ
 )
 ------------
 := ⟨impl.prop4d3₁ μ h₁ h₂, impl.prop4d3₂ μ h₁ h₂⟩

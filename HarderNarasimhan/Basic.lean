@@ -28,8 +28,8 @@ def μA {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 sInf {μmax μ ⟨(a , I.val.2),(lt_of_le_of_ne ha.1.2 ha.2)⟩ | (a : ℒ) (ha : InIntvl I a ∧ a ≠ I.val.2)}
 
 
-def μAstar (ℒ : Type) [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
-(S : Type) [CompleteLattice S]
+def μAstar {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
+{S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) : S :=
 μA μ ⟨(⊥,⊤) , bot_lt_top⟩
 
@@ -48,8 +48,8 @@ def μB {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 sSup {μmin μ ⟨(I.val.1 , a),(lt_of_le_of_ne ha.1.1 ha.2)⟩ | (a : ℒ) (ha : InIntvl I a ∧ I.val.1 ≠ a)}
 
 
-def μBstar (ℒ : Type) [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
-(S : Type) [CompleteLattice S]
+def μBstar {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
+{S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) : S :=
 μB μ ⟨(⊥,⊤) , bot_lt_top⟩
 

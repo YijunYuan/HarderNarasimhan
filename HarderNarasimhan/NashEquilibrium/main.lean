@@ -9,7 +9,7 @@ import Mathlib.Data.List.TFAE
 def NashEquilibrium {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) : Prop :=
-  μAstar ℒ S μ = μBstar ℒ S μ
+  μAstar μ = μBstar μ
 
 
 lemma rmk4d10₀ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
@@ -27,7 +27,7 @@ lemma rmk4d10₀ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 lemma rmk4d10₁ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) :
-μBstar ℒ S μ ≤ μAstar ℒ S μ ↔ ∀ x : ℒ, (hx : x ≠ ⊤) → ∀ y : ℒ, (hy : ⊥ < y) → μmin μ ⟨(⊥,y),hy⟩ ≤ μmax μ ⟨(x,⊤),lt_top_iff_ne_top.2 hx⟩ := by
+μBstar μ ≤ μAstar μ ↔ ∀ x : ℒ, (hx : x ≠ ⊤) → ∀ y : ℒ, (hy : ⊥ < y) → μmin μ ⟨(⊥,y),hy⟩ ≤ μmax μ ⟨(x,⊤),lt_top_iff_ne_top.2 hx⟩ := by
   constructor
   · intro h x hx y hy
     simp [μAstar,μBstar] at h
@@ -101,14 +101,14 @@ NashEquilibrium μ ↔ ∀ y : ℒ, (hy : y ≠ ⊤) → μmax μ TotIntvl ≤ �
 lemma prop4d11₁ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) :
-μmin μ TotIntvl = μmax μ TotIntvl → μBstar ℒ S μ ≤ μAstar ℒ S μ := by
-  have h₁ : μBstar ℒ S μ ≤ μmax μ TotIntvl := by
+μmin μ TotIntvl = μmax μ TotIntvl → μBstar μ ≤ μAstar μ := by
+  have h₁ : μBstar μ ≤ μmax μ TotIntvl := by
     unfold μBstar μB μmax TotIntvl
     apply sSup_le
     rintro b ⟨hb1,⟨hb2,hb3⟩⟩
     refine hb3 ▸ le_trans (rmk4d10₀ μ ⟨(⊥,hb1), bot_lt_iff_ne_bot.2 <| Ne.symm hb2.2⟩).1 <| le_sSup ?_
     use hb1, ⟨in_TotIntvl hb1, hb2.2⟩
-  have h₂ : μmin μ TotIntvl ≤ μAstar ℒ S μ := by
+  have h₂ : μmin μ TotIntvl ≤ μAstar μ := by
     unfold μAstar μA μmin TotIntvl
     apply le_sInf
     rintro b ⟨hb1,⟨hb2,hb3⟩⟩
@@ -122,7 +122,7 @@ lemma prop4d11₂ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
 (h₁ : prop_4_1_cond₁ μ) (h₂ : prop_4_1_cond₂ μ)
 (h₁' : prop_4_3_cond₁ μ) (h₂' : prop_4_3_cond₂ μ):
-μBstar ℒ S μ ≤ μAstar ℒ S μ → μmin μ TotIntvl = μmax μ TotIntvl := fun h ↦ eq_of_le_of_le (le_trans (rmk4d10₀ μ TotIntvl).1 (rmk4d10₀ μ ⟨(⊥,⊤),bot_lt_top⟩).2) <| (impl.prop4d3₁ μ h₁' h₂') ▸ (impl.prop4d1₁ ℒ S μ h₁ h₂) ▸ h
+μBstar μ ≤ μAstar μ → μmin μ TotIntvl = μmax μ TotIntvl := fun h ↦ eq_of_le_of_le (le_trans (rmk4d10₀ μ TotIntvl).1 (rmk4d10₀ μ ⟨(⊥,⊤),bot_lt_top⟩).2) <| (impl.prop4d3₁ μ h₁' h₂') ▸ (impl.prop4d1₁ ℒ S μ h₁ h₂) ▸ h
 
 
 lemma prop4d12 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
@@ -224,9 +224,9 @@ lemma prop4d16₂ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 
 lemma prop4d18₁ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLinearOrder S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : semistable μ) : μBstar ℒ S μ ≤ μAstar ℒ S μ := by
+(μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : semistable μ) : μBstar μ ≤ μAstar μ := by
   rw [semistable_iff] at hμ
-  have : sSup {μA μ ⟨(⊥,x),hx⟩ | (x : ℒ) (hx : ⊥ < x)} ≤ μAstar ℒ S μ := by
+  have : sSup {μA μ ⟨(⊥,x),hx⟩ | (x : ℒ) (hx : ⊥ < x)} ≤ μAstar μ := by
     apply sSup_le
     rintro b ⟨hb1,⟨hb2,hb3⟩⟩
     have := hb3 ▸ hμ.out.choose_spec.choose_spec.1 hb1 (in_TotIntvl hb1) (Ne.symm <| bot_lt_iff_ne_bot.1 hb2)
@@ -245,7 +245,15 @@ lemma prop4d18₁ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
     · exact hy3 ▸ (rmk4d10₀ μ ⟨(hy1,hx1), lt_of_le_of_ne hy2.1.2 hy2.2⟩).2
 
 
---`TODO: prop4d18₂`
+lemma prop4d18₂ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+{S : Type} [CompleteLinearOrder S]
+(μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : semistable μ)
+(h : (prop_4_1_cond₁ μ ∧ prop_4_1_cond₂ μ) ∨ (prop_4_3_cond₁ μ ∧ prop_4_3_cond₂ μ)) :
+NashEquilibrium μ := by
+  refine eq_of_le_of_le ?_ (prop4d18₁ μ hμ)
+  cases' h with h h
+  · exact impl.prop4d1₂ ℒ S μ h.1 h.2
+  · exact impl.prop4d3₂ μ h.1 h.2
 
 
 lemma prop4d20 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
@@ -255,7 +263,7 @@ lemma prop4d20 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 (h₂ :  ∀ x : ℒ, (hx : x ≠ ⊥) → prop_4_1_cond₂ (Resμ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx⟩ μ)) :
 NashEquilibrium μ → semistable μ := by
   intro h
-  have : sSup {μA μ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx⟩ | (x : ℒ) (hx : x ≠ ⊥)} = μBstar ℒ S μ := by
+  have : sSup {μA μ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx⟩ | (x : ℒ) (hx : x ≠ ⊥)} = μBstar μ := by
     unfold μBstar μB
     congr 1; ext
     constructor
@@ -384,11 +392,23 @@ List.TFAE [
     · intro x hx
       simp [prop_4_1_cond₁,Resμ]
       intro f smf
-      rcases h₁ (fun t ↦ (f t).val) sorry with ⟨h1,h2⟩
-      use h1
-      refine le_trans h2 ?_
+      rcases h₁ (fun t ↦ (f t).val) fun _ _ hxy ↦ lt_iff_le_not_le.2 (smf hxy) with ⟨N,hN⟩
+      use N
+      refine le_trans hN ?_
 
       sorry
-    · sorry
-  tfae_have 5 → 4 := sorry
+    · intro x hx
+      simp [prop_4_1_cond₂,Resμ]
+      intro a b hab hb
+      cases' (hμ a.val b.val x ⟨lt_iff_le_not_le.2 hab,lt_iff_le_not_le.2 hb⟩).1 with this this
+      · exact Or.inl this
+      · exact Or.inr <| le_of_lt this
+  tfae_have 5 → 4 := by
+    intro h
+    refine prop4d18₂ μ h (Or.inl <| ⟨h₁,?_⟩)
+    simp [prop_4_1_cond₂]
+    intro a b hab hb
+    cases' (hμ a b ⊤ ⟨hab,hb⟩).1 with this this
+    · exact Or.inl this
+    · exact Or.inr <| le_of_lt this
   tfae_finish
