@@ -1,6 +1,5 @@
 import Mathlib.Order.CompleteLattice.Defs
 import Mathlib.Order.BoundedOrder.Basic
-import Mathlib.Algebra.Group.Subgroup.Defs
 
 def InIntvl {ℒ: Type} [PartialOrder ℒ]
 (I : {p : ℒ × ℒ // p.1 < p.2})
