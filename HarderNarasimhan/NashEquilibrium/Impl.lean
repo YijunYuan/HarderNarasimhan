@@ -1,4 +1,4 @@
-import HarderNarasimhan.Basic
+import HarderNarasimhan.NashEquilibrium.Defs
 import HarderNarasimhan.FirstMoverAdvantage.Impl
 import HarderNarasimhan.FirstMoverAdvantage.Defs
 import HarderNarasimhan.SlopeLike.Defs
@@ -6,11 +6,8 @@ import HarderNarasimhan.Semistability.Translation
 import Mathlib.Tactic.TFAE
 import Mathlib.Data.List.TFAE
 
-def NashEquilibrium {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-{S : Type} [CompleteLattice S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S) : Prop :=
-  μAstar μ = μBstar μ
 
+namespace impl
 
 lemma rmk4d10₀ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S]
@@ -412,3 +409,5 @@ List.TFAE [
     · exact Or.inl this
     · exact Or.inr <| le_of_lt this
   tfae_finish
+
+end impl
