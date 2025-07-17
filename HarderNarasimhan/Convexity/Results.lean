@@ -5,7 +5,7 @@ import HarderNarasimhan.Convexity.Impl
 
 lemma lemma_2_4 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   {S : Type} [CompleteLattice S]
-  (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : IsConvex μ)
+  (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : Convex μ)
   (x : ℒ) (w : ℒ) (hxw : ¬ x ≤ w)
   (u : ℒ) (t : ℒ)
   (huxw : u ≤ x ⊓ w) (hxwt : x ⊔ w ≤ t) :
@@ -23,9 +23,9 @@ lemma lemma_2_4 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 
 lemma remark_2_5 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   {S : Type} [CompleteLattice S]
-  (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : IsConvex μ) :
+  (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : Convex μ) :
 ------------
-  IsConvex (μmax μ) ∧
+  Convex (μmax μ) ∧
   ∀  I : {p : ℒ × ℒ // p.1 < p.2},
     μmax μ I = μmax (μmax μ) I ∧ μA μ I = μA (μmax μ) I
 ------------
@@ -41,7 +41,7 @@ lemma proposition_2_6 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder 
   --`(2.4)`
   μA μ ⟨(x, z), lt_trans h.1 h.2⟩ ≤ μA μ ⟨(y, z), h.2⟩ ∧
   (
-  IsConvex μ →
+  Convex μ →
   --`(a)`
   μA μ ⟨(x, z), lt_trans h.1 h.2⟩ ≥ (μA μ ⟨(x, y), h.1⟩ ⊓ (μA μ ⟨(y, z), h.2⟩))
   ∧ (
@@ -69,7 +69,7 @@ lemma proposition_2_6 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder 
 
 lemma remark_2_7 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   {S : Type} [CompleteLinearOrder S]
-  (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : IsConvex μ)
+  (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : Convex μ)
   (x : ℒ) (h : ⊥ < x ∧ x < ⊤)
   (h' : μA μ ⟨(⊥, x), h.1⟩ > μA μ TotIntvl) :
 ------------
@@ -80,7 +80,7 @@ lemma remark_2_7 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 
 lemma proposition_2_8 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   {S : Type} [CompleteLattice S]
-  (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : IsConvex μ)
+  (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : Convex μ)
   (x : ℒ) (y : ℒ) (u : ℒ)
   (h : u < x ∧ u < y) :
 ------------

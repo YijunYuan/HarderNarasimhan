@@ -2,7 +2,7 @@ import HarderNarasimhan.Semistability.Impl
 
 lemma proposition_3_2 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   {S : Type} [CompleteLattice S]
-  (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : IsConvex μ)
+  (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : Convex μ)
   (x : ℒ) (z : ℒ) (h : x < z)
   (h' : μA μ ⟨(x , z) , h⟩ = ⊤)
   (a : ℒ) (hax : a < x) :
@@ -18,7 +18,7 @@ alias corollary_3_3 := impl.cor3d3
 lemma proposition_3_4 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
   {S : Type} [CompleteLattice S]
   (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
-  (hμDCC : μDCC μ) (hμcvx : IsConvex μ) :
+  (hμDCC : μDCC μ) (hμcvx : Convex μ) :
 ------------
   (St μ).Nonempty
 ------------
@@ -38,7 +38,7 @@ lemma remark_3_5 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] 
 
 lemma proposition_3_7 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   {S : Type} [CompleteLattice S]
-  (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : IsConvex μ)
+  (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : Convex μ)
   (x : ℒ) (hxSt : x ∈ St μ) :
 ------------
   --`(1)`
@@ -52,7 +52,7 @@ lemma proposition_3_7 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder 
 
 lemma proposition_3_8 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
   {S : Type} [CompleteLattice S]
-  (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : IsConvex μ)
+  (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : Convex μ)
   (h : (IsTotal S (· ≤ ·)) ∨
      ∀ z : ℒ, (hz : ⊥ ≠ z) → IsAttained μ ⟨(⊥ , z) , lt_of_le_of_ne bot_le hz⟩) :
 ------------

@@ -9,7 +9,7 @@ namespace impl
 lemma prop3d2 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S]
 (I : {p : ℒ × ℒ // p.1 < p.2})
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : IsConvexI I μ)
+(μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : ConvexI I μ)
 (x : ℒ) (hxI : InIntvl I x)
 (z : ℒ) (hzI : InIntvl I z)
 (h : x < z)
@@ -23,7 +23,7 @@ lemma prop3d2 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 
 lemma cor3d3 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 (S : Type) [CompleteLattice S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : IsConvex μ)
+(μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : Convex μ)
 (h : ∀ f : ℕ → ℒ, (h : ∀ n : ℕ, f n > f (n + 1)) →  ∃N : ℕ, μA μ ⟨(f <| N + 1, f N),h N⟩ = ⊤)
 : μDCC μ := by
   intro a f h₁ h₂
@@ -212,7 +212,7 @@ lemma prop3d4 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [We
 -- This actually does `NOT` make the statement any weaker, since if we take I to be (⊥,⊤), then we can "apply" this global version to I itself, which is also a sublattice of ℒ.
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμDCC : μDCC μ)
-(I : {p : ℒ × ℒ // p.1 < p.2}) (hμcvx : IsConvexI I μ)
+(I : {p : ℒ × ℒ // p.1 < p.2}) (hμcvx : ConvexI I μ)
 : (StI μ I).Nonempty := by
   letI := Classical.propDecidable
   let len := prop3d4₀func_len μ I hμDCC
@@ -294,7 +294,7 @@ semistableI μ ⟨(I.val.1 , x), lt_of_le_of_ne hxSt.out.choose.1 hxSt.out.choos
 lemma prop3d7₂ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
-(I : {p : ℒ × ℒ // p.1 < p.2}) (hμcvx : IsConvexI I μ)
+(I : {p : ℒ × ℒ // p.1 < p.2}) (hμcvx : ConvexI I μ)
 (x : ℒ) (hxSt : x ∈ StI μ I) :
 ∀ y : ℒ, (hyI : InIntvl I y) → (hy : y > x) → ¬ μA μ ⟨(I.val.1 , x) , lt_of_le_of_ne hxSt.out.choose.1 hxSt.out.choose_spec.choose⟩ ≤ μA μ ⟨(x, y), hy⟩ := by
   by_contra!
@@ -305,7 +305,7 @@ lemma prop3d7₂ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 lemma prop3d8₁ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)-- (hμ : μDCC μ)
-(I : {p : ℒ × ℒ // p.1 < p.2}) (hμcvx : IsConvexI I μ)
+(I : {p : ℒ × ℒ // p.1 < p.2}) (hμcvx : ConvexI I μ)
 (h : (IsTotal S (· ≤ ·)) ∨
      ∀ z : ℒ, (hzI : InIntvl I z) → (hz : I.val.1 ≠ z) → IsAttained μ ⟨(I.val.1 , z) , lt_of_le_of_ne hzI.left hz⟩) :
 IsTotal (StI μ I) (· ≤ ·) := by
@@ -331,7 +331,7 @@ IsTotal (StI μ I) (· ≤ ·) := by
 lemma prop3d8₁' {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ]  [BoundedOrder ℒ] [inst_3 : WellFoundedGT ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : μDCC μ)
-(I : {p : ℒ × ℒ // p.1 < p.2}) (hμcvx : IsConvexI I μ)
+(I : {p : ℒ × ℒ // p.1 < p.2}) (hμcvx : ConvexI I μ)
 (h : (IsTotal S (· ≤ ·)) ∨
      ∀ z : ℒ, (hzI : InIntvl I z) → (hz : I.val.1 ≠ z) → IsAttained μ ⟨(I.val.1 , z) , lt_of_le_of_ne hzI.left hz⟩)  :
 ∃ s : ℒ, IsGreatest (StI μ I) s := by
@@ -346,7 +346,7 @@ lemma prop3d8₁' {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ]  [BoundedOrder ℒ
 lemma prop3d8₂ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)-- (hμ : μDCC μ)
-(I : {p : ℒ × ℒ // p.1 < p.2}) (hμcvx : IsConvexI I μ)
+(I : {p : ℒ × ℒ // p.1 < p.2}) (hμcvx : ConvexI I μ)
 (h : (IsTotal S (· ≤ ·)) ∨
      ∀ z : ℒ, (hzI : InIntvl I z) → (hz : I.val.1 ≠ z) → IsAttained μ ⟨(I.val.1 , z) , lt_of_le_of_ne hzI.left hz⟩)
 (x : ℒ) (hxSt : x ∈ StI μ I)

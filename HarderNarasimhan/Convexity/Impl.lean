@@ -25,7 +25,7 @@ lemma lem2d4₁
 
 lemma lem2d4₂I
   (I : {p : ℒ × ℒ // p.1 < p.2})
-  (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : IsConvexI I μ)
+  (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : ConvexI I μ)
   (x : ℒ) (hxI : InIntvl I x)
   (w : ℒ) (hwI : InIntvl I w)
   (hxw : ¬ x ≤ w)
@@ -42,7 +42,7 @@ lemma lem2d4₂I
       simp [hh]
       have hbnlew : ¬ b ≤ w := inf_lt_left.mp
         ((congrArg (fun _a ↦ _a < b) (hh.symm)) ▸ hb.1)
-      have hfinal : μ ⟨(w, b ⊔ w), IsConvexI._proof_2 b w hbnlew⟩ ≤ μmax μ ⟨(w, t), gt_of_ge_of_gt hxwt (right_lt_sup.2 hxw)⟩ := by
+      have hfinal : μ ⟨(w, b ⊔ w), ConvexI._proof_2 b w hbnlew⟩ ≤ μmax μ ⟨(w, t), gt_of_ge_of_gt hxwt (right_lt_sup.2 hxw)⟩ := by
         apply le_sSup
         use b ⊔ w, ⟨⟨le_sup_right, le_trans (sup_le_sup_right hb.2 w) hxwt⟩, (mt right_eq_sup.1) <| inf_lt_left.1 <| hh.symm ▸ hb.1⟩
       apply le_trans (hμcvx b w ⟨le_of_lt (lt_of_le_of_lt (le_inf hxI.1 hwI.1) hb.1), le_trans hb.2 hxI.2⟩ hwI hbnlew) hfinal
@@ -54,7 +54,7 @@ lemma lem2d4₂I
 
 lemma lem2d4₃I
   (I : {p : ℒ × ℒ // p.1 < p.2})
-  (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : IsConvexI I μ)
+  (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : ConvexI I μ)
   (x : ℒ) (hxI : InIntvl I x)
   (w : ℒ) (hwI : InIntvl I w)
   (hxw : ¬ x ≤ w)
@@ -71,7 +71,7 @@ lemma lem2d4₃I
 
 lemma lem2d4I
   (I : {p : ℒ × ℒ // p.1 < p.2})
-  (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : IsConvexI I μ)
+  (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : ConvexI I μ)
   (x : ℒ) (hxI : InIntvl I x) --(hx : I.val.1 ≠ x)
   (w : ℒ) (hwI : InIntvl I w) --(hw : I.val.1 ≠ w)
   (hxw : ¬ x ≤ w)
@@ -88,13 +88,13 @@ lemma lem2d4I
 
 lemma rmk2d5₁
   (I : {p : ℒ × ℒ // p.1 < p.2})
-  (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : IsConvexI I μ) :
-  IsConvexI I (μmax μ)  := fun x y hxI hyI hxy ↦ lem2d4₂I I μ hμcvx x hxI y hyI hxy (x ⊔ y) le_rfl
+  (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : ConvexI I μ) :
+  ConvexI I (μmax μ)  := fun x y hxI hyI hxy ↦ lem2d4₂I I μ hμcvx x hxI y hyI hxy (x ⊔ y) le_rfl
 
 
 lemma rmk2d5₂
   (I : {p : ℒ × ℒ // p.1 < p.2})
-  (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : IsConvexI I μ) :
+  (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : ConvexI I μ) :
   μmax μ I = μmax (μmax μ) I := by
   apply eq_of_le_of_le
   · apply le_sSup
@@ -111,7 +111,7 @@ lemma rmk2d5₂
 
 lemma rmk2d5₃
   (I : {p : ℒ × ℒ // p.1 < p.2})
-  (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : IsConvexI I μ) :
+  (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : ConvexI I μ) :
   μA μ I = μA (μmax μ) I := by
   apply eq_of_le_of_le
   · apply sInf_le_sInf
@@ -140,7 +140,7 @@ lemma prop2d6₀
 
 lemma prop2d6₁I
   (I : {p : ℒ × ℒ // p.1 < p.2})
-  (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : IsConvexI I μ)
+  (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : ConvexI I μ)
   (x : ℒ) (hxI : InIntvl I x)
   (y : ℒ) (hyI : InIntvl I y)
   (z : ℒ) (hzI : InIntvl I z)
@@ -156,7 +156,7 @@ lemma prop2d6₁I
 
 lemma prop2d6₂I₁
   (I : {p : ℒ × ℒ // p.1 < p.2})
-  (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : IsConvexI I μ)
+  (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : ConvexI I μ)
   (x : ℒ) (hxI : InIntvl I x)
   (y : ℒ) (hyI : InIntvl I y)
   (z : ℒ) (hzI : InIntvl I z)
@@ -167,7 +167,7 @@ lemma prop2d6₂I₁
 
 lemma prop2d6₂I₂
   (I : {p : ℒ × ℒ // p.1 < p.2})
-  (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : IsConvexI I μ)
+  (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : ConvexI I μ)
   (x : ℒ) (hxI : InIntvl I x)
   (y : ℒ) (hyI : InIntvl I y)
   (z : ℒ) (hzI : InIntvl I z)
@@ -192,7 +192,7 @@ x < y ∨ y ≤ x := by
 
 lemma prop2d6₃I
   (I : {p : ℒ × ℒ // p.1 < p.2})
-  (μ : {p :ℒ × ℒ // p.1 < p.2} → S)  (hμcvx : IsConvexI I μ)
+  (μ : {p :ℒ × ℒ // p.1 < p.2} → S)  (hμcvx : ConvexI I μ)
   (x : ℒ) (hxI : InIntvl I x)
   (y : ℒ) (hyI : InIntvl I y)
   (z : ℒ) (hzI : InIntvl I z)
@@ -223,7 +223,7 @@ lemma prop2d6₃I
 
 lemma rmk2d7
   {S : Type} [CompleteLinearOrder S]
-  (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : IsConvexI ⟨(⊥, ⊤), bot_lt_top⟩ μ)
+  (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : ConvexI ⟨(⊥, ⊤), bot_lt_top⟩ μ)
   (x : ℒ) (h : ⊥ < x ∧ x < ⊤)
   (h' : μA μ ⟨(⊥, x), h.1⟩ > μA μ ⟨(⊥, ⊤), bot_lt_top⟩) :
   μA μ ⟨(x, ⊤), h.2⟩ = μA μ ⟨(⊥, ⊤), bot_lt_top⟩ := by
@@ -237,7 +237,7 @@ lemma rmk2d7
 
 lemma prop2d8₀I
   (I : {p : ℒ × ℒ // p.1 < p.2})
-  (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : IsConvexI I μ)
+  (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : ConvexI I μ)
   (x : ℒ) (hxI : InIntvl I x)
   (y : ℒ) (hyI : InIntvl I y)
   (u : ℒ) (h : u < x ∧ u < y)
@@ -256,7 +256,7 @@ lemma prop2d8₀I
 
 lemma prop2d8₁I
   (I : {p : ℒ × ℒ // p.1 < p.2})
-  (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : IsConvexI I μ)
+  (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : ConvexI I μ)
   (x : ℒ) (hxI : InIntvl I x)
   (y : ℒ) (hyI : InIntvl I y)
   (u : ℒ) (huI : InIntvl I u)
@@ -274,7 +274,7 @@ lemma prop2d8₁I
 
 lemma prop2d8₂I
   (I : {p : ℒ × ℒ // p.1 < p.2})
-  (μ : {p :ℒ × ℒ // p.1 < p.2} → S)  (hμcvx : IsConvexI I μ)
+  (μ : {p :ℒ × ℒ // p.1 < p.2} → S)  (hμcvx : ConvexI I μ)
   (x : ℒ) (hxI : InIntvl I x)
   (y : ℒ) (hyI : InIntvl I y)
   (u : ℒ) (huI : InIntvl I u)

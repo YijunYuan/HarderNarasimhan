@@ -8,6 +8,7 @@ import HarderNarasimhan.Convexity.Results
 
 import HarderNarasimhan.Semistability.Defs
 import HarderNarasimhan.Semistability.Results
+import HarderNarasimhan.Semistability.Translation
 
 import HarderNarasimhan.Filtration.Defs
 import HarderNarasimhan.Filtration.Results
@@ -17,4 +18,6 @@ import HarderNarasimhan.FirstMoverAdvantage.Results
 import HarderNarasimhan.DedekindMacNeilleCompletion
 
 import HarderNarasimhan.SlopeLike.Defs
-import HarderNarasimhan.SlopeLike.Impl
+
+import HarderNarasimhan.NashEquilibrium.Defs
+import HarderNarasimhan.NashEquilibrium.Results
