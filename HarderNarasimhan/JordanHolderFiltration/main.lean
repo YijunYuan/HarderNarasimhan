@@ -140,9 +140,9 @@ lemma JHFil_prop₂ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
   have this_new := (List.TFAE.out (impl.thm4d21 μ hμsl (fun f smf ↦ False.elim (not_strictMono_of_wellFoundedGT f smf)) (fun f saf ↦ Exists.casesOn (hdc f saf) fun N hN ↦ Exists.intro N (Eq.symm hN ▸ le_top))) 0 4).2 hst
   simp [μmax, TotIntvl] at this_new
   have this_q: μ ⟨(⊥, z), lt_of_le_of_lt bot_le h'⟩ ≤ μ ⟨(⊥, ⊤), bot_lt_top⟩ := by
-        rw [← this_new]
-        apply le_sSup
-        use z, ⟨in_TotIntvl z, Ne.symm <| bot_lt_iff_ne_bot.1 <| lt_of_le_of_lt bot_le h'⟩
+    rw [← this_new]
+    apply le_sSup
+    use z, ⟨in_TotIntvl z, Ne.symm <| bot_lt_iff_ne_bot.1 <| lt_of_le_of_lt bot_le h'⟩
   by_cases hfp1bot : JHFil μ hμ hμsl hst hdc (k + 1) = ⊥
   · simp only [hfp1bot]
     have : ¬ {p | ∃ (h : ⊥ < p), p < JHFil μ hμ hμsl hst hdc k ∧ μ ⟨(⊥, p), h⟩ = μ ⟨(⊥, ⊤), bot_lt_top⟩}.Nonempty := by
