@@ -37,9 +37,6 @@ lemma JHFil_anti_mono {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder 
   · simp only [h]
     exact hk
 
-lemma fuck {α : Type} {a b c : α} (h₁: a = b) (h₂: c = b) : a = c := Eq.symm
-  <| (congrArg (fun _a ↦ c = _a) h₁.symm) ▸ h₂
-
 
 lemma JHFil_prop₁ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [hacc: WellFoundedGT ℒ]
 {S : Type} [CompleteLinearOrder S]
@@ -56,18 +53,15 @@ lemma JHFil_prop₁ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
     · simp only [this]
       have this' := (hacc.wf.has_min _ this).choose_spec.1.2.2
       exact ((Or.resolve_left <| (Or.resolve_left <| (impl.prop4d6 μ).1 hμsl ⊥ (hacc.wf.has_min _ this).choose ⊤ ⟨(hacc.wf.has_min _ this).choose_spec.1.choose,(hacc.wf.has_min _ this).choose_spec.1.out.choose_spec.1⟩) (by aesop)) (by aesop)).2.symm
-    · simp only [this]
-      simp
+    · simp only [this]; simp
   · intro hk'
     have jh_kp1_ntop : {p : ℒ | ∃ h : ⊥ < p, p < JHFil μ hμ hμsl hst hdc k ∧ μ ⟨(⊥,p),h⟩ = μ ⟨(⊥,⊤),bot_lt_top⟩}.Nonempty := by
       by_contra!
-      simp only [JHFil,this] at hk'
-      simp [*] at hk'
+      simp only [JHFil,this] at hk'; simp [*] at hk'
     have jh_kp1_ntop' : JHFil μ hμ hμsl hst hdc k > ⊥ := by
       refine lt_trans hk' ?_
       simp only [JHFil,jh_kp1_ntop]
       exact (hacc.wf.has_min _ jh_kp1_ntop).choose_spec.1.out.choose_spec.1
-    have k_prop := hk jh_kp1_ntop'
     have bot_jh_kp1_eq_ans := (hacc.wf.has_min _ jh_kp1_ntop).choose_spec.1.2.2
     by_cases jh_kp2_ntop : {p : ℒ | ∃ h : ⊥ < p, p < JHFil μ hμ hμsl hst hdc (k + 1) ∧ μ ⟨(⊥,p),h⟩ = μ ⟨(⊥,⊤),bot_lt_top⟩}.Nonempty
     · have stupid : μ ⟨(⊥, (hacc.wf.has_min _ jh_kp2_ntop).choose), (hacc.wf.has_min _ jh_kp2_ntop).choose_spec.1.out.1⟩ = μ ⟨(⊥, JHFil μ hμ hμsl hst hdc (k + 1)), hk'⟩ := by
@@ -78,61 +72,45 @@ lemma JHFil_prop₁ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
         refine (Or.resolve_left ((Or.resolve_left <| (impl.prop4d6 μ).1 hμsl ⊥ (hacc.wf.has_min _ jh_kp2_ntop).choose (JHFil μ hμ hμsl hst hdc (k + 1)) ⟨(hacc.wf.has_min _ jh_kp2_ntop).choose_spec.1.out.choose,(hacc.wf.has_min _ jh_kp2_ntop).choose_spec.1.out.choose_spec.1⟩) (?_)) (?_)).2
         · apply not_and_iff_not_or_not.2
           refine Or.inl ?_
-          simp only [stupid]
-          simp only [JHFil,jh_kp1_ntop]
-          simp
+          simp only [stupid]; simp only [JHFil,jh_kp1_ntop]; simp
         · apply not_and_iff_not_or_not.2
           refine Or.inl ?_
-          simp only [stupid]
-          simp only [JHFil,jh_kp1_ntop]
-          simp
+          simp only [stupid]; simp only [JHFil,jh_kp1_ntop]; simp
       conv_lhs =>
-        arg 1
-        arg 1
-        arg 1
+        arg 1; arg 1; arg 1
         unfold JHFil
-        simp only [jh_kp2_ntop]
-        simp
+        simp only [jh_kp2_ntop]; simp
       simp at hfinal
       rw [← hfinal]
-      simp only [JHFil,jh_kp1_ntop]
-      simp
+      simp only [JHFil,jh_kp1_ntop]; simp
       simp at bot_jh_kp1_eq_ans
       exact bot_jh_kp1_eq_ans
     · conv_lhs =>
-        arg 1
-        arg 1
-        arg 1
+        arg 1; arg 1; arg 1
         unfold JHFil
-        simp only [jh_kp2_ntop]
-        simp
-      induction' k with r hr
-      · unfold JHFil
-        simp only [jh_kp1_ntop]
-        have this' := (hacc.wf.has_min _ jh_kp1_ntop).choose_spec.1.2.2
-        simp
-        have : μ ⟨(⊥, (hacc.wf.has_min _ jh_kp1_ntop).choose), by
-          simp only [JHFil] at jh_kp1_ntop
-          simp only [JHFil,jh_kp1_ntop] at hk'
-          simp at hk'
-          simp
-          exact hk'⟩ = μ ⟨(⊥, ⊤), bot_lt_top⟩ := by
-            refine ((Or.resolve_left <| (Or.resolve_left <| (impl.prop4d6 μ).1 hμsl ⊥ (hacc.wf.has_min _ jh_kp1_ntop).choose ⊤ ⟨(hacc.wf.has_min _ jh_kp1_ntop).choose_spec.1.choose,(hacc.wf.has_min _ jh_kp1_ntop).choose_spec.1.out.choose_spec.1⟩) ?_) ?_).1
-            · apply not_and_iff_not_or_not.2
-              refine Or.inl ?_
-              simp
-              simp at this'
-              exact le_of_eq this'.symm
-            · apply not_and_iff_not_or_not.2
-              refine Or.inl ?_
-              simp
-              simp at this'
-              exact le_of_eq this'
-        simp at this
-        exact this
-      · #check hr sorry sorry sorry sorry sorry sorry sorry
-
-        sorry
+        simp only [jh_kp2_ntop]; simp
+      have this': μ ⟨(⊥, JHFil μ hμ hμsl hst hdc k), jh_kp1_ntop'⟩ = μ ⟨(⊥,⊤),bot_lt_top⟩ := by
+        by_cases hh : k = 0
+        · simp only [hh,JHFil]
+        · have : JHFil μ hμ hμsl hst hdc k = JHFil μ hμ hμsl hst hdc ((k-1)+1) := by
+            simp [Nat.sub_one_add_one hh]
+          simp only [this]
+          have : {p | ∃ (h : ⊥ < p), p < JHFil μ hμ hμsl hst hdc (k-1) ∧ μ ⟨(⊥, p), h⟩ = μ ⟨(⊥, ⊤), bot_lt_top⟩}.Nonempty := by
+            by_contra hthis
+            rw [this] at jh_kp1_ntop'
+            simp only [JHFil,hthis] at jh_kp1_ntop'; simp at jh_kp1_ntop'
+          simp only [JHFil,this]; simp
+          have := (hacc.wf.has_min _ this).choose_spec.1.out.choose_spec.2
+          simp at this
+          exact this
+      simp only [← this']
+      have : JHFil μ hμ hμsl hst hdc (k + 1) < JHFil μ hμ hμsl hst hdc k := by
+        simp only [JHFil,jh_kp1_ntop]
+        exact (hacc.wf.has_min _ jh_kp1_ntop).choose_spec.1.out.choose_spec.1
+      have this'' :  μ ⟨(⊥, JHFil μ hμ hμsl hst hdc (k + 1)), hk'⟩ = μ ⟨(JHFil μ hμ hμsl hst hdc (k + 1), JHFil μ hμ hμsl hst hdc k), this⟩ := by
+        rw [hk jh_kp1_ntop',← bot_jh_kp1_eq_ans]
+        simp only [JHFil,jh_kp1_ntop]; simp
+      exact ((Or.resolve_left <| (Or.resolve_left <| (impl.prop4d6 μ).1 hμsl ⊥ (JHFil μ hμ hμsl hst hdc (k + 1)) (JHFil μ hμ hμsl hst hdc k) ⟨hk',this⟩) (fun this_1 ↦ ne_of_lt (lt_trans this_1.left this_1.right) this'')) (fun this_1 ↦ ne_of_lt (gt_trans this_1.1 this_1.2) (Eq.symm this''))).1
 
 
 
