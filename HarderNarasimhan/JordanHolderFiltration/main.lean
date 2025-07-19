@@ -2,8 +2,9 @@ import Mathlib.Order.CompleteLattice.Defs
 import Mathlib.Order.BoundedOrder.Basic
 import HarderNarasimhan.Semistability.Defs
 import HarderNarasimhan.SlopeLike.Impl
-
-
+import HarderNarasimhan.NashEquilibrium.Impl
+import Mathlib.Data.List.TFAE
+import Mathlib.Order.OrderIsoNat
 open Classical
 
 
@@ -136,7 +137,65 @@ lemma JHFil_prop₂ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
 ∀ k : ℕ,  (hk : JHFil μ hμ hμsl hst hdc k > ⊥) → ∀ z : ℒ, (h' : JHFil μ hμ hμsl hst hdc (k + 1) < z) → (h'' : z < JHFil μ hμ hμsl hst hdc k) →
   μ ⟨(JHFil μ hμ hμsl hst hdc (k + 1), z), h'⟩ < μ ⟨(JHFil μ hμ hμsl hst hdc (k + 1), JHFil μ hμ hμsl hst hdc k), JHFil_anti_mono μ hμ hμsl hst hdc k hk⟩ := by
   intro k hk z h' h''
-  sorry
+  have this_new := (List.TFAE.out (impl.thm4d21 μ hμsl (fun f smf ↦ False.elim (not_strictMono_of_wellFoundedGT f smf)) (fun f saf ↦ Exists.casesOn (hdc f saf) fun N hN ↦ Exists.intro N (Eq.symm hN ▸ le_top))) 0 4).2 hst
+  simp [μmax, TotIntvl] at this_new
+  have this_q: μ ⟨(⊥, z), lt_of_le_of_lt bot_le h'⟩ ≤ μ ⟨(⊥, ⊤), bot_lt_top⟩ := by
+        rw [← this_new]
+        apply le_sSup
+        use z, ⟨in_TotIntvl z, Ne.symm <| bot_lt_iff_ne_bot.1 <| lt_of_le_of_lt bot_le h'⟩
+  by_cases hfp1bot : JHFil μ hμ hμsl hst hdc (k + 1) = ⊥
+  · simp only [hfp1bot]
+    have : ¬ {p | ∃ (h : ⊥ < p), p < JHFil μ hμ hμsl hst hdc k ∧ μ ⟨(⊥, p), h⟩ = μ ⟨(⊥, ⊤), bot_lt_top⟩}.Nonempty := by
+      by_contra!
+      simp only [JHFil,this] at hfp1bot
+      have := (hacc.wf.has_min _ this).choose_spec.1.out.choose
+      simp at hfp1bot
+      simp at this
+      exact (ne_of_lt this) hfp1bot.symm
+    apply Set.not_nonempty_iff_eq_empty.1 at this
+    apply Set.eq_empty_iff_forall_not_mem.1 at this
+    have := this z
+    simp at this
+    have := lt_of_le_of_ne this_q <| this h'' (lt_of_le_of_lt bot_le h')
+    by_cases hk' : k = 0
+    · simp only [hk',JHFil]
+      exact this
+    · conv_rhs =>
+        arg 1; arg 1; arg 2; arg 6
+        rw [← Nat.sub_one_add_one hk']
+      have hne : {p | ∃ (h : ⊥ < p), p < JHFil μ hμ hμsl hst hdc (k - 1) ∧ μ ⟨(⊥, p), h⟩ = μ ⟨(⊥, ⊤), bot_lt_top⟩}.Nonempty := by
+        by_contra!
+        have this': JHFil μ hμ hμsl hst hdc k = JHFil μ hμ hμsl hst hdc ((k-1)+1) := by
+          conv_lhs =>
+            arg 6
+            rw [← Nat.sub_one_add_one hk']
+        simp only [this',JHFil,this] at hk
+        simp at hk
+      rw [← (hacc.wf.has_min _ hne).choose_spec.1.out.2.2] at this
+      simp only [JHFil,hne]; simp
+      simp at this
+      exact this
+  · have h''' : μ ⟨(⊥, z), lt_of_le_of_lt bot_le h'⟩ < μ ⟨(⊥, ⊤), bot_lt_top⟩ := by
+      refine lt_of_le_of_ne this_q ?_
+      by_contra!
+      by_cases hne : {p | ∃ (h : ⊥ < p), p < JHFil μ hμ hμsl hst hdc k ∧ μ ⟨(⊥, p), h⟩ = μ ⟨(⊥, ⊤), bot_lt_top⟩}.Nonempty
+      · have := (hacc.wf.has_min _ hne).choose_spec.2 z (by use lt_of_le_of_lt bot_le h')
+        simp only [JHFil,hne] at h'
+        simp at h'
+        simp at this
+        exact this h'
+      · refine hne ?_
+        use z, lt_of_le_of_lt bot_le h'
+    have h'''' : μ ⟨(⊥, ⊤), bot_lt_top⟩ = μ ⟨(⊥, JHFil μ hμ hμsl hst hdc (k + 1)), bot_lt_iff_ne_bot.2 hfp1bot⟩ := by
+      by_cases hne : {p | ∃ (h : ⊥ < p), p < JHFil μ hμ hμsl hst hdc k ∧ μ ⟨(⊥, p), h⟩ = μ ⟨(⊥, ⊤), bot_lt_top⟩}.Nonempty
+      · simp only [JHFil,hne]
+        have := (hacc.wf.has_min _ hne).choose_spec.1.out.choose_spec.2
+        simp at this
+        simp
+        exact this.symm
+      · simp only [JHFil,hne] at hfp1bot
+        simp at hfp1bot
+    exact (JHFil_prop₁ μ hμ hμsl hst hdc k hk ).symm ▸ lt_trans ((Or.resolve_right <| (Or.resolve_left <| (impl.prop4d6 μ).1 hμsl ⊥ (JHFil μ hμ hμsl hst hdc (k + 1)) z ⟨bot_lt_iff_ne_bot.2 hfp1bot,h'⟩) (not_and_iff_not_or_not.2 <| Or.inl <| not_lt_of_lt <| h'''' ▸ h''')) (not_and_iff_not_or_not.2 <| Or.inl <| ne_of_gt <| h'''' ▸ h''')).2 h'''
 
 
 
