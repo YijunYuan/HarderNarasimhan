@@ -18,12 +18,12 @@ lemma remark_4_10 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   μBstar μ ≤ μAstar μ ↔ ∀ x : ℒ, (hx : x ≠ ⊤) → ∀ y : ℒ, (hy : ⊥ < y) → μmin μ ⟨(⊥,y),hy⟩ ≤ μmax μ ⟨(x,⊤),lt_top_iff_ne_top.2 hx⟩
 ) ∧
 (
-  prop_4_1_cond₁ μ → prop_4_1_cond₂ μ →
+  WeakAscendingChainCondition μ → WeakSlopeLike₁ μ →
   (
     NashEquilibrium μ ↔ ∀ y : ℒ, (hy : y ≠ ⊥) → μmin μ ⟨(⊥,y),bot_lt_iff_ne_bot.2 hy⟩ ≤ μmin μ TotIntvl
   )
 ) ∧ (
-  prop_4_3_cond₁ μ → prop_4_3_cond₂ μ →
+  WeakDescendingChainCondition μ → WeakSlopeLike₂ μ →
   (
     NashEquilibrium μ ↔ ∀ y : ℒ, (hy : y ≠ ⊤) → μmax μ TotIntvl ≤ μmax μ ⟨(y,⊤),lt_top_iff_ne_top.2 hy⟩
   )
@@ -39,8 +39,8 @@ lemma proposition_4_11 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder
 (
   μmin μ TotIntvl = μmax μ TotIntvl → μBstar μ ≤ μAstar μ
 ) ∧ (
-  prop_4_1_cond₁ μ → prop_4_1_cond₂ μ →
-  prop_4_3_cond₁ μ → prop_4_3_cond₂ μ →
+  WeakAscendingChainCondition μ → WeakSlopeLike₁ μ →
+  WeakDescendingChainCondition μ → WeakSlopeLike₂ μ →
   μBstar μ ≤ μAstar μ → μmin μ TotIntvl = μmax μ TotIntvl
 )
 ------------
@@ -99,7 +99,7 @@ lemma proposition_4_16 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder
   μmin μ TotIntvl = μmax μ TotIntvl
   ]
 ) ∧ (
-  prop_4_1_cond₁ μ → prop_4_3_cond₁ μ →
+  WeakAscendingChainCondition μ → WeakDescendingChainCondition μ →
   List.TFAE [
   μmax μ TotIntvl = μ TotIntvl,
   μmin μ TotIntvl = μ TotIntvl,
@@ -123,7 +123,7 @@ lemma proposition_4_18 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder
 (
   μBstar μ ≤ μAstar μ
 ) ∧ (
-  (prop_4_1_cond₁ μ ∧ prop_4_1_cond₂ μ) ∨ (prop_4_3_cond₁ μ ∧ prop_4_3_cond₂ μ) →
+  (WeakAscendingChainCondition μ ∧ WeakSlopeLike₁ μ) ∨ (WeakDescendingChainCondition μ ∧ WeakSlopeLike₂ μ) →
     NashEquilibrium μ
 )
 ------------
@@ -134,9 +134,9 @@ lemma proposition_4_20 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
 (h₁ : ∀ x : ℒ, (hx : x ≠ ⊥) →
-  prop_4_1_cond₁ (Resμ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx⟩ μ))
+  WeakAscendingChainCondition (Resμ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx⟩ μ))
 (h₂ :  ∀ x : ℒ, (hx : x ≠ ⊥) →
-  prop_4_1_cond₂ (Resμ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx⟩ μ)) :
+  WeakSlopeLike₁ (Resμ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx⟩ μ)) :
 ------------
 NashEquilibrium μ → Semistable μ
 ------------
@@ -146,7 +146,7 @@ NashEquilibrium μ → Semistable μ
 theorem theorem_4_21 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLinearOrder S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : SlopeLike μ)
-(h₁ : prop_4_1_cond₁ μ) (h₂ : prop_4_3_cond₁ μ) :
+(h₁ : WeakAscendingChainCondition μ) (h₂ : WeakDescendingChainCondition μ) :
 ------------
 List.TFAE [
   μmax μ TotIntvl = μ TotIntvl,

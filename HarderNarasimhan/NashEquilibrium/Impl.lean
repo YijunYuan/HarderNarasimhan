@@ -43,12 +43,12 @@ lemma rmk4d10₁ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 lemma rmk4d10₂ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
-(h₁ : prop_4_1_cond₁ μ) (h₂ : prop_4_1_cond₂ μ):
+(h₁ : WeakAscendingChainCondition μ) (h₂ : WeakSlopeLike₁ μ):
 NashEquilibrium μ ↔ ∀ y : ℒ, (hy : y ≠ ⊥) → μmin μ ⟨(⊥,y),bot_lt_iff_ne_bot.2 hy⟩ ≤ μmin μ TotIntvl := by
   constructor
   · intro h y hy
     unfold NashEquilibrium at h
-    rw [impl.prop4d1₁ ℒ S μ h₁ h₂] at h
+    rw [impl.prop4d1₁ ℒ S μ h₁.wacc h₂.wsl₁] at h
     simp [μBstar,TotIntvl,μB] at h
     unfold TotIntvl
     rw [h]
@@ -56,7 +56,7 @@ NashEquilibrium μ ↔ ∀ y : ℒ, (hy : y ≠ ⊥) → μmin μ ⟨(⊥,y),bot
     use y, ⟨in_TotIntvl y,Ne.symm hy⟩
   · intro h
     unfold NashEquilibrium
-    rw [impl.prop4d1₁ ℒ S μ h₁ h₂]
+    rw [impl.prop4d1₁ ℒ S μ h₁.wacc h₂.wsl₁]
     simp [μBstar,μB]
     apply eq_of_le_of_le
     · apply le_sSup
@@ -70,12 +70,12 @@ NashEquilibrium μ ↔ ∀ y : ℒ, (hy : y ≠ ⊥) → μmin μ ⟨(⊥,y),bot
 lemma rmk4d10₃ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
-(h₁ : prop_4_3_cond₁ μ) (h₂ : prop_4_3_cond₂ μ):
+(h₁ : WeakDescendingChainCondition μ) (h₂ : WeakSlopeLike₂ μ):
 NashEquilibrium μ ↔ ∀ y : ℒ, (hy : y ≠ ⊤) → μmax μ TotIntvl ≤ μmax μ ⟨(y,⊤),lt_top_iff_ne_top.2 hy⟩ := by
   constructor
   · intro h y hy
     unfold NashEquilibrium at h
-    rw [impl.prop4d3₁ μ h₁ h₂] at h
+    rw [impl.prop4d3₁ μ h₁.wdcc h₂.wsl₂] at h
     simp [μBstar,TotIntvl,μB] at h
     unfold TotIntvl
     rw [← h]
@@ -84,7 +84,7 @@ NashEquilibrium μ ↔ ∀ y : ℒ, (hy : y ≠ ⊤) → μmax μ TotIntvl ≤ �
     use y, ⟨in_TotIntvl y,hy⟩
   · intro h
     unfold NashEquilibrium
-    rw [impl.prop4d3₁ μ h₁ h₂]
+    rw [impl.prop4d3₁ μ h₁.wdcc h₂.wsl₂]
     simp [μAstar,μA]
     apply eq_of_le_of_le
     · apply sInf_le
@@ -117,9 +117,9 @@ lemma prop4d11₁ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 lemma prop4d11₂ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
-(h₁ : prop_4_1_cond₁ μ) (h₂ : prop_4_1_cond₂ μ)
-(h₁' : prop_4_3_cond₁ μ) (h₂' : prop_4_3_cond₂ μ):
-μBstar μ ≤ μAstar μ → μmin μ TotIntvl = μmax μ TotIntvl := fun h ↦ eq_of_le_of_le (le_trans (rmk4d10₀ μ TotIntvl).1 (rmk4d10₀ μ ⟨(⊥,⊤),bot_lt_top⟩).2) <| (impl.prop4d3₁ μ h₁' h₂') ▸ (impl.prop4d1₁ ℒ S μ h₁ h₂) ▸ h
+(h₁ : WeakAscendingChainCondition μ) (h₂ : WeakSlopeLike₁ μ)
+(h₁' : WeakDescendingChainCondition μ) (h₂' : WeakSlopeLike₂ μ):
+μBstar μ ≤ μAstar μ → μmin μ TotIntvl = μmax μ TotIntvl := fun h ↦ eq_of_le_of_le (le_trans (rmk4d10₀ μ TotIntvl).1 (rmk4d10₀ μ ⟨(⊥,⊤),bot_lt_top⟩).2) <| (impl.prop4d3₁ μ h₁'.wdcc h₂'.wsl₂) ▸ (impl.prop4d1₁ ℒ S μ h₁.wacc h₂.wsl₁) ▸ h
 
 
 lemma prop4d12 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
@@ -206,14 +206,14 @@ List.TFAE [
 lemma prop4d16₂ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : SlopeLike μ)
-(h₁ : prop_4_1_cond₁ μ) (h₂ : prop_4_3_cond₁ μ) :
+(h₁ : WeakAscendingChainCondition μ) (h₂ : WeakDescendingChainCondition μ) :
 μmin μ TotIntvl = μmax μ TotIntvl ↔ NashEquilibrium μ := by
   have : ∀ (z : { p : ℒ × ℒ // p.1 < p.2 }) (hz : z.val.2 < ⊤), μ z ≤ μ ⟨(z.val.1, ⊤), lt_trans z.prop hz⟩ ∨ μ ⟨(z.val.2, ⊤), hz⟩ ≤ μ ⟨(z.val.1, ⊤), lt_trans z.prop hz⟩ := by
     intro z hz
     cases' (hμ z.val.1 z.val.2 ⊤ ⟨z.prop, hz⟩).1 with this this
     · exact Or.inl this
     · exact Or.inr <| le_of_lt this
-  refine ⟨fun h ↦ eq_of_le_of_le (impl.prop4d1₂ ℒ S μ h₁ this) <| prop4d11₁ μ h,fun h ↦ prop4d11₂ μ h₁ this h₂ (fun z hz ↦ ?_) h.symm.le⟩
+  refine ⟨fun h ↦ eq_of_le_of_le (impl.prop4d1₂ ℒ S μ h₁.wacc this) <| prop4d11₁ μ h,fun h ↦ prop4d11₂ μ h₁ {wsl₁ := this} h₂ {wsl₂:=(fun z hz ↦ ?_)} h.symm.le⟩
   cases' (hμ ⊥ z.val.1 z.val.2 ⟨hz,z.prop⟩).2.2.1 with this this
   · exact Or.inr <| le_of_lt this
   · exact Or.inl <| this
@@ -245,19 +245,19 @@ lemma prop4d18₁ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 lemma prop4d18₂ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLinearOrder S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : Semistable μ)
-(h : (prop_4_1_cond₁ μ ∧ prop_4_1_cond₂ μ) ∨ (prop_4_3_cond₁ μ ∧ prop_4_3_cond₂ μ)) :
+(h : (WeakAscendingChainCondition μ ∧ WeakSlopeLike₁ μ) ∨ (WeakDescendingChainCondition μ ∧ WeakSlopeLike₂ μ)) :
 NashEquilibrium μ := by
   refine eq_of_le_of_le ?_ (prop4d18₁ μ hμ)
   cases' h with h h
-  · exact impl.prop4d1₂ ℒ S μ h.1 h.2
-  · exact impl.prop4d3₂ μ h.1 h.2
+  · exact impl.prop4d1₂ ℒ S μ h.1.wacc h.2.wsl₁
+  · exact impl.prop4d3₂ μ h.1.wdcc h.2.wsl₂
 
 
 lemma prop4d20 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
-(h₁ : ∀ x : ℒ, (hx : x ≠ ⊥) → prop_4_1_cond₁ (Resμ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx⟩ μ))
-(h₂ :  ∀ x : ℒ, (hx : x ≠ ⊥) → prop_4_1_cond₂ (Resμ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx⟩ μ)) :
+(h₁ : ∀ x : ℒ, (hx : x ≠ ⊥) → WeakAscendingChainCondition (Resμ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx⟩ μ))
+(h₂ :  ∀ x : ℒ, (hx : x ≠ ⊥) → WeakSlopeLike₁ (Resμ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx⟩ μ)) :
 NashEquilibrium μ → Semistable μ := by
   intro h
   have : sSup {μA μ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx⟩ | (x : ℒ) (hx : x ≠ ⊥)} = μBstar μ := by
@@ -268,7 +268,7 @@ NashEquilibrium μ → Semistable μ := by
       intro x hx hx'
       rw [← hx']
       use x, ⟨in_TotIntvl _,Ne.symm hx⟩
-      refine impl.stupid_helper ?_ (Eq.symm <| impl.prop4d1₁ (Interval ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx⟩) S (Resμ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx⟩ μ) (h₁ x hx) (h₂ x hx)) ?_
+      refine impl.stupid_helper ?_ (Eq.symm <| impl.prop4d1₁ (Interval ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx⟩) S (Resμ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx⟩ μ) (h₁ x hx).wacc (h₂ x hx).wsl₁) ?_
       · simp [μmin]
         congr 1; ext
         constructor
@@ -315,7 +315,7 @@ NashEquilibrium μ → Semistable μ := by
       intro x hx hx'
       rw [← hx']
       use x, Ne.symm hx.2
-      refine impl.stupid_helper ?_ (impl.prop4d1₁ (Interval ⟨(⊥,x),bot_lt_iff_ne_bot.2 <| Ne.symm hx.2⟩) S (Resμ ⟨(⊥,x),bot_lt_iff_ne_bot.2 <| Ne.symm hx.2⟩ μ) (h₁ x <| Ne.symm hx.2) (h₂ x <| Ne.symm hx.2)) ?_
+      refine impl.stupid_helper ?_ (impl.prop4d1₁ (Interval ⟨(⊥,x),bot_lt_iff_ne_bot.2 <| Ne.symm hx.2⟩) S (Resμ ⟨(⊥,x),bot_lt_iff_ne_bot.2 <| Ne.symm hx.2⟩ μ) (h₁ x <| Ne.symm hx.2).wacc (h₂ x <| Ne.symm hx.2).wsl₁) ?_
       · simp [μAstar,μA,Resμ]
         congr 1; ext
         constructor
@@ -372,7 +372,7 @@ NashEquilibrium μ → Semistable μ := by
 theorem thm4d21 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLinearOrder S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : SlopeLike μ)
-(h₁ : prop_4_1_cond₁ μ) (h₂ : prop_4_3_cond₁ μ) :
+(h₁ : WeakAscendingChainCondition μ) (h₂ : WeakDescendingChainCondition μ) :
 List.TFAE [
   μmax μ TotIntvl = μ TotIntvl,
   μmin μ TotIntvl = μ TotIntvl,
@@ -387,25 +387,27 @@ List.TFAE [
   tfae_have 4 → 5 := by
     refine fun h ↦ prop4d20 μ ?_ ?_ h
     · intro x hx
-      simp [prop_4_1_cond₁,Resμ]
+      simp [WeakAscendingChainCondition,Resμ]
+      refine {wacc := ?_}
       intro f smf
-      rcases h₁ (fun t ↦ (f t).val) fun _ _ hxy ↦ lt_iff_le_not_le.2 (smf hxy) with ⟨N,hN⟩
+      rcases h₁.wacc (fun t ↦ (f t).val) fun _ _ hxy ↦ lt_iff_le_not_le.2 (smf hxy) with ⟨N,hN⟩
       use N
       refine le_trans hN ?_
 
       sorry
     · intro x hx
-      simp [prop_4_1_cond₂,Resμ]
-      intro a b hab hb
-      cases' (hμ a.val b.val x ⟨lt_iff_le_not_le.2 hab,lt_iff_le_not_le.2 hb⟩).1 with this this
+      simp [WeakSlopeLike₁,Resμ]
+      refine {wsl₁ := ?_}
+      intro a b
+      cases' (hμ a.val.1 a.val.2 x ⟨lt_iff_le_not_le.2 (by aesop),lt_iff_le_not_le.2 (by aesop)⟩).1 with this this
       · exact Or.inl this
       · exact Or.inr <| le_of_lt this
   tfae_have 5 → 4 := by
     intro h
     refine prop4d18₂ μ h (Or.inl <| ⟨h₁,?_⟩)
-    simp [prop_4_1_cond₂]
-    intro a b hab hb
-    cases' (hμ a b ⊤ ⟨hab,hb⟩).1 with this this
+    refine {wsl₁ := ?_}
+    intro a b
+    cases' (hμ a.val.1 a.val.2 ⊤ ⟨a.prop,b⟩).1 with this this
     · exact Or.inl this
     · exact Or.inr <| le_of_lt this
   tfae_finish
