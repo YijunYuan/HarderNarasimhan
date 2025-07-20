@@ -42,10 +42,10 @@ lemma lem2d4₂I
       simp [hh]
       have hbnlew : ¬ b ≤ w := inf_lt_left.mp
         ((congrArg (fun _a ↦ _a < b) (hh.symm)) ▸ hb.1)
-      have hfinal : μ ⟨(w, b ⊔ w), ConvexI._proof_2 b w hbnlew⟩ ≤ μmax μ ⟨(w, t), gt_of_ge_of_gt hxwt (right_lt_sup.2 hxw)⟩ := by
+      have hfinal : μ ⟨(w, b ⊔ w), by aesop⟩ ≤ μmax μ ⟨(w, t), gt_of_ge_of_gt hxwt (right_lt_sup.2 hxw)⟩ := by
         apply le_sSup
         use b ⊔ w, ⟨⟨le_sup_right, le_trans (sup_le_sup_right hb.2 w) hxwt⟩, (mt right_eq_sup.1) <| inf_lt_left.1 <| hh.symm ▸ hb.1⟩
-      apply le_trans (hμcvx b w ⟨le_of_lt (lt_of_le_of_lt (le_inf hxI.1 hwI.1) hb.1), le_trans hb.2 hxI.2⟩ hwI hbnlew) hfinal
+      apply le_trans (hμcvx.convex b w ⟨le_of_lt (lt_of_le_of_lt (le_inf hxI.1 hwI.1) hb.1), le_trans hb.2 hxI.2⟩ hwI hbnlew) hfinal
     apply sSup_le
     rintro b ⟨w_1, ⟨hf₁, hf₂⟩⟩
     rw [hf₂.symm]
@@ -89,7 +89,7 @@ lemma lem2d4I
 lemma rmk2d5₁
   (I : {p : ℒ × ℒ // p.1 < p.2})
   (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : ConvexI I μ) :
-  ConvexI I (μmax μ)  := fun x y hxI hyI hxy ↦ lem2d4₂I I μ hμcvx x hxI y hyI hxy (x ⊔ y) le_rfl
+  ConvexI I (μmax μ)  := {convex :=fun x y hxI hyI hxy ↦ lem2d4₂I I μ hμcvx x hxI y hyI hxy (x ⊔ y) le_rfl}
 
 
 lemma rmk2d5₂
