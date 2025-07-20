@@ -3,7 +3,7 @@ import HarderNarasimhan.Semistability.Results
 namespace Filtration
 noncomputable def HNFil {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]-- [DecidableEq ℒ]
 {S : Type} [CompleteLattice S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : μDCC μ) (hμcvx : Convex μ)
+(μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : μA_DescendingChainCondition μ) (hμcvx : Convex μ)
 (h : (IsTotal S (· ≤ ·)) ∨
      ∀ I : {p : ℒ × ℒ // p.1 < p.2},  IsAttained μ I)
 (k : Nat) : ℒ :=
@@ -23,7 +23,7 @@ noncomputable def HNFil {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrde
 
 lemma HNFil_prop_of_def {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type} [CompleteLattice S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : μDCC μ) (hμcvx : Convex μ)
+(μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : μA_DescendingChainCondition μ) (hμcvx : Convex μ)
 (h : (IsTotal S (· ≤ ·)) ∨
      ∀ I : {p : ℒ × ℒ // p.1 < p.2},  IsAttained μ I) :
 ∀ n : Nat, (h' : HNFil μ hμ hμcvx h n ≠ ⊤) → IsGreatest (StI μ ⟨(HNFil μ hμ hμcvx h n , ⊤), lt_top_iff_ne_top.2 h'⟩) (HNFil μ hμ hμcvx h (n + 1)) := by
@@ -34,7 +34,7 @@ lemma HNFil_prop_of_def {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrde
 
 lemma is_strict_mono {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type} [CompleteLattice S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : μDCC μ) (hμcvx : Convex μ)
+(μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : μA_DescendingChainCondition μ) (hμcvx : Convex μ)
 (h : (IsTotal S (· ≤ ·)) ∨
      ∀ I : {p : ℒ × ℒ // p.1 < p.2},  IsAttained μ I) :
 ∀ n : Nat, HNFil μ hμ hμcvx h n ≠ ⊤ → HNFil μ hμ hμcvx h n < HNFil μ hμ hμcvx h (n + 1) := fun
@@ -43,7 +43,7 @@ lemma is_strict_mono {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
 
 lemma of_fin_len {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [inst_3 : WellFoundedGT ℒ]
 {S : Type} [CompleteLattice S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : μDCC μ) (hμcvx : Convex μ)
+(μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : μA_DescendingChainCondition μ) (hμcvx : Convex μ)
 (h : (IsTotal S (· ≤ ·)) ∨
      ∀ I : {p : ℒ × ℒ // p.1 < p.2},  IsAttained μ I)
 : ∃ N : Nat, HNFil μ hμ hμcvx h N = ⊤ := by
@@ -53,7 +53,7 @@ lemma of_fin_len {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] 
 
 noncomputable def HNlen {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type} [CompleteLattice S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : μDCC μ) (hμcvx : Convex μ)
+(μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : μA_DescendingChainCondition μ) (hμcvx : Convex μ)
 (h : (IsTotal S (· ≤ ·)) ∨
      ∀ I : {p : ℒ × ℒ // p.1 < p.2},  IsAttained μ I) : Nat := by
   letI := Classical.propDecidable
@@ -62,7 +62,7 @@ noncomputable def HNlen {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrde
 
 lemma ne_top_iff_lt_len {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type} [CompleteLattice S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : μDCC μ) (hμcvx : Convex μ)
+(μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : μA_DescendingChainCondition μ) (hμcvx : Convex μ)
 (h : (IsTotal S (· ≤ ·)) ∨
      ∀ I : {p : ℒ × ℒ // p.1 < p.2},  IsAttained μ I) :
   ∀ n : Nat, HNFil μ hμ hμcvx h n ≠ ⊤ ↔ n < HNlen μ hμ hμcvx h := by
@@ -82,7 +82,7 @@ lemma ne_top_iff_lt_len {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrde
 
 lemma is_strict_mono' {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type} [CompleteLattice S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : μDCC μ) (hμcvx : Convex μ)
+(μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : μA_DescendingChainCondition μ) (hμcvx : Convex μ)
 (h : (IsTotal S (· ≤ ·)) ∨
      ∀ I : {p : ℒ × ℒ // p.1 < p.2},  IsAttained μ I) :
 ∀ i : ℕ, ∀ j : ℕ, i < j → j ≤ HNlen μ hμ hμcvx h → HNFil μ hμ hμcvx h i < HNFil μ hμ hμcvx h j := by

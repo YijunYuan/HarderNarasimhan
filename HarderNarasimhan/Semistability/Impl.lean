@@ -25,8 +25,8 @@ lemma cor3d3 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 (S : Type) [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : Convex μ)
 (h : ∀ f : ℕ → ℒ, (h : ∀ n : ℕ, f n > f (n + 1)) →  ∃N : ℕ, μA μ ⟨(f <| N + 1, f N),h N⟩ = ⊤)
-: μDCC μ := by
-  intro a f h₁ h₂
+: μA_DescendingChainCondition μ := by
+  refine { μ_dcc := fun a f h₁ h₂ ↦ ?_ }
   rcases (h f h₂) with ⟨N, hN⟩
   exact ⟨N,prop3d2 TotIntvl μ hμcvx (f <| N + 1) (in_TotIntvl <| f <| N + 1) (f N) (in_TotIntvl <| f N) (h₂ N) hN a (in_TotIntvl <| a) (h₁ <| N + 1)⟩
 
@@ -139,7 +139,7 @@ lemma prop3d4₀func_fin_len  {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [Bound
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
 (I : {p : ℒ × ℒ // p.1 < p.2})
-(hμDCC : μDCC μ) :
+(hμDCC : μA_DescendingChainCondition μ) :
 ∃ i : ℕ, (prop3d4₀func μ I i).val = I.val.1 := by
   by_contra!
   let func := fun m : ℕ => (prop3d4₀func μ I m).val
@@ -148,7 +148,7 @@ lemma prop3d4₀func_fin_len  {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [Bound
     rw [gt_iff_lt]
     exact Ne.lt_of_le (this i).symm  (prop3d4₀func μ I i).prop.1
   have h₂ := fun t ↦ prop3d4₀func_defprop1 μ I t (this (t + 1)).symm
-  rcases (hμDCC I.val.1 func h₀ fun t ↦ prop3d4₀func_strict_decreasing μ I t (this t).symm) with ⟨N, hN⟩
+  rcases (hμDCC.μ_dcc I.val.1 func h₀ fun t ↦ prop3d4₀func_strict_decreasing μ I t (this t).symm) with ⟨N, hN⟩
   exact not_le_of_gt (h₂ N) hN
 
 
@@ -156,7 +156,7 @@ noncomputable def prop3d4₀func_len  {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
 (I : {p : ℒ × ℒ // p.1 < p.2})
-(hμDCC : μDCC μ) : ℕ := by
+(hμDCC : μA_DescendingChainCondition μ) : ℕ := by
   letI := Classical.propDecidable
   exact Nat.find (prop3d4₀func_fin_len μ I hμDCC)
 
@@ -164,7 +164,7 @@ noncomputable def prop3d4₀func_len  {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ
 lemma prop3d4₀func_len_nonzero {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
-(I : {p : ℒ × ℒ // p.1 < p.2}) (hμDCC : μDCC μ) :
+(I : {p : ℒ × ℒ // p.1 < p.2}) (hμDCC : μA_DescendingChainCondition μ) :
 prop3d4₀func_len μ I hμDCC ≠ 0 := by
   letI := Classical.propDecidable
   by_contra hcontra
@@ -176,7 +176,7 @@ prop3d4₀func_len μ I hμDCC ≠ 0 := by
 lemma prop3d4₀func_defprop3₀ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
-(I : {p : ℒ × ℒ // p.1 < p.2}) (hμDCC : μDCC μ)
+(I : {p : ℒ × ℒ // p.1 < p.2}) (hμDCC : μA_DescendingChainCondition μ)
 (i : ℕ) (hi : i < (prop3d4₀func_len μ I hμDCC)) :
 I.val.1 < (prop3d4₀func μ I i).val := by
   letI := Classical.propDecidable
@@ -186,7 +186,7 @@ I.val.1 < (prop3d4₀func μ I i).val := by
 lemma prop3d4₀func_defprop3 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [inst_3 : WellFoundedGT ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
-(I : {p : ℒ × ℒ // p.1 < p.2}) (hμDCC : μDCC μ)
+(I : {p : ℒ × ℒ // p.1 < p.2}) (hμDCC : μA_DescendingChainCondition μ)
 (y: ℒ) (hy : I.val.1 < y ∧ y ≤ (prop3d4₀func μ I <| (prop3d4₀func_len μ I hμDCC) - 1).val) :
 ¬ μA μ ⟨(I.val.1,y),hy.1⟩ >
   μA μ ⟨(I.val.1 , (prop3d4₀func μ I <| (prop3d4₀func_len μ I hμDCC) - 1).val) , prop3d4₀func_defprop3₀ μ I hμDCC ((prop3d4₀func_len μ I hμDCC) - 1) <| Nat.sub_one_lt <| prop3d4₀func_len_nonzero μ I hμDCC⟩ := by
@@ -211,7 +211,7 @@ lemma prop3d4₀func_defprop3 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [Bound
 lemma prop3d4 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ] -- The ascending chain condition. Actually we only need this condition on the Interval I, but to make the life easy, we require it on the whole ℒ.
 -- This actually does `NOT` make the statement any weaker, since if we take I to be (⊥,⊤), then we can "apply" this global version to I itself, which is also a sublattice of ℒ.
 {S : Type} [CompleteLattice S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμDCC : μDCC μ)
+(μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμDCC : μA_DescendingChainCondition μ)
 (I : {p : ℒ × ℒ // p.1 < p.2}) (hμcvx : ConvexI I μ)
 : (StI μ I).Nonempty := by
   letI := Classical.propDecidable
@@ -330,7 +330,7 @@ IsTotal (StI μ I) (· ≤ ·) := by
 
 lemma prop3d8₁' {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ]  [BoundedOrder ℒ] [inst_3 : WellFoundedGT ℒ]
 {S : Type} [CompleteLattice S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : μDCC μ)
+(μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : μA_DescendingChainCondition μ)
 (I : {p : ℒ × ℒ // p.1 < p.2}) (hμcvx : ConvexI I μ)
 (h : (IsTotal S (· ≤ ·)) ∨
      ∀ z : ℒ, (hzI : InIntvl I z) → (hz : I.val.1 ≠ z) → IsAttained μ ⟨(I.val.1 , z) , lt_of_le_of_ne hzI.left hz⟩)  :

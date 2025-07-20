@@ -4,7 +4,7 @@ open Classical
 
 theorem theorem_3_10  {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]-- [DecidableEq ℒ]
 {S : Type} [CompleteLinearOrder S] (hS : IsTotal S (· ≤ ·))
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : μDCC μ) (hμcvx : Convex μ)
+(μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : μA_DescendingChainCondition μ) (hμcvx : Convex μ)
 (f : ℕ → ℒ) (hf0 : f 0 = ⊥)
 (hffin : ∃ n : ℕ, f n = ⊤)
 (hfsi : ∀ i : ℕ, ∀ j : ℕ, i < j → j ≤ Nat.find hffin → f i < f j)

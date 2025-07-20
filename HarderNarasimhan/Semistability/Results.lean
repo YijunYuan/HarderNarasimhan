@@ -18,7 +18,7 @@ alias corollary_3_3 := impl.cor3d3
 lemma proposition_3_4 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
   {S : Type} [CompleteLattice S]
   (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
-  (hμDCC : μDCC μ) (hμcvx : Convex μ) :
+  (hμDCC : μA_DescendingChainCondition μ) (hμcvx : Convex μ) :
 ------------
   (St μ).Nonempty
 ------------
@@ -58,7 +58,7 @@ lemma proposition_3_8 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder 
 ------------
   (
   --`(1)`
-  IsTotal (St μ) (· ≤ ·) ∧ (μDCC μ → ∃ s : ℒ, IsGreatest (St μ) s)
+  IsTotal (St μ) (· ≤ ·) ∧ (μA_DescendingChainCondition μ → ∃ s : ℒ, IsGreatest (St μ) s)
   ) ∧
   --`(2)`
   ∀ x : ℒ, (hxSt : x ∈ St μ) →
