@@ -8,15 +8,15 @@ class μ_Admissible {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
   μ_adm : (IsTotal S (· ≤ ·)) ∨ ∀ I : {p : ℒ × ℒ // p.1 < p.2},  IsAttained μ I
 
 
+@[ext]
 class HardarNarasimhanFiltration
 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) [hμ : μA_DescendingChainCondition μ] [hμcvx : Convex μ] [h : μ_Admissible μ] where
   filtration : ℕ → ℒ
+  monotone : Monotone filtration
   first_eq_bot : filtration 0 = ⊥
   fin_len : ∃ n : ℕ, filtration n = ⊤
-  strict_mono : ∀ i j : ℕ, i < j →
-    j ≤ Nat.find (fin_len) → filtration i < filtration j
-  piecewise_semistable : ∀ i : ℕ, (h: i < Nat.find (fin_len)) →
-    Semistable (Resμ ⟨(filtration i, filtration (i+1)), strict_mono i (i+1) (lt_add_one i) h⟩ μ)
+  strict_mono : ∀ i j : ℕ, i < j → j ≤ Nat.find (fin_len) → filtration i < filtration j
+  piecewise_semistable : ∀ i : ℕ, (h: i < Nat.find (fin_len)) → Semistable (Resμ ⟨(filtration i, filtration (i+1)), strict_mono i (i+1) (lt_add_one i) h⟩ μ)
   μA_not_increaing : ∀ i : ℕ, ∀ j : ℕ, (hij : i < j) → (hj : j + 1 ≤ Nat.find fin_len) → ¬ μA μ ⟨(filtration i, filtration (i+1)), strict_mono i (i+1) (lt_add_one i) <| by omega⟩ ≤ μA μ ⟨(filtration j, filtration (j+1)), strict_mono j (j+1) (lt_add_one j) <| hj⟩

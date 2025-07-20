@@ -33,7 +33,7 @@ lemma HNFil_prop_of_def {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrde
   exact (HNFil._proof_4 μ n h').choose_spec
 
 
-lemma is_strict_mono {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
+lemma HNFil_is_strict_mono {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) [hμ : μA_DescendingChainCondition μ] [hμcvx : Convex μ]
 [h : μ_Admissible μ] :
@@ -41,13 +41,13 @@ lemma is_strict_mono {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
     n hn ↦ lt_of_le_of_ne (HNFil_prop_of_def μ n hn).1.1.1 (HNFil_prop_of_def μ n hn).1.2.1
 
 
-lemma of_fin_len {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [inst_3 : WellFoundedGT ℒ]
+lemma HNFil_of_fin_len {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [inst_3 : WellFoundedGT ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) [hμ : μA_DescendingChainCondition μ] [hμcvx : Convex μ]
 [h : μ_Admissible μ]
 : ∃ N : Nat, HNFil μ N = ⊤ := by
   by_contra!
-  exact (WellFounded.wellFounded_iff_no_descending_seq.1 inst_3.wf).elim ⟨fun n => HNFil μ n, fun n => is_strict_mono μ n (this n)⟩
+  exact (WellFounded.wellFounded_iff_no_descending_seq.1 inst_3.wf).elim ⟨fun n => HNFil μ n, fun n => HNFil_is_strict_mono μ n (this n)⟩
 
 
 noncomputable def HNlen {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
@@ -55,10 +55,10 @@ noncomputable def HNlen {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrde
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) [hμ : μA_DescendingChainCondition μ] [hμcvx : Convex μ]
 [h : μ_Admissible μ] : Nat := by
   letI := Classical.propDecidable
-  exact Nat.find (of_fin_len μ)
+  exact Nat.find (HNFil_of_fin_len μ)
 
 
-lemma ne_top_iff_lt_len {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
+lemma HNFil_ne_top_iff_lt_len {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) [hμ : μA_DescendingChainCondition μ] [hμcvx : Convex μ]
 [h : μ_Admissible μ] :
@@ -70,14 +70,14 @@ lemma ne_top_iff_lt_len {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrde
     by_contra!
     have h : ∀ n : ℕ, (hn' : HNlen μ ≤ n) → HNFil μ n = ⊤ := by
       apply Nat.le_induction
-      · exact Nat.find_spec (of_fin_len μ)
+      · exact Nat.find_spec (HNFil_of_fin_len μ)
       · intro k hk hk'
         simp [HNFil,hk']
     exact hn (h n this)
-  · exact fun hn ↦ Nat.find_min (of_fin_len μ) hn
+  · exact fun hn ↦ Nat.find_min (HNFil_of_fin_len μ) hn
 
 
-lemma is_strict_mono' {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
+lemma HNFil_is_strict_mono' {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) [hμ : μA_DescendingChainCondition μ] [hμcvx : Convex μ]
 [h : μ_Admissible μ] :
@@ -85,13 +85,28 @@ lemma is_strict_mono' {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder 
   intro i
   have h' : ∀ j : ℕ, i + 1 ≤ j → j ≤ HNlen μ → HNFil μ i < HNFil μ j := Nat.le_induction
     (fun hi ↦
-      is_strict_mono μ i
-        ((ne_top_iff_lt_len μ i).2 (Nat.add_one_le_iff.1 hi)))
+      HNFil_is_strict_mono μ i
+        ((HNFil_ne_top_iff_lt_len μ i).2 (Nat.add_one_le_iff.1 hi)))
     fun k _ hk' hk'' ↦
     lt_trans (hk' (le_trans (Nat.le_succ k) hk''))
-      (is_strict_mono μ k
-        ((ne_top_iff_lt_len μ k).2 (Nat.add_one_le_iff.1 hk'')))
+      (HNFil_is_strict_mono μ k
+        ((HNFil_ne_top_iff_lt_len μ k).2 (Nat.add_one_le_iff.1 hk'')))
   exact fun j hj hij ↦ h' j (Nat.add_one_le_iff.2 hj) hij
+
+
+lemma HNFil_piecewise_semistable {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
+{S : Type} [CompleteLattice S]
+(μ : {p :ℒ × ℒ // p.1 < p.2} → S) [hμ : μA_DescendingChainCondition μ] [hμcvx : Convex μ] [h : μ_Admissible μ] :
+∀ i : ℕ, (h: i < Nat.find (HNFil_of_fin_len μ)) →
+    Semistable (Resμ ⟨(HNFil μ i, HNFil μ (i+1)), HNFil_is_strict_mono' μ i (i+1) (lt_add_one i) h⟩ μ)
+:= sorry
+
+
+lemma HNFil_μA_not_increaing {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
+{S : Type} [CompleteLattice S]
+(μ : {p :ℒ × ℒ // p.1 < p.2} → S) [hμ : μA_DescendingChainCondition μ] [hμcvx : Convex μ] [h : μ_Admissible μ] :
+∀ i : ℕ, ∀ j : ℕ, (hij : i < j) → (hj : j + 1 ≤ Nat.find (HNFil_of_fin_len μ)) → ¬ μA μ ⟨(HNFil μ i, HNFil μ (i+1)), HNFil_is_strict_mono' μ i (i+1) (lt_add_one i) (le_trans (Nat.le_add_right_of_le hij) hj)⟩ ≤ μA μ ⟨(HNFil μ j, HNFil μ (j+1)), HNFil_is_strict_mono' μ j (j+1) (lt_add_one j) <| hj⟩
+:= sorry
 
 instance {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type} [CompleteLinearOrder S]
@@ -117,7 +132,7 @@ theorem theorem3d10  {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
   · by_cases h₁ : n + 1 ≤ Nat.find hffin
     · have h₂ : ∃ N : ℕ, N ≥ (n+1) ∧ HNFilt (n+1) ≤ f N := ⟨Nat.find hffin, h₁, by simp [ffst]⟩
       let i : ℕ := Nat.find h₂
-      have h₃ := (is_strict_mono μ n <| Nat.find_min (of_fin_len μ) <| lt_of_lt_of_le (lt_add_one n) <| Nat.add_one_le_iff.2 ((ne_top_iff_lt_len μ n).mp (Eq.rec (motive := fun x h ↦ n < Nat.find hffin → ¬x = ⊤) (Nat.find_min hffin) hn (lt_of_lt_of_le (lt_add_one n) h₁))))
+      have h₃ := (HNFil_is_strict_mono μ n <| Nat.find_min (HNFil_of_fin_len μ) <| lt_of_lt_of_le (lt_add_one n) <| Nat.add_one_le_iff.2 ((HNFil_ne_top_iff_lt_len μ n).mp (Eq.rec (motive := fun x h ↦ n < Nat.find hffin → ¬x = ⊤) (Nat.find_min hffin) hn (lt_of_lt_of_le (lt_add_one n) h₁))))
       have h₁₅ : i ≥ n + 1 := (Nat.find_spec h₂).1
       have h₄ : ¬ HNFilt (n+1) ≤ f (i-1) := by
         have h₅ := Nat.find_min h₂ (Nat.sub_one_lt <| ne_of_gt <| lt_of_lt_of_le (Nat.add_one_pos n) h₁₅ )
@@ -172,14 +187,14 @@ theorem theorem3d10  {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
           nth_rw 1 [h₁₂] at h₇
           exact h₇
       have h₁₆ : f n < HNFilt (n + 1):= Eq.mpr (hn ▸ rfl)
-        (is_strict_mono μ n (ne_of_lt (lt_of_lt_of_le h₃ le_top)))
+        (HNFil_is_strict_mono μ n (ne_of_lt (lt_of_lt_of_le h₃ le_top)))
       have h₁₇ := le_of_not_gt <| (hss n (by omega)).out.choose_spec.choose_spec.1 (HNFilt (n+1)) ⟨le_of_lt h₁₆,h₁₄⟩ <| ne_of_lt h₁₆
       simp only [hn] at h₁₇
       exact eq_of_le_of_le ((HNFil_prop_of_def μ n <| ne_of_lt <| lt_of_lt_of_le h₃ le_top).1.out.choose_spec.choose_spec.2 (f (n+1)) ⟨le_of_lt h₁₉,le_top⟩ (ne_of_lt h₁₉) (eq_of_le_of_not_lt h₁₇ <| (HNFil_prop_of_def μ n <| ne_of_lt <| lt_of_lt_of_le h₃ le_top).1.out.choose_spec.choose_spec.1 (f (n+1)) ⟨le_of_lt h₁₉,le_top⟩ <| ne_of_lt h₁₉).symm) h₁₄
     · apply Nat.gt_of_not_le at h₁
       rw [ffst (n+1) (by omega),eq_comm]
       rw [ffst n (by omega)] at hn
-      exact not_ne_iff.1 <| (ne_top_iff_lt_len μ (n+1)).not.2 (not_lt_of_ge <| le_of_lt <| Nat.lt_add_one_iff.2 <| le_of_not_lt <| (ne_top_iff_lt_len μ n).not.1 (not_ne_iff.2 hn.symm))
+      exact not_ne_iff.1 <| (HNFil_ne_top_iff_lt_len μ (n+1)).not.2 (not_lt_of_ge <| le_of_lt <| Nat.lt_add_one_iff.2 <| le_of_not_lt <| (HNFil_ne_top_iff_lt_len μ n).not.1 (not_ne_iff.2 hn.symm))
 
 
 end impl
