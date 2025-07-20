@@ -147,7 +147,7 @@ lemma rmk4d13 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : SlopeLike μ):
 ∀ x : ℒ, (hx : x ≠ ⊥ ∧ x ≠ ⊤) → ¬ μ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx.1⟩ ≤ μ TotIntvl ∨ μ TotIntvl ≤ μ ⟨(x,⊤),lt_top_iff_ne_top.2 hx.2⟩ := by
   intro x hx
-  have := (hμ ⊥ x ⊤ ⟨bot_lt_iff_ne_bot.2 hx.1,lt_top_iff_ne_top.2 hx.2⟩).2.2.1
+  have := (hμ.slopelike ⊥ x ⊤ ⟨bot_lt_iff_ne_bot.2 hx.1,lt_top_iff_ne_top.2 hx.2⟩).2.2.1
   cases' this with this this
   · exact Or.inl <| not_le_of_lt this
   · exact Or.inr this
@@ -177,7 +177,7 @@ lemma rmk4d15 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : SlopeLike μ):
 ∀ x : ℒ, (hx : x ≠ ⊥ ∧ x ≠ ⊤) → μ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx.1⟩ ≤ μ TotIntvl ∨ ¬ μ TotIntvl ≤ μ ⟨(x,⊤),lt_top_iff_ne_top.2 hx.2⟩ := by
   intro x hx
-  have := (hμ ⊥ x ⊤ ⟨bot_lt_iff_ne_bot.2 hx.1,lt_top_iff_ne_top.2 hx.2⟩).1
+  have := (hμ.slopelike ⊥ x ⊤ ⟨bot_lt_iff_ne_bot.2 hx.1,lt_top_iff_ne_top.2 hx.2⟩).1
   cases' this with this this
   · exact Or.inl this
   · exact Or.inr <| not_le_of_lt this
@@ -211,11 +211,11 @@ lemma prop4d16₂ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 μmin μ TotIntvl = μmax μ TotIntvl ↔ NashEquilibrium μ := by
   have : ∀ (z : { p : ℒ × ℒ // p.1 < p.2 }) (hz : z.val.2 < ⊤), μ z ≤ μ ⟨(z.val.1, ⊤), lt_trans z.prop hz⟩ ∨ μ ⟨(z.val.2, ⊤), hz⟩ ≤ μ ⟨(z.val.1, ⊤), lt_trans z.prop hz⟩ := by
     intro z hz
-    cases' (hμ z.val.1 z.val.2 ⊤ ⟨z.prop, hz⟩).1 with this this
+    cases' (hμ.slopelike z.val.1 z.val.2 ⊤ ⟨z.prop, hz⟩).1 with this this
     · exact Or.inl this
     · exact Or.inr <| le_of_lt this
   refine ⟨fun h ↦ {nash_eq := eq_of_le_of_le (impl.prop4d1₂ ℒ S μ h₁.wacc this) <| prop4d11₁ μ h},fun h ↦ prop4d11₂ μ h₁ {wsl₁ := this} h₂ {wsl₂:=(fun z hz ↦ ?_)} h.nash_eq.symm.le⟩
-  cases' (hμ ⊥ z.val.1 z.val.2 ⟨hz,z.prop⟩).2.2.1 with this this
+  cases' (hμ.slopelike ⊥ z.val.1 z.val.2 ⟨hz,z.prop⟩).2.2.1 with this this
   · exact Or.inr <| le_of_lt this
   · exact Or.inl <| this
 
@@ -401,7 +401,7 @@ List.TFAE [
       simp [WeakSlopeLike₁,Resμ]
       refine {wsl₁ := ?_}
       intro a b
-      cases' (hμ a.val.1 a.val.2 x ⟨lt_iff_le_not_le.2 (by aesop),lt_iff_le_not_le.2 (by aesop)⟩).1 with this this
+      cases' (hμ.slopelike a.val.1 a.val.2 x ⟨lt_iff_le_not_le.2 (by aesop),lt_iff_le_not_le.2 (by aesop)⟩).1 with this this
       · exact Or.inl this
       · exact Or.inr <| le_of_lt this
   tfae_have 5 → 4 := by
@@ -409,7 +409,7 @@ List.TFAE [
     refine prop4d18₂ μ h (Or.inl <| ⟨h₁,?_⟩)
     refine {wsl₁ := ?_}
     intro a b
-    cases' (hμ a.val.1 a.val.2 ⊤ ⟨a.prop,b⟩).1 with this this
+    cases' (hμ.slopelike a.val.1 a.val.2 ⊤ ⟨a.prop,b⟩).1 with this this
     · exact Or.inl this
     · exact Or.inr <| le_of_lt this
   tfae_finish

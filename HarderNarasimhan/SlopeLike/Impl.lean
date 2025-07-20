@@ -14,7 +14,7 @@ SlopeLike μ ↔ ∀ (x y z : ℒ), (h : x < y ∧ y < z) → (
 ) := by
   constructor
   · intro sl x y z h
-    have sl := sl x y z h
+    have sl := sl.slopelike x y z h
     by_cases h' : μ ⟨(x, y), h.1⟩ < μ ⟨(x, z), lt_trans h.1 h.2⟩
     · exact Or.inl ⟨h', Or.resolve_left sl.2.2.2 (not_le_of_lt h')⟩
     · by_cases h'' : μ ⟨(x, z), lt_trans h.1 h.2⟩ < μ ⟨(x, y), h.1⟩
@@ -22,7 +22,9 @@ SlopeLike μ ↔ ∀ (x y z : ℒ), (h : x < y ∧ y < z) → (
         tauto
       · have h₁ := not_lt_of_ge <| Or.resolve_left sl.2.1 h'
         exact Or.inr <| Or.inr ⟨Eq.symm <| eq_of_le_of_not_lt (Or.resolve_right sl.2.2.2 h₁) h'', eq_of_le_of_not_lt (by tauto) h₁⟩
-  · intro seesaw x y z h
+  · intro seesaw
+    refine {slopelike :=?_}
+    intro x y z h
     have seesaw := seesaw x y z h
     refine ⟨?_,⟨?_,⟨?_,?_⟩⟩⟩
     · have : μ ⟨(y, z), h.2⟩ < μ ⟨(x, z), lt_trans h.1 h.2⟩ ↔ ¬¬ μ ⟨(y, z), h.2⟩ < μ ⟨(x, z), lt_trans h.1 h.2⟩ := Iff.symm not_not

@@ -4,9 +4,10 @@ import Mathlib.Algebra.Module.Defs
 import Mathlib.Data.NNReal.Basic
 import HarderNarasimhan.DedekindMacNeilleCompletion
 
-def SlopeLike {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+class SlopeLike {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S) : Prop := ∀ (x y z : ℒ), (h : x < y ∧ y < z) →
+(μ : {p :ℒ × ℒ // p.1 < p.2} → S) : Prop where
+  slopelike : ∀ (x y z : ℒ), (h : x < y ∧ y < z) →
 (
   μ ⟨(x, y), h.1⟩ ≤ μ ⟨(x, z), lt_trans h.1 h.2⟩ ∨ μ ⟨(y, z), h.2⟩ < μ ⟨(x, z), lt_trans h.1 h.2⟩
 ) ∧ (
