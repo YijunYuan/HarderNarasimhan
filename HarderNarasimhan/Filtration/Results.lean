@@ -1,6 +1,10 @@
 import HarderNarasimhan.Filtration.Defs
 import HarderNarasimhan.Filtration.Impl
 
+
+open Classical
+
+
 noncomputable instance {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) [hμ : μA_DescendingChainCondition μ] [hμcvx : Convex μ] [h : μ_Admissible μ] :
@@ -13,7 +17,6 @@ Inhabited (HardarNarasimhanFiltration μ) := by
       piecewise_semistable := impl.HNFil_piecewise_semistable μ,
       μA_not_increaing := impl.HNFil_μA_not_increaing μ,
       monotone := by
-        letI := Classical.propDecidable
         intro i j hij
         by_cases h : i = j
         · rw [h]
@@ -42,5 +45,4 @@ Unique (HardarNarasimhanFiltration μ) where
   uniq := by
     intro a
     ext n
-    letI := Classical.propDecidable
     exact congrFun (impl.theorem3d10 μ hμ hμcvx a.filtration a.first_eq_bot a.fin_len a.strict_mono (Nat.le_induction (Nat.find_spec a.fin_len) fun n hn hn' ↦ eq_top_iff.2 <| hn' ▸ a.monotone (Nat.le_succ n)) a.piecewise_semistable fun i j hij hj ↦ lt_of_not_ge <| a.μA_not_increaing i j hij hj) n
