@@ -221,7 +221,7 @@ lemma prop4d16₂ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 
 lemma prop4d18₁ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLinearOrder S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : semistable μ) : μBstar μ ≤ μAstar μ := by
+(μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : Semistable μ) : μBstar μ ≤ μAstar μ := by
   rw [semistable_iff] at hμ
   have : sSup {μA μ ⟨(⊥,x),hx⟩ | (x : ℒ) (hx : ⊥ < x)} ≤ μAstar μ := by
     apply sSup_le
@@ -244,7 +244,7 @@ lemma prop4d18₁ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 
 lemma prop4d18₂ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLinearOrder S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : semistable μ)
+(μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : Semistable μ)
 (h : (prop_4_1_cond₁ μ ∧ prop_4_1_cond₂ μ) ∨ (prop_4_3_cond₁ μ ∧ prop_4_3_cond₂ μ)) :
 NashEquilibrium μ := by
   refine eq_of_le_of_le ?_ (prop4d18₁ μ hμ)
@@ -258,7 +258,7 @@ lemma prop4d20 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
 (h₁ : ∀ x : ℒ, (hx : x ≠ ⊥) → prop_4_1_cond₁ (Resμ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx⟩ μ))
 (h₂ :  ∀ x : ℒ, (hx : x ≠ ⊥) → prop_4_1_cond₂ (Resμ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx⟩ μ)) :
-NashEquilibrium μ → semistable μ := by
+NashEquilibrium μ → Semistable μ := by
   intro h
   have : sSup {μA μ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx⟩ | (x : ℒ) (hx : x ≠ ⊥)} = μBstar μ := by
     unfold μBstar μB
@@ -366,7 +366,7 @@ NashEquilibrium μ → semistable μ := by
     rw [← this]
     apply le_sSup
     use x, hx
-  exact fun x hx ↦ LE.le.not_lt <| this x hx
+  exact {semistable := fun x hx ↦ LE.le.not_lt <| this x hx}
 
 
 theorem thm4d21 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
@@ -378,7 +378,7 @@ List.TFAE [
   μmin μ TotIntvl = μ TotIntvl,
   μmin μ TotIntvl = μmax μ TotIntvl,
   NashEquilibrium μ,
-  semistable μ
+  Semistable μ
   ] := by
   have h16 := prop4d16₁ μ hμ
   tfae_have 1 ↔ 2 := (h16.out 0 1 (by norm_num) (by norm_num))

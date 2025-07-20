@@ -10,9 +10,10 @@ theorem theorem_3_10  {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder 
 (hfsi : ∀ i : ℕ, ∀ j : ℕ, i < j → j ≤ Nat.find hffin → f i < f j)
 --(hfsi : ∀ i : ℕ, i < Nat.find hffin → f i < f (i + 1))
 (ffst : ∀ i : ℕ, i ≥ Nat.find hffin → f i = ⊤)
-(hss : ∀ j : ℕ, (hj : j < Nat.find hffin) → semistableI μ ⟨(f j, f (j+1)), hfsi j (j+1) (lt_add_one j) hj⟩)
+(hss : ∀ j : ℕ, (hj : j < Nat.find hffin) → Semistable (Resμ ⟨(f j, f (j+1)), hfsi j (j+1) (lt_add_one j) hj⟩ μ))
 (hmua: ∀ i : ℕ, ∀ j : ℕ, (hij : i < j) → (hj : j + 1 ≤ Nat.find hffin) → μA μ ⟨(f i, f (i+1)), hfsi i (i+1) (lt_add_one i) <| (by omega)⟩ > μA μ ⟨(f j, f (j+1)), hfsi j (j+1) (lt_add_one j) <| (by omega)⟩)
 : f = Filtration.HNFil μ hμ hμcvx (Or.inl hS) := by
+  have hss := fun j hj ↦ (semistableI_iff μ ⟨(f j, f (j+1)), hfsi j (j+1) (lt_add_one j) hj⟩).2 <| hss j hj
   let HNFilt := Filtration.HNFil μ hμ hμcvx (Or.inl hS)
   funext k
   induction' k with n hn

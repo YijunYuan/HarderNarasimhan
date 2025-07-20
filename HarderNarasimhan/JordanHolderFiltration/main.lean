@@ -12,7 +12,7 @@ noncomputable def JHFil {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrde
 {S : Type} [CompleteLinearOrder S]
 (μ : {p : ℒ × ℒ // p.1 < p.2} → S)
 (hμ : μ ⟨(⊥,⊤),bot_lt_top⟩ ≠ ⊤)
-(hμsl : SlopeLike μ) (hst : semistable μ)
+(hμsl : SlopeLike μ) (hst : Semistable μ)
 (hdc: ∀ x : ℕ → ℒ, (sax : StrictAnti x) → ∃ N : ℕ, μ ⟨(x (N +1), x N), sax <| by linarith⟩ = ⊤) (k : ℕ) : ℒ :=
   match k with
   | 0 => ⊤
@@ -28,7 +28,7 @@ lemma JHFil_anti_mono {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder 
 {S : Type} [CompleteLinearOrder S]
 (μ : {p : ℒ × ℒ // p.1 < p.2} → S)
 (hμ : μ ⟨(⊥,⊤),bot_lt_top⟩ ≠ ⊤)
-(hμsl : SlopeLike μ) (hst : semistable μ)
+(hμsl : SlopeLike μ) (hst : Semistable μ)
 (hdc: ∀ x : ℕ → ℒ, (sax : StrictAnti x) → ∃ N : ℕ, μ ⟨(x (N +1), x N), sax <| by linarith⟩ = ⊤) :
 ∀ k : ℕ, JHFil μ hμ hμsl hst hdc k > ⊥ → JHFil μ hμ hμsl hst hdc k > JHFil μ hμ hμsl hst hdc (k + 1) := by
   intro k hk
@@ -44,7 +44,7 @@ lemma JHFil_prop₁ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
 {S : Type} [CompleteLinearOrder S]
 (μ : {p : ℒ × ℒ // p.1 < p.2} → S)
 (hμ : μ ⟨(⊥,⊤),bot_lt_top⟩ ≠ ⊤)
-(hμsl : SlopeLike μ) (hst : semistable μ)
+(hμsl : SlopeLike μ) (hst : Semistable μ)
 (hdc: ∀ x : ℕ → ℒ, (sax : StrictAnti x) → ∃ N : ℕ, μ ⟨(x (N +1), x N), sax <| by linarith⟩ = ⊤) :
 ∀ k : ℕ,  (hk : JHFil μ hμ hμsl hst hdc k > ⊥) → μ ⟨(JHFil μ hμ hμsl hst hdc (k + 1),JHFil μ hμ hμsl hst hdc k),JHFil_anti_mono μ hμ hμsl hst hdc k hk⟩ = μ ⟨(⊥,⊤),bot_lt_top⟩ := by
   intro k
@@ -119,7 +119,7 @@ lemma JHFil_fin_len {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
 {S : Type} [CompleteLinearOrder S]
 (μ : {p : ℒ × ℒ // p.1 < p.2} → S)
 (hμ : μ ⟨(⊥,⊤),bot_lt_top⟩ ≠ ⊤)
-(hμsl : SlopeLike μ) (hst : semistable μ)
+(hμsl : SlopeLike μ) (hst : Semistable μ)
 (hdc: ∀ x : ℕ → ℒ, (sax : StrictAnti x) → ∃ N : ℕ, μ ⟨(x (N +1), x N), sax <| by linarith⟩ = ⊤) :
 ∃ N : ℕ, JHFil μ hμ hμsl hst hdc N = ⊥ := by
   by_contra hc
@@ -132,7 +132,7 @@ lemma JHFil_prop₂ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
 {S : Type} [CompleteLinearOrder S]
 (μ : {p : ℒ × ℒ // p.1 < p.2} → S)
 (hμ : μ ⟨(⊥,⊤),bot_lt_top⟩ ≠ ⊤)
-(hμsl : SlopeLike μ) (hst : semistable μ)
+(hμsl : SlopeLike μ) (hst : Semistable μ)
 (hdc: ∀ x : ℕ → ℒ, (sax : StrictAnti x) → ∃ N : ℕ, μ ⟨(x (N +1), x N), sax <| by linarith⟩ = ⊤) :
 ∀ k : ℕ,  (hk : JHFil μ hμ hμsl hst hdc k > ⊥) → ∀ z : ℒ, (h' : JHFil μ hμ hμsl hst hdc (k + 1) < z) → (h'' : z < JHFil μ hμ hμsl hst hdc k) →
   μ ⟨(JHFil μ hμ hμsl hst hdc (k + 1), z), h'⟩ < μ ⟨(JHFil μ hμ hμsl hst hdc (k + 1), JHFil μ hμ hμsl hst hdc k), JHFil_anti_mono μ hμ hμsl hst hdc k hk⟩ := by
@@ -203,7 +203,7 @@ theorem thm4d25 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [
 {S : Type} [CompleteLinearOrder S]
 (μ : {p : ℒ × ℒ // p.1 < p.2} → S)
 (hμ : μ ⟨(⊥,⊤),bot_lt_top⟩ ≠ ⊤)
-(hμsl : SlopeLike μ) (hst : semistable μ)
+(hμsl : SlopeLike μ) (hst : Semistable μ)
 (hdc: ∀ x : ℕ → ℒ, (sax : StrictAnti x) → ∃ N : ℕ, μ ⟨(x (N +1), x N), sax <| by linarith⟩ = ⊤) :
 ∃ y : ℕ → ℒ, ∃ say : StrictAnti y, ∃ hfl : (∃ N :ℕ, y N =⊥),
 (
@@ -226,7 +226,7 @@ theorem thm4d25 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [
 class JordanHolderFiltration {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type} [CompleteLinearOrder S]
 (μ : {p : ℒ × ℒ // p.1 < p.2} → S) {hμ : μ ⟨(⊥,⊤),bot_lt_top⟩ ≠ ⊤}
-{hμsl : SlopeLike μ} {hst : semistable μ}
+{hμsl : SlopeLike μ} {hst : Semistable μ}
 {hdc: ∀ x : ℕ → ℒ, (sax : StrictAnti x) → ∃ N : ℕ, μ ⟨(x (N +1), x N), sax <| by linarith⟩ = ⊤} where
   filtration : ℕ → ℒ
   strict_anti : StrictAnti filtration
@@ -242,7 +242,7 @@ class JordanHolderFiltration {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [Bounde
 instance {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type} [CompleteLinearOrder S]
 {μ : {p : ℒ × ℒ // p.1 < p.2} → S} {hμ : μ ⟨(⊥,⊤),bot_lt_top⟩ ≠ ⊤}
-{hμsl : SlopeLike μ} {hst : semistable μ}
+{hμsl : SlopeLike μ} {hst : Semistable μ}
 {hdc: ∀ x : ℕ → ℒ, (sax : StrictAnti x) → ∃ N : ℕ, μ ⟨(x (N +1), x N), sax <| by linarith⟩ = ⊤}
 : Nonempty (@JordanHolderFiltration ℒ _ _ _ _ S _ μ hμ hμsl hst hdc) := by
   refine exists_true_iff_nonempty.mp ?_
@@ -252,7 +252,7 @@ instance {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFou
 lemma rmk4d26 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type} [CompleteLinearOrder S]
 {μ : {p : ℒ × ℒ // p.1 < p.2} → S} {hμ : μ ⟨(⊥,⊤),bot_lt_top⟩ ≠ ⊤}
-{hμsl : SlopeLike μ} {hst : semistable μ}
+{hμsl : SlopeLike μ} {hst : Semistable μ}
 {hdc: ∀ x : ℕ → ℒ, (sax : StrictAnti x) → ∃ N : ℕ, μ ⟨(x (N +1), x N), sax <| by linarith⟩ = ⊤} :
 ∀ f₁ f₂ : @JordanHolderFiltration ℒ _ _ _ _ S _ μ hμ hμsl hst hdc, Nat.find f₁.fin_len = Nat.find f₂.fin_len
 := sorry

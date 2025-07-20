@@ -118,7 +118,7 @@ lemma proposition_4_16 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder
 
 lemma proposition_4_18 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLinearOrder S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : semistable μ) :
+(μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : Semistable μ) :
 ------------
 (
   μBstar μ ≤ μAstar μ
@@ -138,7 +138,7 @@ lemma proposition_4_20 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder
 (h₂ :  ∀ x : ℒ, (hx : x ≠ ⊥) →
   prop_4_1_cond₂ (Resμ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx⟩ μ)) :
 ------------
-NashEquilibrium μ → semistable μ
+NashEquilibrium μ → Semistable μ
 ------------
 := impl.prop4d20 μ h₁ h₂
 
@@ -153,7 +153,7 @@ List.TFAE [
   μmin μ TotIntvl = μ TotIntvl,
   μmin μ TotIntvl = μmax μ TotIntvl,
   NashEquilibrium μ,
-  semistable μ
+  Semistable μ
   ]
 ------------
 := impl.thm4d21 μ hμ h₁ h₂

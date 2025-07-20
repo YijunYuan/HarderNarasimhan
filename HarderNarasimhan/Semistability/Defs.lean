@@ -40,9 +40,10 @@ def semistableI {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 (I : {p : ℒ × ℒ // p.1 < p.2}) : Prop := I.val.2 ∈ StI μ I
 
 
-def semistable {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+class Semistable {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S) : Prop := ∀x : ℒ, (hx : x ≠ ⊥) → ¬ μA μ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx⟩ > μA μ ⟨(⊥,⊤),bot_lt_top⟩
+(μ : {p :ℒ × ℒ // p.1 < p.2} → S) : Prop where
+  semistable : ∀x : ℒ, (hx : x ≠ ⊥) → ¬ μA μ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx⟩ > μA μ ⟨(⊥,⊤),bot_lt_top⟩
 
 
 def stableI {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]

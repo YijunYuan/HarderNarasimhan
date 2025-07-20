@@ -7,7 +7,7 @@ theorem semistable_iff {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) :
 ------------
-  semistable μ ↔ semistableI μ TotIntvl
+  Semistable μ ↔ semistableI μ TotIntvl
 ------------
 := impl.semistable_iff μ
 
@@ -16,6 +16,6 @@ theorem semistableI_iff {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrde
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
 (I : {p : ℒ × ℒ // p.1 < p.2}) :
 ------------
-semistableI μ I ↔ semistable (Resμ I μ)
+semistableI μ I ↔ Semistable (Resμ I μ)
 ------------
 := impl.semistableI_iff μ I

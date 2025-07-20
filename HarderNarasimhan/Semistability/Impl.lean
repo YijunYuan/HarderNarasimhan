@@ -365,14 +365,13 @@ lemma prop3d8₂ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] 
 theorem semistable_iff {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) :
-  semistable μ ↔ semistableI μ TotIntvl := by
-  simp [semistable, semistableI, TotIntvl,StI,S₁I,S₂I]
+  Semistable μ ↔ semistableI μ TotIntvl := by
+  simp [semistableI, TotIntvl,StI,S₁I,S₂I]
   constructor
   · intro h
     use in_TotIntvl _
-    exact fun y hyI hy ↦ h y <| Ne.symm hy
-  · intro h x hx
-    exact h.choose_spec x (in_TotIntvl _) (Ne.symm hx)
+    exact fun y hyI hy ↦ h.semistable y <| Ne.symm hy
+  · exact fun h ↦ {semistable := fun y hyI hy ↦ (h.choose_spec y (in_TotIntvl _) (Ne.symm hyI)) hy}
 
 
 lemma stupid_helper {α : Type} {a b c d: α} (h : a = b) (h' : b = c) (h'' : c = d) : a = d := h ▸ h' ▸ h''
@@ -381,7 +380,7 @@ lemma stupid_helper {α : Type} {a b c d: α} (h : a = b) (h' : b = c) (h'' : c 
 theorem semistableI_iff {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
-(I : {p : ℒ × ℒ // p.1 < p.2}) : semistableI μ I ↔ semistable (Resμ I μ) := by
+(I : {p : ℒ × ℒ // p.1 < p.2}) : semistableI μ I ↔ Semistable (Resμ I μ) := by
   rw [semistable_iff]
   unfold Resμ
   constructor

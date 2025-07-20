@@ -1,4 +1,5 @@
 import HarderNarasimhan.Semistability.Impl
+import HarderNarasimhan.Semistability.Translation
 
 lemma proposition_3_2 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   {S : Type} [CompleteLattice S]
@@ -42,12 +43,15 @@ lemma proposition_3_7 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder 
   (x : ℒ) (hxSt : x ∈ St μ) :
 ------------
   --`(1)`
-  semistableI μ ⟨(⊥, x), lt_of_le_of_ne bot_le hxSt.out.choose_spec.choose⟩
+  Semistable  (Resμ ⟨(⊥, x), lt_of_le_of_ne bot_le hxSt.out.choose_spec.choose⟩ μ)
   ∧
   --`(2)`
   ∀ y : ℒ, (hy : y > x) → ¬ μA μ ⟨(⊥ , x) , lt_of_le_of_ne hxSt.out.choose.1 hxSt.out.choose_spec.choose⟩ ≤ μA μ ⟨(x, y), hy⟩
 ------------
-  := ⟨impl.prop3d7₁ μ TotIntvl x hxSt, fun y hy ↦ impl.prop3d7₂ μ TotIntvl hμcvx x hxSt y (in_TotIntvl y) hy⟩
+  := by
+    constructor
+    · apply (semistableI_iff μ ⟨(⊥, x), lt_of_le_of_ne bot_le hxSt.out.choose_spec.choose⟩).1 <| impl.prop3d7₁ μ TotIntvl x hxSt
+    · exact fun y hy ↦ impl.prop3d7₂ μ TotIntvl hμcvx x hxSt y (in_TotIntvl y) hy
 
 
 lemma proposition_3_8 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
