@@ -7,7 +7,7 @@ open Classical
 
 noncomputable instance {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type} [CompleteLattice S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S) [hμ : μA_DescendingChainCondition μ] [hμcvx : Convex μ] [h : μ_Admissible μ] :
+{μ : {p :ℒ × ℒ // p.1 < p.2} → S} [hμ : μA_DescendingChainCondition μ] [hμcvx : Convex μ] [h : μ_Admissible μ] :
 ------------
 Inhabited (HardarNarasimhanFiltration μ)
 ------------
@@ -20,13 +20,13 @@ Inhabited (HardarNarasimhanFiltration μ)
       μA_not_increaing     := impl.HNFil_μA_not_increaing μ,
       monotone             := by
         have : ∀ n : ℕ, impl.HNlen μ ≤ n → impl.HNFil μ n = ⊤ := Nat.le_induction (Nat.find_spec (impl.HNFil_of_fin_len μ)) (fun n hn hn' ↦ (by simp only [impl.HNFil,hn']; simp))
-        refine fun i j hij ↦ if h : i = j then (by rw [h]) else (if h' : j ≤ impl.HNlen μ then (le_of_lt <| impl.HNFil_is_strict_mono' μ i j (lt_of_le_of_ne hij h) h') else ((this) j <| le_of_lt <| lt_of_not_le h') ▸ le_top)
+        exact fun i j hij ↦ if h : i = j then (by rw [h]) else (if h' : j ≤ impl.HNlen μ then (le_of_lt <| impl.HNFil_is_strict_mono' μ i j (lt_of_le_of_ne hij h) h') else ((this) j <| le_of_lt <| lt_of_not_le h') ▸ le_top)
          } }
 
 
 noncomputable instance {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type} [CompleteLattice S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S) [hμ : μA_DescendingChainCondition μ] [hμcvx : Convex μ] [h : μ_Admissible μ] :
+{μ : {p :ℒ × ℒ // p.1 < p.2} → S} [hμ : μA_DescendingChainCondition μ] [hμcvx : Convex μ] [h : μ_Admissible μ] :
 ------------
 Nonempty (HardarNarasimhanFiltration μ)
 ------------
@@ -35,7 +35,7 @@ Nonempty (HardarNarasimhanFiltration μ)
 
 noncomputable instance {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type} [CompleteLinearOrder S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S) [hμ : μA_DescendingChainCondition μ] [hμcvx : Convex μ] :
+{μ : {p :ℒ × ℒ // p.1 < p.2} → S} [hμ : μA_DescendingChainCondition μ] [hμcvx : Convex μ] :
 ------------
 Unique (HardarNarasimhanFiltration μ)
 ------------

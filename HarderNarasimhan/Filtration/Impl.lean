@@ -13,7 +13,6 @@ noncomputable def HNFil {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrde
   | 0 => ⊥
   | n + 1 =>
     let prev_term := HNFil μ n
-    letI := Classical.propDecidable
     if htop : prev_term = ⊤ then
       ⊤
     else
@@ -53,9 +52,7 @@ lemma HNFil_of_fin_len {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder
 noncomputable def HNlen {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) [hμ : μA_DescendingChainCondition μ] [hμcvx : Convex μ]
-[h : μ_Admissible μ] : Nat := by
-  letI := Classical.propDecidable
-  exact Nat.find (HNFil_of_fin_len μ)
+[h : μ_Admissible μ] : Nat := Nat.find (HNFil_of_fin_len μ)
 
 
 lemma HNFil_ne_top_iff_lt_len {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
@@ -63,7 +60,6 @@ lemma HNFil_ne_top_iff_lt_len {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [Bound
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) [hμ : μA_DescendingChainCondition μ] [hμcvx : Convex μ]
 [h : μ_Admissible μ] :
   ∀ n : Nat, HNFil μ n ≠ ⊤ ↔ n < HNlen μ := by
-  letI := Classical.propDecidable
   intro n
   constructor
   · intro hn
