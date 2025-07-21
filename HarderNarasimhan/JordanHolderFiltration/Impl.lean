@@ -5,9 +5,11 @@ import HarderNarasimhan.SlopeLike.Impl
 import HarderNarasimhan.NashEquilibrium.Impl
 import Mathlib.Data.List.TFAE
 import Mathlib.Order.OrderIsoNat
+import HarderNarasimhan.JordanHolderFiltration.Defs
 open Classical
 
 
+namespace impl
 noncomputable def JHFil {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [hacc: WellFoundedGT ℒ]
 {S : Type} [CompleteLinearOrder S]
 (μ : {p : ℒ × ℒ // p.1 < p.2} → S)
@@ -198,7 +200,6 @@ lemma JHFil_prop₂ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
     exact (JHFil_prop₁ μ hμ hμsl hst hdc k hk ).symm ▸ lt_trans ((Or.resolve_right <| (Or.resolve_left <| (impl.prop4d6 μ).1 hμsl ⊥ (JHFil μ hμ hμsl hst hdc (k + 1)) z ⟨bot_lt_iff_ne_bot.2 hfp1bot,h'⟩) (not_and_iff_not_or_not.2 <| Or.inl <| not_lt_of_lt <| h'''' ▸ h''')) (not_and_iff_not_or_not.2 <| Or.inl <| ne_of_gt <| h'''' ▸ h''')).2 h'''
 
 
-
 theorem thm4d25 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type} [CompleteLinearOrder S]
 (μ : {p : ℒ × ℒ // p.1 < p.2} → S)
@@ -218,41 +219,4 @@ theorem thm4d25 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [
 )
 := sorry
 
-
-
-
-
-
-class JordanHolderFiltration {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
-{S : Type} [CompleteLinearOrder S]
-(μ : {p : ℒ × ℒ // p.1 < p.2} → S) {hμ : μ ⟨(⊥,⊤),bot_lt_top⟩ ≠ ⊤}
-{hμsl : SlopeLike μ} {hst : Semistable μ}
-{hdc: ∀ x : ℕ → ℒ, (sax : StrictAnti x) → ∃ N : ℕ, μ ⟨(x (N +1), x N), sax <| by linarith⟩ = ⊤} where
-  filtration : ℕ → ℒ
-  strict_anti : StrictAnti filtration
-  fin_len : ∃ N : ℕ, filtration N =⊥
-  first_top : filtration 0 = ⊤
-  step_cond₁ : ∀ i : ℕ, (hpos : 1 ≤ i) → i ≤ Nat.find fin_len →
-    (μ ⟨(filtration i, filtration (i - 1)), strict_anti <| Nat.sub_one_lt_of_lt hpos⟩ = μ ⟨(⊥,⊤),bot_lt_top⟩)
-  step_cond₂ : ∀ i : ℕ, (hpos : 1 ≤ i) → i ≤ Nat.find fin_len →
-    ∀ z : ℒ, (h' : filtration i < z) → (h'' : z < filtration (i - 1)) →
-    μ ⟨(filtration i, z), h'⟩ = μ ⟨(filtration i, filtration (i - 1)), strict_anti <| Nat.sub_one_lt_of_lt hpos⟩
-
-
-instance {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
-{S : Type} [CompleteLinearOrder S]
-{μ : {p : ℒ × ℒ // p.1 < p.2} → S} {hμ : μ ⟨(⊥,⊤),bot_lt_top⟩ ≠ ⊤}
-{hμsl : SlopeLike μ} {hst : Semistable μ}
-{hdc: ∀ x : ℕ → ℒ, (sax : StrictAnti x) → ∃ N : ℕ, μ ⟨(x (N +1), x N), sax <| by linarith⟩ = ⊤}
-: Nonempty (@JordanHolderFiltration ℒ _ _ _ _ S _ μ hμ hμsl hst hdc) := by
-  refine exists_true_iff_nonempty.mp ?_
-  use JordanHolderFiltration.mk (thm4d25 μ hμ hμsl hst hdc).choose (thm4d25 μ hμ hμsl hst hdc).choose_spec.choose (thm4d25 μ hμ hμsl hst hdc).choose_spec.choose_spec.choose (thm4d25 μ hμ hμsl hst hdc).choose_spec.choose_spec.choose_spec.1 (fun i hpos h'↦ ((thm4d25 μ hμ hμsl hst hdc).choose_spec.choose_spec.choose_spec.2 i hpos h').1) (fun i hpos h'↦ ((thm4d25 μ hμ hμsl hst hdc).choose_spec.choose_spec.choose_spec.2 i hpos h').2)
-
-
-lemma rmk4d26 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
-{S : Type} [CompleteLinearOrder S]
-{μ : {p : ℒ × ℒ // p.1 < p.2} → S} {hμ : μ ⟨(⊥,⊤),bot_lt_top⟩ ≠ ⊤}
-{hμsl : SlopeLike μ} {hst : Semistable μ}
-{hdc: ∀ x : ℕ → ℒ, (sax : StrictAnti x) → ∃ N : ℕ, μ ⟨(x (N +1), x N), sax <| by linarith⟩ = ⊤} :
-∀ f₁ f₂ : @JordanHolderFiltration ℒ _ _ _ _ S _ μ hμ hμsl hst hdc, Nat.find f₁.fin_len = Nat.find f₂.fin_len
-:= sorry
+end impl
