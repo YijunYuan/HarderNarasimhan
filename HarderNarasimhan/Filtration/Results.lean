@@ -17,7 +17,7 @@ Inhabited (HardarNarasimhanFiltration μ)
       fin_len              := impl.HNFil_of_fin_len μ,
       strict_mono          := impl.HNFil_is_strict_mono' μ,
       piecewise_semistable := impl.HNFil_piecewise_semistable μ,
-      μA_not_increaing     := impl.HNFil_μA_not_increaing μ,
+      μA_pseudo_strict_anti:= impl.HNFil_μA_pseudo_strict_anti μ,
       monotone             := by
         have : ∀ n : ℕ, impl.HNlen μ ≤ n → impl.HNFil μ n = ⊤ := Nat.le_induction (Nat.find_spec (impl.HNFil_of_fin_len μ)) (fun n hn hn' ↦ (by simp only [impl.HNFil,hn']; simp))
         exact fun i j hij ↦ if h : i = j then (by rw [h]) else (if h' : j ≤ impl.HNlen μ then (le_of_lt <| impl.HNFil_is_strict_mono' μ i j (lt_of_le_of_ne hij h) h') else ((this) j <| le_of_lt <| lt_of_not_le h') ▸ le_top)
@@ -40,4 +40,19 @@ noncomputable instance {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder
 Unique (HardarNarasimhanFiltration μ)
 ------------
 where
-  uniq := fun a ↦ HardarNarasimhanFiltration.ext (funext fun n ↦ congrFun (impl.theorem3d10 μ hμ hμcvx a.filtration a.first_eq_bot a.fin_len a.strict_mono (Nat.le_induction (Nat.find_spec a.fin_len) fun n _ hn' ↦ eq_top_iff.2 <| hn' ▸ a.monotone (Nat.le_succ n)) a.piecewise_semistable fun i j hij hj ↦ lt_of_not_ge <| a.μA_not_increaing i j hij hj) n)
+  uniq := fun a ↦ HardarNarasimhanFiltration.ext (funext fun n ↦ congrFun (impl.theorem3d10 μ hμ hμcvx a.filtration a.first_eq_bot a.fin_len a.strict_mono (Nat.le_induction (Nat.find_spec a.fin_len) fun n _ hn' ↦ eq_top_iff.2 <| hn' ▸ a.monotone (Nat.le_succ n)) a.piecewise_semistable fun i  ↦ by
+    have : ∀ (j : ℕ) (hij : i + 1 ≤ j) (hj : j < Nat.find a.fin_len),
+  μA μ ⟨(HardarNarasimhanFiltration.filtration μ i, HardarNarasimhanFiltration.filtration μ (i + 1)), HardarNarasimhanFiltration.strict_mono i (i + 1) (lt_add_one i)
+  (Decidable.byContradiction fun a_1 ↦
+    impl.theorem3d10._proof_5 (HardarNarasimhanFiltration.filtration μ) HardarNarasimhanFiltration.fin_len i j hij hj
+      a_1)⟩ >
+    μA μ ⟨(HardarNarasimhanFiltration.filtration μ j, HardarNarasimhanFiltration.filtration μ (j + 1)), HardarNarasimhanFiltration.strict_mono j (j + 1) (lt_add_one j)
+  (Decidable.byContradiction fun a_1 ↦
+    impl.theorem3d10._proof_6 (HardarNarasimhanFiltration.filtration μ) HardarNarasimhanFiltration.fin_len i j hj a_1)⟩ := by
+      apply Nat.le_induction
+      · exact fun hj ↦ lt_of_not_ge (a.μA_pseudo_strict_anti i hj)
+      · refine fun j hij hind hj ↦ gt_trans (hind (by linarith)) ?_
+        have := a.μA_pseudo_strict_anti j (by linarith)
+        aesop
+    exact fun j hij hj ↦ this j (by linarith) hj
+  ) n)

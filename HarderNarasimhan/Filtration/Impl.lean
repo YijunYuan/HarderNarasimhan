@@ -95,14 +95,17 @@ lemma HNFil_piecewise_semistable {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [Bo
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) [hμ : μA_DescendingChainCondition μ] [hμcvx : Convex μ] [h : μ_Admissible μ] :
 ∀ i : ℕ, (h: i < Nat.find (HNFil_of_fin_len μ)) →
     Semistable (Resμ ⟨(HNFil μ i, HNFil μ (i+1)), HNFil_is_strict_mono' μ i (i+1) (lt_add_one i) h⟩ μ)
-:= sorry
+:= fun i hi ↦ (semistableI_iff μ ⟨(HNFil μ i , HNFil μ (i+1)), HNFil_is_strict_mono' μ i (i+1) (lt_add_one i) hi⟩).1 <| impl.prop3d7₁ μ ⟨(HNFil μ i , ⊤), lt_top_iff_ne_top.2 <|Nat.find_min (HNFil_of_fin_len μ) hi⟩ (HNFil μ (i + 1)) (HNFil_prop_of_def μ i (Nat.find_min (HNFil_of_fin_len μ) hi)).1
 
 
-lemma HNFil_μA_not_increaing {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
+lemma HNFil_μA_pseudo_strict_anti {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) [hμ : μA_DescendingChainCondition μ] [hμcvx : Convex μ] [h : μ_Admissible μ] :
-∀ i : ℕ, ∀ j : ℕ, (hij : i < j) → (hj : j + 1 ≤ Nat.find (HNFil_of_fin_len μ)) → ¬ μA μ ⟨(HNFil μ i, HNFil μ (i+1)), HNFil_is_strict_mono' μ i (i+1) (lt_add_one i) (le_trans (Nat.le_add_right_of_le hij) hj)⟩ ≤ μA μ ⟨(HNFil μ j, HNFil μ (j+1)), HNFil_is_strict_mono' μ j (j+1) (lt_add_one j) <| hj⟩
-:= sorry
+∀ i : ℕ, (hi : i + 1 < Nat.find (HNFil_of_fin_len μ)) → ¬ μA μ ⟨(HNFil μ i, HNFil μ (i+1)), HNFil_is_strict_mono μ i (Nat.find_min (HNFil_of_fin_len μ) (by linarith))⟩ ≤ μA μ ⟨(HNFil μ (i+1), HNFil μ (i+2)), HNFil_is_strict_mono μ (i + 1) (Nat.find_min (HNFil_of_fin_len μ) (by linarith))⟩
+:= by
+  intro i hj
+  refine impl.prop3d7₂ μ ⟨(HNFil μ i,⊤),lt_top_iff_ne_top.2 <| Nat.find_min (HNFil_of_fin_len μ) <| lt_trans (lt_add_one i) hj⟩ (Convex_of_Convex_large TotIntvl ⟨(HNFil μ i,⊤),lt_top_iff_ne_top.2 <| Nat.find_min (HNFil_of_fin_len μ) <| lt_trans (lt_add_one i) hj⟩ ⟨bot_le,le_top⟩ μ hμcvx) (HNFil μ (i + 1)) (HNFil_prop_of_def μ i <| Nat.find_min (HNFil_of_fin_len μ) <| lt_trans (lt_add_one i) hj).1 (HNFil μ (i + 1 + 1)) (?_) ?_
+  exact ⟨le_of_lt <| lt_trans (HNFil_is_strict_mono μ i <| Nat.find_min (HNFil_of_fin_len μ) <| lt_trans (lt_add_one i) hj) <| HNFil_is_strict_mono μ (i + 1) <| Nat.find_min (HNFil_of_fin_len μ) <| hj,le_top⟩
 
 instance {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type} [CompleteLinearOrder S]
@@ -118,7 +121,7 @@ theorem theorem3d10  {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
 --(hfsi : ∀ i : ℕ, i < Nat.find hffin → f i < f (i + 1))
 (ffst : ∀ i : ℕ, i ≥ Nat.find hffin → f i = ⊤)
 (hss : ∀ j : ℕ, (hj : j < Nat.find hffin) → Semistable (Resμ ⟨(f j, f (j+1)), hfsi j (j+1) (lt_add_one j) hj⟩ μ))
-(hmua: ∀ i : ℕ, ∀ j : ℕ, (hij : i < j) → (hj : j + 1 ≤ Nat.find hffin) → μA μ ⟨(f i, f (i+1)), hfsi i (i+1) (lt_add_one i) <| (by omega)⟩ > μA μ ⟨(f j, f (j+1)), hfsi j (j+1) (lt_add_one j) <| (by omega)⟩)
+(hmua: ∀ i : ℕ, ∀ j : ℕ, (hij : i < j) → (hj : j < Nat.find hffin) → μA μ ⟨(f i, f (i+1)), hfsi i (i+1) (lt_add_one i) <| (by omega)⟩ > μA μ ⟨(f j, f (j+1)), hfsi j (j+1) (lt_add_one j) <| (by omega)⟩)
 : f = HNFil μ := by
   have hss := fun j hj ↦ (semistableI_iff μ ⟨(f j, f (j+1)), hfsi j (j+1) (lt_add_one j) hj⟩).2 <| hss j hj
   let HNFilt := HNFil μ
