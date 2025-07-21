@@ -5,13 +5,13 @@ open Classical
 
 class FiniteTotalPayoff {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLinearOrder S]
-(μ : {p : ℒ × ℒ // p.1 < p.2} → S) where
+(μ : {p : ℒ × ℒ // p.1 < p.2} → S) : Prop where
   fin_tot_payoff : μ ⟨(⊥,⊤),bot_lt_top⟩ ≠ ⊤
 
 
 class WeakDescendingChainCondition' {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S]
-(μ : {p : ℒ × ℒ // p.1 < p.2} → S) where
+(μ : {p : ℒ × ℒ // p.1 < p.2} → S) : Prop where
   wdcc' : ∀ x : ℕ → ℒ, (sax : StrictAnti x) → ∃ N : ℕ, μ ⟨(x (N +1), x N), sax <| by linarith⟩ = ⊤
 
 
@@ -40,3 +40,9 @@ WeakDescendingChainCondition μ where
     rcases h.wdcc' f saf with ⟨N, hN⟩
     use N
     exact hN ▸ le_top
+
+
+class Affine {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+{S : Type} [CompleteLattice S]
+(μ : {p : ℒ × ℒ // p.1 < p.2} → S) : Prop where
+  affine : ∀ a b : ℒ, (h : ¬ a ≤ b) → μ ⟨(a ⊓ b, a), inf_lt_left.2 h⟩ = μ ⟨(b, a ⊔ b), right_lt_sup.2 h⟩
