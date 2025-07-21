@@ -1,10 +1,5 @@
-import Mathlib.Order.CompleteLattice.Defs
-import Mathlib.Order.BoundedOrder.Basic
-import HarderNarasimhan.Semistability.Defs
-import HarderNarasimhan.SlopeLike.Impl
 import HarderNarasimhan.NashEquilibrium.Impl
-import Mathlib.Data.List.TFAE
-import Mathlib.Order.OrderIsoNat
+
 open Classical
 
 
