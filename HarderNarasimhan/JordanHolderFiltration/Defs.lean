@@ -19,7 +19,8 @@ class WeakDescendingChainCondition' {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] 
 class JordanHolderFiltration {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type} [CompleteLinearOrder S]
 (μ : {p : ℒ × ℒ // p.1 < p.2} → S)
-[FiniteTotalPayoff μ] [SlopeLike μ] [Semistable μ] [WeakDescendingChainCondition' μ] where
+--[FiniteTotalPayoff μ] [SlopeLike μ] [Semistable μ] [WeakDescendingChainCondition' μ]
+where
   filtration : ℕ → ℒ
   antitone : Antitone filtration
   fin_len : ∃ N : ℕ, filtration N =⊥

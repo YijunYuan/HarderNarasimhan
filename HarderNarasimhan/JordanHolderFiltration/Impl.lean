@@ -219,4 +219,35 @@ theorem thm4d25 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [
 )
 := sorry
 
+
+instance {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
+{S : Type} [CompleteLinearOrder S]
+{μ : {p : ℒ × ℒ // p.1 < p.2} → S}
+[hftp : FiniteTotalPayoff μ] [hsl : SlopeLike μ] [hst : Semistable μ] [hwdcc' : WeakDescendingChainCondition' μ] {x : ℒ} {hx : ⊥ < x}: FiniteTotalPayoff (Resμ ⟨(⊥, x), hx⟩ μ) := by
+  refine { fin_tot_payoff := ?_ }
+  simp only [Resμ]
+  by_contra h
+  have := (List.TFAE.out (impl.thm4d21 μ hsl {wacc := (fun f smf ↦ False.elim (not_strictMono_of_wellFoundedGT f smf))} inferInstance) 0 4).2 hst
+  simp [μmax, TotIntvl] at this
+  have this_q: μ ⟨(⊥, x), hx⟩ ≤ μ ⟨(⊥, ⊤), bot_lt_top⟩ := by
+    rw [← this]
+    apply le_sSup
+    use x, ⟨in_TotIntvl x, Ne.symm <| bot_lt_iff_ne_bot.1 hx⟩
+  exact (not_le_of_lt <| h ▸ lt_top_iff_ne_top.2 hftp.fin_tot_payoff) this_q
+
+
+instance {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+{S : Type} [CompleteLattice S]
+{μ : {p : ℒ × ℒ // p.1 < p.2} → S} [hsl : SlopeLike μ]
+{z : {p : ℒ × ℒ // p.1 < p.2}} : SlopeLike (Resμ z μ)
+:= { slopelike := fun x y z h ↦ hsl.slopelike x.val y.val z.val ⟨lt_iff_le_not_le.2 h.1,lt_iff_le_not_le.2 h.2⟩ }
+
+
+
+lemma strange {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
+{S : Type} [CompleteLinearOrder S]
+{μ : {p : ℒ × ℒ // p.1 < p.2} → S}
+[hftp : FiniteTotalPayoff μ] [hsl : SlopeLike μ] [hst : Semistable μ] [hwdcc' : WeakDescendingChainCondition' μ] [Affine μ] :
+∀ k : ℕ, ∀ x : ℒ, (hx : ⊥ < x) → (∃ JHx : JordanHolderFiltration (Resμ ⟨(⊥,x),hx⟩ μ), Nat.find JHx.fin_len = k) → ∀ JH : JordanHolderFiltration (Resμ ⟨(⊥,x),hx⟩ μ), Nat.find JH.fin_len = k := sorry
+
 end impl

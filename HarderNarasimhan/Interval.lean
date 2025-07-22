@@ -50,3 +50,11 @@ def Resμ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] (z : {p
 
 instance {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] {z : {p : ℒ × ℒ // p.1 < p.2}} {S : Type} [CompleteLattice S] : Coe ({p :ℒ × ℒ // p.1 < p.2} → S) ({p :(Interval z) × (Interval z) // p.1 < p.2} → S) where
     coe := Resμ z
+
+instance {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [hw : WellFoundedGT ℒ] {z : {p : ℒ × ℒ // p.1 < p.2}} : WellFoundedGT (Interval z) := by
+    refine { wf := WellFounded.wellFounded_iff_has_min.mpr fun S hS ↦ ?_ }
+    rcases hw.wf.has_min (Subtype.val '' S) ( Set.Nonempty.image Subtype.val hS) with ⟨a,ha⟩
+    have := ha.1
+    simp at this
+    rcases this with ⟨x, hx⟩
+    exact Exists.intro ⟨a, x⟩ ⟨hx, fun y hy h ↦ ha.right y.val (Set.mem_image_of_mem Subtype.val hy) (lt_iff_le_not_le.2 h)⟩
