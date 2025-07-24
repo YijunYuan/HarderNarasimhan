@@ -1,10 +1,10 @@
 import HarderNarasimhan.NashEquilibrium.Impl
-
+import Mathlib.Order.OrderIsoNat
 open Classical
 
 
 class FiniteTotalPayoff {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-{S : Type} [CompleteLinearOrder S]
+{S : Type} [CompleteLattice S]
 (μ : {p : ℒ × ℒ // p.1 < p.2} → S) : Prop where
   fin_tot_payoff : μ ⟨(⊥,⊤),bot_lt_top⟩ ≠ ⊤
 
@@ -47,3 +47,19 @@ class Affine {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p : ℒ × ℒ // p.1 < p.2} → S) : Prop where
   affine : ∀ a b : ℒ, (h : ¬ a ≤ b) → μ ⟨(a ⊓ b, a), inf_lt_left.2 h⟩ = μ ⟨(b, a ⊔ b), right_lt_sup.2 h⟩
+
+
+instance {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
+{S : Type} [CompleteLinearOrder S]
+{μ : {p : ℒ × ℒ // p.1 < p.2} → S}
+[hftp : FiniteTotalPayoff μ] [hsl : SlopeLike μ] [hst : Semistable μ] [hwdcc' : WeakDescendingChainCondition' μ] {x : ℒ} {hx : ⊥ < x}: FiniteTotalPayoff (Resμ ⟨(⊥, x), hx⟩ μ) := by
+  refine { fin_tot_payoff := ?_ }
+  simp only [Resμ]
+  by_contra h
+  have := (List.TFAE.out (impl.thm4d21 μ hsl {wacc := (fun f smf ↦ False.elim (not_strictMono_of_wellFoundedGT f smf))} inferInstance) 0 4).2 hst
+  simp [μmax, TotIntvl] at this
+  have this_q: μ ⟨(⊥, x), hx⟩ ≤ μ ⟨(⊥, ⊤), bot_lt_top⟩ := by
+    rw [← this]
+    apply le_sSup
+    use x, ⟨in_TotIntvl x, Ne.symm <| bot_lt_iff_ne_bot.1 hx⟩
+  exact (not_le_of_lt <| h ▸ lt_top_iff_ne_top.2 hftp.fin_tot_payoff) this_q

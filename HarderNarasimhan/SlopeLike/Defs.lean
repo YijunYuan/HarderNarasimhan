@@ -3,6 +3,7 @@ import Mathlib.Data.Real.Basic
 import Mathlib.Algebra.Module.Defs
 import Mathlib.Data.NNReal.Basic
 import HarderNarasimhan.DedekindMacNeilleCompletion
+import HarderNarasimhan.Interval
 
 class SlopeLike {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S]
@@ -32,3 +33,10 @@ noncomputable def μQuotient {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [Bounde
 (r : {p :ℒ × ℒ // p.1 < p.2} → NNReal)
 (d : {p :ℒ × ℒ // p.1 < p.2} → V): {p :ℒ × ℒ // p.1 < p.2} → DedekindMacNeilleCompletion V :=
   fun z ↦ if _ : r z > 0 then coe' ((r z)⁻¹ • d z) else ⊤
+
+
+instance {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+{S : Type} [CompleteLattice S]
+{μ : {p : ℒ × ℒ // p.1 < p.2} → S} [hsl : SlopeLike μ]
+{z : {p : ℒ × ℒ // p.1 < p.2}} : SlopeLike (Resμ z μ)
+:= { slopelike := fun x y z h ↦ hsl.slopelike x.val y.val z.val ⟨lt_iff_le_not_le.2 h.1,lt_iff_le_not_le.2 h.2⟩ }
