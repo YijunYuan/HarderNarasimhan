@@ -371,6 +371,26 @@ NashEquilibrium μ → Semistable μ := by
   exact {semistable := fun x hx ↦ LE.le.not_lt <| this x hx}
 
 
+instance {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+{S : Type} [CompleteLinearOrder S]
+{μ : {p :ℒ × ℒ // p.1 < p.2} → S} [hμ : SlopeLike μ]:
+WeakSlopeLike₁ μ := by
+  refine { wsl₁ := fun z hz ↦ ?_ }
+  cases' (hμ.slopelike z.val.1 z.val.2 ⊤ ⟨z.prop,hz⟩).1 with this this
+  · exact Or.inl this
+  · exact Or.inr <| le_of_lt this
+
+
+instance {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+{S : Type} [CompleteLinearOrder S]
+{μ : {p :ℒ × ℒ // p.1 < p.2} → S} [hμ : SlopeLike μ]:
+WeakSlopeLike₂ μ := by
+  refine { wsl₂ := fun z hz ↦ ?_ }
+  cases' (hμ.slopelike ⊥ z.val.1 z.val.2 ⟨hz,z.prop⟩).2.2.1 with this this
+  · exact Or.inr <| le_of_lt this
+  · exact Or.inl this
+
+
 theorem thm4d21 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLinearOrder S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : SlopeLike μ)
@@ -395,6 +415,11 @@ List.TFAE [
       rcases h₁.wacc (fun t ↦ (f t).val) fun _ _ hxy ↦ lt_iff_le_not_le.2 (smf hxy) with ⟨N,hN⟩
       use N
       refine le_trans hN ?_
+      have : WeakSlopeLike₁ μ := inferInstance
+      if h' : x = ⊤ then
+        aesop
+      else
+      have := this.wsl₁ ⟨((f N).val,x),lt_of_lt_of_le (lt_iff_le_not_le.mpr <| smf <| lt_add_one N) (f (N+1)).prop.2⟩ (lt_top_iff_ne_top.2 h')
 
       sorry
     · intro x hx

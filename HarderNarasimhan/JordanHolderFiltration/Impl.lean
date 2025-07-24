@@ -205,129 +205,101 @@ lemma strange {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [We
 {S : Type} [CompleteLinearOrder S]
 {μ : {p : ℒ × ℒ // p.1 < p.2} → S}
 [hftp : FiniteTotalPayoff μ] [hsl : SlopeLike μ] [hst : Semistable μ] [hwdcc' : WeakDescendingChainCondition' μ] [Affine μ] :
-∀ k : ℕ, ∀ x : ℒ, (hx : x < ⊤) → (∃ JHx : JordanHolderFiltration (Resμ ⟨(x,⊤),hx⟩ μ), Nat.find JHx.fin_len = k) → (∀ JH : JordanHolderFiltration (Resμ ⟨(x,⊤),hx⟩ μ), Nat.find JH.fin_len = k) := by
+∀ k : ℕ, ∀ x : ℒ, (hx : x < ⊤) → (∃ JHx : JordanHolderFiltration (Resμ ⟨(x,⊤),hx⟩ μ), Nat.find JHx.fin_len = k) → (∀ JH : JordanHolderFiltration (Resμ ⟨(x,⊤),hx⟩ μ), k ≤ Nat.find JH.fin_len) := by
   intro k
   induction' k with k hk
   · rintro x hx ⟨JHx,hJHx⟩ JH
     have := JHx.first_eq_top ▸ hJHx ▸ Nat.find_spec JHx.fin_len
     exact False.elim <| bot_ne_top this.symm
   · intro x hx ⟨JHx,hJHx⟩ JH
+    have h1: Nat.find JHx.fin_len ≠ 0 := fun h ↦ bot_ne_top (JHx.first_eq_top ▸ h ▸ Nat.find_spec JHx.fin_len).symm
+    if kzero : k = 0 then
+      rw [kzero,zero_add]
+      refine Nat.one_le_iff_ne_zero.mpr <| fun h ↦ bot_ne_top (JH.first_eq_top ▸ h ▸ Nat.find_spec JH.fin_len).symm
+    else
     if hnz : (JHx.filtration (Nat.find JHx.fin_len - 1)).val = ⊤ then
-
-      sorry
+      have : 0 < Nat.find JHx.fin_len - 1 := by
+        rw [hJHx,Nat.add_one_sub_one]
+        exact Nat.zero_lt_of_ne_zero kzero
+      have this':= JHx.first_eq_top ▸ JHx.strict_anti 0 (Nat.find JHx.fin_len - 1) this (Nat.sub_le (Nat.find JHx.fin_len) 1)
+      exfalso
+      have : JHx.filtration (Nat.find JHx.fin_len - 1) = ⊤ := Subtype.coe_inj.mp (Eq.mpr (id (congrArg (fun _a ↦ _a = ↑⊤) hnz)) (Eq.refl ⊤))
+      exact (and_not_self_iff ((fun a b ↦ ↑a ≤ ↑b) ⊤ ⊤)).1 <| this ▸ this'
     else
     let JHfun : ℕ → Interval ⟨((JHx.filtration (Nat.find JHx.fin_len - 1)).val, ⊤), lt_top_iff_ne_top.2 hnz⟩ := fun n ↦
       if hn : n ≤ Nat.find JHx.fin_len - 1 then
         ⟨JHx.filtration n,⟨JHx.antitone hn,by simp⟩⟩
       else
         ⊥
-
-    sorry
-
-/-
-lemma strange {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
-{S : Type} [CompleteLinearOrder S]
-{μ : {p : ℒ × ℒ // p.1 < p.2} → S}
-[hftp : FiniteTotalPayoff μ] [hsl : SlopeLike μ] [hst : Semistable μ] [hwdcc' : WeakDescendingChainCondition' μ] [Affine μ] :
-∀ k : ℕ, ∀ x : ℒ, (hx : x < ⊤) → (∀ JH₁ JH₂ : JordanHolderFiltration (Resμ ⟨(x,⊤),hx⟩ μ), Nat.find JH₁.fin_len = k ↔ Nat.find JH₂.fin_len = k) := by
-  intro k
-  induction' k with k hk
-  · exact fun  x hx JH₁ JH₂ ↦ ⟨fun h ↦ False.elim <| bot_ne_top (JH₁.first_eq_top ▸ h ▸ Nat.find_spec JH₁.fin_len).symm,fun h ↦ False.elim <| bot_ne_top (JH₂.first_eq_top ▸ h ▸ Nat.find_spec JH₂.fin_len).symm⟩
-  · have hcore: ∀ x : ℒ, (hx : x < ⊤) → (∀ JH₁ JH₂ : JordanHolderFiltration (Resμ ⟨(x, ⊤),hx⟩ μ), Nat.find JH₁.fin_len = (k+1) → k+1 ≤ Nat.find JH₂.fin_len ) := by
-      intro x hx JH1 JH2 h
-      have h1: Nat.find JH1.fin_len ≠ 0 := fun h ↦ bot_ne_top (JH1.first_eq_top ▸ h ▸ Nat.find_spec JH1.fin_len).symm
-      if hkzero : k = 0 then
-        rw [hkzero,zero_add]
-        refine Nat.one_le_iff_ne_zero.mpr <| fun h ↦ bot_ne_top (JH2.first_eq_top ▸ h ▸ Nat.find_spec JH2.fin_len).symm
-      else
-      have h2: (JH1.filtration (Nat.find JH1.fin_len - 1)).val < ⊤ := by
-        have : 0 < Nat.find JH1.fin_len - 1 := Nat.sub_pos_of_lt (h.symm ▸ Nat.sub_ne_zero_iff_lt.mp hkzero)
-        have := JH1.first_eq_top ▸ JH1.strict_anti 0 (Nat.find JH1.fin_len - 1) this (by aesop)
-        exact lt_iff_le_not_le.mpr this
-      have := hk (JH1.filtration (Nat.find JH1.fin_len - 1)).val h2
-      let JHfun : ℕ → Interval ⟨((JH1.filtration (Nat.find JH1.fin_len - 1)).val, ⊤), h2⟩ := fun n ↦
-          if hn : n ≤ Nat.find JH1.fin_len - 1 then
-            ⟨JH1.filtration n,⟨JH1.antitone hn,by simp⟩⟩
-          else
-            ⊥
-      have JHfun_fin_len : ∃ N : ℕ, JHfun N = ⊥ := by
+    have JHfun_fin_len : ∃ N : ℕ, JHfun N = ⊥ := by
         simp only [JHfun]
-        use Nat.find JH1.fin_len
+        use Nat.find JHx.fin_len
         simp [lt_iff_not_le.1 <| Nat.sub_one_lt h1]
-      have JHfun_antitone : Antitone JHfun := by
+    have JHfun_antitone : Antitone JHfun := by
         intro n1 n2 hn
-        by_cases h3 : n2 ≤ Nat.find JH1.fin_len - 1
+        by_cases h3 : n2 ≤ Nat.find JHx.fin_len - 1
         · simp only [JHfun,le_trans hn h3,h3]
           simp
-          exact JH1.antitone hn
+          exact JHx.antitone hn
         · simp [JHfun,h3]
-      have hhard : Nat.find JHfun_fin_len = Nat.find JH1.fin_len - 1 := sorry
-      let JHres : JordanHolderFiltration (Resμ ⟨(↑(JH1.filtration (Nat.find JH1.fin_len - 1)), ⊤), h2⟩ μ) := by
-        refine { filtration := ?_, antitone := ?_, fin_len := ?_, strict_anti := ?_, first_eq_top := ?_, step_cond₁ := ?_, step_cond₂ := ?_ }
-        · use JHfun
-        · exact JHfun_antitone
-        · exact JHfun_fin_len
-        · intro i j hij hj
-          simp only [JHfun,hhard ▸ hj,le_of_lt <| lt_of_lt_of_le hij (hhard ▸ hj)]
-          simp
-          exact JH1.strict_anti i j hij (le_trans (hhard ▸ hj) <| le_of_lt <| Nat.sub_one_lt h1)
-        · simp only [JHfun]
-          simp [JH1.first_eq_top]
-          exact rfl
-        · intro k1 hk1
-          simp [Resμ]
-          simp only [JHfun]
-          have hk1 := hhard ▸ hk1
-          have hk1' : k1 + 1 ≤ Nat.find JH1.fin_len - 1 := hk1
-          have hk1'' : k1 ≤ Nat.find JH1.fin_len - 1 := le_of_lt hk1
-          simp only [hk1',le_of_lt hk1]
-          simp
-          have := JH1.step_cond₁ k1 <| Nat.lt_of_lt_pred hk1
-          simp at this
-          simp only [Resμ] at this
-          rw [this]
-          have this' := JH1.step_cond₁ (Nat.find JH1.fin_len - 1) (Nat.sub_one_lt h1)
-          simp only [Resμ,Nat.sub_one_add_one h1] at this'
-          simp only [Nat.find_spec JH1.fin_len] at this'
-          have ntop : JH1.filtration (Nat.find JH1.fin_len - 1) < ⊤ := by
-            have : Nat.find JH1.fin_len - 1 ≠ 0 := by
-              by_contra t
-              rw [t] at hk1
-              linarith
-            rw [← JH1.first_eq_top]
-            exact JH1.strict_anti 0 (Nat.find JH1.fin_len - 1) (by linarith) (le_of_lt <| Nat.sub_one_lt h1)
-          exact (((seesaw_useful (Resμ ⟨(x, ⊤), hx⟩ μ)) (inferInstance) ⊥
-            (JH1.filtration (Nat.find JH1.fin_len - 1)) ⊤ ⟨bot_lt_iff_ne_bot.2 <| Nat.find_min JH1.fin_len (Nat.sub_one_lt h1),ntop⟩).2.2.1 this').2
-        · intro i hi z hz hz'
-          simp only [Resμ]
-          have ilt : i < Nat.find JH1.fin_len := by
-            rw [hhard] at hi
-            exact Nat.lt_of_lt_pred hi
-          have htemp : JH1.filtration (i + 1) < ⟨z.val,⟨le_trans (JH1.filtration (Nat.find JH1.fin_len - 1)).prop.1 z.prop.1,z.prop.2⟩⟩ := by
-            simp only [JHfun] at hz
-            simp [Eq.mpr (id (congrArg (fun _a ↦ i + 1 ≤ _a) hhard.symm)) hi] at hz
-            exact hz
-          have htemp2 : ⟨z.val,⟨le_trans (JH1.filtration (Nat.find JH1.fin_len - 1)).prop.1 z.prop.1,z.prop.2⟩⟩ < JH1.filtration i := by
-            simp only [JHfun,le_of_lt <| hhard ▸ hi] at hz'
-            simp at hz'
-            exact hz'
-          have hnew := JH1.step_cond₂ i ilt ⟨z.val,⟨le_trans (JH1.filtration (Nat.find JH1.fin_len - 1)).prop.1 z.prop.1,z.prop.2⟩⟩ htemp htemp2
-          simp [Resμ] at hnew
-          simp only [JHfun]
-          simp [Eq.mpr (id (congrArg (fun _a ↦ i + 1 ≤ _a) hhard.symm)) hi,le_of_lt <| hhard ▸ hi]
-          exact hnew
-      have := this JHres
+    have hhard : Nat.find JHfun_fin_len = Nat.find JHx.fin_len - 1 := sorry
+    let JHres : JordanHolderFiltration (Resμ ⟨((JHx.filtration (Nat.find JHx.fin_len - 1)).val, ⊤), lt_top_iff_ne_top.2 hnz⟩ μ) := by
+      refine { filtration := ?_, antitone := ?_, fin_len := ?_, strict_anti := ?_, first_eq_top := ?_, step_cond₁ := ?_, step_cond₂ := ?_ }
+      · use JHfun
+      · exact JHfun_antitone
+      · exact JHfun_fin_len
+      · intro i j hij hj
+        simp only [JHfun,hhard ▸ hj,le_of_lt <| lt_of_lt_of_le hij (hhard ▸ hj)]
+        simp
+        exact JHx.strict_anti i j hij (le_trans (hhard ▸ hj) <| le_of_lt <| Nat.sub_one_lt h1)
+      · simp only [JHfun]
+        simp [JHx.first_eq_top]
+        rfl
+      · intro k1 hk1
+        simp [Resμ]
+        simp only [JHfun]
+        have hk1 := hhard ▸ hk1
+        have hk1' : k1 + 1 ≤ Nat.find JHx.fin_len - 1 := hk1
+        have hk1'' : k1 ≤ Nat.find JHx.fin_len - 1 := le_of_lt hk1
+        simp only [hk1',le_of_lt hk1]
+        simp
+        have := JHx.step_cond₁ k1 <| Nat.lt_of_lt_pred hk1
+        simp at this
+        simp only [Resμ] at this
+        rw [this]
+        have this' := JHx.step_cond₁ (Nat.find JHx.fin_len - 1) (Nat.sub_one_lt h1)
+        simp only [Resμ,Nat.sub_one_add_one h1] at this'
+        simp only [Nat.find_spec JHx.fin_len] at this'
+        have ntop : JHx.filtration (Nat.find JHx.fin_len - 1) < ⊤ := by
+          have : Nat.find JHx.fin_len - 1 ≠ 0 := by
+            by_contra t
+            rw [t] at hk1
+            linarith
+          rw [← JHx.first_eq_top]
+          exact JHx.strict_anti 0 (Nat.find JHx.fin_len - 1) (by linarith) (le_of_lt <| Nat.sub_one_lt h1)
+        exact (((seesaw_useful (Resμ ⟨(x, ⊤), hx⟩ μ)) (inferInstance) ⊥
+          (JHx.filtration (Nat.find JHx.fin_len - 1)) ⊤ ⟨bot_lt_iff_ne_bot.2 <| Nat.find_min JHx.fin_len (Nat.sub_one_lt h1),ntop⟩).2.2.1 this').2
+      · intro i hi z hz hz'
+        simp only [Resμ]
+        have ilt : i < Nat.find JHx.fin_len := by
+          rw [hhard] at hi
+          exact Nat.lt_of_lt_pred hi
+        have htemp : JHx.filtration (i + 1) < ⟨z.val,⟨le_trans (JHx.filtration (Nat.find JHx.fin_len - 1)).prop.1 z.prop.1,z.prop.2⟩⟩ := by
+          simp only [JHfun] at hz
+          simp [Eq.mpr (id (congrArg (fun _a ↦ i + 1 ≤ _a) hhard.symm)) hi] at hz
+          exact hz
+        have htemp2 : ⟨z.val,⟨le_trans (JHx.filtration (Nat.find JHx.fin_len - 1)).prop.1 z.prop.1,z.prop.2⟩⟩ < JHx.filtration i := by
+          simp only [JHfun,le_of_lt <| hhard ▸ hi] at hz'
+          simp at hz'
+          exact hz'
+        have hnew := JHx.step_cond₂ i ilt ⟨z.val,⟨le_trans (JHx.filtration (Nat.find JHx.fin_len - 1)).prop.1 z.prop.1,z.prop.2⟩⟩ htemp htemp2
+        simp [Resμ] at hnew
+        simp only [JHfun]
+        simp [Eq.mpr (id (congrArg (fun _a ↦ i + 1 ≤ _a) hhard.symm)) hi,le_of_lt <| hhard ▸ hi]
+        exact hnew
+    have res_len: Nat.find JHres.fin_len = k := by
+      rw [hhard,hJHx,Nat.add_one_sub_one]
+    have himportant := hk (JHx.filtration (Nat.find JHx.fin_len - 1)).val (lt_top_iff_ne_top.2 hnz) ⟨JHres,res_len⟩
+    sorry
 
-      sorry
-    intro x hx JH₁ JH₂
-    have h' : Nat.find JH₁.fin_len = Nat.find JH₂.fin_len := by
-      have h1: Nat.find JH₁.fin_len ≠ 0 := by
-        refine fun h ↦ bot_ne_top (JH₁.first_eq_top ▸ h ▸ Nat.find_spec JH₁.fin_len).symm
-      have h2: Nat.find JH₂.fin_len ≠ 0 := by refine fun h ↦ bot_ne_top (JH₂.first_eq_top ▸ h ▸ Nat.find_spec JH₂.fin_len).symm
-      have habc := hcore x hx JH₁ JH₂
-      have habc' := hcore x hx JH₂ JH₁
-
-      sorry
-    rw [h']
--/
 end impl
