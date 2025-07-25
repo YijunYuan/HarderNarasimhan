@@ -210,7 +210,66 @@ noncomputable def function_wrapper {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [
     else
       f <| Nat.find (⟨atf.choose,atf.choose_spec.symm ▸ bot_lt_iff_ne_bot.2 hcond⟩: ∃ k : ℕ, f k < function_wrapper f atf t)
 
-set_option maxRecDepth 1000
+
+lemma function_wrapper_prop0 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] (f : ℕ → ℒ) (atf : ∃ k, f k = ⊥) (hf: Antitone f) (hf0 : f 0 = ⊤): ∀ i : ℕ, ∃ j : ℕ, f i = function_wrapper f atf j := by
+  intro i
+  induction' i with i hi
+  · use 0
+    simp only [function_wrapper]
+    exact hf0
+  · rcases hi with ⟨j,hj⟩
+    if h : f i = ⊥ then
+      use j
+      rw [← hj,h]
+      exact le_bot_iff.1 <| h ▸ hf (Nat.le_succ i)
+    else
+    if h' : f i = f (i+1) then
+      use j
+      exact h' ▸ hj
+    else
+      use j+1
+      simp only [function_wrapper,hj ▸ h]
+      simp
+      have hq := function_wrapper._proof_6 f atf j (Eq.mpr_not (eq_false (hj ▸ h)) (of_eq_false (Eq.refl False)))
+      have : i + 1 = Nat.find hq := by
+        apply eq_of_le_of_le
+        · have hb:= Nat.find_spec hq
+          have : Nat.find hq > i := by
+            by_contra hu
+            apply le_of_not_gt at hu
+            have hg := hj ▸ lt_of_le_of_lt (hf hu) hb
+            exact (lt_self_iff_false (function_wrapper f atf j)).mp hg
+          exact this
+        · by_contra!
+          refine (hj ▸ Nat.find_min hq this) ?_
+          exact lt_of_le_of_ne (hf <| Nat.le_succ i) <| Ne.symm h'
+      exact congrArg f this
+
+
+lemma function_wrapper_prop1 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] (f : ℕ → ℒ) (atf : ∃ k, f k = ⊥) (hf: Antitone f) (hf0 : f 0 = ⊤): ∃ N : ℕ, function_wrapper f atf N = ⊥ := by
+  have := function_wrapper_prop0 f atf hf hf0 atf.choose
+  rcases this with ⟨N,hN⟩
+  use N
+  exact hN ▸ atf.choose_spec
+
+lemma function_wrapper_prop2 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] (f : ℕ → ℒ) (atf : ∃ k, f k = ⊥) (hf: Antitone f) (hf0 : f 0 = ⊤): Antitone (function_wrapper f atf) := by
+  intro i j hij
+  if hj : j = 0 then
+    have hi : i = 0 := by linarith
+    rw [hi,hj]
+  else
+  let j' := j - 1
+  have : j = j'.succ := by exact Eq.symm (Nat.succ_pred_eq_of_ne_zero hj)
+  unfold function_wrapper
+  simp only [this]
+  if hi : i = 0 then
+    simp only [hi]
+    exact le_top
+  else
+
+  sorry
+
+
 lemma strange {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type} [CompleteLinearOrder S]
 {μ : {p : ℒ × ℒ // p.1 < p.2} → S}
@@ -333,21 +392,25 @@ lemma strange {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [We
     have JHfinal_first_top : JHfinal 0 = ⊤ := by
       simp only [JHfinal,function_wrapper]
     have JHfinal_fin_len : ∃ N : ℕ, JHfinal N = ⊥ := by
-      simp only [JHfinal]
-      use Nat.find JH.fin_len
-      have htemp1 : Nat.find JH.fin_len ≠ 0 := fun h ↦ bot_ne_top (JH.first_eq_top ▸ h ▸ Nat.find_spec JH.fin_len).symm
-      have htemp2 : Nat.find JH.fin_len = (Nat.find JH.fin_len -1).succ  := by
-        apply Eq.symm
-        apply Nat.sub_one_add_one htemp1
-      unfold function_wrapper
-      simp [htemp1]
+        exact function_wrapper_prop1 JH_raw (⟨Nat.find JH.fin_len,JH_raw_fin_len⟩) JH_raw_antitone JH_raw_first_top
+    let JHFINAL : JordanHolderFiltration (Resμ ⟨((JHx.filtration (Nat.find JHx.fin_len - 1)).val, ⊤), lt_top_iff_ne_top.2 hnz⟩ μ) := by
+      refine { filtration := ?_, antitone := ?_, fin_len := ?_, strict_anti := ?_, first_eq_top := ?_, step_cond₁ := ?_, step_cond₂ := ?_ }
+      · exact JHfinal
+      · sorry
+      · exact JHfinal_fin_len
+      · sorry
+      · sorry
+      · sorry
+      · sorry
+    have ha : Nat.find JHFINAL.fin_len < Nat.find JH.fin_len := by
+      refine lt_of_le_of_ne ?_ ?_
+      · have : JHfinal (Nat.find JH.fin_len) = ⊥ := by
+          simp only [JHfinal,function_wrapper]
+          unfold function_wrapper
 
-      --unfold function_wrapper
-
-
-
-
-      sorry
-    sorry
+          sorry
+        exact Nat.find_min' JHFINAL.fin_len this
+      · sorry
+    exact lt_of_le_of_lt (himportant JHFINAL) ha
 
 end impl
