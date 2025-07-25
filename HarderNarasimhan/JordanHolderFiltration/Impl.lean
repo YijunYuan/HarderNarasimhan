@@ -201,6 +201,16 @@ lemma JHFil_prop₂ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
     exact (JHFil_prop₁ μ hμ hμsl hst hdc k hk ).symm ▸ lt_trans ((Or.resolve_right <| (Or.resolve_left <| (impl.prop4d6 μ).1 hμsl ⊥ (JHFil μ hμ hμsl hst hdc (k + 1)) z ⟨bot_lt_iff_ne_bot.2 hfp1bot,h'⟩) (not_and_iff_not_or_not.2 <| Or.inl <| not_lt_of_lt <| h'''' ▸ h''')) (not_and_iff_not_or_not.2 <| Or.inl <| ne_of_gt <| h'''' ▸ h''')).2 h'''
 
 
+noncomputable def function_wrapper {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] (f : ℕ → ℒ) (atf : ∃ k, f k = ⊥) : ℕ → ℒ := fun n ↦
+  match n with
+  | 0 => ⊤
+  | t + 1 =>
+    if hcond : function_wrapper f atf t = ⊥ then
+      ⊥
+    else
+      f <| Nat.find (⟨atf.choose,atf.choose_spec.symm ▸ bot_lt_iff_ne_bot.2 hcond⟩: ∃ k : ℕ, f k < function_wrapper f atf t)
+
+set_option maxRecDepth 1000
 lemma strange {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type} [CompleteLinearOrder S]
 {μ : {p : ℒ × ℒ // p.1 < p.2} → S}
@@ -300,6 +310,44 @@ lemma strange {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [We
     have res_len: Nat.find JHres.fin_len = k := by
       rw [hhard,hJHx,Nat.add_one_sub_one]
     have himportant := hk (JHx.filtration (Nat.find JHx.fin_len - 1)).val (lt_top_iff_ne_top.2 hnz) ⟨JHres,res_len⟩
+    have JH_raw_first_top: JHx.filtration (Nat.find JHx.fin_len - 1) ⊔ JH.filtration 0 = ⊤ := by
+      simp [JH.first_eq_top]
+
+    let JH_raw : ℕ → Interval ⟨((JHx.filtration (Nat.find JHx.fin_len - 1)).val, ⊤), lt_top_iff_ne_top.2 hnz⟩ := fun n ↦ ⟨(JHx.filtration (Nat.find JHx.fin_len - 1) ⊔ JH.filtration n),⟨le_sup_left,le_top⟩⟩
+    have JH_raw_antitone : Antitone JH_raw := by
+      intro n1 n2 hn
+      apply sup_le_sup_left
+      exact JH.antitone hn
+    have JH_raw_cond1 : ∀ n : ℕ, n < Nat.find JH.fin_len → (hn: JH_raw (n+1) < JH_raw n) → μ ⟨(JH_raw (n+1),JH_raw n),lt_iff_le_not_le.mpr hn⟩ = μ ⟨((JHx.filtration (Nat.find JHx.fin_len - 1)).val,⊤),lt_top_iff_ne_top.2 hnz⟩ := by
+      sorry
+    have JH_raw_cond2 : ∀ n : ℕ, n < Nat.find JH.fin_len → (hn: JH_raw (n+1) < JH_raw n) → ∀ w : Interval ⟨((JHx.filtration (Nat.find JHx.fin_len - 1)).val, ⊤), lt_top_iff_ne_top.2 hnz⟩, (hw : JH_raw (n+1) < w) → (hw' : w < JH_raw n) → ¬ JH_raw n ≤ w := by sorry
+    have JH_raw_first_top : JH_raw 0 = ⊤ := by
+      simp only [JH_raw,Resμ]
+      simp [JH.first_eq_top]
+      rfl
+    have JH_raw_fin_len: JH_raw (Nat.find JH.fin_len) = ⊥ := by
+      simp only [JH_raw]
+      simp [Nat.find_spec JH.fin_len]
+      rfl
+    let JHfinal := function_wrapper JH_raw (⟨Nat.find JH.fin_len,JH_raw_fin_len⟩)
+    have JHfinal_first_top : JHfinal 0 = ⊤ := by
+      simp only [JHfinal,function_wrapper]
+    have JHfinal_fin_len : ∃ N : ℕ, JHfinal N = ⊥ := by
+      simp only [JHfinal]
+      use Nat.find JH.fin_len
+      have htemp1 : Nat.find JH.fin_len ≠ 0 := fun h ↦ bot_ne_top (JH.first_eq_top ▸ h ▸ Nat.find_spec JH.fin_len).symm
+      have htemp2 : Nat.find JH.fin_len = (Nat.find JH.fin_len -1).succ  := by
+        apply Eq.symm
+        apply Nat.sub_one_add_one htemp1
+      unfold function_wrapper
+      simp [htemp1]
+
+      --unfold function_wrapper
+
+
+
+
+      sorry
     sorry
 
 end impl
