@@ -7,6 +7,7 @@ import Mathlib.Data.List.TFAE
 import Mathlib.Order.OrderIsoNat
 import HarderNarasimhan.JordanHolderFiltration.Defs
 import HarderNarasimhan.SlopeLike.Result
+import Mathlib.Data.Finite.Card
 open Classical
 
 
@@ -246,28 +247,166 @@ lemma function_wrapper_prop0 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [Bounde
       exact congrArg f this
 
 
+lemma function_wrapper_prop0' {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] (f : ℕ → ℒ) (atf : ∃ k, f k = ⊥) (hf: Antitone f) (hf0 : f 0 = ⊤): ∀ i : ℕ, ∃ j : ℕ, j ≥ i ∧ function_wrapper f atf i = f j:= by
+  intro i
+  induction' i with i hi
+  · use 0
+    simp only [function_wrapper]
+    simp [*]
+  · simp only [function_wrapper]
+    if hcond : function_wrapper f atf i = ⊥ then
+      simp [hcond]
+      rcases hi with ⟨t,ht⟩
+      rw [hcond] at ht
+      use t + 1
+      simp [*]
+      rw [← ht.2]
+      exact Eq.symm <| le_bot_iff.1 <| ht.2 ▸ hf (Nat.le_succ t)
+    else
+    simp [hcond]
+    have hq := function_wrapper._proof_6 f atf i (of_eq_false (eq_false hcond))
+    rcases hi with ⟨t,ht⟩
+    rw [ht.2] at hq
+    use Nat.find hq
+    constructor
+    · have := Nat.find_spec hq
+      have : Nat.find hq > t := by
+        by_contra d
+        apply le_of_not_lt at d
+        if hy: Nat.find hq = t then
+          rw [hy] at this
+          exact (lt_self_iff_false (f t)).1 this
+        else
+        have this' := lt_of_lt_of_le this <| hf <| le_of_lt <| lt_of_le_of_ne d hy
+        exact (lt_self_iff_false (f <| Nat.find hq)).1 this'
+      linarith
+    simp [*]
+
 lemma function_wrapper_prop1 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] (f : ℕ → ℒ) (atf : ∃ k, f k = ⊥) (hf: Antitone f) (hf0 : f 0 = ⊤): ∃ N : ℕ, function_wrapper f atf N = ⊥ := by
   have := function_wrapper_prop0 f atf hf hf0 atf.choose
   rcases this with ⟨N,hN⟩
   use N
   exact hN ▸ atf.choose_spec
 
-lemma function_wrapper_prop2 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] (f : ℕ → ℒ) (atf : ∃ k, f k = ⊥) (hf: Antitone f) (hf0 : f 0 = ⊤): Antitone (function_wrapper f atf) := by
-  intro i j hij
-  if hj : j = 0 then
-    have hi : i = 0 := by linarith
-    rw [hi,hj]
-  else
-  let j' := j - 1
-  have : j = j'.succ := by exact Eq.symm (Nat.succ_pred_eq_of_ne_zero hj)
-  unfold function_wrapper
-  simp only [this]
-  if hi : i = 0 then
-    simp only [hi]
-    exact le_top
-  else
+lemma function_wrapper_prop2 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] (f : ℕ → ℒ) (atf : ∃ k, f k = ⊥) : Antitone (function_wrapper f atf) := by
+  intro i j
+  apply Nat.le_induction
+  · exact le_rfl
+  · intro n hn hn'
+    refine le_trans ?_ hn'
+    if hnzero : n = 0 then
+      rw [hnzero]
+      simp only [function_wrapper]
+      exact le_top
+    else
+    simp only [function_wrapper]
+    if hcond : function_wrapper f atf n = ⊥ then
+      simp [hcond]
+    else
+    simp [hcond]
+    exact le_of_lt <| Nat.find_spec <| function_wrapper._proof_6 f atf n (of_eq_false (eq_false hcond))
+
+
+lemma function_wrapper_prop3 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] (f : ℕ → ℒ) (hf0 : f 0 = ⊤) (atf : ∃ k, f k = ⊥) (hfat: Antitone f): ∀ k : ℕ, function_wrapper f atf k ≤ f k := by
+  intro k
+  induction' k with k hk
+  · simp [hf0,function_wrapper]
+  · simp only [function_wrapper]
+    if hcond : function_wrapper f atf k = ⊥ then
+      simp [hcond]
+    else
+    simp [hcond]
+    have hq := function_wrapper._proof_6 f atf k (of_eq_false (eq_false hcond))
+    rcases function_wrapper_prop0' f atf hfat hf0 (k+1) with ⟨jtilde,hjtilde⟩
+    simp only [function_wrapper] at hjtilde
+    simp [hcond] at hjtilde
+    if hjt : jtilde = k+1 then
+      rw [hjt] at hjtilde
+      exact le_of_eq hjtilde.2
+    else
+    have hjt : jtilde > k+1 := by exact lt_of_le_of_ne hjtilde.1 <| Ne.symm hjt
+    rw [hjtilde.2]
+    exact hfat <| le_of_lt hjt
+
+
+lemma function_wrapper_prop5 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] (f : ℕ → ℒ) (hf0 : f 0 = ⊤) (atf : ∃ k, f k = ⊥) (hfat: Antitone f) : ∀ (i j : ℕ), i < j → j ≤ Nat.find (function_wrapper_prop1 f atf hfat hf0) → function_wrapper f atf j < function_wrapper f atf i := by
+  intro i j hij hj
+
 
   sorry
+
+
+lemma function_wrapper_prop4 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] (f : ℕ → ℒ) (hf0 : f 0 = ⊤) (atf : ∃ k, f k = ⊥) (hfat: Antitone f) (k : ℕ) (hk : f k = ⊥) (htech : ∃ N : ℕ, N + 1 ≤ k ∧ f N = f (N+1)) : (Nat.find <| function_wrapper_prop1 f atf hfat hf0) ≠ k := by
+  have Acond := function_wrapper_prop1 f atf hfat hf0
+  let A := Nat.find Acond
+  have shit := le_bot_iff.1 <| hk ▸ function_wrapper_prop3 f hf0 atf hfat k
+  let 𝒮 := {f t | (t ≤ k)}
+  have helper : ∀ t : ℕ, ∃ l : ℕ, l ≤ k ∧ function_wrapper f atf t = f l := by
+    intro t
+    if hcond : function_wrapper f atf t = ⊥ then
+      use k
+      simp
+      rw [hcond]
+      exact hk.symm
+    else
+    rcases function_wrapper_prop0' f atf hfat hf0 t with ⟨l,hl1,hl2⟩
+    use l
+    refine ⟨?_,hl2⟩
+    by_contra!
+    exact hcond <| (le_bot_iff.1 <| hk ▸ (hfat <| le_of_lt this)) ▸ hl2
+  let Φ : Fin (A+1) → 𝒮 := by
+    intro d
+    use  f (Nat.find (helper d))
+    refine Set.mem_setOf.mpr ?_
+    have := Nat.find_spec (helper d)
+    use Nat.find (helper d)
+    exact ⟨this.1,rfl⟩
+  have hΦ : Function.Injective Φ := by
+    intro d1 d2 h
+    simp [Φ] at h
+    have := (Nat.find_spec (helper d2)).2.symm ▸ (Nat.find_spec (helper d1)).2.symm ▸ h
+    if hd : d1 < d2 then
+      exact False.elim <| (lt_self_iff_false (function_wrapper f atf ↑d2)).mp <| this ▸ function_wrapper_prop5 f hf0 atf hfat d1 d2 hd (Fin.is_le d2)
+    else
+      if hd' : d2 < d1 then
+        exact False.elim <| (lt_self_iff_false (function_wrapper f atf ↑d2)).mp <| this ▸ function_wrapper_prop5 f hf0 atf hfat d2 d1 hd' (Fin.is_le d1)
+      else
+      exact Fin.le_antisymm (le_of_not_lt hd') (le_of_not_lt hd)
+  let fS : Fin (k+1) → 𝒮 := by
+    intro n
+    use f n
+    refine Set.mem_setOf.mpr ?_
+    use n
+    simp
+    exact Fin.is_le n
+  have fSsuj : Function.Surjective fS := by
+    intro y
+    have := y.prop.out
+    rcases this with ⟨n1,n2,n3⟩
+    use ⟨n1,Nat.lt_succ_of_le n2⟩
+    simp only [fS]
+    exact SetCoe.ext n3
+  have finS : Fintype 𝒮 :=  Set.Finite.fintype <| Finite.of_surjective fS fSsuj
+  have ineq1: A + 1 ≤ Fintype.card ↑𝒮 := by
+    have := Fintype.card_le_of_injective Φ hΦ
+    simp at this
+    exact this
+  have hnot : ¬ Function.Injective fS := by
+    rcases htech with ⟨N, hN1, hN2⟩
+    refine Function.not_injective_iff.mpr ?_
+    use ⟨N,by linarith⟩, ⟨N+1,by linarith⟩
+    constructor
+    · simp only [fS]
+      exact SetCoe.ext hN2
+    · simp
+  have ineq2 : Fintype.card ↑𝒮 < k + 1 := by
+    have := Fintype.card_lt_of_surjective_not_injective fS fSsuj hnot
+    simp at this
+    exact this
+  have := lt_of_le_of_lt ineq1 ineq2
+  simp at this
+  apply ne_of_lt at this
+  exact this
 
 
 lemma strange {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
@@ -396,21 +535,27 @@ lemma strange {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [We
     let JHFINAL : JordanHolderFiltration (Resμ ⟨((JHx.filtration (Nat.find JHx.fin_len - 1)).val, ⊤), lt_top_iff_ne_top.2 hnz⟩ μ) := by
       refine { filtration := ?_, antitone := ?_, fin_len := ?_, strict_anti := ?_, first_eq_top := ?_, step_cond₁ := ?_, step_cond₂ := ?_ }
       · exact JHfinal
-      · sorry
+      · exact function_wrapper_prop2 JH_raw (⟨Nat.find JH.fin_len,JH_raw_fin_len⟩)
       · exact JHfinal_fin_len
-      · sorry
-      · sorry
+      · intro i j hij hj
+        simp only [JHfinal]
+        exact function_wrapper_prop5 JH_raw JH_raw_first_top (⟨Nat.find JH.fin_len,JH_raw_fin_len⟩) JH_raw_antitone i j hij hj
+      · simp [*]
       · sorry
       · sorry
     have ha : Nat.find JHFINAL.fin_len < Nat.find JH.fin_len := by
+      have : JHfinal (Nat.find JH.fin_len) = ⊥ := by
+        simp only [JHfinal,function_wrapper]
+        have : JH_raw (Nat.find JH.fin_len) = ⊥ := by
+          simp only [JH_raw]
+          simp [Nat.find_spec JH.fin_len]
+          rfl
+        have hweird := eq_bot_iff.2 <| this ▸ function_wrapper_prop3 JH_raw JH_raw_first_top (⟨Nat.find JH.fin_len,JH_raw_fin_len⟩) JH_raw_antitone (Nat.find JH.fin_len)
+        exact hweird
       refine lt_of_le_of_ne ?_ ?_
-      · have : JHfinal (Nat.find JH.fin_len) = ⊥ := by
-          simp only [JHfinal,function_wrapper]
-          unfold function_wrapper
-
-          sorry
-        exact Nat.find_min' JHFINAL.fin_len this
-      · sorry
+      · exact Nat.find_min' JHFINAL.fin_len this
+      · refine function_wrapper_prop4 JH_raw JH_raw_first_top (⟨Nat.find JH.fin_len,JH_raw_fin_len⟩) JH_raw_antitone (Nat.find JH.fin_len) JH_raw_fin_len ?_
+        sorry
     exact lt_of_le_of_lt (himportant JHFINAL) ha
 
 end impl
