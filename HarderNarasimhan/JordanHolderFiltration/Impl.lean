@@ -424,6 +424,63 @@ lemma function_wrapper_prop4 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [Bounde
   exact this
 
 
+lemma function_wrapper_prop6 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] (f : ℕ → ℒ) (hf0 : f 0 = ⊤) (atf : ∃ k, f k = ⊥) (hfat: Antitone f)
+(P : {z : ℒ × ℒ // z.1 < z.2} → Prop)
+(ho : ∀ i : ℕ, i < Nat.find atf → (hfi :f (i + 1) < f i) → P ⟨(f (i+1), f i),hfi⟩) : ∀ i : ℕ, (hi : i < Nat.find (function_wrapper_prop1 f atf hfat hf0)) → P ⟨(function_wrapper f atf (i + 1),function_wrapper f atf i), function_wrapper_prop5 f hf0 atf hfat i (i+1) (Nat.lt_succ_self i) (Nat.succ_le.2 hi)⟩ := by
+  intro i hi
+  simp only [function_wrapper]
+  have hcond : function_wrapper f atf i ≠ ⊥ := by
+    by_contra!
+    have := Nat.find_min' (function_wrapper_prop1 f atf hfat hf0) this
+    linarith
+  simp [hcond]
+  rcases function_wrapper_prop0' f atf hfat hf0 i with ⟨j,⟨_,hj⟩⟩
+  simp only [hj]
+  rw [hj] at hcond
+  have hjeff : j < Nat.find atf := by
+    by_contra!
+    exact hcond (le_bot_iff.1 <| Nat.find_spec atf ▸ hfat this)
+  have hcondnew : ∃ l : ℕ, f l < f j := by
+    rcases atf with ⟨k,hk⟩
+    use k
+    rw [hk]
+    (expose_names; exact Ne.bot_lt' (id (Ne.symm hcond_1)))
+  let jtilde := Nat.find hcondnew
+  expose_names
+  have heq : Nat.find ((funext fun k ↦ congrArg (LT.lt (f k)) hj) ▸ function_wrapper._proof_6 f atf i (of_eq_false (eq_false hcond_1))) = (jtilde -1) +1:= by
+    refine (Nat.sub_eq_iff_eq_add ?_).mp rfl
+    by_contra!
+    simp at this
+    exact (not_lt_of_le le_top) <| hf0 ▸ this
+  have ha : f j = f (jtilde -1) := by
+    have : ∀ j' : ℕ, j ≤ j' → j' < jtilde → f j' = f j := by
+      apply Nat.le_induction
+      · exact fun _ ↦ rfl
+      · intro n hn hn' hn''
+        by_contra!
+        have := lt_of_le_of_lt (Nat.find_min' hcondnew <| lt_of_le_of_ne (hfat (by linarith)) this) hn''
+        linarith
+    refine Eq.symm <| this (jtilde -1) ?_ (by linarith)
+    by_contra!
+    exact (lt_self_iff_false (f j)).mp <| lt_of_le_of_lt (hfat (by linarith)) (Nat.find_spec hcondnew)
+  conv =>
+    arg 1; arg 1; arg 2;
+    rw [ha]
+  have yah : f jtilde < f (jtilde -1)  := lt_of_lt_of_eq (Nat.find_spec hcondnew) ha
+  have hq : jtilde - 1 < Nat.find atf := by
+    by_contra this'
+    apply le_of_not_lt at this'
+    exact (not_le_of_gt <| lt_of_le_of_lt bot_le yah) ((Nat.find_spec atf) ▸ hfat this')
+  have : f (jtilde - 1 + 1) < f (jtilde - 1) := by
+    conv_lhs =>
+      arg 1;
+      apply Nat.sub_one_add_one <| fun this ↦ (lt_self_iff_false ⊤).mp <| hf0 ▸ lt_of_lt_of_le (this ▸ yah) le_top
+    exact yah
+  have := ho (jtilde -1) hq this
+  simp [← heq] at this
+  exact this
+
+
 lemma strange {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type} [CompleteLinearOrder S]
 {μ : {p : ℒ × ℒ // p.1 < p.2} → S}
@@ -576,8 +633,12 @@ lemma strange {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [We
         simp only [JHfinal]
         exact function_wrapper_prop5 JH_raw JH_raw_first_top (⟨Nat.find JH.fin_len,JH_raw_fin_len⟩) JH_raw_antitone i j hij hj
       · simp [*]
-      · sorry
-      · sorry
+      · intro k1 hk1
+        refine function_wrapper_prop6 JH_raw JH_raw_first_top (⟨Nat.find JH.fin_len,JH_raw_fin_len⟩) JH_raw_antitone (fun z ↦ (Resμ ⟨((JHx.filtration (Nat.find JHx.fin_len - 1)).val, ⊤), lt_top_iff_ne_top.2 hnz⟩ μ) z = (Resμ ⟨((JHx.filtration (Nat.find JHx.fin_len - 1)).val, ⊤), lt_top_iff_ne_top.2 hnz⟩ μ) ⟨(⊥,⊤),bot_lt_top⟩) ?_ k1 hk1
+        sorry
+      · intro i hi
+        refine function_wrapper_prop6 JH_raw JH_raw_first_top (⟨Nat.find JH.fin_len,JH_raw_fin_len⟩) JH_raw_antitone (fun w ↦ ∀ z : (Interval ⟨((JHx.filtration (Nat.find JHx.fin_len - 1)).val, ⊤), lt_top_iff_ne_top.2 hnz⟩), (hw : w.val.1 < z) → z < w.val.2 → (Resμ ⟨((JHx.filtration (Nat.find JHx.fin_len - 1)).val, ⊤), lt_top_iff_ne_top.2 hnz⟩ μ) ⟨(w.val.1,z),hw⟩ < (Resμ ⟨((JHx.filtration (Nat.find JHx.fin_len - 1)).val, ⊤), lt_top_iff_ne_top.2 hnz⟩ μ) w ) ?_ i hi
+        sorry
     have ha : Nat.find JHFINAL.fin_len < Nat.find JH.fin_len := by
       have : JHfinal (Nat.find JH.fin_len) = ⊥ := by
         simp only [JHfinal,function_wrapper]
