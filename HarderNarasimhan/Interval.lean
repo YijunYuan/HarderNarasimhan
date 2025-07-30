@@ -2,7 +2,7 @@ import Mathlib.Order.CompleteLattice.Defs
 import Mathlib.Order.BoundedOrder.Basic
 import Mathlib.Order.Sublattice
 
-
+namespace HardarNarasimhan
 def Interval {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 (z : {p : ℒ × ℒ // p.1 < p.2}) : Type :=
 {p : ℒ // z.val.1 ≤ p ∧ p ≤ z.val.2}
@@ -58,3 +58,5 @@ instance {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [hw : We
     simp at this
     rcases this with ⟨x, hx⟩
     exact Exists.intro ⟨a, x⟩ ⟨hx, fun y hy h ↦ ha.right y.val (Set.mem_image_of_mem Subtype.val hy) (lt_iff_le_not_le.2 h)⟩
+
+end HardarNarasimhan

@@ -1,6 +1,7 @@
 import HarderNarasimhan.Semistability.Results
 import Mathlib.Data.Real.Basic
 
+namespace HardarNarasimhan
 
 namespace impl
 
@@ -233,3 +234,5 @@ lemma rmk4d4 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   use this.choose, (h ⟨(x (this.choose+1), x this.choose), saf <| Nat.lt_add_one this.choose⟩ this.choose_spec.symm) ▸ le_top
 
 end impl
+
+end HardarNarasimhan

@@ -2,6 +2,8 @@ import HarderNarasimhan.Semistability.Results
 
 open Classical
 
+namespace HardarNarasimhan
+
 class μ_Admissible {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) where
@@ -20,3 +22,5 @@ class HardarNarasimhanFiltration
   strict_mono          : ∀ i j : ℕ, i < j → j ≤ Nat.find (fin_len) → filtration i < filtration j
   piecewise_semistable : ∀ i : ℕ, (h: i < Nat.find (fin_len)) → Semistable (Resμ ⟨(filtration i, filtration (i+1)), strict_mono i (i+1) (lt_add_one i) h⟩ μ)
   μA_pseudo_strict_anti: ∀ i : ℕ, (hi : i + 1 < Nat.find fin_len) → ¬ μA μ ⟨(filtration i, filtration (i+1)), strict_mono i (i+1) (lt_add_one i) <| by omega⟩ ≤ μA μ ⟨(filtration (i+1), filtration (i+2)), strict_mono (i+1) (i+2) (by linarith) (by linarith)⟩
+
+end HardarNarasimhan

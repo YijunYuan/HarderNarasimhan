@@ -1,5 +1,8 @@
 import HarderNarasimhan.Basic
 import HarderNarasimhan.Interval
+
+namespace HardarNarasimhan
+
 section
 
 variable {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
@@ -31,3 +34,5 @@ ConvexI I μ ↔ Convex (Resμ I μ) := by
   · exact fun h ↦ { convex := fun x y hx hy hxy ↦ h.convex ⟨x,hx⟩ ⟨y,hy⟩ (in_TotIntvl _) (in_TotIntvl _) hxy }
 
 end
+
+end HardarNarasimhan

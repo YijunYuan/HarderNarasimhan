@@ -3,6 +3,7 @@ import HarderNarasimhan.Convexity.Impl
 import HarderNarasimhan.Semistability.Defs
 import Mathlib.Tactic.Linarith
 
+namespace HardarNarasimhan
 
 namespace impl
 
@@ -663,3 +664,5 @@ theorem semistableI_iff {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrde
 
 
 end impl
+
+end HardarNarasimhan

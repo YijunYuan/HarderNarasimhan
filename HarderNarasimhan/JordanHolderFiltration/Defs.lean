@@ -2,6 +2,7 @@ import HarderNarasimhan.NashEquilibrium.Impl
 import Mathlib.Order.OrderIsoNat
 open Classical
 
+namespace HardarNarasimhan
 
 class FiniteTotalPayoff {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S]
@@ -63,3 +64,5 @@ instance {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFou
     apply le_sSup
     use x, ⟨in_TotIntvl x, Ne.symm <| bot_lt_iff_ne_bot.1 hx⟩
   exact (not_le_of_lt <| h ▸ lt_top_iff_ne_top.2 hftp.fin_tot_payoff) this_q
+
+end HardarNarasimhan

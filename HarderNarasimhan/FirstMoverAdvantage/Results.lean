@@ -1,5 +1,6 @@
 import HarderNarasimhan.FirstMoverAdvantage.Defs
 
+namespace HardarNarasimhan
 
 lemma proposition_4_1 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S]
@@ -56,3 +57,5 @@ lemma remark_4_4 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 WeakDescendingChainCondition μ
 ------------
 := {wdcc := impl.rmk4d4 μ r hr₁ hr₂ h}
+
+end HardarNarasimhan

@@ -1,6 +1,8 @@
 import HarderNarasimhan.Basic
 import HarderNarasimhan.Convexity.Defs
 
+namespace HardarNarasimhan
+
 namespace impl
 
 section
@@ -294,3 +296,5 @@ lemma prop2d8₂I
 end
 
 end impl
+
+end HardarNarasimhan

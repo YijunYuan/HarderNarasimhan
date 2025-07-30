@@ -10,6 +10,7 @@ import HarderNarasimhan.SlopeLike.Result
 import Mathlib.Data.Finite.Card
 open Classical
 
+namespace HardarNarasimhan
 
 namespace impl
 noncomputable def JHFil {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [hacc: WellFoundedGT ℒ]
@@ -655,3 +656,5 @@ lemma strange {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [We
     exact lt_of_le_of_lt (himportant JHFINAL) ha
 
 end impl
+
+end HardarNarasimhan

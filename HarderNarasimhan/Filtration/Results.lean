@@ -4,6 +4,7 @@ import HarderNarasimhan.Filtration.Impl
 
 open Classical
 
+namespace HardarNarasimhan
 
 noncomputable instance {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type} [CompleteLattice S]
@@ -56,3 +57,5 @@ where
         aesop
     exact fun j hij hj ↦ this j (by linarith) hj
   ) n)
+
+end HardarNarasimhan

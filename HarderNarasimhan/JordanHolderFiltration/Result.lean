@@ -2,6 +2,7 @@ import HarderNarasimhan.JordanHolderFiltration.Impl
 
 open Classical
 
+namespace HardarNarasimhan
 
 instance {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type} [CompleteLinearOrder S]
@@ -18,3 +19,5 @@ theorem remark_4_26 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
 {μ : {p : ℒ × ℒ // p.1 < p.2} → S}
 [hftp : FiniteTotalPayoff μ] [hsl : SlopeLike μ] [hst : Semistable μ] [hwdcc' : WeakDescendingChainCondition' μ] [Affine μ] :
 ∀ (X Y : JordanHolderFiltration μ), Nat.find X.fin_len = Nat.find Y.fin_len := sorry
+
+end HardarNarasimhan

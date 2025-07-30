@@ -1,5 +1,6 @@
 import HarderNarasimhan.NashEquilibrium.Impl
 
+namespace HardarNarasimhan
 
 lemma μmin_lt_μ_lt_μmax {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S]
@@ -157,3 +158,5 @@ List.TFAE [
   ]
 ------------
 := impl.thm4d21 μ hμ h₁ h₂
+
+end HardarNarasimhan

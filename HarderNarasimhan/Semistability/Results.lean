@@ -1,6 +1,8 @@
 import HarderNarasimhan.Semistability.Impl
 import HarderNarasimhan.Semistability.Translation
 
+namespace HardarNarasimhan
+
 lemma proposition_3_2 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   {S : Type} [CompleteLattice S]
   (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : Convex μ)
@@ -82,3 +84,5 @@ lemma proposition_3_8 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder 
     cases' h with c1 c2
     · exact impl.prop3d8₂ μ TotIntvl hμcvx (Or.inl c1) x hxSt y (in_TotIntvl y) hxy
     · exact impl.prop3d8₂ μ TotIntvl hμcvx (Or.inr fun z _ hz ↦ c2 z hz) x hxSt y (in_TotIntvl y) hxy
+
+end HardarNarasimhan
