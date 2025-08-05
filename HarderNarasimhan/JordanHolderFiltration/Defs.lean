@@ -44,10 +44,22 @@ WeakDescendingChainCondition μ where
     exact hN ▸ le_top
 
 
+instance {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+{S : Type} [CompleteLattice S]
+{μ : {p : ℒ × ℒ // p.1 < p.2} → S} [h : WeakDescendingChainCondition' μ] {I : {p : ℒ × ℒ // p.1 < p.2}} : WeakDescendingChainCondition' (Resμ I μ) where
+  wdcc' := fun f saf ↦ h.wdcc' (fun n ↦ (f n).val) fun ⦃_ _⦄ hn ↦ lt_iff_le_not_le.mpr (saf hn)
+
+
 class Affine {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p : ℒ × ℒ // p.1 < p.2} → S) : Prop where
   affine : ∀ a b : ℒ, (h : ¬ a ≤ b) → μ ⟨(a ⊓ b, a), inf_lt_left.2 h⟩ = μ ⟨(b, a ⊔ b), right_lt_sup.2 h⟩
+
+
+instance {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+{S : Type} [CompleteLattice S]
+{μ : {p : ℒ × ℒ // p.1 < p.2} → S} [haff : Affine μ] {I : {p : ℒ × ℒ // p.1 < p.2}} : Affine (Resμ I μ) where
+  affine := fun a b h ↦ haff.affine a b h
 
 
 instance {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
