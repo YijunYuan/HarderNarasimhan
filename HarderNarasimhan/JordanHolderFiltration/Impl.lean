@@ -581,7 +581,43 @@ lemma strange' : ∀ n : ℕ, ∀ ℒ : Type, ∀ ntl: Nontrivial ℒ, ∀ l : L
       refine lt_of_le_of_ne ?_ ?_
       · exact Nat.find_min' JH_FINAL.fin_len this
       · refine function_wrapper_prop4 JH_raw JH_raw_first_top (⟨Nat.find JHy.fin_len,JH_raw_fin_len⟩) JH_raw_antitone (Nat.find JHy.fin_len) JH_raw_fin_len ?_
-        sorry
+        let i0 := Nat.findGreatest (fun n ↦ JHx.filtration (Nat.find JHx.fin_len -1) ≤ JHy.filtration n) (Nat.find JHy.fin_len -1)
+        use i0
+        constructor
+        · exact Nat.add_le_of_le_sub (Nat.one_le_iff_ne_zero.mpr <| JH_pos_len JHy) <| Nat.findGreatest_le (Nat.find JHy.fin_len -1)
+        · have := @Nat.findGreatest_spec 0 (fun n ↦ JHx.filtration (Nat.find JHx.fin_len -1) ≤ JHy.filtration n) inferInstance (Nat.find JHy.fin_len -1) (zero_le _) (by simp [JHy.first_eq_top])
+          simp at this
+          have h1 : JH_raw (i0 + 1) = JHy.filtration i0 := by
+            refine eq_of_le_of_not_lt (sup_le this <| JHy.antitone (Nat.le_add_right i0 1)) ?_
+            by_contra hc
+            have : i0 ≤ Nat.find JHy.fin_len - 1 := @Nat.findGreatest_le (fun n ↦ JHx.filtration (Nat.find JHx.fin_len -1) ≤ JHy.filtration n) inferInstance (Nat.find JHy.fin_len -1)
+            have hsmall : JHy.filtration (i0 + 1) < ↑(JH_raw (i0 + 1)) := by
+              refine lt_of_le_of_ne le_sup_right ?_
+              · by_contra hcon
+                have this' := right_eq_sup.1 hcon
+                if hw : i0 + 1 ≤ Nat.find JHy.fin_len -1 then
+                  refine @Nat.findGreatest_is_greatest (i0+1) (fun n ↦ JHx.filtration (Nat.find JHx.fin_len -1) ≤ JHy.filtration n) inferInstance (Nat.find JHy.fin_len -1) (lt_add_one _) hw this'
+                else
+                  have : i0 + 1 = Nat.find JHy.fin_len := by
+                    have : i0 + 1 ≤ Nat.find JHy.fin_len := (Eq.symm <| Nat.sub_one_add_one <| JH_pos_len JHy) ▸ add_le_add_right this 1
+                    omega
+                  rw [this] at this'
+                  simp [Nat.find_spec JHy.fin_len] at this'
+                  exact Nat.find_min JHx.fin_len (Nat.sub_one_lt <| JH_pos_len JHx) this'
+            have otherwise := JHy.step_cond₂ i0 ((Nat.le_sub_one_iff_lt <| zero_lt_iff.2 <| JH_pos_len JHy).1 this) ↑(JH_raw (i0 + 1)) hsmall hc
+            rw [JHy.step_cond₁ i0 <| lt_of_le_of_lt this <| Nat.sub_one_lt <| JH_pos_len JHy ] at otherwise
+            refine (lt_iff_not_le.1 otherwise) ?_
+            rw [← JHx.step_cond₁ (Nat.find JHx.fin_len - 1) (by omega)]
+            conv_lhs =>
+              arg 1; arg 1; arg 1; arg 2;
+              apply Nat.sub_one_add_one <| JH_pos_len JHx
+            --simp only [Nat.find_spec JHx.fin_len]
+            have himp : ¬ JHx.filtration (Nat.find JHx.fin_len - 1) ≤ JHy.filtration (i0+1) := sorry
+            have : μ ⟨(JHy.filtration (i0 + 1), ↑(JH_raw (i0 + 1))), hsmall⟩ = μ ⟨(JHx.filtration (Nat.find JHx.fin_len - 1) ⊓ JHy.filtration (i0+1), JHx.filtration (Nat.find JHx.fin_len - 1)),inf_lt_left.2 himp⟩ := (affine.affine (JHx.filtration (Nat.find JHx.fin_len - 1)) (JHy.filtration (i0+1)) himp).symm
+            rw [this]
+
+            sorry
+          exact Subtype.coe_inj.1 <| h1 ▸ (sup_eq_right.2 this)
     let JHfun : ℕ → Interval Ires := fun n ↦
       if hn : n ≤ Nat.find JHx.fin_len - 1 then
         ⟨JHx.filtration n,⟨JHx.antitone hn,le_top⟩⟩
