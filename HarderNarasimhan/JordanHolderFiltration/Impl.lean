@@ -460,7 +460,7 @@ lemma function_wrapper_prop6 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [Bounde
   simp [← heq] at this
   exact this
 
-
+set_option maxHeartbeats 0
 lemma strange' : ∀ n : ℕ, ∀ ℒ : Type, ∀ ntl: Nontrivial ℒ, ∀ l : Lattice ℒ, ∀ bo : BoundedOrder ℒ, ∀ wacc : WellFoundedGT ℒ,
 ∀ S : Type, ∀ clo : CompleteLinearOrder S, ∀ μ : {p : ℒ × ℒ // p.1 < p.2} → S,
 ∀ hftp : FiniteTotalPayoff μ, ∀ hsl : SlopeLike μ,
@@ -511,37 +511,63 @@ lemma strange' : ∀ n : ℕ, ∀ ℒ : Type, ∀ ntl: Nontrivial ℒ, ∀ l : L
     let JHfinal := function_wrapper JH_raw (⟨Nat.find JHy.fin_len,JH_raw_fin_len⟩)
     have JHfinal_first_top : JHfinal 0 = ⊤ := by
       simp only [JHfinal,function_wrapper]
-    let JH_FINAL : JordanHolderFiltration (Resμ Ires μ) := by
-      refine { filtration := JHfinal, antitone := function_wrapper_prop2 JH_raw (⟨Nat.find JHy.fin_len,JH_raw_fin_len⟩), fin_len := function_wrapper_prop1 JH_raw (⟨Nat.find JHy.fin_len,JH_raw_fin_len⟩) JH_raw_antitone JH_raw_first_top, strict_anti := fun i j hij hj ↦ function_wrapper_prop5 JH_raw JH_raw_first_top (⟨Nat.find JHy.fin_len,JH_raw_fin_len⟩) JH_raw_antitone i j hij hj, first_eq_top := by simp [*], step_cond₁ := ?_, step_cond₂ := ?_ }
-      · refine fun k1 hk1 ↦ function_wrapper_prop6 JH_raw JH_raw_first_top (⟨Nat.find JHy.fin_len,JH_raw_fin_len⟩) JH_raw_antitone (fun z ↦ (Resμ Ires μ) z = (Resμ Ires μ) ⟨(⊥,⊤),bot_lt_top⟩) (fun j hj hfj ↦ ?_) k1 hk1
-        simp only [Resμ,JH_raw]
-        have htrans : μ ⟨(JHx.filtration (Nat.find JHx.fin_len - 1),⊤),(JHx.first_eq_top) ▸ JHx.strict_anti 0 (Nat.find JHx.fin_len - 1) this (Nat.sub_le (Nat.find JHx.fin_len) 1)⟩ = μ ⟨(⊥,⊤),bot_lt_top⟩ := by
-          have := JHx.step_cond₁ (Nat.find JHx.fin_len - 1) (by omega)
-          simp only [Nat.sub_one_add_one <| JH_pos_len JHx,Nat.find_spec JHx.fin_len] at this
-          exact ((seesaw_useful μ hsl ⊥ (JHx.filtration <| Nat.find JHx.fin_len - 1) ⊤ ⟨bot_lt_iff_ne_bot.2 <| Nat.find_min JHx.fin_len <| Nat.sub_one_lt <| JH_pos_len JHx,nt⟩).2.2.1 this).2.symm
-        have hj': ∀ j: ℕ, j ≤ Nat.find JHy.fin_len → μ ⟨(⊥,JHx.filtration (Nat.find JHx.fin_len -1) ⊔ JHy.filtration j), lt_of_lt_of_le (bot_lt_iff_ne_bot.2 <| Nat.find_min JHx.fin_len <| Nat.sub_one_lt <| JH_pos_len JHx) le_sup_left⟩ = μ ⟨(⊥,⊤),bot_lt_top⟩ := by
-          refine fun j hj ↦ eq_of_le_of_le ?_ ?_
-          · have := (List.TFAE.out (thm4d21 μ hsl {wacc := (fun f smf ↦ False.elim (not_strictMono_of_wellFoundedGT f smf))} inferInstance) 0 4).2 hst
-            unfold TotIntvl at this
-            rw [← this]
-            apply le_sSup
+    have hcond1 : ∀ i < Nat.find (⟨Nat.find JHy.fin_len,JH_raw_fin_len⟩: ∃ k, JH_raw k = ⊥), ∀ (hfi : JH_raw (i + 1) < JH_raw i), (fun z ↦ Resμ Ires μ z = Resμ Ires μ ⟨(⊥, ⊤), bot_lt_top⟩) ⟨(JH_raw (i + 1), JH_raw i), hfi⟩ := by
+      intro j hj hfj
+      simp only [Resμ,JH_raw]
+      have htrans : μ ⟨(JHx.filtration (Nat.find JHx.fin_len - 1),⊤),(JHx.first_eq_top) ▸ JHx.strict_anti 0 (Nat.find JHx.fin_len - 1) this (Nat.sub_le (Nat.find JHx.fin_len) 1)⟩ = μ ⟨(⊥,⊤),bot_lt_top⟩ := by
+        have := JHx.step_cond₁ (Nat.find JHx.fin_len - 1) (by omega)
+        simp only [Nat.sub_one_add_one <| JH_pos_len JHx,Nat.find_spec JHx.fin_len] at this
+        exact ((seesaw_useful μ hsl ⊥ (JHx.filtration <| Nat.find JHx.fin_len - 1) ⊤ ⟨bot_lt_iff_ne_bot.2 <| Nat.find_min JHx.fin_len <| Nat.sub_one_lt <| JH_pos_len JHx,nt⟩).2.2.1 this).2.symm
+      have hj': ∀ j: ℕ, j ≤ Nat.find JHy.fin_len → μ ⟨(⊥,JHx.filtration (Nat.find JHx.fin_len -1) ⊔ JHy.filtration j), lt_of_lt_of_le (bot_lt_iff_ne_bot.2 <| Nat.find_min JHx.fin_len <| Nat.sub_one_lt <| JH_pos_len JHx) le_sup_left⟩ = μ ⟨(⊥,⊤),bot_lt_top⟩ := by
+        refine fun j hj ↦ eq_of_le_of_le ?_ ?_
+        · have := (List.TFAE.out (thm4d21 μ hsl {wacc := (fun f smf ↦ False.elim (not_strictMono_of_wellFoundedGT f smf))} inferInstance) 0 4).2 hst
+          unfold TotIntvl at this
+          rw [← this]
+          apply le_sSup
+          simp
+          use JHx.filtration (Nat.find JHx.fin_len -1) ⊔ JHy.filtration j, ⟨in_TotIntvl _,Ne.symm <| bot_lt_iff_ne_bot.1<| lt_of_lt_of_le (bot_lt_iff_ne_bot.2 <| Nat.find_min JHx.fin_len <| Nat.sub_one_lt <| JH_pos_len JHx) le_sup_left⟩
+        · have : μmin μ ⟨(⊥,JHx.filtration (Nat.find JHx.fin_len -1) ⊔ JHy.filtration j),lt_of_lt_of_le (bot_lt_iff_ne_bot.2 <| Nat.find_min JHx.fin_len <| Nat.sub_one_lt <| JH_pos_len JHx) le_sup_left⟩ ≤ μ ⟨(⊥,JHx.filtration (Nat.find JHx.fin_len -1) ⊔ JHy.filtration j),lt_of_lt_of_le (bot_lt_iff_ne_bot.2 <| Nat.find_min JHx.fin_len <| Nat.sub_one_lt <| JH_pos_len JHx) le_sup_left⟩ := by
+            apply sInf_le
             simp
-            use JHx.filtration (Nat.find JHx.fin_len -1) ⊔ JHy.filtration j, ⟨in_TotIntvl _,Ne.symm <| bot_lt_iff_ne_bot.1<| lt_of_lt_of_le (bot_lt_iff_ne_bot.2 <| Nat.find_min JHx.fin_len <| Nat.sub_one_lt <| JH_pos_len JHx) le_sup_left⟩
-          · have : μmin μ ⟨(⊥,JHx.filtration (Nat.find JHx.fin_len -1) ⊔ JHy.filtration j),lt_of_lt_of_le (bot_lt_iff_ne_bot.2 <| Nat.find_min JHx.fin_len <| Nat.sub_one_lt <| JH_pos_len JHx) le_sup_left⟩ ≤ μ ⟨(⊥,JHx.filtration (Nat.find JHx.fin_len -1) ⊔ JHy.filtration j),lt_of_lt_of_le (bot_lt_iff_ne_bot.2 <| Nat.find_min JHx.fin_len <| Nat.sub_one_lt <| JH_pos_len JHx) le_sup_left⟩ := by
-              apply sInf_le
-              simp
-              use ⊥, ⟨⟨le_rfl, le_of_lt <| lt_of_lt_of_le (bot_lt_iff_ne_bot.2 <| Nat.find_min JHx.fin_len <| Nat.sub_one_lt <| JH_pos_len JHx) le_sup_left⟩,Ne.symm <| bot_lt_iff_ne_bot.1<| lt_of_lt_of_le (bot_lt_iff_ne_bot.2 <| Nat.find_min JHx.fin_len <| Nat.sub_one_lt <| JH_pos_len JHx) le_sup_left⟩
-            refine le_trans ?_ this
-            sorry
-        have tj1 := hj' j (le_of_lt <| lt_of_lt_of_le hj <| Nat.find_min' ((⟨Nat.find JHy.fin_len,JH_raw_fin_len⟩) : ∃ k, JH_raw k = ⊥) JH_raw_fin_len)
-        have := tj1 ▸ ((seesaw_useful μ hsl ⊥ (JHx.filtration (Nat.find JHx.fin_len -1) ⊔ JHy.filtration (j+1)) (JHx.filtration (Nat.find JHx.fin_len -1) ⊔ JHy.filtration j) ⟨lt_of_lt_of_le (bot_lt_iff_ne_bot.2 <| Nat.find_min JHx.fin_len <| Nat.sub_one_lt <| JH_pos_len JHx) le_sup_left,lt_iff_le_not_le.mpr hfj⟩).2.2.1 <| tj1 ▸ hj' (j+1) (lt_of_lt_of_le hj <| Nat.find_min' ((⟨Nat.find JHy.fin_len,JH_raw_fin_len⟩) : ∃ k, JH_raw k = ⊥) JH_raw_fin_len)).2
-        rw [← this]
-        exact id (Eq.symm htrans)
+            use ⊥, ⟨⟨le_rfl, le_of_lt <| lt_of_lt_of_le (bot_lt_iff_ne_bot.2 <| Nat.find_min JHx.fin_len <| Nat.sub_one_lt <| JH_pos_len JHx) le_sup_left⟩,Ne.symm <| bot_lt_iff_ne_bot.1<| lt_of_lt_of_le (bot_lt_iff_ne_bot.2 <| Nat.find_min JHx.fin_len <| Nat.sub_one_lt <| JH_pos_len JHx) le_sup_left⟩
+          refine le_trans ?_ this
+          sorry
+      have tj1 := hj' j (le_of_lt <| lt_of_lt_of_le hj <| Nat.find_min' ((⟨Nat.find JHy.fin_len,JH_raw_fin_len⟩) : ∃ k, JH_raw k = ⊥) JH_raw_fin_len)
+      have := tj1 ▸ ((seesaw_useful μ hsl ⊥ (JHx.filtration (Nat.find JHx.fin_len -1) ⊔ JHy.filtration (j+1)) (JHx.filtration (Nat.find JHx.fin_len -1) ⊔ JHy.filtration j) ⟨lt_of_lt_of_le (bot_lt_iff_ne_bot.2 <| Nat.find_min JHx.fin_len <| Nat.sub_one_lt <| JH_pos_len JHx) le_sup_left,lt_iff_le_not_le.mpr hfj⟩).2.2.1 <| tj1 ▸ hj' (j+1) (lt_of_lt_of_le hj <| Nat.find_min' ((⟨Nat.find JHy.fin_len,JH_raw_fin_len⟩) : ∃ k, JH_raw k = ⊥) JH_raw_fin_len)).2
+      rw [← this]
+      exact id (Eq.symm htrans)
+    let JH_FINAL : JordanHolderFiltration (Resμ Ires μ) := by
+      refine { filtration := JHfinal, antitone := function_wrapper_prop2 JH_raw (⟨Nat.find JHy.fin_len,JH_raw_fin_len⟩), fin_len := function_wrapper_prop1 JH_raw (⟨Nat.find JHy.fin_len,JH_raw_fin_len⟩) JH_raw_antitone JH_raw_first_top, strict_anti := fun i j hij hj ↦ function_wrapper_prop5 JH_raw JH_raw_first_top (⟨Nat.find JHy.fin_len,JH_raw_fin_len⟩) JH_raw_antitone i j hij hj, first_eq_top := by simp [*], step_cond₁ := fun k1 hk1 ↦ function_wrapper_prop6 JH_raw JH_raw_first_top (⟨Nat.find JHy.fin_len,JH_raw_fin_len⟩) JH_raw_antitone (fun z ↦ (Resμ Ires μ) z = (Resμ Ires μ) ⟨(⊥,⊤),bot_lt_top⟩) hcond1 k1 hk1, step_cond₂ := ?_ }
       · intro i hi
         refine function_wrapper_prop6 JH_raw JH_raw_first_top (⟨Nat.find JHy.fin_len,JH_raw_fin_len⟩) JH_raw_antitone (fun w ↦ ∀ z : (Interval Ires), (hw : w.val.1 < z) → z < w.val.2 → (Resμ Ires μ) ⟨(w.val.1,z),hw⟩ < (Resμ Ires μ) w ) ?_ i hi
-        intro j hj hfj z hz1 hz2
-        simp only [Resμ,JH_raw]
-
+        intro j hj hfj w hw1 hw2
+        simp only [Resμ]
+        refine ((seesaw_useful μ hsl ↑(JH_raw (j + 1)) w ↑(JH_raw j) ⟨lt_iff_le_not_le.mpr hw1,lt_iff_le_not_le.mpr hw2⟩).1.2.2 ?_).1
+        have := hcond1 j hj hfj
+        simp [Resμ] at this
+        have this' := JHx.step_cond₁ (Nat.find JHx.fin_len - 1) (by omega)
+        simp only [Nat.sub_one_add_one <| JH_pos_len JHx,Nat.find_spec JHx.fin_len] at this'
+        have this' := ((seesaw_useful μ hsl ⊥ (JHx.filtration (Nat.find JHx.fin_len - 1)) ⊤ ⟨bot_lt_iff_ne_bot.2 <| Nat.find_min JHx.fin_len <| Nat.sub_one_lt <| JH_pos_len JHx,nt⟩).2.2.1 this').2
+        rw [this]
+        have hnle : ¬ (JHy.filtration j ≤ w) := by
+          by_contra!
+          simp [JH_raw] at hw2
+          sorry
+        have heqs : μ ⟨(↑w, ↑(JH_raw j)), lt_iff_le_not_le.mpr hw2⟩ = μ ⟨(JHy.filtration j ⊓ w,JHy.filtration j),inf_lt_left.2 hnle⟩ := by
+          sorry
+        rw [heqs]
+        have hstupid : μ ⟨(↑(⊥: Interval Ires), ↑(⊤: Interval Ires)), nt⟩ = μ ⟨(JHx.filtration (Nat.find JHx.fin_len - 1), ⊤), nt⟩ := by
+          rfl
+        rw [hstupid,← this']
+        have hnew := JHy.step_cond₁ j <| lt_of_lt_of_le hj <| Nat.find_le JH_raw_fin_len
+        rw [← hnew]
+        have hlt : JHy.filtration (j+1) < JHy.filtration j ⊓ w := by
+          refine lt_of_le_of_ne (le_inf ?_ ?_) ?_
+          · exact JHy.antitone <| Nat.le_add_right j 1
+          · simp [JH_raw,sup_comm] at hw1
+            exact le_of_lt <| lt_of_le_of_lt (le_sup_left) <| lt_iff_le_not_le.mpr hw1
+          · sorry
+        refine ((seesaw_useful μ hsl (JHy.filtration (j+1)) (JHy.filtration j ⊓ w) (JHy.filtration j) ⟨hlt,inf_lt_left.2 hnle⟩).1.1 ?_).2
         sorry
     have ha : Nat.find JH_FINAL.fin_len < Nat.find JHy.fin_len := by
       have : JHfinal (Nat.find JHy.fin_len) = ⊥ := by
