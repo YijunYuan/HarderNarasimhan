@@ -21,3 +21,6 @@ import HarderNarasimhan.SlopeLike.Defs
 
 import HarderNarasimhan.NashEquilibrium.Defs
 import HarderNarasimhan.NashEquilibrium.Results
+
+import HarderNarasimhan.JordanHolderFiltration.Defs
+import HarderNarasimhan.JordanHolderFiltration.Results

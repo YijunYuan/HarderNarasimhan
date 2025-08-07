@@ -4,6 +4,7 @@ open Classical
 
 namespace HardarNarasimhan
 
+--`Theorem 4.25`
 instance {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type} [CompleteLinearOrder S]
 {μ : {p : ℒ × ℒ // p.1 < p.2} → S}
@@ -17,7 +18,12 @@ Nonempty (JordanHolderFiltration μ)
 theorem remark_4_26 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type} [CompleteLinearOrder S]
 {μ : {p : ℒ × ℒ // p.1 < p.2} → S}
-[hftp : FiniteTotalPayoff μ] [hsl : SlopeLike μ] [hst : Semistable μ] [hwdcc' : WeakDescendingChainCondition' μ] [Affine μ] :
-∀ (X Y : JordanHolderFiltration μ), Nat.find X.fin_len = Nat.find Y.fin_len := sorry
+[hftp : FiniteTotalPayoff μ] [SlopeLike μ] [Semistable μ]
+[WeakDescendingChainCondition' μ] [Affine μ] :
+------------
+∀ JH1 JH2 : JordanHolderFiltration μ, Nat.find JH1.fin_len = Nat.find JH2.fin_len
+------------
+:= fun JH1 JH2 ↦ eq_of_le_of_le (impl.looooooooooooooooog_lemma (Nat.find JH2.fin_len) ℒ _ _ _ _ _ _ μ inferInstance inferInstance inferInstance inferInstance inferInstance ⟨JH2,rfl.le⟩ JH1) <| impl.looooooooooooooooog_lemma (Nat.find JH1.fin_len) ℒ _ _ _ _ _ _ _ inferInstance inferInstance inferInstance inferInstance inferInstance ⟨JH1,rfl.le⟩ JH2
+
 
 end HardarNarasimhan
