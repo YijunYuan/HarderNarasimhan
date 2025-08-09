@@ -43,13 +43,13 @@ Unique (HardarNarasimhanFiltration μ)
 where
   uniq := fun a ↦ HardarNarasimhanFiltration.ext (funext fun n ↦ congrFun (impl.theorem3d10 μ hμ hμcvx a.filtration a.first_eq_bot a.fin_len a.strict_mono (Nat.le_induction (Nat.find_spec a.fin_len) fun n _ hn' ↦ eq_top_iff.2 <| hn' ▸ a.monotone (Nat.le_succ n)) a.piecewise_semistable fun i  ↦ by
     have : ∀ (j : ℕ) (hij : i + 1 ≤ j) (hj : j < Nat.find a.fin_len),
-  μA μ ⟨(HardarNarasimhanFiltration.filtration μ i, HardarNarasimhanFiltration.filtration μ (i + 1)), HardarNarasimhanFiltration.strict_mono i (i + 1) (lt_add_one i)
+  μA μ ⟨(HardarNarasimhanFiltration.filtration a i, HardarNarasimhanFiltration.filtration a (i + 1)), HardarNarasimhanFiltration.strict_mono a i (i + 1) (lt_add_one i)
   (Decidable.byContradiction fun a_1 ↦
-    impl.theorem3d10._proof_5 (HardarNarasimhanFiltration.filtration μ) HardarNarasimhanFiltration.fin_len i j hij hj
+    impl.theorem3d10._proof_5 (HardarNarasimhanFiltration.filtration a) (HardarNarasimhanFiltration.fin_len a) i j hij hj
       a_1)⟩ >
-    μA μ ⟨(HardarNarasimhanFiltration.filtration μ j, HardarNarasimhanFiltration.filtration μ (j + 1)), HardarNarasimhanFiltration.strict_mono j (j + 1) (lt_add_one j)
+    μA μ ⟨(HardarNarasimhanFiltration.filtration a j, HardarNarasimhanFiltration.filtration a (j + 1)), HardarNarasimhanFiltration.strict_mono a j (j + 1) (lt_add_one j)
   (Decidable.byContradiction fun a_1 ↦
-    impl.theorem3d10._proof_6 (HardarNarasimhanFiltration.filtration μ) HardarNarasimhanFiltration.fin_len i j hj a_1)⟩ := by
+    impl.theorem3d10._proof_6 (HardarNarasimhanFiltration.filtration a) (HardarNarasimhanFiltration.fin_len a) i j hj a_1)⟩ := by
       apply Nat.le_induction
       · exact fun hj ↦ lt_of_not_ge (a.μA_pseudo_strict_anti i hj)
       · refine fun j hij hind hj ↦ gt_trans (hind (by linarith)) ?_

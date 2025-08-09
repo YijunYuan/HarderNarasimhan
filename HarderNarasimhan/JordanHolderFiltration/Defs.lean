@@ -17,7 +17,7 @@ class WeakDescendingChainCondition' {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] 
 
 
 @[ext]
-class JordanHolderFiltration {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
+structure JordanHolderFiltration {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type} [CompleteLinearOrder S]
 (μ : {p : ℒ × ℒ // p.1 < p.2} → S)
 --[FiniteTotalPayoff μ] [SlopeLike μ] [Semistable μ] [WeakDescendingChainCondition' μ]
