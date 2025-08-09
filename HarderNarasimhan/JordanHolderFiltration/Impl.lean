@@ -510,6 +510,7 @@ lemma looooooooooooooooog_lemma : ∀ n : ℕ, ∀ ℒ : Type, ∀ ntl: Nontrivi
         simp only [Nat.sub_one_add_one <| JH_pos_len JHx,Nat.find_spec JHx.fin_len] at this'
         have this' := ((seesaw_useful μ hsl ⊥ (JHx.filtration (Nat.find JHx.fin_len - 1)) ⊤ ⟨bot_lt_iff_ne_bot.2 <| Nat.find_min JHx.fin_len <| Nat.sub_one_lt <| JH_pos_len JHx,nt⟩).2.2.1 this').2
         rw [this]
+        have hproblem : JHy.filtration (j + 1) ≠ JHy.filtration j ⊓ ↑w := sorry
         have hnle : ¬ (JHy.filtration j ≤ w) := by
           by_contra!
           simp [JH_raw] at hw2
@@ -518,12 +519,20 @@ lemma looooooooooooooooog_lemma : ∀ n : ℕ, ∀ ℒ : Type, ∀ ntl: Nontrivi
           sorry
         rw [heqs,((by rfl):μ ⟨(↑(⊥: Interval Ires), ↑(⊤: Interval Ires)), nt⟩ = μ ⟨(JHx.filtration (Nat.find JHx.fin_len - 1), ⊤), nt⟩),← this',← JHy.step_cond₁ j <| lt_of_lt_of_le hj <| Nat.find_le JH_raw_fin_len]
         have hlt : JHy.filtration (j+1) < JHy.filtration j ⊓ w := by
-          refine lt_of_le_of_ne (le_inf (JHy.antitone <| Nat.le_add_right j 1) ?_) ?_
-          · simp [JH_raw,sup_comm] at hw1
-            exact le_of_lt <| lt_of_le_of_lt (le_sup_left) <| lt_iff_le_not_le.mpr hw1
-          · sorry
+          refine lt_of_le_of_ne (le_inf (JHy.antitone <| Nat.le_add_right j 1) ?_) hproblem
+          simp [JH_raw,sup_comm] at hw1
+          exact le_of_lt <| lt_of_le_of_lt (le_sup_left) <| lt_iff_le_not_le.mpr hw1
         refine ((seesaw_useful μ hsl (JHy.filtration (j+1)) (JHy.filtration j ⊓ w) (JHy.filtration j) ⟨hlt,inf_lt_left.2 hnle⟩).1.1 ?_).2
-        sorry
+        exact JHy.step_cond₂ j (by
+          have this' := Nat.find_min (Exists.intro (Nat.find JHy.fin_len) JH_raw_fin_len : ∃ k, JH_raw k = ⊥) hj
+          unfold JH_raw at this'
+          by_contra hcontra
+          push_neg at hcontra
+          have : JHy.filtration j = ⊥ := le_bot_iff.mp <| (Nat.find_spec JHy.fin_len) ▸ JHy.antitone hcontra
+          rw [this] at this'
+          simp at this'
+          exact this' rfl
+          ) (JHy.filtration j ⊓ w) hlt <| inf_lt_left.mpr hnle
     have ha : Nat.find JH_FINAL.fin_len < Nat.find JHy.fin_len := by
       have : JHfinal (Nat.find JHy.fin_len) = ⊥ := by
         simp only [JHfinal,function_wrapper]
