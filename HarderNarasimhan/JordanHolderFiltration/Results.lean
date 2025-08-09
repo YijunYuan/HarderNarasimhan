@@ -18,7 +18,7 @@ Nonempty (JordanHolderFiltration μ)
 theorem remark_4_26 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type} [CompleteLinearOrder S]
 {μ : {p : ℒ × ℒ // p.1 < p.2} → S}
-[hftp : FiniteTotalPayoff μ] [SlopeLike μ] [Semistable μ]
+[FiniteTotalPayoff μ] [SlopeLike μ] [Semistable μ]
 [WeakDescendingChainCondition' μ] [Affine μ] :
 ------------
 ∀ JH1 JH2 : JordanHolderFiltration μ, Nat.find JH1.fin_len = Nat.find JH2.fin_len
