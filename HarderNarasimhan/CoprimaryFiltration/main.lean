@@ -74,6 +74,11 @@ noncomputable abbrev μ (R : Type) [CommRing R] [IsNoetherianRing R]
   have : Fintype W := this.fintype
   exact ↑W.toFinset
 
+lemma inS₀ {R : Type} [CommRing R] [IsNoetherianRing R]
+{M : Type} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]: ∀ I :{z: (ℒ R M) × (ℒ R M) // z.1 < z.2}, ∃ J : (S₀ R), ↑J = (μ R M) I := by
+  intro _
+  apply exists_apply_eq_apply
+
 lemma noname {R : Type} [CommRing R] [IsNoetherianRing R]
 {M : Type} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] : ∀ I : {z: (ℒ R M) × (ℒ R M) // z.1 < z.2}, μmax (μ R M) I = (μ R M) I := sorry
 
@@ -81,7 +86,7 @@ lemma prop_3_11 {R : Type} [CommRing R] [IsNoetherianRing R]
 {M : Type} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] : Convex (μ R M) := sorry
 
 lemma prop_3_12 {R : Type} [CommRing R] [IsNoetherianRing R]
-{M : Type} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] : True := sorry
+{M : Type} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] : ∀ I : {z: (ℒ R M) × (ℒ R M) // z.1 < z.2}, True := sorry
 
 end
 
