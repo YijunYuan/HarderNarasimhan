@@ -4,6 +4,7 @@ import Mathlib.Order.CompleteLattice.Defs
 import Mathlib.Order.BoundedOrder.Basic
 import Mathlib.RingTheory.Spectrum.Prime.Basic
 import Mathlib.Order.Extension.Linear
+import Mathlib.Algebra.Module.Submodule.Defs
 import HarderNarasimhan.Basic
 import HarderNarasimhan.Convexity.Results
 import HarderNarasimhan.DedekindMacNeilleCompletion
@@ -42,7 +43,7 @@ lemma S₀_order {R : Type} [CommRing R] [IsNoetherianRing R]: ∀ p q : LinearE
 
 abbrev S (R : Type) [CommRing R] [IsNoetherianRing R] := @DedekindMacNeilleCompletion (S₀ R) instPartialOrderS₀
 
-def sb (R : Type) [CommRing R] [IsNoetherianRing R]
+abbrev sb (R : Type) [CommRing R] [IsNoetherianRing R]
 (M : Type) [Nontrivial M] [AddCommGroup M] [Module R M]
 {I₁ I₂ : Submodule R M} (h : I₁ ≤ I₂) : Submodule R I₂ where
   carrier := {x | x.val ∈ I₁}
@@ -66,13 +67,7 @@ abbrev ℒ (R : Type) [CommRing R] [IsNoetherianRing R]
 
 noncomputable abbrev μ (R : Type) [CommRing R] [IsNoetherianRing R]
 (M : Type) [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]:
-{z: (ℒ R M) × (ℒ R M) // z.1 < z.2} → (S R) := by
-  intro I
-  let W : Set (LinearExtension (PrimeSpectrum R)) :={ {asIdeal := p, isPrime := h.out.1} | (p : Ideal R) (h : p ∈ associatedPrimes R (I.val.2⧸(sb R M (le_of_lt I.prop)))) }
-  have : W.Finite := by
-    exact Set.Finite.dependent_image (associatedPrimes.finite R (I.val.2⧸(sb R M (le_of_lt I.prop)))) (fun I hI ↦ ({asIdeal := I, isPrime := hI.out.1} : LinearExtension (PrimeSpectrum R)))
-  have : Fintype W := this.fintype
-  exact ↑W.toFinset
+{z: (ℒ R M) × (ℒ R M) // z.1 < z.2} → (S R) := fun I ↦ coe'.toFun <| @Set.toFinset (LinearExtension (PrimeSpectrum R)) ({ {asIdeal := p, isPrime := h.out.1} | (p : Ideal R) (h : p ∈ associatedPrimes R (I.val.2⧸(sb R M (le_of_lt I.prop)))) }) <| (Set.Finite.dependent_image (associatedPrimes.finite R (I.val.2⧸(sb R M (le_of_lt I.prop)))) (fun I hI ↦ ({asIdeal := I, isPrime := hI.out.1} : LinearExtension (PrimeSpectrum R)))).fintype
 
 lemma inS₀ {R : Type} [CommRing R] [IsNoetherianRing R]
 {M : Type} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]: ∀ I :{z: (ℒ R M) × (ℒ R M) // z.1 < z.2}, ∃ J : (S₀ R), ↑J = (μ R M) I := by
@@ -86,7 +81,29 @@ lemma prop_3_11 {R : Type} [CommRing R] [IsNoetherianRing R]
 {M : Type} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] : Convex (μ R M) := sorry
 
 lemma prop_3_12 {R : Type} [CommRing R] [IsNoetherianRing R]
-{M : Type} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] : ∀ I : {z: (ℒ R M) × (ℒ R M) // z.1 < z.2}, True := sorry
+{M : Type} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] : ∀ I : {z: (ℒ R M) × (ℒ R M) // z.1 < z.2}, True := by
+  intro I
+  have := μA (μ R M) I
+  have : (inS₀ I).choose.Nonempty := by
+    rw [coe'.inj.1 (inS₀ I).choose_spec]
+    simp
+    have : Nontrivial ((I.val.2⧸(sb R M (le_of_lt I.prop)))) := by
+      refine Submodule.Quotient.nontrivial_of_lt_top (sb R M (le_of_lt I.prop)) ?_
+      unfold sb
+      by_contra!
+      simp at this
+      apply SetLike.coe_set_eq.2 at this
+      simp at this
+      have this' := I.prop
+      apply Set.ext_iff.1 at this
+
+      sorry
+    rcases associatedPrimes.nonempty R (I.val.2⧸(sb R M (le_of_lt I.prop))) with ⟨q,hq⟩
+    refine ⟨{ asIdeal := q, isPrime := hq.out.1 },Set.mem_setOf.mpr ?_⟩
+    use q, hq
+  have := (inS₀ I).choose.min' (this)
+
+  sorry
 
 end
 
