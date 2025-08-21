@@ -97,8 +97,8 @@ structure CoprimaryFiltration (R : Type) [CommRing R] [IsNoetherianRing R]
 
 def lift_quot {R : Type} [CommRing R] [IsNoetherianRing R]
 {M : Type} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] (N₁ N₂ : Submodule R M)
-(x : Submodule R (N₂⧸(N₁.submoduleOf N₂))) : Submodule R M := by
-  exact Submodule.span R <| (Submodule.subtype N₂) '' {m : N₂ | Submodule.Quotient.mk m ∈ x}
+(x : Submodule R (N₂⧸(N₁.submoduleOf N₂))) : Submodule R M :=
+  Submodule.map N₂.subtype (Submodule.comap (N₁.submoduleOf N₂).mkQ x)
 
 lemma lift_quot_middle {R : Type} [CommRing R] [IsNoetherianRing R]
 {M : Type} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]
@@ -108,17 +108,17 @@ N₁ ≤ lift_quot N₁ N₂ x ∧ lift_quot N₁ N₂ x ≤ N₂ := by
   constructor
   · intro x' hx
     unfold lift_quot
-    apply Submodule.subset_span
-    simp
+    simp only [Submodule.mem_map, Submodule.mem_comap, Submodule.mkQ_apply, Submodule.subtype_apply,
+      Subtype.exists, exists_and_right, exists_eq_right]
     use hN hx
-    exact (Submodule.Quotient.mk_eq_zero x).mp (congrArg Submodule.Quotient.mk <| (Submodule.Quotient.mk_eq_zero (N₁.submoduleOf N₂)).mpr hx)
+    convert Submodule.zero_mem x
+    simp
+    exact hx
   · unfold lift_quot
     intro x' hx
-    refine Submodule.span_le.2 ?_ <| hx
-    intro y hy
-    simp at hy
-    rcases hy with ⟨m,_⟩
-    exact m
+    simp only [Submodule.mem_map, Submodule.mem_comap, Submodule.mkQ_apply, Submodule.subtype_apply,
+      Subtype.exists, exists_and_right, exists_eq_right] at hx
+    exact hx.choose
 
 lemma lift_quot_not_bot {R : Type} [CommRing R] [IsNoetherianRing R]
 {M : Type} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]
@@ -132,9 +132,8 @@ lemma lift_quot_not_bot {R : Type} [CommRing R] [IsNoetherianRing R]
   rcases (Quotient.exists_rep r) with ⟨rtilde,hrtilde⟩
   have : N₂.subtype rtilde ∈ N₁ := by
     rw [← hc]
-    refine Submodule.apply_mem_span_image_of_mem_span N₂.subtype ?_
-    rw [← hrtilde] at hr
-    exact Submodule.mem_span.mpr fun p a ↦ a hr
+    simp
+    convert hr
   rw [← hrtilde]
   apply (Submodule.Quotient.mk_eq_zero (N₁.submoduleOf N₂)).2
   exact this
@@ -148,9 +147,14 @@ Inhabited (CoprimaryFiltration R M) := by
   have := HNFil.piecewise_semistable n hn
   have ntl : Nontrivial (↥(HNFil.filtration (n + 1)) ⧸ Submodule.submoduleOf (HNFil.filtration n) (HNFil.filtration (n + 1))) := by
     apply Submodule.Quotient.nontrivial_of_lt_top
-    have := HNFil.strict_mono n (n+1) (lt_add_one n) hn
-
-    sorry
+    apply lt_top_iff_ne_top.2
+    by_contra hc
+    have h' : ∀ x ∈ HNFil.filtration (n + 1), x ∈ HNFil.filtration n := by
+      intro x hx
+      have : ⟨x,hx⟩ ∈ Submodule.submoduleOf (HNFil.filtration n) (HNFil.filtration (n + 1)) := hc ▸ Submodule.mem_top
+      simp only [Submodule.submoduleOf, Submodule.mem_comap, Submodule.subtype_apply] at this
+      exact this
+    exact (not_lt_of_le h') <| HNFil.strict_mono n (n+1) (lt_add_one n) hn
   refine Coprimary_iff.2 <| rmk4d14₂.1 <| {semistable := ?_}
   intro x hx
   have := this.semistable ⟨lift_quot (HNFil.filtration n) (HNFil.filtration (n + 1)) x, lift_quot_middle (HNFil.filtration n) (HNFil.filtration (n + 1)) (HNFil.monotone <| Nat.le_succ n) x⟩ <| (by
@@ -168,7 +172,16 @@ Inhabited (CoprimaryFiltration R M) := by
       simp only [ne_eq, Set.mem_setOf_eq] at *
       rcases hu with ⟨m,⟨hm,hm'⟩⟩
       use ⟨lift_quot (HNFil.filtration n) (HNFil.filtration (n + 1)) m, lift_quot_middle (HNFil.filtration n) (HNFil.filtration (n + 1)) (HNFil.monotone <| Nat.le_succ n) m⟩
-      use ⟨in_TotIntvl _,sorry⟩
+      use ⟨in_TotIntvl _,by
+        have c1 : ∃ d ∈ (⊤ : ℒ R (↥(HNFil.filtration (n + 1)) ⧸ Submodule.submoduleOf (HNFil.filtration n) (HNFil.filtration (n + 1)))), d ∉ m := by
+          by_contra hc
+          push_neg at hc
+          exact (and_not_self_iff (↑⊤ ⊆ ↑⊤)).mp <| (top_le_iff.1 hc : m = ⊤) ▸ lt_top_iff_ne_top.2 hm.2
+        rcases c1 with ⟨d,hd⟩
+        by_contra hc
+        apply Subtype.coe_inj.2 at hc
+        simp at hc
+        sorry⟩
       rw [← hm']
       unfold μmax
       congr
@@ -177,8 +190,29 @@ Inhabited (CoprimaryFiltration R M) := by
       · intro hv
         simp only [ne_eq, Set.mem_setOf_eq] at *
         rcases hv with ⟨w,⟨hw,hw'⟩⟩
+        use Submodule.map (Submodule.submoduleOf (HNFil.filtration n) (HNFil.filtration (n + 1))).mkQ <| w.val.submoduleOf (HNFil.filtration (n + 1))
+        refine ⟨⟨?_,?_⟩,?_⟩
+        · constructor
+          · simp only
+            have hw := hw.1.1
+            apply Subtype.coe_le_coe.2 at hw
+            simp at hw
+            unfold lift_quot at hw
+            exact Submodule.le_map_of_comap_le_of_surjective (Submodule.mkQ_surjective (Submodule.submoduleOf (HNFil.filtration n) (HNFil.filtration (n + 1)))) <| Submodule.map_le_iff_le_comap.1 hw
+          · exact le_top
+        · by_contra hc
+          refine hw.2 ?_
+          rw [hc]
+          apply Subtype.coe_inj.1
+          simp only
+          unfold lift_quot
+          simp [Submodule.map_comap_eq]
 
-        sorry
+          sorry
+        · rw [← hw']
+          simp [lift_quot,Resμ]
+
+          sorry
       · sorry
     · sorry
 
