@@ -17,7 +17,25 @@ namespace HardarNarasimhan
 
 abbrev S₀ (R : Type) [CommRing R] [IsNoetherianRing R] := Finset (LinearExtension (PrimeSpectrum R))
 
+namespace LexOrder
+
+def Finset2Fun {α : Type} [LinearOrder α] (A : Finset α) : (ℕ → WithTop α) := by
+  intro k
+  match k with
+  | 0 => exact A.min
+  | k + 1 => sorry
+
+instance {α : Type} [LinearOrder α] : LT (Finset α) where
+  lt := by
+    intro x y
+
+    sorry
+end LexOrder
+
+
+
 lemma po (R : Type) [CommRing R] [IsNoetherianRing R] : ∃ lo: LinearOrder (S₀ R),  (∀ x y : (S₀ R), x ≤ y → lo.le x y) ∧ ∀ p q : LinearExtension (PrimeSpectrum R), p ≤ q ↔ lo.le ({p} : (S₀ R)) {q} := by
+
   sorry
 
 noncomputable instance (priority:=114514) {R : Type} [CommRing R] [IsNoetherianRing R]: LinearOrder (S₀ R) := (po R).choose
@@ -173,15 +191,19 @@ Inhabited (CoprimaryFiltration R M) := by
       rcases hu with ⟨m,⟨hm,hm'⟩⟩
       use ⟨lift_quot (HNFil.filtration n) (HNFil.filtration (n + 1)) m, lift_quot_middle (HNFil.filtration n) (HNFil.filtration (n + 1)) (HNFil.monotone <| Nat.le_succ n) m⟩
       use ⟨in_TotIntvl _,by
-        have c1 : ∃ d ∈ (⊤ : ℒ R (↥(HNFil.filtration (n + 1)) ⧸ Submodule.submoduleOf (HNFil.filtration n) (HNFil.filtration (n + 1)))), d ∉ m := by
-          by_contra hc
-          push_neg at hc
-          exact (and_not_self_iff (↑⊤ ⊆ ↑⊤)).mp <| (top_le_iff.1 hc : m = ⊤) ▸ lt_top_iff_ne_top.2 hm.2
-        rcases c1 with ⟨d,hd⟩
         by_contra hc
+        refine hm.2 ?_
         apply Subtype.coe_inj.2 at hc
-        simp at hc
-        sorry⟩
+        simp only at hc
+        simp [lift_quot] at hc
+        have : Submodule.comap (Submodule.submoduleOf (HNFil.filtration n) (HNFil.filtration (n + 1))).mkQ m = ⊤ := by
+          have : ↑(⊤: Interval ⟨(HNFil.filtration n, HNFil.filtration (n + 1)), HNFil.strict_mono n (n + 1) (lt_add_one n) hn⟩) = Submodule.map (Submodule.subtype (HNFil.filtration (n + 1))) ⊤ := by
+            simp only [Submodule.map_top, Submodule.range_subtype]
+            exact rfl
+          exact Submodule.map_injective_of_injective (Submodule.injective_subtype (HNFil.filtration (n + 1))) <| this ▸ hc
+        refine Submodule.comap_injective_of_surjective ?_ this
+        exact Submodule.mkQ_surjective (Submodule.submoduleOf (HNFil.filtration n) (HNFil.filtration (n + 1)))
+        ⟩
       rw [← hm']
       unfold μmax
       congr
@@ -207,8 +229,14 @@ Inhabited (CoprimaryFiltration R M) := by
           simp only
           unfold lift_quot
           simp [Submodule.map_comap_eq]
-
-          sorry
+          have h1 : Submodule.map (Submodule.subtype (HNFil.filtration (n + 1))) (Submodule.submoduleOf (HNFil.filtration n) (HNFil.filtration (n + 1))) = HNFil.filtration n := by
+            simp only [Submodule.submoduleOf, Submodule.map_comap_subtype, inf_eq_right]
+            exact le_trans w.prop.1 w.prop.2
+          have h2: Submodule.map (Submodule.subtype (HNFil.filtration (n + 1))) (Submodule.submoduleOf (↑w) (HNFil.filtration (n + 1))) = ↑w := by
+            simp only [Submodule.submoduleOf, Submodule.map_comap_subtype, inf_eq_right]
+            exact w.prop.2
+          rw [h1, h2]
+          exact sup_eq_right.2 <| w.prop.1
         · rw [← hw']
           simp [lift_quot,Resμ]
 
