@@ -19,17 +19,46 @@ abbrev S₀ (R : Type) [CommRing R] [IsNoetherianRing R] := Finset (LinearExtens
 
 namespace LexOrder
 
-def Finset2Fun {α : Type} [LinearOrder α] (A : Finset α) : (ℕ → WithTop α) := by
-  intro k
-  match k with
-  | 0 => exact A.min
-  | k + 1 => sorry
+private def aux {α : Type} [LinearOrder α] (A : Finset α) : ℕ → List (WithBot α)
+  | 0 =>
+    if hne : A.Nonempty then
+      [↑(A.min' hne)]
+    else
+      [⊥]
+  | k + 1 =>
+    let prev_list := aux A k
+    let S := {x ∈ A | ∀ y ∈ prev_list, ↑x ≠ y}
+    if hne : S.Nonempty then
+      ↑(S.min' hne) :: prev_list
+    else
+      ⊥ :: prev_list
 
-instance {α : Type} [LinearOrder α] : LT (Finset α) where
+def Finset2Fun {α : Type} [LinearOrder α] (A : Finset α): ℕ → WithBot α := fun k ↦ (aux A k).head!
+
+scoped instance (priority:=114514) LexLT {α : Type} [LinearOrder α] : LT (Finset α) where
   lt := by
     intro x y
+    have fx := Finset2Fun x
+    have fy := Finset2Fun y
+    let N := Nat.findGreatest (fun n ↦ ∀ i < n, fx i = fy i) (max x.card y.card)
+    exact fx N < fy N
 
-    sorry
+scoped instance (priority:=114513) LexLE {α : Type} [LinearOrder α] : LE (Finset α) where le := fun A B ↦ (LexLT.lt A B) ∨ A = B
+
+def A : Finset ℕ := {1, 5}
+def B : Finset ℕ := {1, 2, 5}
+--#eval A < B
+--#eval A = B
+--#eval (A < B) ∨ (A = B)
+
+#eval LexLT.lt A B
+set_option trace.Meta.synthInstance true
+#eval A < B
+#eval A < B ∨ A = B
+#eval (LexLT.lt A B) ∨ A = B
+
+#eval LexLE.le A B
+
 end LexOrder
 
 
