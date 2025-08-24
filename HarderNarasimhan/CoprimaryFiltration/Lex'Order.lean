@@ -113,7 +113,7 @@ private def Lex'LinearOrder {α : Type} [LinearOrder α] : LinearOrder (Finset �
       simp only [not_lt] at h1
       exact h2.1.symm
 
-theorem Lex'Order_prop {α : Type} [lo : LinearOrder α] : ∃ lo : LinearOrder (Finset α),
+theorem Lex'Order_prop (α : Type) [lo : LinearOrder α] : ∃ lo : LinearOrder (Finset α),
 (∀ A B : Finset α, A ⊆ B → lo.le A B) ∧
 (∀ a b : α, a ≤ b ↔ lo.le {a} {b}) := by
   use Lex'LinearOrder

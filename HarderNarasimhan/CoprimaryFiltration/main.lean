@@ -12,67 +12,23 @@ import HarderNarasimhan.Convexity.Results
 import HarderNarasimhan.DedekindMacNeilleCompletion
 import HarderNarasimhan.Semistability.Defs
 import HarderNarasimhan.Filtration.Results
+import HarderNarasimhan.CoprimaryFiltration.Lex'Order
 
 namespace HardarNarasimhan
 
 abbrev S₀ (R : Type) [CommRing R] [IsNoetherianRing R] := Finset (LinearExtension (PrimeSpectrum R))
 
-namespace LexOrder
+noncomputable instance (priority:=114514) {R : Type} [CommRing R] [IsNoetherianRing R]: LinearOrder (S₀ R) :=
+  (Lex'Order.Lex'Order_prop (LinearExtension (PrimeSpectrum R))).choose
 
-private def aux {α : Type} [LinearOrder α] (A : Finset α) : ℕ → List (WithBot α)
-  | 0 =>
-    if hne : A.Nonempty then
-      [↑(A.min' hne)]
-    else
-      [⊥]
-  | k + 1 =>
-    let prev_list := aux A k
-    let S := {x ∈ A | ∀ y ∈ prev_list, ↑x ≠ y}
-    if hne : S.Nonempty then
-      ↑(S.min' hne) :: prev_list
-    else
-      ⊥ :: prev_list
-
-def Finset2Fun {α : Type} [LinearOrder α] (A : Finset α): ℕ → WithBot α := fun k ↦ (aux A k).head!
-
-scoped instance (priority:=114514) LexLT {α : Type} [LinearOrder α] : LT (Finset α) where
-  lt := by
-    intro x y
-    have fx := Finset2Fun x
-    have fy := Finset2Fun y
-    let N := Nat.findGreatest (fun n ↦ ∀ i < n, fx i = fy i) (max x.card y.card)
-    exact fx N < fy N
-
-scoped instance (priority:=114513) LexLE {α : Type} [LinearOrder α] : LE (Finset α) where le := fun A B ↦ (LexLT.lt A B) ∨ A = B
-
-def A : Finset ℕ := {1, 5}
-def B : Finset ℕ := {1, 2, 5}
---#eval A < B
---#eval A = B
---#eval (A < B) ∨ (A = B)
-
-#eval LexLT.lt A B
-set_option trace.Meta.synthInstance true
-#eval A < B
-#eval A < B ∨ A = B
-#eval (LexLT.lt A B) ∨ A = B
-
-#eval LexLE.le A B
-
-end LexOrder
-
-
-
-lemma po (R : Type) [CommRing R] [IsNoetherianRing R] : ∃ lo: LinearOrder (S₀ R),  (∀ x y : (S₀ R), x ≤ y → lo.le x y) ∧ ∀ p q : LinearExtension (PrimeSpectrum R), p ≤ q ↔ lo.le ({p} : (S₀ R)) {q} := by
-
-  sorry
-
-noncomputable instance (priority:=114514) {R : Type} [CommRing R] [IsNoetherianRing R]: LinearOrder (S₀ R) := (po R).choose
 noncomputable instance (priority:=114513) {R : Type} [CommRing R] [IsNoetherianRing R]: PartialOrder (S₀ R) := instLinearOrderS₀.toPartialOrder
 noncomputable instance (priority:=114512) {R : Type} [CommRing R] [IsNoetherianRing R]: LE (S₀ R) where
   le := instLinearOrderS₀.le
 
-lemma S₀_order {R : Type} [CommRing R] [IsNoetherianRing R]: ∀ p q : LinearExtension (PrimeSpectrum R), p ≤ q ↔ ({p} : (S₀ R)) ≤ ({q} : (S₀ R)) := (po R).choose_spec.2
+lemma S₀_order {R : Type} [CommRing R] [IsNoetherianRing R]:
+(∀ A B : S₀ R, A ⊆ B → A ≤ B) ∧
+∀ a b : LinearExtension (PrimeSpectrum R), a ≤ b ↔ ({a} : (S₀ R)) ≤ ({b} : (S₀ R)) :=
+  (Lex'Order.Lex'Order_prop (LinearExtension (PrimeSpectrum R))).choose_spec
 
 abbrev S (R : Type) [CommRing R] [IsNoetherianRing R] := @DedekindMacNeilleCompletion (S₀ R) instPartialOrderS₀
 
