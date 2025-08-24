@@ -37,7 +37,9 @@ abbrev ℒ (R : Type) [CommRing R] [IsNoetherianRing R]
 
 noncomputable abbrev μ (R : Type) [CommRing R] [IsNoetherianRing R]
 (M : Type) [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]:
-{z: (ℒ R M) × (ℒ R M) // z.1 < z.2} → (S R) := fun I ↦ coe'.toFun <| @Set.toFinset (LinearExtension (PrimeSpectrum R)) ({ {asIdeal := p, isPrime := h.out.1} | (p : Ideal R) (h : p ∈ associatedPrimes R (I.val.2⧸(Submodule.submoduleOf I.val.1 I.val.2))) }) <| (Set.Finite.dependent_image (associatedPrimes.finite R (I.val.2⧸(Submodule.submoduleOf I.val.1 I.val.2))) (fun I hI ↦ ({asIdeal := I, isPrime := hI.out.1} : LinearExtension (PrimeSpectrum R)))).fintype
+{z: (ℒ R M) × (ℒ R M) // z.1 < z.2} → (S R) := fun I ↦ coe'.toFun <| @Set.toFinset (LinearExtension (PrimeSpectrum R))
+({ {asIdeal := p, isPrime := h.out.1} | (p : Ideal R) (h : p ∈ associatedPrimes R (I.val.2⧸(Submodule.submoduleOf I.val.1 I.val.2))) })
+ <| (Set.Finite.dependent_image (associatedPrimes.finite R (I.val.2⧸(Submodule.submoduleOf I.val.1 I.val.2))) (fun I hI ↦ ({asIdeal := I, isPrime := hI.out.1} : LinearExtension (PrimeSpectrum R)))).fintype
 
 lemma strip_μ {R : Type} [CommRing R] [IsNoetherianRing R]
 {M : Type} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]:
@@ -57,10 +59,84 @@ lemma μ_nonempty {R : Type} [CommRing R] [IsNoetherianRing R]
   use q, hq
 
 lemma noname {R : Type} [CommRing R] [IsNoetherianRing R]
-{M : Type} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] : ∀ I : {z: (ℒ R M) × (ℒ R M) // z.1 < z.2}, μmax (μ R M) I = (μ R M) I := sorry
+{M : Type} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] : ∀ I : {z: (ℒ R M) × (ℒ R M) // z.1 < z.2}, μmax (μ R M) I = (μ R M) I := by
+  intro I
+  unfold μmax
+  apply IsGreatest.csSup_eq
+  unfold IsGreatest
+  constructor
+  · simp only [ne_eq, Set.mem_setOf_eq]
+    use I.val.2
+    use ⟨⟨le_of_lt I.prop,le_rfl⟩,ne_of_lt I.prop⟩
+  · apply mem_upperBounds.2
+    intro x hx
+    simp only [ne_eq, Set.mem_setOf_eq] at hx
+    rcases hx with ⟨u,⟨hu1,hu2⟩⟩
+    rw [← hu2]
+    unfold μ
+    simp only [Function.Embedding.toFun_eq_coe, RelEmbedding.coe_toEmbedding,
+      OrderEmbedding.le_iff_le]
+    apply S₀_order.1
+    intro w hw
+    simp only [Set.mem_toFinset, Set.mem_setOf_eq] at hw
+    simp only [Set.mem_toFinset, Set.mem_setOf_eq]
+    rcases hw with ⟨p,⟨hp,hp'⟩⟩
+    rw [← hp']
+    use p
+    simp only [exists_prop, and_true]
+    apply AssociatePrimes.mem_iff.mpr
+    apply AssociatePrimes.mem_iff.1 at hp
+    unfold IsAssociatedPrime at *
+    refine ⟨hp.1,?_⟩
+    rcases hp.2 with ⟨m,hm⟩
+    have : ↑m.out ∈ I.val.2 := by
+      have := hu1.1.2
+      refine (Submodule.Quotient.mk_eq_zero I.val.2).mp ?_
+      aesop
+    use Submodule.Quotient.mk ⟨m.out, this⟩
+    ext y
+    constructor
+    · intro hy
+      rw [hm] at hy
+      simp only [LinearMap.mem_ker, LinearMap.toSpanSingleton_apply] at *
+      have this': y • (Submodule.Quotient.mk ⟨m.out, this⟩ : ↥I.val.2 ⧸ Submodule.submoduleOf I.val.1 I.val.2) = Submodule.Quotient.mk (y • ⟨m.out, this⟩) := by
+        exact rfl
+      rw [this']
+      simp only [SetLike.mk_smul_mk, Submodule.Quotient.mk_eq_zero]
+      unfold Submodule.submoduleOf
+      simp only [Submodule.mem_comap, Submodule.subtype_apply]
+      have : ↑(y • m.out) ∈ I.val.1 := by
+        have : y • m.out ∈ I.val.1.submoduleOf u := by
+          apply (Submodule.Quotient.mk_eq_zero _).1
+          simp only [Submodule.Quotient.mk_smul]
+          unfold Submodule.Quotient.mk
+          simp only [Quotient.out_eq, hy]
+        exact this
+      exact this
+    · intro hy
+      rw [hm]
+      simp only [LinearMap.mem_ker, LinearMap.toSpanSingleton_apply] at *
+      apply (Submodule.Quotient.mk_eq_zero _).1 at hy
+      simp only [SetLike.mk_smul_mk] at hy
+      have hy : Submodule.Quotient.mk ((y • Quotient.out m): ↥u) = (0 : ↥u ⧸ Submodule.submoduleOf I.val.1 u) := by
+        apply (Submodule.Quotient.mk_eq_zero _).2
+        exact hy
+      apply (Submodule.Quotient.mk_eq_zero _).1 at hy
+      have : (⟦Quotient.out (y • m)⟧ : ↥u ⧸ Submodule.submoduleOf I.val.1 u) = ⟦y • Quotient.out m⟧ := by
+        simp only [Quotient.out_eq]
+        nth_rw 1 [← Quotient.out_eq m]
+        exact rfl
+      rw [← Quotient.out_eq (y • m), this]
+      exact (Submodule.Quotient.mk_eq_zero _).2 hy
 
 instance prop_3_11 {R : Type} [CommRing R] [IsNoetherianRing R]
-{M : Type} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] : Convex (μ R M) := sorry
+{M : Type} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] : Convex (μ R M) := by
+  refine { convex := fun x y _ _ hxy ↦ ?_ }
+  unfold μ
+  simp only [Function.Embedding.toFun_eq_coe, RelEmbedding.coe_toEmbedding,
+    OrderEmbedding.le_iff_le]
+
+  sorry
 
 lemma prop_3_12 {R : Type} [CommRing R] [IsNoetherianRing R]
 {M : Type} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] : ∀ I : {z: (ℒ R M) × (ℒ R M) // z.1 < z.2}, μA (μ R M) I = ({((strip_μ I).choose.min' <| μ_nonempty I)} : S₀ R) := by
