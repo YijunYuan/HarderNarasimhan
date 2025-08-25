@@ -62,12 +62,6 @@ noncomputable abbrev μ (R : Type) [CommRing R] [IsNoetherianRing R]
 (M : Type) [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]:
 {z: (ℒ R M) × (ℒ R M) // z.1 < z.2} → (S R) := fun I ↦ coe'.toFun ((μ₀' R M) I).toFinset
 
-lemma strip_μ {R : Type} [CommRing R] [IsNoetherianRing R]
-{M : Type} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]:
-∀ I : {z: (ℒ R M) × (ℒ R M) // z.1 < z.2}, ∃ J : (S₀ R), ↑J = (μ R M) I := by
-  intro _
-  apply exists_apply_eq_apply
-
 lemma μ_nonempty {R : Type} [CommRing R] [IsNoetherianRing R]
 {M : Type} [Nontrivial M] [AddCommGroup M] [Module R M]  [Module.Finite R M]:
 ∀ I : {z: (ℒ R M) × (ℒ R M) // z.1 < z.2}, (μ₀' R M I).toFinset.Nonempty := by
