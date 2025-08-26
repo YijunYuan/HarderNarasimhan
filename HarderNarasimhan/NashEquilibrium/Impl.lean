@@ -401,44 +401,35 @@ List.TFAE [
   μmin μ TotIntvl = μ TotIntvl,
   μmin μ TotIntvl = μmax μ TotIntvl,
   NashEquilibrium μ,
-  Semistable μ
-  ] := by
+  --Semistable μ
+  ] ∧
+(Semistable μ → NashEquilibrium μ) ∧
+((∀ x : ℒ, (hx : x ≠ ⊥) →
+  WeakAscendingChainCondition (Resμ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx⟩ μ)) → NashEquilibrium μ → Semistable μ)
+  := by
+  constructor
   have h16 := prop4d16₁ μ hμ
   tfae_have 1 ↔ 2 := (h16.out 0 1 (by norm_num) (by norm_num))
   tfae_have 2 ↔ 3 := (h16.out 1 2 (by norm_num) (by norm_num))
   tfae_have 3 ↔ 4 := prop4d16₂ μ hμ h₁ h₂
-  tfae_have 4 → 5 := by
-    refine fun h ↦ prop4d20 μ ?_ ?_ h
-    · intro x hx
-      simp [WeakAscendingChainCondition,Resμ]
-      refine {wacc := ?_}
-      intro f smf
-      rcases h₁.wacc (fun t ↦ (f t).val) fun _ _ hxy ↦ lt_iff_le_not_le.2 (smf hxy) with ⟨N,hN⟩
-      use N
-      refine le_trans hN ?_
-      have : WeakSlopeLike₁ μ := inferInstance
-      if h' : x = ⊤ then
-        aesop
-      else
-      have := this.wsl₁ ⟨((f N).val,x),lt_of_lt_of_le (lt_iff_le_not_le.mpr <| smf <| lt_add_one N) (f (N+1)).prop.2⟩ (lt_top_iff_ne_top.2 h')
-
-      sorry
-    · intro x hx
-      simp [WeakSlopeLike₁,Resμ]
-      refine {wsl₁ := ?_}
-      intro a b
-      cases' (hμ.slopelike a.val.1 a.val.2 x ⟨lt_iff_le_not_le.2 (by aesop),lt_iff_le_not_le.2 (by aesop)⟩).1 with this this
-      · exact Or.inl this
-      · exact Or.inr <| le_of_lt this
-  tfae_have 5 → 4 := by
-    intro h
-    refine prop4d18₂ μ h (Or.inl <| ⟨h₁,?_⟩)
-    refine {wsl₁ := ?_}
-    intro a b
-    cases' (hμ.slopelike a.val.1 a.val.2 ⊤ ⟨a.prop,b⟩).1 with this this
-    · exact Or.inl this
-    · exact Or.inr <| le_of_lt this
   tfae_finish
+  constructor
+  intro h
+  refine prop4d18₂ μ h (Or.inl <| ⟨h₁,?_⟩)
+  refine {wsl₁ := ?_}
+  intro a b
+  cases' (hμ.slopelike a.val.1 a.val.2 ⊤ ⟨a.prop,b⟩).1 with this this
+  · exact Or.inl this
+  · exact Or.inr <| le_of_lt this
+  intro h₁
+  refine prop4d20 μ h₁ ?_
+  intro x hx
+  simp [WeakSlopeLike₁,Resμ]
+  refine {wsl₁ := ?_}
+  intro a b
+  cases' (hμ.slopelike a.val.1 a.val.2 x ⟨lt_iff_le_not_le.2 (by aesop),lt_iff_le_not_le.2 (by aesop)⟩).1 with this this
+  · exact Or.inl this
+  · exact Or.inr <| le_of_lt this
 
 end impl
 

@@ -69,7 +69,8 @@ instance {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFou
   refine { fin_tot_payoff := ?_ }
   simp only [Resμ]
   by_contra h
-  have := (List.TFAE.out (impl.thm4d21 μ hsl {wacc := (fun f smf ↦ False.elim (not_strictMono_of_wellFoundedGT f smf))} inferInstance) 0 4).2 hst
+  have : Semistable μ → μmax μ TotIntvl = μ TotIntvl := by sorry
+  have := this hst
   simp [μmax, TotIntvl] at this
   have this_q: μ ⟨(⊥, x), hx⟩ ≤ μ ⟨(⊥, ⊤), bot_lt_top⟩ := by
     rw [← this]

@@ -153,9 +153,15 @@ List.TFAE [
   μmax μ TotIntvl = μ TotIntvl,
   μmin μ TotIntvl = μ TotIntvl,
   μmin μ TotIntvl = μmax μ TotIntvl,
-  NashEquilibrium μ,
-  Semistable μ
+  NashEquilibrium μ--,
+  --Semistable μ
   ]
+∧ (
+  Semistable μ → NashEquilibrium μ
+) ∧ (
+  (∀ x : ℒ, (hx : x ≠ ⊥) → WeakAscendingChainCondition (Resμ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx⟩ μ)) →
+  NashEquilibrium μ → Semistable μ
+)
 ------------
 := impl.thm4d21 μ hμ h₁ h₂
 
