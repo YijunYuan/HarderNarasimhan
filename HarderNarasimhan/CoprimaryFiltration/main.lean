@@ -269,21 +269,69 @@ class Coprimary (R : Type) [CommRing R] [IsNoetherianRing R](M : Type) [AddCommG
 
 theorem Coprimary_iff  {R : Type} [CommRing R] [IsNoetherianRing R] {M : Type} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] : Coprimary R M ↔ ∃! p, p ∈ associatedPrimes R M := sorry
 
+
+set_option maxHeartbeats 0
 lemma rmk4d14₂ {R : Type} [CommRing R] [IsNoetherianRing R]
 {M : Type} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] : Semistable (μ R M) ↔ ∃! p, p ∈ associatedPrimes R M := by
   rw [rmk4d14₁]
   constructor
   · intro h
     have := prop_3_12 (⟨((⊥ : ℒ R M), ⊤), bot_lt_top⟩)
+    use ((_μ R M ⟨(⊥, ⊤), bot_lt_top⟩).toFinset.min' <| μ_nonempty ⟨(⊥, ⊤), bot_lt_top⟩).asIdeal
+    constructor
+    · simp only
+      have := (_μ R M ⟨(⊥, ⊤), bot_lt_top⟩).toFinset.min'_mem <| μ_nonempty ⟨(⊥, ⊤), bot_lt_top⟩
+      simp only [Set.mem_toFinset, Set.mem_setOf_eq] at this
+      rcases this with ⟨p,⟨hp1,hp2⟩⟩
+      rw [← hp2]
+      simp
+      convert hp1
+      refine LinearEquiv.AssociatedPrimes.eq <| LinearEquiv.symm ?_
+      have t1 := @Submodule.quotEquivOfEqBot R ↥(⊤ : Submodule R M) _ _ _ (Submodule.submoduleOf (⊥: Submodule R M) (⊤: Submodule R M)) (id
+        (of_eq_true (Eq.trans (congrArg (fun x ↦ x = ⊥) (Submodule.ker_subtype ⊤)) (eq_self ⊥)))
+        )
+      exact LinearEquiv.trans t1 Submodule.topEquiv
+    · intro J hJ
+      unfold μA at this
 
-    sorry
+      sorry
   · intro h N hN
     have := prop_3_12 (⟨(⊥, N), hN⟩)
     rw [this]
     simp only [Function.Embedding.toFun_eq_coe, RelEmbedding.coe_toEmbedding,
       EmbeddingLike.apply_eq_iff_eq, Finset.singleton_inj]
-
-    sorry
+    have := assinc hN le_top
+    have : (_μ R M ⟨(⊥, N), hN⟩).toFinset.min' (μ_nonempty ⟨(⊥, N), hN⟩) ∈ _μ R M ⟨(⊥, ⊤), bot_lt_top⟩ := by
+      refine this ?_
+      simp only [Set.mem_setOf_eq]
+      have := (_μ R M ⟨(⊥, N), hN⟩).toFinset.min'_mem (μ_nonempty ⟨(⊥, N), hN⟩)
+      simp only [Set.mem_toFinset, Set.mem_setOf_eq] at this
+      rcases this with ⟨t1,_⟩
+      use t1
+    simp only [Set.mem_setOf_eq] at this
+    rcases this with ⟨p,⟨hp1,hp2⟩⟩
+    have hp1 : p ∈ associatedPrimes R M := by
+      convert hp1
+      refine LinearEquiv.AssociatedPrimes.eq <| LinearEquiv.symm ?_
+      have t1 := @Submodule.quotEquivOfEqBot R ↥(⊤ : Submodule R M) _ _ _ (Submodule.submoduleOf (⊥: Submodule R M) (⊤: Submodule R M)) (id
+        (of_eq_true (Eq.trans (congrArg (fun x ↦ x = ⊥) (Submodule.ker_subtype ⊤)) (eq_self ⊥)))
+        )
+      exact LinearEquiv.trans t1 Submodule.topEquiv
+    have hp1' : ((_μ R M ⟨(⊥, ⊤), bot_lt_top⟩).toFinset.min' (μ_nonempty ⟨(⊥, ⊤), bot_lt_top⟩)).asIdeal ∈ associatedPrimes R M := by
+      have := (_μ R M ⟨(⊥, ⊤), bot_lt_top⟩).toFinset.min'_mem (μ_nonempty ⟨(⊥, ⊤), bot_lt_top⟩)
+      simp only [Set.mem_toFinset, Set.mem_setOf_eq] at this
+      rcases this with ⟨p,⟨hp1,hp2⟩⟩
+      rw [← hp2]
+      convert hp1
+      refine LinearEquiv.AssociatedPrimes.eq <| LinearEquiv.symm ?_
+      have t1 := @Submodule.quotEquivOfEqBot R ↥(⊤ : Submodule R M) _ _ _ (Submodule.submoduleOf (⊥: Submodule R M) (⊤: Submodule R M)) (id
+        (of_eq_true (Eq.trans (congrArg (fun x ↦ x = ⊥) (Submodule.ker_subtype ⊤)) (eq_self ⊥)))
+        )
+      exact LinearEquiv.trans t1 Submodule.topEquiv
+    rw [← hp2]
+    simp only [h.unique hp1 hp1']
+    unfold _μ
+    rfl
 
 instance {R : Type} [CommRing R] [IsNoetherianRing R]
 {M : Type} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] : μ_Admissible (μ R M) := sorry
