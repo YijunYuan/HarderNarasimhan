@@ -292,9 +292,88 @@ lemma rmk4d14₂ {R : Type} [CommRing R] [IsNoetherianRing R]
         )
       exact LinearEquiv.trans t1 Submodule.topEquiv
     · intro J hJ
-      unfold μA at this
-
-      sorry
+      by_contra hc
+      have := (_μ R M ⟨(⊥, ⊤), bot_lt_top⟩).toFinset.min'_le ⟨J,hJ.out.1⟩ (by
+        simp only [Set.mem_toFinset, Set.mem_setOf_eq]
+        use J
+        simp only [exists_prop, and_true]
+        convert hJ
+        refine LinearEquiv.AssociatedPrimes.eq <| ?_
+        have t1 := @Submodule.quotEquivOfEqBot R ↥(⊤ : Submodule R M) _ _ _ (Submodule.submoduleOf (⊥: Submodule R M) (⊤: Submodule R M)) (id
+        (of_eq_true (Eq.trans (congrArg (fun x ↦ x = ⊥) (Submodule.ker_subtype ⊤)) (eq_self ⊥)))
+        )
+        exact LinearEquiv.trans t1 Submodule.topEquiv
+        )
+      simp only at this
+      unfold associatedPrimes IsAssociatedPrime at hJ
+      simp only [Set.mem_setOf_eq] at hJ
+      rcases hJ.2 with ⟨t,ht⟩
+      let N := Submodule.span R {t}
+      have hN : ⊥ < N := by
+        by_contra hc
+        simp only [not_bot_lt_iff] at hc
+        rw [Submodule.span_singleton_eq_bot.mp hc] at ht
+        simp only [LinearMap.toSpanSingleton_zero, LinearMap.ker_zero] at ht
+        exact Ideal.IsPrime.ne_top (ht ▸ hJ).1 rfl
+      have h:= h N hN
+      rw [prop_3_12 ⟨(⊥, N), hN⟩] at h
+      simp at h
+      rw [← h] at hc
+      have : (_μ R M ⟨(⊥, N), hN⟩) = {⟨J,hJ.1⟩} := by
+        unfold _μ
+        simp only
+        ext s
+        constructor
+        · intro hs
+          simp only [Set.mem_setOf_eq] at hs
+          simp only [Set.mem_singleton_iff]
+          rcases hs with ⟨p,⟨hp1,hp2⟩⟩
+          have : p = J := by
+            unfold associatedPrimes IsAssociatedPrime at hp1
+            simp only [Set.mem_setOf_eq] at hp1
+            have hp1 := hp1.2
+            rcases hp1 with ⟨s,hs⟩
+            rw [hs, ht]
+            apply Eq.symm
+            refine Submodule.ext ?_
+            intro g
+            constructor
+            · intro hg
+              simp only [LinearMap.mem_ker, LinearMap.toSpanSingleton_apply] at *
+              sorry
+            · intro hg
+              simp only [LinearMap.mem_ker, LinearMap.toSpanSingleton_apply] at *
+              sorry
+          simp only [← hp2, this]
+        · intro hs
+          simp only [Set.mem_singleton_iff] at hs
+          simp only [Set.mem_setOf_eq]
+          use s.asIdeal
+          simp only [hs, exists_prop, and_true]
+          unfold associatedPrimes IsAssociatedPrime
+          simp only [Set.mem_setOf_eq]
+          refine ⟨IsAssociatedPrime.isPrime hJ,?_⟩
+          use Submodule.Quotient.mk ⟨t,Submodule.mem_span_singleton_self t⟩
+          rw [ht]
+          refine Submodule.ext ?_
+          intro g
+          constructor
+          · intro hg
+            simp only [LinearMap.mem_ker, LinearMap.toSpanSingleton_apply] at *
+            have : ((g • Submodule.Quotient.mk (⟨t, Submodule.mem_span_singleton_self t⟩: ↥N)):↥N ⧸ Submodule.submoduleOf ⊥ N) = Submodule.Quotient.mk (g • ⟨t, Submodule.mem_span_singleton_self t⟩ : ↥N) := by
+              exact rfl
+            rw [this]
+            simp only [SetLike.mk_smul_mk, Submodule.Quotient.mk_eq_zero]
+            exact hg
+          · intro hg
+            simp only [LinearMap.mem_ker, LinearMap.toSpanSingleton_apply] at *
+            have : ((g • Submodule.Quotient.mk (⟨t, Submodule.mem_span_singleton_self t⟩: ↥N)):↥N ⧸ Submodule.submoduleOf ⊥ N) = Submodule.Quotient.mk (g • ⟨t, Submodule.mem_span_singleton_self t⟩ : ↥N) := by
+              exact rfl
+            rw [hg] at this
+            have this' : (g • ⟨t, Submodule.mem_span_singleton_self t⟩ : ↥N) = ( ⟨g • t,  Submodule.smul_mem N g <| Submodule.mem_span_singleton_self t⟩ : ↥N) := rfl
+            simp only [this'] at this
+            exact (Submodule.Quotient.mk_eq_zero _).1 this.symm
+      simp only [this, Set.toFinset_singleton, Finset.min'_singleton, not_true_eq_false] at hc
   · intro h N hN
     have := prop_3_12 (⟨(⊥, N), hN⟩)
     rw [this]
