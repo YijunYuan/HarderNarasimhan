@@ -370,7 +370,17 @@ lemma rmk4d14₂ {R : Type} [CommRing R] [IsNoetherianRing R]
               have hs' : g • s' = 0 := by
                 unfold s'
                 simp only [Submodule.subtype_apply]
-                sorry
+                --⟦x⟧
+                have : g • (↑(Quotient.out s) : M) = ↑(g • Quotient.out s) := by rfl
+                rw [this]
+                refine ZeroMemClass.coe_eq_zero.mpr ?_
+                have := Classical.choose_spec <| Quot.exists_rep s
+                have : (⟦g • Quotient.out s⟧ : ↥N ⧸ Submodule.submoduleOf ⊥ N) = g • (Submodule.Quotient.mk (Quotient.out s)) := by
+                  exact rfl
+                unfold Submodule.Quotient.mk Quotient.mk'' at this
+                rw [Quotient.out_eq, hg] at this
+                have this' : (Submodule.Quotient.mk (g • Quotient.out s) : ↥N ⧸ Submodule.submoduleOf ⊥ N) = ⟦g • Quotient.out s⟧ := by rfl
+                exact Submodule.coe_eq_zero.mp <| (Submodule.Quotient.mk_eq_zero _).1 <| this' ▸ this
               have hst : s' ∈ Submodule.span R {t} := by
                 unfold s'
                 simp only [Submodule.subtype_apply, SetLike.coe_mem]
