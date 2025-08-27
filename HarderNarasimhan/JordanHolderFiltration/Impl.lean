@@ -135,14 +135,16 @@ lemma JHFil_fin_len {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
 
 lemma JHFil_prop₂ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [hacc: WellFoundedGT ℒ]
 {S : Type} [CompleteLinearOrder S]
-(μ : {p : ℒ × ℒ // p.1 < p.2} → S)
+(μ : {p : ℒ × ℒ // p.1 < p.2} → S) [hwdcc' : WeakDescendingChainCondition' μ]
 (hμ : μ ⟨(⊥,⊤),bot_lt_top⟩ ≠ ⊤)
 (hμsl : SlopeLike μ) (hst : Semistable μ)
 (hdc: ∀ x : ℕ → ℒ, (sax : StrictAnti x) → ∃ N : ℕ, μ ⟨(x (N +1), x N), sax <| by linarith⟩ = ⊤) :
 ∀ k : ℕ,  (hk : JHFil μ hμ hμsl hst hdc k > ⊥) → ∀ z : ℒ, (h' : JHFil μ hμ hμsl hst hdc (k + 1) < z) → (h'' : z < JHFil μ hμ hμsl hst hdc k) →
   μ ⟨(JHFil μ hμ hμsl hst hdc (k + 1), z), h'⟩ < μ ⟨(JHFil μ hμ hμsl hst hdc (k + 1), JHFil μ hμ hμsl hst hdc k), JHFil_anti_mono μ hμ hμsl hst hdc k hk⟩ := by
   intro k hk z h' h''
-  have this_new : Semistable μ → μmax μ TotIntvl = μ TotIntvl := by sorry
+  have this_new : Semistable μ → μmax μ TotIntvl = μ TotIntvl := by
+    have : WeakAscendingChainCondition μ := {wacc := (fun f smf ↦ False.elim (not_strictMono_of_wellFoundedGT f smf))}
+    exact fun a ↦ (List.TFAE.out (impl.thm4d21 μ hμsl this inferInstance).1 0 3).2 ((impl.thm4d21 μ hμsl this inferInstance).2.1 a)
   have this_new := this_new hst
   simp [μmax, TotIntvl] at this_new
   have this_q: μ ⟨(⊥, z), lt_of_le_of_lt bot_le h'⟩ ≤ μ ⟨(⊥, ⊤), bot_lt_top⟩ := by
@@ -487,7 +489,9 @@ lemma looooooooooooooooog_lemma : ∀ n : ℕ, ∀ ℒ : Type, ∀ ntl: Nontrivi
         exact ((seesaw_useful μ hsl ⊥ (JHx.filtration <| Nat.find JHx.fin_len - 1) ⊤ ⟨bot_lt_iff_ne_bot.2 <| Nat.find_min JHx.fin_len <| Nat.sub_one_lt <| JH_pos_len JHx,nt⟩).2.2.1 this).2.symm
       have hj': ∀ j: ℕ, j ≤ Nat.find JHy.fin_len → μ ⟨(⊥,JHx.filtration (Nat.find JHx.fin_len -1) ⊔ JHy.filtration j), lt_of_lt_of_le (bot_lt_iff_ne_bot.2 <| Nat.find_min JHx.fin_len <| Nat.sub_one_lt <| JH_pos_len JHx) le_sup_left⟩ = μ ⟨(⊥,⊤),bot_lt_top⟩ := by
         refine fun j hj ↦ eq_of_le_of_le ?_ ?_
-        · have : Semistable μ → μmax μ TotIntvl = μ TotIntvl := by sorry
+        · have : Semistable μ → μmax μ TotIntvl = μ TotIntvl := by
+            have : WeakAscendingChainCondition μ := {wacc := (fun f smf ↦ False.elim (not_strictMono_of_wellFoundedGT f smf))}
+            exact fun a ↦ (List.TFAE.out (impl.thm4d21 μ hsl this inferInstance).1 0 3).2 ((impl.thm4d21 μ hsl this inferInstance).2.1 a)
           have := this hst
           unfold TotIntvl at this
           rw [← this]
