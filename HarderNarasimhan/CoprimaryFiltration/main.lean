@@ -340,10 +340,55 @@ lemma rmk4d14₂ {R : Type} [CommRing R] [IsNoetherianRing R]
             constructor
             · intro hg
               simp only [LinearMap.mem_ker, LinearMap.toSpanSingleton_apply] at *
+              let s' : M:= N.subtype s.out
+              have hs' : s' ∈ N := by
+                unfold s'
+                simp only [Submodule.subtype_apply, SetLike.coe_mem]
+              rcases (@Submodule.mem_span_singleton R M _ _ _ s' t).1 hs' with ⟨r₀,hr₀⟩
+              have hfinal : g • s' = 0 := by
+                rw [← hr₀,← smul_assoc]
+                nth_rw 1 [smul_eq_mul]
+                rw [CommRing.mul_comm,← smul_eq_mul,smul_assoc,hg]
+                exact MulActionWithZero.smul_zero r₀
+              unfold s' at hfinal
+              simp only [Submodule.subtype_apply] at hfinal
+
               sorry
             · intro hg
               simp only [LinearMap.mem_ker, LinearMap.toSpanSingleton_apply] at *
-              sorry
+              let s' : M:= N.subtype s.out
+              have s'_ne0 : s' ≠ 0 := by
+                by_contra hc
+                unfold s' at hc
+                simp at hc
+                have : s = 0 := by
+                  have := hc ▸ Quotient.out_eq s
+                  exact id (Eq.symm this)
+                rw [this] at hs
+                simp only [LinearMap.toSpanSingleton_zero, LinearMap.ker_zero] at hs
+                exact (Ideal.IsPrime.ne_top hp1.1) hs
+              have hs' : g • s' = 0 := by
+                unfold s'
+                simp only [Submodule.subtype_apply]
+                sorry
+              have hst : s' ∈ Submodule.span R {t} := by
+                unfold s'
+                simp only [Submodule.subtype_apply, SetLike.coe_mem]
+              rcases (@Submodule.mem_span_singleton R M _ _ _ s' t).1 hst with ⟨r₀,hr₀⟩
+              rw [← hr₀,← smul_assoc] at hs'
+              have : (g • r₀) ∈ J := by
+                rw [ht]
+                simp only [smul_eq_mul, LinearMap.mem_ker, LinearMap.toSpanSingleton_apply]
+                rw [← smul_eq_mul,hs']
+              rw [smul_eq_mul] at this
+              cases' hJ.1.mul_mem_iff_mem_or_mem.1 this with this this
+              · rw [ht] at this
+                simp only [LinearMap.mem_ker, LinearMap.toSpanSingleton_apply] at this
+                exact this
+              · rw [ht] at this
+                simp only [LinearMap.mem_ker, LinearMap.toSpanSingleton_apply] at this
+                rw [hr₀] at this
+                exact False.elim <| s'_ne0 this
           simp only [← hp2, this]
         · intro hs
           simp only [Set.mem_singleton_iff] at hs
