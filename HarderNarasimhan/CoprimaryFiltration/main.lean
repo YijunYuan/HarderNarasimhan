@@ -352,8 +352,14 @@ lemma rmk4d14₂ {R : Type} [CommRing R] [IsNoetherianRing R]
                 exact MulActionWithZero.smul_zero r₀
               unfold s' at hfinal
               simp only [Submodule.subtype_apply] at hfinal
-
-              sorry
+              have hfinal' : (g • ↑(Quotient.out s) : M) = ↑(g • Quotient.out s) := by
+                exact rfl
+              have hfinal : g • Quotient.out s = 0 := Submodule.coe_eq_zero.mp <| hfinal' ▸ hfinal
+              have : (⟦g • Quotient.out s⟧ : ↥N ⧸ Submodule.submoduleOf ⊥ N) = g • (Submodule.Quotient.mk (Quotient.out s)) := by rfl
+              rw [hfinal] at this
+              unfold Submodule.Quotient.mk Quotient.mk'' at this
+              rw [Quotient.out_eq] at this
+              exact this ▸ rfl
             · intro hg
               simp only [LinearMap.mem_ker, LinearMap.toSpanSingleton_apply] at *
               let s' : M:= N.subtype s.out
@@ -370,11 +376,8 @@ lemma rmk4d14₂ {R : Type} [CommRing R] [IsNoetherianRing R]
               have hs' : g • s' = 0 := by
                 unfold s'
                 simp only [Submodule.subtype_apply]
-                --⟦x⟧
-                have : g • (↑(Quotient.out s) : M) = ↑(g • Quotient.out s) := by rfl
-                rw [this]
+                rw [((by rfl) : g • (↑(Quotient.out s) : M) = ↑(g • Quotient.out s))]
                 refine ZeroMemClass.coe_eq_zero.mpr ?_
-                have := Classical.choose_spec <| Quot.exists_rep s
                 have : (⟦g • Quotient.out s⟧ : ↥N ⧸ Submodule.submoduleOf ⊥ N) = g • (Submodule.Quotient.mk (Quotient.out s)) := by
                   exact rfl
                 unfold Submodule.Quotient.mk Quotient.mk'' at this
