@@ -561,8 +561,46 @@ Inhabited (CoprimaryFiltration R M) := by
     exact lift_quot_not_bot (HNFil.filtration n) (HNFil.filtration (n + 1)) (HNFil.monotone <| Nat.le_succ n) x hx
   )
   convert this
-  · sorry
-  · simp only [μA, ne_eq]
+  · have htool : HNFil.filtration n < lift_quot (HNFil.filtration n) (HNFil.filtration (n + 1)) x := by
+      sorry
+    have : μA (Resμ ⟨(HNFil.filtration n, HNFil.filtration (n + 1)), HNFil.strict_mono n (n + 1) (lt_add_one n) hn⟩ (μ R M)) ⟨(⊥, ⟨lift_quot (HNFil.filtration n) (HNFil.filtration (n + 1)) x, lift_quot_middle (HNFil.filtration n) (HNFil.filtration (n + 1)) (HNFil.monotone (Nat.le_succ n)) x⟩), bot_lt_iff_ne_bot.mpr (Subtype.coe_ne_coe.mp (id (lift_quot_not_bot (HNFil.filtration n) (HNFil.filtration (n + 1)) (HNFil.monotone (Nat.le_succ n)) x hx)))⟩ = μA (μ R M) ⟨(HNFil.filtration n,lift_quot (HNFil.filtration n) (HNFil.filtration (n + 1)) x),htool⟩ := by
+      unfold μA
+      congr
+      ext t
+      constructor
+      · intro ht
+        simp at *
+        rcases ht with ⟨a,ha1,ha2⟩
+        use a.val
+        use ⟨ha1.1,fun hc ↦ ha1.right (Subtype.coe_inj.mp hc)⟩
+        rw [← ha2]
+        unfold μmax
+        congr
+        ext z
+        constructor
+        · intro hz
+          simp at *
+          rcases hz with ⟨p,hp1,hp2⟩
+          use ⟨p,le_trans a.prop.1 hp1.1.1,sorry⟩
+          rw [← hp2]
+
+
+          sorry
+        · sorry
+      · sorry
+    rw [this]
+    repeat rw [prop_3_12]
+    simp only [ne_eq, Function.Embedding.toFun_eq_coe, RelEmbedding.coe_toEmbedding,
+      EmbeddingLike.apply_eq_iff_eq, Finset.singleton_inj]
+    have : _μ R (↥(HNFil.filtration (n + 1)) ⧸ Submodule.submoduleOf (HNFil.filtration n) (HNFil.filtration (n + 1))) ⟨(⊥, x), bot_lt_iff_ne_bot.mpr hx⟩ =  _μ R M ⟨(HNFil.filtration n, lift_quot (HNFil.filtration n) (HNFil.filtration (n + 1)) x), htool⟩ := by
+      unfold _μ
+      simp
+
+      sorry
+    simp only [this]
+  ·
+    sorry
+   /-simp only [μA, ne_eq]
     congr
     ext u
     constructor
@@ -638,7 +676,7 @@ Inhabited (CoprimaryFiltration R M) := by
           · sorry
       · sorry
     · sorry
-
+-/
 
 instance {R : Type} [CommRing R] [IsNoetherianRing R]
 {M : Type} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] :
