@@ -471,7 +471,14 @@ lemma rmk4d14₂ {R : Type} [CommRing R] [IsNoetherianRing R]
     rfl
 
 instance {R : Type} [CommRing R] [IsNoetherianRing R]
-{M : Type} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] : μ_Admissible (μ R M) := sorry
+{M : Type} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] : μ_Admissible (μ R M) where
+  μ_adm := by
+    right
+    intro I
+    unfold IsAttained
+
+
+    sorry
 
 open Classical
 
@@ -544,7 +551,9 @@ Inhabited (CoprimaryFiltration R M) := by
       simp only [Submodule.submoduleOf, Submodule.mem_comap, Submodule.subtype_apply] at this
       exact this
     exact (not_lt_of_le h') <| HNFil.strict_mono n (n+1) (lt_add_one n) hn
-  refine Coprimary_iff.2 <| rmk4d14₂.1 <| {semistable := ?_}
+  refine Coprimary_iff.2 <| rmk4d14₂.1 <| ?_
+
+  refine {semistable := ?_}
   intro x hx
   have := this.semistable ⟨lift_quot (HNFil.filtration n) (HNFil.filtration (n + 1)) x, lift_quot_middle (HNFil.filtration n) (HNFil.filtration (n + 1)) (HNFil.monotone <| Nat.le_succ n) x⟩ <| (by
     apply Subtype.coe_ne_coe.1
@@ -609,9 +618,24 @@ Inhabited (CoprimaryFiltration R M) := by
           rw [h1, h2]
           exact sup_eq_right.2 <| w.prop.1
         · rw [← hw']
-          simp [lift_quot,Resμ]
+          simp [lift_quot,Resμ,μ,_μ]
+          ext d
+          constructor
+          · intro hd
+            simp at *
+            rcases hd with ⟨p,⟨hp1,hp2⟩⟩
+            use p
+            rw [← hp2]
+            simp only [exists_prop, and_true]
+            unfold associatedPrimes at *
+            simp only [Set.mem_setOf_eq] at *
+            unfold IsAssociatedPrime at *
+            simp only [Set.mem_setOf_eq] at hp1
+            refine ⟨hp1.1,?_⟩
+            rcases hp1.2 with ⟨q,hq⟩
 
-          sorry
+            sorry
+          · sorry
       · sorry
     · sorry
 
