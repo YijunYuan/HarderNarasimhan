@@ -8,6 +8,7 @@ import Mathlib.Order.OrderIsoNat
 import HarderNarasimhan.JordanHolderFiltration.Defs
 import HarderNarasimhan.SlopeLike.Result
 import HarderNarasimhan.FirstMoverAdvantage.Results
+import HarderNarasimhan.Convexity.Results
 import Mathlib.Data.Finite.Card
 open Classical
 
@@ -430,6 +431,74 @@ lemma function_wrapper_prop6 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [Bounde
   simp [← heq] at this
   exact this
 
+lemma μA_eq_μmin {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
+{S : Type} [CompleteLinearOrder S]
+(μ : {p : ℒ × ℒ // p.1 < p.2} → S)
+[SlopeLike μ] (I : {p : ℒ × ℒ // p.1 < p.2}) :
+μmin μ I = μA μ I := by
+  convert Eq.symm <| (proposition_4_1 (Resμ I μ) {wacc := (fun f smf ↦ False.elim (not_strictMono_of_wellFoundedGT f smf))} inferInstance).1
+  · unfold μmin
+    congr
+    ext x
+    constructor
+    · intro hx
+      simp only [ne_eq, Set.mem_setOf_eq] at *
+      rcases hx with ⟨u,⟨hu1,hu2⟩⟩
+      use ⟨u,hu1.1⟩
+      use ⟨in_TotIntvl _,fun hc ↦ hu1.right (Subtype.coe_inj.mpr hc)⟩
+      exact hu2
+    · intro hx
+      simp only [ne_eq, Set.mem_setOf_eq] at *
+      rcases hx with ⟨u,⟨hu1,hu2⟩⟩
+      use u.val
+      use ⟨hu1.1,fun hc ↦ hu1.right (Subtype.coe_inj.mp hc)⟩
+      exact hu2
+  · unfold μA μAstar μA Resμ
+    simp only [ne_eq]
+    congr
+    ext x
+    constructor
+    · intro hx
+      simp only [Set.mem_setOf_eq] at *
+      rcases hx with ⟨u,⟨hu1,hu2⟩⟩
+      use ⟨u,hu1.1⟩
+      use ⟨in_TotIntvl _,fun hc ↦ hu1.right (Subtype.coe_inj.mpr hc)⟩
+      convert hu2
+      unfold μmax
+      congr
+      ext y
+      constructor
+      · intro hy
+        simp only [ne_eq, Set.mem_setOf_eq] at *
+        rcases hy with ⟨a,ha1,ha2⟩
+        use a
+        use ⟨⟨ha1.1.1,a.prop.2⟩,fun hc ↦ ha1.right (Subtype.coe_inj.mp hc)⟩
+      · intro hy
+        simp only [ne_eq, Set.mem_setOf_eq] at *
+        rcases hy with ⟨a,ha1,ha2⟩
+        use ⟨a,⟨le_trans hu1.1.1 ha1.1.1,ha1.1.2⟩⟩
+        use ⟨⟨ha1.1.1,le_top⟩,fun hc ↦ ha1.right (Subtype.coe_inj.mpr hc)⟩
+    · intro hx
+      simp only [Set.mem_setOf_eq] at *
+      rcases hx with ⟨u,⟨hu1,hu2⟩⟩
+      use u
+      use ⟨hu1.1,fun hc ↦ hu1.right (Subtype.coe_inj.mp hc)⟩
+      rw [← hu2]
+      unfold μmax
+      congr
+      ext y
+      constructor
+      · intro hy
+        simp only [ne_eq, Set.mem_setOf_eq] at *
+        rcases hy with ⟨a,ha1,ha2⟩
+        use ⟨a,⟨le_trans hu1.1.1 ha1.1.1,ha1.1.2⟩⟩
+        use ⟨⟨ha1.1.1,le_top⟩,fun hc ↦ ha1.right (Subtype.coe_inj.mpr hc)⟩
+      · intro hy
+        simp only [ne_eq, Set.mem_setOf_eq] at *
+        rcases hy with ⟨a,ha1,ha2⟩
+        use a
+        use ⟨⟨ha1.1.1,a.prop.2⟩,fun hc ↦ ha1.right (Subtype.coe_inj.mp hc)⟩
+
 --set_option maxHeartbeats 0
 lemma looooooooooooooooog_lemma : ∀ n : ℕ, ∀ ℒ : Type, ∀ ntl: Nontrivial ℒ, ∀ l : Lattice ℒ, ∀ bo : BoundedOrder ℒ, ∀ wacc : WellFoundedGT ℒ,
 ∀ S : Type, ∀ clo : CompleteLinearOrder S, ∀ μ : {p : ℒ × ℒ // p.1 < p.2} → S,
@@ -502,53 +571,25 @@ lemma looooooooooooooooog_lemma : ∀ n : ℕ, ∀ ℒ : Type, ∀ ntl: Nontrivi
             simp
             use ⊥, ⟨⟨le_rfl, le_of_lt <| lt_of_lt_of_le (bot_lt_iff_ne_bot.2 <| Nat.find_min JHx.fin_len <| Nat.sub_one_lt <| JH_pos_len JHx) le_sup_left⟩,Ne.symm <| bot_lt_iff_ne_bot.1<| lt_of_lt_of_le (bot_lt_iff_ne_bot.2 <| Nat.find_min JHx.fin_len <| Nat.sub_one_lt <| JH_pos_len JHx) le_sup_left⟩
           refine le_trans ?_ this
-          have μmin_eq_μA : μmin μ ⟨(⊥, JHx.filtration (Nat.find JHx.fin_len - 1) ⊔ JHy.filtration j), lt_of_lt_of_le (bot_lt_iff_ne_bot.mpr (Nat.find_min JHx.fin_len (Nat.sub_one_lt (JH_pos_len JHx)))) le_sup_left⟩ = μA μ ⟨(⊥, JHx.filtration (Nat.find JHx.fin_len - 1) ⊔ JHy.filtration j), lt_of_lt_of_le (bot_lt_iff_ne_bot.mpr (Nat.find_min JHx.fin_len (Nat.sub_one_lt (JH_pos_len JHx)))) le_sup_left⟩ := by
-            have := Eq.symm <| (proposition_4_1 (Resμ ⟨(⊥, JHx.filtration (Nat.find JHx.fin_len - 1) ⊔ JHy.filtration j), lt_of_lt_of_le (bot_lt_iff_ne_bot.mpr (Nat.find_min JHx.fin_len (Nat.sub_one_lt (JH_pos_len JHx)))) le_sup_left⟩ μ) {wacc := (fun f smf ↦ False.elim (not_strictMono_of_wellFoundedGT f smf))} inferInstance).1
-            convert this
-            · unfold μmin TotIntvl Resμ
-              congr
-              simp only [ne_eq]
-              ext x
-              constructor
-              · intro hx
-                simp only [Set.mem_setOf_eq] at *
-                rcases hx with ⟨u,⟨hu1,hu2⟩⟩
-                use ⟨u,⟨bot_le,hu1.1.2⟩⟩, ⟨in_TotIntvl _,fun hc ↦ hu1.right (Subtype.coe_inj.mpr hc)⟩
-                exact hu2
-              · intro hx
-                simp only [Set.mem_setOf_eq] at *
-                rcases hx with ⟨u,⟨hu1,hu2⟩⟩
-                use u.val
-                use ⟨u.prop,fun hc ↦ hu1.right (Subtype.coe_inj.mp hc)⟩
-                exact hu2
-            · unfold μAstar μA
-              congr
-              ext x
-              constructor
-              · intro hx
-                simp only [Set.mem_setOf_eq] at *
-                rcases hx with ⟨a,⟨ha1,ha2⟩⟩
-                use ⟨a,⟨bot_le,ha1.1.2⟩⟩
-                use ⟨in_TotIntvl _,fun hc ↦ ha1.right (Subtype.coe_inj.mpr hc)⟩
-                rw [← ha2]
-                unfold μmax Resμ
-                congr
-                ext y
-                constructor
-                · intro hy
-                  simp only [Set.mem_setOf_eq] at *
-                  rcases hy with ⟨u,⟨hu1,hu2⟩⟩
-                  use u.val, ⟨hu1.1,fun hc ↦ hu1.right (Subtype.coe_inj.mp hc)⟩
-                · intro hy
-                  simp only [Set.mem_setOf_eq] at *
-                  rcases hy with ⟨u,⟨hu1,hu2⟩⟩
-                  use ⟨u,⟨bot_le,hu1.1.2⟩⟩, ⟨⟨hu1.1.1,le_top⟩,fun hc ↦ hu1.right (Subtype.coe_inj.2 hc)⟩
-              · intro hx
-                simp only [Set.mem_setOf_eq] at *
-                rcases hx with ⟨a,⟨ha1,ha2⟩⟩
+          rw [μA_eq_μmin μ ⟨(⊥, JHx.filtration (Nat.find JHx.fin_len - 1) ⊔ JHy.filtration j), lt_of_lt_of_le (bot_lt_iff_ne_bot.mpr (Nat.find_min JHx.fin_len (Nat.sub_one_lt (JH_pos_len JHx)))) le_sup_left⟩]
+          if hjbot : ⊥ = JHy.filtration j  then
+            simp only [← hjbot, bot_le, sup_of_le_left]
+            rw [← μA_eq_μmin μ]
 
-                sorry
-          sorry
+
+            sorry
+          else
+          have := (proposition_2_8 μ inferInstance (JHx.filtration (Nat.find JHx.fin_len - 1)) (JHy.filtration j) ⊥ ⟨bot_lt_iff_ne_bot.mpr (Nat.find_min JHx.fin_len (Nat.sub_one_lt (JH_pos_len JHx))),bot_lt_iff_ne_bot.2 fun a ↦ hjbot (id (Eq.symm a))⟩).1
+          convert this.le
+          have t1 : μ TotIntvl = μA μ ⟨(⊥, JHx.filtration (Nat.find JHx.fin_len - 1)), bot_lt_iff_ne_bot.mpr (Nat.find_min JHx.fin_len (Nat.sub_one_lt (JH_pos_len JHx)))⟩ := by
+            rw [← μA_eq_μmin μ]
+
+            sorry
+          have t2 : μ TotIntvl = μA μ ⟨(⊥, JHy.filtration j), bot_lt_iff_ne_bot.2 fun a ↦ hjbot (id (Eq.symm a))⟩ := by
+            rw [← μA_eq_μmin μ]
+            sorry
+          rw [← t1,← t2]
+          exact Eq.symm (min_self (μ TotIntvl))
       have tj1 := hj' j (le_of_lt <| lt_of_lt_of_le hj <| Nat.find_min' ((⟨Nat.find JHy.fin_len,JH_raw_fin_len⟩) : ∃ k, JH_raw k = ⊥) JH_raw_fin_len)
       have := tj1 ▸ ((seesaw_useful μ hsl ⊥ (JHx.filtration (Nat.find JHx.fin_len -1) ⊔ JHy.filtration (j+1)) (JHx.filtration (Nat.find JHx.fin_len -1) ⊔ JHy.filtration j) ⟨lt_of_lt_of_le (bot_lt_iff_ne_bot.2 <| Nat.find_min JHx.fin_len <| Nat.sub_one_lt <| JH_pos_len JHx) le_sup_left,lt_iff_le_not_le.mpr hfj⟩).2.2.1 <| tj1 ▸ hj' (j+1) (lt_of_lt_of_le hj <| Nat.find_min' ((⟨Nat.find JHy.fin_len,JH_raw_fin_len⟩) : ∃ k, JH_raw k = ⊥) JH_raw_fin_len)).2
       rw [← this]
