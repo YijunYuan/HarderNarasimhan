@@ -56,7 +56,7 @@ lemma not_top_of_Nontrivial_TotallyOrderedRealVectorSpace {V : Type} [TotallyOrd
     · simp [v₀,h]
       exact (eq_or_lt_of_not_lt h).resolve_left hne
   by_contra!
-  exact not_top_lt <| ((le_iff_eq_or_lt.1 le_top).resolve_right this) ▸ (coe'.lt_iff_lt.2 <| lt_add_of_pos_right v hpos)
+  exact not_top_lt <| top_le_iff.1 this ▸ (coe'.lt_iff_lt.2 <| lt_add_of_pos_right v hpos)
 
 
 lemma μQuotient_helper {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
