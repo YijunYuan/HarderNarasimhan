@@ -61,8 +61,59 @@ def DedekindMacNeilleClosureOperator (α : Type) [PartialOrder α] : ClosureOper
 abbrev DedekindMacNeilleCompletion (α : Type) [PartialOrder α] := (DedekindMacNeilleClosureOperator α).Closeds
 
 
-instance {α : Type} [PartialOrder α] : CompleteLattice (DedekindMacNeilleCompletion α) := inferInstance
+instance NH.completeLattice {α : Type} [PartialOrder α] : CompleteLattice (DedekindMacNeilleCompletion α) := inferInstance
 
+instance NH.isTotal {α : Type} [LinearOrder α] : IsTotal (DedekindMacNeilleCompletion α) NH.completeLattice.le := by
+  refine { total := ?_ }
+  intro a b
+  --unfold DedekindMacNeilleCompletion DedekindMacNeilleClosureOperator at a b
+  rcases a with ⟨A, hA⟩
+  rcases b with ⟨B, hB⟩
+  simp only [Subtype.mk_le_mk, Set.le_eq_subset]
+  apply or_iff_not_imp_left.2
+  intro h1
+  rcases Set.not_subset_iff_exists_mem_not_mem.1 h1 with ⟨a₀,ha₀⟩
+  intro b hb
+  rw [← hB] at hb
+  simp only [GaloisConnection.lowerAdjoint_toFun, OrderDual.ofDual_toDual] at hb
+  by_contra hc
+  rw [← hA] at hc
+  simp only [GaloisConnection.lowerAdjoint_toFun, OrderDual.ofDual_toDual] at hc
+  unfold lowerBounds at hc
+  simp only [Set.mem_setOf_eq, not_forall, Classical.not_imp, not_le] at hc
+  rcases hc with ⟨a',ha'1,ha'2⟩
+  have hhb : b ∈ upperBounds A := upperBounds_mono (fun ⦃a⦄ a ↦ a) (le_of_lt ha'2) ha'1
+  simp [upperBounds] at hhb
+  have hhb := hhb ha₀.1
+  have := lowerBounds_mono (fun ⦃a⦄ a ↦ a) hhb hb
+
+  sorry
+
+open Classical
+
+noncomputable instance NH.linearOrder {α : Type} [LinearOrder α] : LinearOrder (DedekindMacNeilleCompletion α) := {
+  NH.completeLattice with
+  le_total := NH.isTotal.total
+  toDecidableLE := inferInstance
+  min_def a b := by
+    by_cases h : a ≤ b
+    · simp [h]
+    · simp [h]
+      simpa [h] using NH.isTotal.total a b
+  max_def a b := by
+    by_cases h : a ≤ b
+    · simp [h]
+    · simp [h]
+      simpa [h] using NH.isTotal.total a b
+  }
+
+noncomputable instance NH.biheytingAlgebra {α : Type} [LinearOrder α] : BiheytingAlgebra (DedekindMacNeilleCompletion α) := LinearOrder.toBiheytingAlgebra
+
+noncomputable instance {α : Type} [LinearOrder α] : CompleteLinearOrder (DedekindMacNeilleCompletion α) :=
+  {NH.linearOrder, NH.biheytingAlgebra, NH.completeLattice with}
+
+variable {α : Type} [LinearOrder α]
+#synth CompleteLinearOrder (DedekindMacNeilleCompletion α)
 
 def coe' {α : Type} [PartialOrder α] : α ↪o DedekindMacNeilleCompletion α := by
   have inj: ∀ x : α, (DedekindMacNeilleClosureOperator α).IsClosed (Set.Iic x) := fun x ↦ Set.ext fun y ↦ ⟨fun hy ↦ hy (by simp [upperBounds]),fun hy x_1 ha ↦ ha hy⟩

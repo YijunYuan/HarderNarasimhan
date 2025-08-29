@@ -13,6 +13,7 @@ import HarderNarasimhan.DedekindMacNeilleCompletion
 import HarderNarasimhan.Semistability.Defs
 import HarderNarasimhan.Filtration.Results
 import HarderNarasimhan.CoprimaryFiltration.Lex'Order
+import HarderNarasimhan.Filtration.Results
 
 namespace HardarNarasimhan
 
@@ -472,16 +473,11 @@ lemma rmk4d14₂ {R : Type} [CommRing R] [IsNoetherianRing R]
 
 instance {R : Type} [CommRing R] [IsNoetherianRing R]
 {M : Type} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] : μ_Admissible (μ R M) where
-  μ_adm := by
-    right
-    intro I
-    unfold IsAttained
-
-
-    sorry
+  μ_adm := Or.inl inferInstance
 
 open Classical
 
+@[ext]
 structure CoprimaryFiltration (R : Type) [CommRing R] [IsNoetherianRing R]
 (M : Type) [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] where
   filtration : ℕ → (ℒ R M)
@@ -588,6 +584,24 @@ Semistable (Resμ ⟨(HNFil.filtration n, HNFil.filtration (n + 1)), HNFil.stric
     sorry
   sorry
 
+lemma quot_ntl {R : Type} [CommRing R] [IsNoetherianRing R] {M : Type} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] {N₁ N₂ : ℒ R M} {hN : N₁ < N₂} : Nontrivial (↥N₂ ⧸ N₁.submoduleOf N₂) := by
+  apply Submodule.Quotient.nontrivial_of_lt_top
+  apply lt_top_iff_ne_top.2
+  by_contra hc
+  have h' : ∀ x ∈ N₂, x ∈ N₁ := by
+    intro x hx
+    have : ⟨x,hx⟩ ∈ Submodule.submoduleOf N₁ N₂ := hc ▸ Submodule.mem_top
+    simp only [Submodule.submoduleOf, Submodule.mem_comap, Submodule.subtype_apply] at this
+    exact this
+  exact (not_lt_of_le h') <| hN
+
+lemma quot_ntl' {R : Type} [CommRing R] [IsNoetherianRing R] {M : Type} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] {N₁ N₂ : ℒ R M} {hN : N₁ < N₂} : Nontrivial (@ℒ R _ _ (↥N₂ ⧸ Submodule.submoduleOf N₁ N₂) (@quot_ntl R _ _ M _ _ _ _ N₁ N₂ hN) _ _ _) :=
+(Submodule.nontrivial_iff R).mpr <| (@quot_ntl R _ _ M _ _ _ _ N₁ N₂ hN)
+
+lemma ss_iff' {R : Type} [CommRing R] [IsNoetherianRing R] {M : Type} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] (N₁ N₂ : ℒ R M) (hN : N₁ < N₂) : Semistable (Resμ ⟨(N₁, N₂), hN⟩ (μ R M)) ↔ @Semistable (@ℒ R _ _ (↥N₂ ⧸ N₁.submoduleOf N₂) (@quot_ntl R _ _ M _ _ _ _ N₁ N₂ hN)  _ _ _) (@quot_ntl' R _ _ M _ _ _ _ N₁ N₂ hN) _ _ (S R) _
+(@μ R _ _ (↥N₂ ⧸ Submodule.submoduleOf N₁ N₂) (@quot_ntl R _ _ M _ _ _ _ N₁ N₂ hN) _ _ _) := by
+  sorry
+
 
 noncomputable instance {R : Type} [CommRing R] [IsNoetherianRing R]
 {M : Type} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] :
@@ -607,31 +621,83 @@ Inhabited (CoprimaryFiltration R M) := by
       exact this
     exact (not_lt_of_le h') <| HNFil.strict_mono n (n+1) (lt_add_one n) hn
   refine Coprimary_iff.2 <| rmk4d14₂.1 <| ?_
-  rw [← ss_iff]
+  rw [← ss_iff']
   exact this
-  exact hn
 
 instance {R : Type} [CommRing R] [IsNoetherianRing R]
 {M : Type} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] :
 Nonempty (CoprimaryFiltration R M) := inferInstance
+
+lemma CP_HN {R : Type} [CommRing R] [IsNoetherianRing R]
+{M : Type} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] (a : CoprimaryFiltration R M) : ∃ HNFil : HardarNarasimhanFiltration (μ R M), a.filtration = HNFil.filtration := by
+  let ahn : HardarNarasimhanFiltration (μ R M) := by
+      refine { filtration := a.filtration, monotone := a.monotone, first_eq_bot := a.first_eq_bot, piecewise_semistable := ?_, fin_len := a.fin_len, strict_mono := a.strict_mono, μA_pseudo_strict_anti := ?_ }
+      · intro i hi
+        have := a.coprimary i hi
+        have ntl : Nontrivial (↥(a.filtration (i + 1)) ⧸ Submodule.submoduleOf (a.filtration i) (a.filtration (i + 1))) := by
+          apply Submodule.Quotient.nontrivial_of_lt_top
+          apply lt_top_iff_ne_top.2
+          by_contra hc
+          have h' : ∀ x ∈ a.filtration (i + 1), x ∈ a.filtration i := by
+            intro x hx
+            have : ⟨x,hx⟩ ∈ Submodule.submoduleOf (a.filtration i) (a.filtration (i + 1)) := hc ▸ Submodule.mem_top
+            simp only [Submodule.submoduleOf, Submodule.mem_comap, Submodule.subtype_apply] at this
+            exact this
+          exact (not_lt_of_le h') <| a.strict_mono i (i+1) (lt_add_one i) hi
+        rw [Coprimary_iff,← rmk4d14₂,← ss_iff'] at this
+        exact this
+      · intro i hi
+        have := a.coprimary i (Nat.lt_of_succ_lt hi)
+        repeat rw [prop_3_12]
+        simp only [Function.Embedding.toFun_eq_coe, RelEmbedding.coe_toEmbedding, Int.reduceNeg,
+          Int.rawCast.eq_1, Int.cast_eq, Nat.rawCast.eq_1, Int.cast_ofNat_Int, Int.reduceAdd,
+          Int.ofNat_eq_coe, Nat.cast_ofNat, Nat.cast_id, Int.natCast_add, eq_mp_eq_cast, id_eq,
+          OrderEmbedding.le_iff_le, not_le, gt_iff_lt]
+        apply S₀_order'.1
+        --have : _μ R M ⟨(a.filtration i, a.filtration (i + 1)), a.strict_mono i (i + 1) (lt_add_one i) (Decidable.byContradiction fun a_1 ↦ HardarNarasimhanFiltration._proof_1 a.filtration a.fin_len i hi a_1)⟩ ⊆ _μ R M ⟨(a.filtration (i + 1), a.filtration (i + 2)), a.strict_mono (i + 1) (i + 2) (Nat.lt_add_one (i + 1)) hi⟩ := sorry
+
+        simp only [Int.reduceNeg, Finset.lt_min'_iff, Set.mem_toFinset, Set.mem_setOf_eq,
+          forall_exists_index]
+        intro P Q hq hPQ
+        rw [← hPQ]
+        unfold _μ
+        simp only [Int.reduceNeg]
+
+        sorry
+  use ahn
+
+lemma CP_HN' {R : Type} [CommRing R] [IsNoetherianRing R]
+{M : Type} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] : ∀ CPFil : CoprimaryFiltration R M, CPFil.filtration = (inferInstance : Inhabited (HardarNarasimhanFiltration (μ R M))).default.filtration := by
+  intro CPFil
+  rcases (CP_HN CPFil) with ⟨HNFil, hfil⟩
+  have := (@prop_3_13₂ R _ _ M _ _ _ _)
+  have := @instUniqueHardarNarasimhanFiltration (ℒ R M) _ _ _ _ (S R) (by
+    have t2 : IsTotal (S R) instCompleteLatticeDedekindMacNeilleCompletion.le := inferInstance
+    have : CompleteLinearOrder (S R) := by
+      refine { toCompleteLattice := inferInstance, toHImp := ?_, le_himp_iff := ?_, toHasCompl := ?_, himp_bot := ?_, toSDiff := ?_, toHNot := ?_, sdiff_le_iff := ?_, top_sdiff := ?_, toOrd := ?_, le_total := t2.total, toDecidableLE := inferInstance, toDecidableEq := inferInstance, toDecidableLT := inferInstance, compare_eq_compareOfLessAndEq := ?_ }
+      sorry
+      sorry
+      sorry
+      sorry
+      sorry
+      sorry
+      sorry
+      sorry
+      sorry
+      sorry
+    exact this
+    ) (μ R M) (this) _
+  rw [hfil,this.uniq HNFil, this.uniq (@default (HardarNarasimhanFiltration (μ R M)) inferInstance)]
 
 noncomputable instance {R : Type} [CommRing R] [IsNoetherianRing R]
 {M : Type} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] :
 Unique (CoprimaryFiltration R M) where
   uniq := by
     intro a
-    let ahn : HardarNarasimhanFiltration (μ R M) := by
-      refine { filtration := a.filtration, monotone := a.monotone, first_eq_bot := a.first_eq_bot, piecewise_semistable := ?_, fin_len := a.fin_len, strict_mono := a.strict_mono, μA_pseudo_strict_anti := ?_ }
-      ·
-        sorry
-      · intro i hi
-        have := a.coprimary i (Nat.lt_of_succ_lt hi)
-
-
-
-
-        sorry
-    sorry
+    have t2 := CP_HN' (@default (CoprimaryFiltration R M) instInhabitedCoprimaryFiltration)
+    rw [← CP_HN' a] at t2
+    ext
+    rw [t2]
 
 
 end HardarNarasimhan
