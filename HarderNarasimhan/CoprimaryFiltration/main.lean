@@ -151,7 +151,7 @@ lemma noname {R : Type} [CommRing R] [IsNoetherianRing R]
     exact Set.toFinset_subset_toFinset.mpr <| assinc (lt_of_le_of_ne hu1.1.1 hu1.2) hu1.1.2
 
 
-instance prop_3_11 {R : Type} [CommRing R] [IsNoetherianRing R]
+instance prop3d11 {R : Type} [CommRing R] [IsNoetherianRing R]
 {M : Type} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] : Convex (μ R M) := by
   refine { convex := fun x y _ _ hxy ↦ ?_ }
   unfold μ
@@ -182,7 +182,7 @@ instance prop_3_11 {R : Type} [CommRing R] [IsNoetherianRing R]
     rw [this] at h
     exact (LinearEquiv.map_eq_zero_iff (LinearMap.quotientInfEquivSupQuotient x y)).mp h
 
-lemma prop_3_12 {R : Type} [CommRing R] [IsNoetherianRing R]
+lemma prop3d12 {R : Type} [CommRing R] [IsNoetherianRing R]
 {M : Type} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] : ∀ I : {z: (ℒ R M) × (ℒ R M) // z.1 < z.2}, μA (μ R M) I = ({(((_μ R M) I).toFinset.min' (μ_nonempty I))} : S₀ R) := by
   intro I
   simp only [Function.Embedding.toFun_eq_coe, RelEmbedding.coe_toEmbedding]
@@ -190,18 +190,20 @@ lemma prop_3_12 {R : Type} [CommRing R] [IsNoetherianRing R]
 
   sorry
 
-instance prop_3_13₁ {R : Type} [CommRing R] [IsNoetherianRing R]
+instance prop3d13₁ {R : Type} [CommRing R] [IsNoetherianRing R]
 {M : Type} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] : WellFoundedGT (ℒ R M) := wellFoundedGT
 
-instance prop_3_13₂ {R : Type} [CommRing R] [IsNoetherianRing R]
+instance prop3d13₂ {R : Type} [CommRing R] [IsNoetherianRing R]
 {M : Type} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] : μA_DescendingChainCondition (μ R M) where
   μ_dcc := by
     intro N x hx1 hx2
     by_contra hc
     simp at hc
-    simp only [prop_3_12, Function.Embedding.toFun_eq_coe, RelEmbedding.coe_toEmbedding,
+    simp only [prop3d12, Function.Embedding.toFun_eq_coe, RelEmbedding.coe_toEmbedding,
       OrderEmbedding.le_iff_le, not_le] at hc
-    have hc := fun w ↦ S₀_order'.mpr (hc w)
+    have hc := fun w ↦ S₀_order'.mpr (by
+      simpa only [OrderEmbedding.lt_iff_lt] using (hc w)
+      )
     have s1 : ∀ i, ((_μ R M ⟨(N, x i), hx1 i⟩).toFinset.min' <| μ_nonempty ⟨(N, x i), hx1 i⟩).asIdeal ∈ associatedPrimes R ((x i)⧸(Submodule.submoduleOf N (x i))) := by
       intro i
       have := (_μ R M ⟨(N, x i), hx1 i⟩).toFinset.min'_mem (μ_nonempty ⟨(N, x i), hx1 i⟩)
@@ -242,8 +244,8 @@ lemma rmk4d14₁ {R : Type} [CommRing R] [IsNoetherianRing R]
     intro N hN
     have hst := hst.semistable N (bot_lt_iff_ne_bot.1 hN)
     simp only [Function.Embedding.toFun_eq_coe, RelEmbedding.coe_toEmbedding]
-    rw [prop_3_12 ⟨(⊥,N),hN⟩, prop_3_12 ⟨((⊥ : ℒ R M), ⊤), bot_lt_top⟩] at hst
-    rw [prop_3_12 ⟨(⊥,N),hN⟩]
+    rw [prop3d12 ⟨(⊥,N),hN⟩, prop3d12 ⟨((⊥ : ℒ R M), ⊤), bot_lt_top⟩] at hst
+    rw [prop3d12 ⟨(⊥,N),hN⟩]
     simp only [Function.Embedding.toFun_eq_coe, RelEmbedding.coe_toEmbedding,
       EmbeddingLike.apply_eq_iff_eq, Finset.singleton_inj]
     simp only [Function.Embedding.toFun_eq_coe, RelEmbedding.coe_toEmbedding, gt_iff_lt,
@@ -254,9 +256,9 @@ lemma rmk4d14₁ {R : Type} [CommRing R] [IsNoetherianRing R]
     refine { semistable := ?_ }
     intro N hN
     have h := h N (bot_lt_iff_ne_bot.2 hN)
-    have t1 := prop_3_12 ⟨(⊥,N),bot_lt_iff_ne_bot.2 hN⟩
-    have t2 := prop_3_12 ⟨((⊥ : ℒ R M), ⊤), bot_lt_top⟩
-    rw [t1] at h
+    have t1 := prop3d12 ⟨(⊥,N),bot_lt_iff_ne_bot.2 hN⟩
+    have t2 := prop3d12 ⟨((⊥ : ℒ R M), ⊤), bot_lt_top⟩
+    rw [prop3d12 ⟨(⊥,N),bot_lt_iff_ne_bot.2 hN⟩] at h
     simp only [ne_eq, Function.Embedding.toFun_eq_coe, RelEmbedding.coe_toEmbedding,
       EmbeddingLike.apply_eq_iff_eq, Finset.singleton_inj] at h
     rw [t1,t2]
@@ -277,7 +279,7 @@ lemma rmk4d14₂ {R : Type} [CommRing R] [IsNoetherianRing R]
   rw [rmk4d14₁]
   constructor
   · intro h
-    have := prop_3_12 (⟨((⊥ : ℒ R M), ⊤), bot_lt_top⟩)
+    have := prop3d12 (⟨((⊥ : ℒ R M), ⊤), bot_lt_top⟩)
     use ((_μ R M ⟨(⊥, ⊤), bot_lt_top⟩).toFinset.min' <| μ_nonempty ⟨(⊥, ⊤), bot_lt_top⟩).asIdeal
     constructor
     · simp only
@@ -317,7 +319,7 @@ lemma rmk4d14₂ {R : Type} [CommRing R] [IsNoetherianRing R]
         simp only [LinearMap.toSpanSingleton_zero, LinearMap.ker_zero] at ht
         exact Ideal.IsPrime.ne_top (ht ▸ hJ).1 rfl
       have h:= h N hN
-      rw [prop_3_12 ⟨(⊥, N), hN⟩] at h
+      rw [prop3d12 ⟨(⊥, N), hN⟩] at h
       simp at h
       rw [← h] at hc
       have : (_μ R M ⟨(⊥, N), hN⟩) = {⟨J,hJ.1⟩} := by
@@ -434,7 +436,7 @@ lemma rmk4d14₂ {R : Type} [CommRing R] [IsNoetherianRing R]
             exact (Submodule.Quotient.mk_eq_zero _).1 this.symm
       simp only [this, Set.toFinset_singleton, Finset.min'_singleton, not_true_eq_false] at hc
   · intro h N hN
-    have := prop_3_12 (⟨(⊥, N), hN⟩)
+    have := prop3d12 (⟨(⊥, N), hN⟩)
     rw [this]
     simp only [Function.Embedding.toFun_eq_coe, RelEmbedding.coe_toEmbedding,
       EmbeddingLike.apply_eq_iff_eq, Finset.singleton_inj]
@@ -571,7 +573,7 @@ Semistable (Resμ ⟨(HNFil.filtration n, HNFil.filtration (n + 1)), HNFil.stric
         · sorry
       · sorry
     rw [this]
-    repeat rw [prop_3_12]
+    repeat rw [prop3d12]
     simp only [ne_eq, Function.Embedding.toFun_eq_coe, RelEmbedding.coe_toEmbedding,
       EmbeddingLike.apply_eq_iff_eq, Finset.singleton_inj]
     have : _μ R (↥(HNFil.filtration (n + 1)) ⧸ Submodule.submoduleOf (HNFil.filtration n) (HNFil.filtration (n + 1))) ⟨(⊥, x), bot_lt_iff_ne_bot.mpr hx⟩ =  _μ R M ⟨(HNFil.filtration n, lift_quot (HNFil.filtration n) (HNFil.filtration (n + 1)) x), htool⟩ := by
@@ -648,7 +650,7 @@ lemma CP_HN {R : Type} [CommRing R] [IsNoetherianRing R]
         exact this
       · intro i hi
         have := a.coprimary i (Nat.lt_of_succ_lt hi)
-        repeat rw [prop_3_12]
+        repeat rw [prop3d12]
         simp only [Function.Embedding.toFun_eq_coe, RelEmbedding.coe_toEmbedding, Int.reduceNeg,
           Int.rawCast.eq_1, Int.cast_eq, Nat.rawCast.eq_1, Int.cast_ofNat_Int, Int.reduceAdd,
           Int.ofNat_eq_coe, Nat.cast_ofNat, Nat.cast_id, Int.natCast_add, eq_mp_eq_cast, id_eq,
@@ -670,23 +672,7 @@ lemma CP_HN' {R : Type} [CommRing R] [IsNoetherianRing R]
 {M : Type} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] : ∀ CPFil : CoprimaryFiltration R M, CPFil.filtration = (inferInstance : Inhabited (HardarNarasimhanFiltration (μ R M))).default.filtration := by
   intro CPFil
   rcases (CP_HN CPFil) with ⟨HNFil, hfil⟩
-  have := (@prop_3_13₂ R _ _ M _ _ _ _)
-  have := @instUniqueHardarNarasimhanFiltration (ℒ R M) _ _ _ _ (S R) (by
-    have t2 : IsTotal (S R) instCompleteLatticeDedekindMacNeilleCompletion.le := inferInstance
-    have : CompleteLinearOrder (S R) := by
-      refine { toCompleteLattice := inferInstance, toHImp := ?_, le_himp_iff := ?_, toHasCompl := ?_, himp_bot := ?_, toSDiff := ?_, toHNot := ?_, sdiff_le_iff := ?_, top_sdiff := ?_, toOrd := ?_, le_total := t2.total, toDecidableLE := inferInstance, toDecidableEq := inferInstance, toDecidableLT := inferInstance, compare_eq_compareOfLessAndEq := ?_ }
-      sorry
-      sorry
-      sorry
-      sorry
-      sorry
-      sorry
-      sorry
-      sorry
-      sorry
-      sorry
-    exact this
-    ) (μ R M) (this) _
+  have := @instUniqueHardarNarasimhanFiltration (ℒ R M) _ _ _ _ (S R) inferInstance (μ R M) (@prop3d13₂ R _ _ M _ _ _ _) _
   rw [hfil,this.uniq HNFil, this.uniq (@default (HardarNarasimhanFiltration (μ R M)) inferInstance)]
 
 noncomputable instance {R : Type} [CommRing R] [IsNoetherianRing R]

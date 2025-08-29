@@ -61,12 +61,11 @@ def DedekindMacNeilleClosureOperator (α : Type) [PartialOrder α] : ClosureOper
 abbrev DedekindMacNeilleCompletion (α : Type) [PartialOrder α] := (DedekindMacNeilleClosureOperator α).Closeds
 
 
-instance NH.completeLattice {α : Type} [PartialOrder α] : CompleteLattice (DedekindMacNeilleCompletion α) := inferInstance
+instance {α : Type} [PartialOrder α] : CompleteLattice (DedekindMacNeilleCompletion α) := inferInstance
 
-instance NH.isTotal {α : Type} [LinearOrder α] : IsTotal (DedekindMacNeilleCompletion α) NH.completeLattice.le := by
+instance {α : Type} [LinearOrder α] : IsTotal (DedekindMacNeilleCompletion α) instCompleteLatticeDedekindMacNeilleCompletion.le := by
   refine { total := ?_ }
   intro a b
-  --unfold DedekindMacNeilleCompletion DedekindMacNeilleClosureOperator at a b
   rcases a with ⟨A, hA⟩
   rcases b with ⟨B, hB⟩
   simp only [Subtype.mk_le_mk, Set.le_eq_subset]
@@ -84,33 +83,33 @@ instance NH.isTotal {α : Type} [LinearOrder α] : IsTotal (DedekindMacNeilleCom
   rcases hc with ⟨a',ha'1,ha'2⟩
   have hhb : b ∈ upperBounds A := upperBounds_mono (fun ⦃a⦄ a ↦ a) (le_of_lt ha'2) ha'1
   simp [upperBounds] at hhb
-  have hhb := hhb ha₀.1
-  have := lowerBounds_mono (fun ⦃a⦄ a ↦ a) hhb hb
+  have := lowerBounds_mono (fun ⦃a⦄ a ↦ a) (hhb ha₀.1) hb
+  have hB : B = lowerBounds (upperBounds B) := by
+    nth_rw 1 [← hB]
+    simp only [GaloisConnection.lowerAdjoint_toFun, OrderDual.ofDual_toDual]
+  rw [← hB] at this
+  exact ha₀.2 this
 
-  sorry
+--open Classical
 
-open Classical
-
-noncomputable instance NH.linearOrder {α : Type} [LinearOrder α] : LinearOrder (DedekindMacNeilleCompletion α) := {
-  NH.completeLattice with
-  le_total := NH.isTotal.total
-  toDecidableLE := inferInstance
+noncomputable instance {α : Type} [LinearOrder α] : LinearOrder (DedekindMacNeilleCompletion α) := {
+  instCompleteLatticeDedekindMacNeilleCompletion with
+  le_total := instIsTotalDedekindMacNeilleCompletionLe.total
+  toDecidableLE := Classical.decRel LE.le
   min_def a b := by
     by_cases h : a ≤ b
     · simp [h]
     · simp [h]
-      simpa [h] using NH.isTotal.total a b
+      simpa [h] using instIsTotalDedekindMacNeilleCompletionLe.total a b
   max_def a b := by
     by_cases h : a ≤ b
     · simp [h]
     · simp [h]
-      simpa [h] using NH.isTotal.total a b
+      simpa [h] using instIsTotalDedekindMacNeilleCompletionLe.total a b
   }
 
-noncomputable instance NH.biheytingAlgebra {α : Type} [LinearOrder α] : BiheytingAlgebra (DedekindMacNeilleCompletion α) := LinearOrder.toBiheytingAlgebra
-
 noncomputable instance {α : Type} [LinearOrder α] : CompleteLinearOrder (DedekindMacNeilleCompletion α) :=
-  {NH.linearOrder, NH.biheytingAlgebra, NH.completeLattice with}
+  {instLinearOrderDedekindMacNeilleCompletion , LinearOrder.toBiheytingAlgebra, instCompleteLatticeDedekindMacNeilleCompletion with}
 
 variable {α : Type} [LinearOrder α]
 #synth CompleteLinearOrder (DedekindMacNeilleCompletion α)
