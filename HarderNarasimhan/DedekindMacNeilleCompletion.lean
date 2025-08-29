@@ -82,13 +82,10 @@ instance {α : Type} [LinearOrder α] : IsTotal (DedekindMacNeilleCompletion α)
   simp only [Set.mem_setOf_eq, not_forall, Classical.not_imp, not_le] at hc
   rcases hc with ⟨a',ha'1,ha'2⟩
   have hhb : b ∈ upperBounds A := upperBounds_mono (fun ⦃a⦄ a ↦ a) (le_of_lt ha'2) ha'1
-  simp [upperBounds] at hhb
-  have := lowerBounds_mono (fun ⦃a⦄ a ↦ a) (hhb ha₀.1) hb
   have hB : B = lowerBounds (upperBounds B) := by
     nth_rw 1 [← hB]
     simp only [GaloisConnection.lowerAdjoint_toFun, OrderDual.ofDual_toDual]
-  rw [← hB] at this
-  exact ha₀.2 this
+  exact ha₀.2 <| hB ▸ lowerBounds_mono (fun ⦃a⦄ a ↦ a) (hhb ha₀.1) hb
 
 --open Classical
 
@@ -111,8 +108,6 @@ noncomputable instance {α : Type} [LinearOrder α] : LinearOrder (DedekindMacNe
 noncomputable instance {α : Type} [LinearOrder α] : CompleteLinearOrder (DedekindMacNeilleCompletion α) :=
   {instLinearOrderDedekindMacNeilleCompletion , LinearOrder.toBiheytingAlgebra, instCompleteLatticeDedekindMacNeilleCompletion with}
 
-variable {α : Type} [LinearOrder α]
-#synth CompleteLinearOrder (DedekindMacNeilleCompletion α)
 
 def coe' {α : Type} [PartialOrder α] : α ↪o DedekindMacNeilleCompletion α := by
   have inj: ∀ x : α, (DedekindMacNeilleClosureOperator α).IsClosed (Set.Iic x) := fun x ↦ Set.ext fun y ↦ ⟨fun hy ↦ hy (by simp [upperBounds]),fun hy x_1 ha ↦ ha hy⟩
