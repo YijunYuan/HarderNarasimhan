@@ -2,6 +2,8 @@ import Mathlib.Order.CompleteLattice.Defs
 import Mathlib.Order.BoundedOrder.Basic
 import Mathlib.Order.Sublattice
 
+import HarderNarasimhan.Basic
+
 namespace HardarNarasimhan
 def Interval {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 (z : {p : ℒ × ℒ // p.1 < p.2}) : Type :=
@@ -58,5 +60,127 @@ instance {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [hw : We
     simp at this
     rcases this with ⟨x, hx⟩
     exact Exists.intro ⟨a, x⟩ ⟨hx, fun y hy h ↦ ha.right y.val (Set.mem_image_of_mem Subtype.val hy) (lt_iff_le_not_le.2 h)⟩
+
+lemma μ_res_intvl {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+{I : {p : ℒ × ℒ // p.1 < p.2}}
+{S : Type} [CompleteLattice S]
+{μ : {p :ℒ × ℒ // p.1 < p.2} → S}
+{J : {p :(Interval I) × (Interval I) // p.1 < p.2}} :
+------------
+(Resμ I μ) J = μ ⟨(J.val.1.val,J.val.2.val),Subtype.GCongr.coe_lt_coe <| Subtype.mk_lt_mk.2 (lt_iff_le_not_le.mpr J.prop)⟩
+------------
+:= rfl
+
+lemma μmax_res_intvl {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+{I : {p : ℒ × ℒ // p.1 < p.2}}
+{S : Type} [CompleteLattice S]
+{μ : {p :ℒ × ℒ // p.1 < p.2} → S}
+{J : {p :(Interval I) × (Interval I) // p.1 < p.2}} :
+------------
+μmax (Resμ I μ) J = μmax μ ⟨(J.val.1.val,J.val.2.val),Subtype.GCongr.coe_lt_coe <| Subtype.mk_lt_mk.2 (lt_iff_le_not_le.mpr J.prop)⟩
+------------
+:= by
+  unfold μmax
+  simp only [μ_res_intvl, ne_eq]
+  congr
+  ext x
+  constructor
+  · intro hx
+    simp only [Set.mem_setOf_eq] at *
+    rcases hx with ⟨u,hu1,hu2⟩
+    use u.val
+    use ⟨hu1.1,fun hc ↦ hu1.right (Subtype.coe_inj.1 hc)⟩
+  · intro hx
+    simp only [Set.mem_setOf_eq] at *
+    rcases hx with ⟨u,hu1,hu2⟩
+    use ⟨u,le_trans ((J.val).1.prop.1) hu1.1.1
+      ,le_trans hu1.1.2 ((J.val).2.prop.2)⟩
+    rw [← hu2]
+    simp only [exists_prop, and_true]
+    exact ⟨hu1.1,fun hc ↦ hu1.right (Subtype.coe_inj.2 hc)⟩
+
+lemma μmin_res_intvl {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+{I : {p : ℒ × ℒ // p.1 < p.2}}
+{S : Type} [CompleteLattice S]
+{μ : {p :ℒ × ℒ // p.1 < p.2} → S}
+{J : {p :(Interval I) × (Interval I) // p.1 < p.2}} :
+------------
+μmin (Resμ I μ) J = μmin μ ⟨(J.val.1.val,J.val.2.val),Subtype.GCongr.coe_lt_coe <| Subtype.mk_lt_mk.2 (lt_iff_le_not_le.mpr J.prop)⟩
+------------
+:= by
+  unfold μmin
+  simp only [μ_res_intvl, ne_eq]
+  congr
+  ext x
+  constructor
+  · intro hx
+    simp only [Set.mem_setOf_eq] at *
+    rcases hx with ⟨u,hu1,hu2⟩
+    use u.val
+    use ⟨hu1.1,fun hc ↦ hu1.right (Subtype.coe_inj.1 hc)⟩
+  · intro hx
+    simp only [Set.mem_setOf_eq] at *
+    rcases hx with ⟨u,hu1,hu2⟩
+    use ⟨u,le_trans ((J.val).1.prop.1) hu1.1.1
+      ,le_trans hu1.1.2 ((J.val).2.prop.2)⟩
+    rw [← hu2]
+    simp only [exists_prop, and_true]
+    exact ⟨hu1.1,fun hc ↦ hu1.right (Subtype.coe_inj.2 hc)⟩
+
+lemma μA_res_intvl {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+{I : {p : ℒ × ℒ // p.1 < p.2}}
+{S : Type} [CompleteLattice S]
+{μ : {p :ℒ × ℒ // p.1 < p.2} → S}
+{J : {p :(Interval I) × (Interval I) // p.1 < p.2}} :
+------------
+μA (Resμ I μ) J = μA μ ⟨(J.val.1.val,J.val.2.val),Subtype.GCongr.coe_lt_coe <| Subtype.mk_lt_mk.2 (lt_iff_le_not_le.mpr J.prop)⟩
+------------
+:= by
+  unfold μA
+  simp only [μmax_res_intvl, ne_eq]
+  congr
+  ext x
+  constructor
+  · intro hx
+    simp only [Set.mem_setOf_eq] at *
+    rcases hx with ⟨u,hu1,hu2⟩
+    use u.val
+    use ⟨hu1.1,fun hc ↦ hu1.right (Subtype.coe_inj.1 hc)⟩
+  · intro hx
+    simp only [Set.mem_setOf_eq] at *
+    rcases hx with ⟨u,hu1,hu2⟩
+    use ⟨u,le_trans ((J.val).1.prop.1) hu1.1.1
+      ,le_trans hu1.1.2 ((J.val).2.prop.2)⟩
+    rw [← hu2]
+    simp only [exists_prop, and_true]
+    exact ⟨hu1.1,fun hc ↦ hu1.right (Subtype.coe_inj.2 hc)⟩
+
+lemma μB_res_intvl {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+{I : {p : ℒ × ℒ // p.1 < p.2}}
+{S : Type} [CompleteLattice S]
+{μ : {p :ℒ × ℒ // p.1 < p.2} → S}
+{J : {p :(Interval I) × (Interval I) // p.1 < p.2}} :
+------------
+μB (Resμ I μ) J = μB μ ⟨(J.val.1.val,J.val.2.val),Subtype.GCongr.coe_lt_coe <| Subtype.mk_lt_mk.2 (lt_iff_le_not_le.mpr J.prop)⟩
+------------
+:= by
+  unfold μB
+  simp only [μmin_res_intvl, ne_eq]
+  congr
+  ext x
+  constructor
+  · intro hx
+    simp only [Set.mem_setOf_eq] at *
+    rcases hx with ⟨u,hu1,hu2⟩
+    use u.val
+    use ⟨hu1.1,fun hc ↦ hu1.right (Subtype.coe_inj.1 hc)⟩
+  · intro hx
+    simp only [Set.mem_setOf_eq] at *
+    rcases hx with ⟨u,hu1,hu2⟩
+    use ⟨u,le_trans ((J.val).1.prop.1) hu1.1.1
+      ,le_trans hu1.1.2 ((J.val).2.prop.2)⟩
+    rw [← hu2]
+    simp only [exists_prop, and_true]
+    exact ⟨hu1.1,fun hc ↦ hu1.right (Subtype.coe_inj.2 hc)⟩
 
 end HardarNarasimhan

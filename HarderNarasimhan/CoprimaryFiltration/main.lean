@@ -21,8 +21,6 @@ namespace HardarNarasimhan
 
 namespace impl
 
-
-
 lemma μ_nonempty {R : Type} [CommRing R] [IsNoetherianRing R]
 {M : Type} [Nontrivial M] [AddCommGroup M] [Module R M]  [Module.Finite R M]:
 ∀ I : {z: (ℒ R M) × (ℒ R M) // z.1 < z.2}, (_μ R M I).toFinset.Nonempty := by
@@ -493,60 +491,6 @@ lemma lift_quot_not_bot {R : Type} [CommRing R] [IsNoetherianRing R]
   apply (Submodule.Quotient.mk_eq_zero (N₁.submoduleOf N₂)).2
   exact this
 
-lemma ss_iff {R : Type} [CommRing R] [IsNoetherianRing R] {M : Type} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] (HNFil : HardarNarasimhanFiltration (μ R M)) (n : ℕ) (hn : n < Nat.find HNFil.fin_len) (
-ntl : Nontrivial (↥(HNFil.filtration (n + 1)) ⧸ Submodule.submoduleOf (HNFil.filtration n) (HNFil.filtration (n + 1)))) :
-Semistable (Resμ ⟨(HNFil.filtration n, HNFil.filtration (n + 1)), HNFil.strict_mono n (n + 1) (lt_add_one n) hn⟩ (μ R M)) ↔ Semistable (μ R (↥(HNFil.filtration (n + 1)) ⧸ Submodule.submoduleOf (HNFil.filtration n) (HNFil.filtration (n + 1))))  := by
-  constructor
-  intro this
-  refine {semistable := ?_}
-  intro x hx
-  have := this.semistable ⟨lift_quot (HNFil.filtration n) (HNFil.filtration (n + 1)) x, lift_quot_middle (HNFil.filtration n) (HNFil.filtration (n + 1)) (HNFil.monotone <| Nat.le_succ n) x⟩ <| (by
-    apply Subtype.coe_ne_coe.1
-    simp only [ne_eq]
-    exact lift_quot_not_bot (HNFil.filtration n) (HNFil.filtration (n + 1)) x hx
-  )
-  convert this
-  · have htool : HNFil.filtration n < lift_quot (HNFil.filtration n) (HNFil.filtration (n + 1)) x := by
-      sorry
-    have : μA (Resμ ⟨(HNFil.filtration n, HNFil.filtration (n + 1)), HNFil.strict_mono n (n + 1) (lt_add_one n) hn⟩ (μ R M)) ⟨(⊥, ⟨lift_quot (HNFil.filtration n) (HNFil.filtration (n + 1)) x, lift_quot_middle (HNFil.filtration n) (HNFil.filtration (n + 1)) (HNFil.monotone (Nat.le_succ n)) x⟩), bot_lt_iff_ne_bot.mpr (Subtype.coe_ne_coe.mp (id (lift_quot_not_bot (HNFil.filtration n) (HNFil.filtration (n + 1)) x hx)))⟩ = μA (μ R M) ⟨(HNFil.filtration n,lift_quot (HNFil.filtration n) (HNFil.filtration (n + 1)) x),htool⟩ := by
-      unfold μA
-      congr
-      ext t
-      constructor
-      · intro ht
-        simp at *
-        rcases ht with ⟨a,ha1,ha2⟩
-        use a.val
-        use ⟨ha1.1,fun hc ↦ ha1.right (Subtype.coe_inj.mp hc)⟩
-        rw [← ha2]
-        unfold μmax
-        congr
-        ext z
-        constructor
-        · intro hz
-          simp at *
-          rcases hz with ⟨p,hp1,hp2⟩
-          use ⟨p,le_trans a.prop.1 hp1.1.1,sorry⟩
-          rw [← hp2]
-
-
-          sorry
-        · sorry
-      · sorry
-    rw [this]
-    repeat rw [prop3d12]
-    simp only [ne_eq, Function.Embedding.toFun_eq_coe, RelEmbedding.coe_toEmbedding,
-      EmbeddingLike.apply_eq_iff_eq, Finset.singleton_inj]
-    have : _μ R (↥(HNFil.filtration (n + 1)) ⧸ Submodule.submoduleOf (HNFil.filtration n) (HNFil.filtration (n + 1))) ⟨(⊥, x), bot_lt_iff_ne_bot.mpr hx⟩ =  _μ R M ⟨(HNFil.filtration n, lift_quot (HNFil.filtration n) (HNFil.filtration (n + 1)) x), htool⟩ := by
-      unfold _μ
-      simp
-
-      sorry
-    simp only [this]
-  ·
-    sorry
-  sorry
-
 lemma quot_ntl {R : Type} [CommRing R] [IsNoetherianRing R] {M : Type} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] {N₁ N₂ : ℒ R M} (hN : N₁ < N₂) : Nontrivial (↥N₂ ⧸ N₁.submoduleOf N₂) := by
   apply Submodule.Quotient.nontrivial_of_lt_top
   apply lt_top_iff_ne_top.2
@@ -572,8 +516,50 @@ lemma ss_iff' {R : Type} [CommRing R] [IsNoetherianRing R] {M : Type} [Nontrivia
     have h := h ⟨(lift_quot N₁ N₂ W),(lift_quot_middle N₁ N₂  <| le_of_lt hN) W ⟩ (fun hc ↦ lift_quot_not_bot N₁ N₂ W hW (Subtype.coe_inj.mpr hc))
     convert h
     · rw [prop3d12]
+      simp only [ne_eq, Function.Embedding.toFun_eq_coe, RelEmbedding.coe_toEmbedding, μA_res_intvl]
+      rw [prop3d12]
+      simp only [ne_eq, Function.Embedding.toFun_eq_coe, RelEmbedding.coe_toEmbedding,
+        EmbeddingLike.apply_eq_iff_eq, Finset.singleton_inj]
+      have : _μ R (↥N₂ ⧸ Submodule.submoduleOf N₁ N₂) ⟨(⊥, W), bot_lt_iff_ne_bot.mpr hW⟩ = _μ R M ⟨(↑(⊥ : Interval ⟨(N₁, N₂), hN⟩), lift_quot N₁ N₂ W), by
+        refine lt_of_le_of_ne ?_ ?_
+        · apply (lift_quot_middle _ _ _ _).1
+          exact le_of_lt hN
+        · apply Ne.symm
+          exact lift_quot_not_bot N₁ N₂ W hW
+        ⟩ := by
+        unfold _μ
+        simp only [ne_eq]
+        ext x
+        constructor
+        · intro hx
+          simp only [ne_eq, gt_iff_lt, not_lt, Submodule.nontrivial_iff, Set.mem_setOf_eq] at *
+          rcases hx with ⟨p,⟨hp1,hp2⟩⟩
+          use p
+          rw [← hp2]
+          simp only [exists_prop, and_true]
+          unfold associatedPrimes at *
+          simp only [Set.mem_setOf_eq] at *
+          simp only [Set.mem_setOf_eq] at hp1
+          unfold IsAssociatedPrime at *
+          refine ⟨hp1.1,?_⟩
+          rcases hp1.2 with ⟨q,hq1,hq2⟩
 
-      sorry
+          sorry
+        · intro hx
+          simp only [ne_eq, gt_iff_lt, not_lt, Submodule.nontrivial_iff, Set.mem_setOf_eq] at *
+          rcases hx with ⟨p,⟨hp1,hp2⟩⟩
+          use p
+          rw [← hp2]
+          simp only [exists_prop, and_true]
+          unfold associatedPrimes at *
+          simp only [Set.mem_setOf_eq] at *
+          simp only [Set.mem_setOf_eq] at hp1
+          unfold IsAssociatedPrime at *
+          refine ⟨hp1.1,?_⟩
+          rcases hp1.2 with ⟨q,hq1,hq2⟩
+
+          sorry
+      simp only [this]
     · sorry
   · have h := h.semistable
     have : Nontrivial (↥N₂ ⧸ Submodule.submoduleOf N₁ N₂) := quot_ntl hN
@@ -635,14 +621,7 @@ lemma CP_HN {R : Type} [CommRing R] [IsNoetherianRing R]
           Int.ofNat_eq_coe, Nat.cast_ofNat, Nat.cast_id, Int.natCast_add, eq_mp_eq_cast, id_eq,
           OrderEmbedding.le_iff_le, not_le, gt_iff_lt]
         apply S₀_order'.1
-        --have : _μ R M ⟨(a.filtration i, a.filtration (i + 1)), a.strict_mono i (i + 1) (lt_add_one i) (Decidable.byContradiction fun a_1 ↦ HardarNarasimhanFiltration._proof_1 a.filtration a.fin_len i hi a_1)⟩ ⊆ _μ R M ⟨(a.filtration (i + 1), a.filtration (i + 2)), a.strict_mono (i + 1) (i + 2) (Nat.lt_add_one (i + 1)) hi⟩ := sorry
 
-        simp only [Int.reduceNeg, Finset.lt_min'_iff, Set.mem_toFinset, Set.mem_setOf_eq,
-          forall_exists_index]
-        intro P Q hq hPQ
-        rw [← hPQ]
-        unfold _μ
-        simp only [Int.reduceNeg]
 
         sorry
   use ahn
@@ -667,14 +646,3 @@ Unique (CoprimaryFiltration R M) where
 end impl
 
 end HardarNarasimhan
-
-/-
-陈老师，coprimary filtration （下简称CP）这个地方，我们实际用了这个filtration 和之前定义的h-n filtration （下简称HN） coincide。但是其实之间两者的转化好像并没有这么显然。
-1。我们首先要说明CP的存在性（虽然这不是新结果）。对这个game我们已经证明了HN的存在性，它满足【对任意i < n，ℒ限制在[Mᵢ,Mᵢ₊₁]上semistable】。而在CP这边，我们需要的实际是【对任意i < n，Mᵢ₊₁/Mᵢ的所有子模构成的lattice作为H-N game semistable】（由Remark 3.14得到）。
-2。在证明CP的唯一性时，我们实际用的是如下逻辑：给定两个CP：CP₁, CP₂，它们分别给出了两个HN：HN₁，HN₂。由HN的唯一性知CP₁=HN₁=HN₂=CP₂。在此过程中我们需要通过CP₁（resp. CP₂）的【Mᵢ₊₁/Mᵢ coprimary】推出【HN₁（resp.HN₂）限制在[Mᵢ,Mᵢ₊₁]上semistable】。
-
-总之，我们需要：
-对满足条件的模M，令ℒ(M)为本文中的H-N game。对M的任意（或在需要时加一定条件）子模N₁ < N₂，ℒ(M)限制在[N₁,N₂]上semistable ↔ ℒ(N₂/N₁)semistable。
-
-而这似乎并不能在一两百行中完成形式化...？
--/
