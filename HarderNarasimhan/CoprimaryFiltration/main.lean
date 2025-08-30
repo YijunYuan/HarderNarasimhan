@@ -500,6 +500,13 @@ lemma quot_ntl {R : Type} [CommRing R] [IsNoetherianRing R] {M : Type} [Nontrivi
 lemma quot_ntl' {R : Type} [CommRing R] [IsNoetherianRing R] {M : Type} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] {N₁ N₂ : ℒ R M} (hN : N₁ < N₂) : Nontrivial (@ℒ R _ _ (↥N₂ ⧸ Submodule.submoduleOf N₁ N₂) (@quot_ntl R _ _ M _ _ _ _ N₁ N₂ hN) _ _ _) :=
 (Submodule.nontrivial_iff R).mpr <| (@quot_ntl R _ _ M _ _ _ _ N₁ N₂ hN)
 
+
+lemma quot_hom {R : Type} [CommRing R] [IsNoetherianRing R] {M : Type} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] {N₁ N₂ : Submodule R M} {r : R} {x : N₂}:
+r • (@Submodule.Quotient.mk R ↥N₂ _ _ _ (N₁.submoduleOf N₂) x) = (@Submodule.Quotient.mk R ↥N₂ _ _ _ (N₁.submoduleOf N₂) (r • x)) := by
+  exact rfl
+
+set_option synthInstance.maxHeartbeats 0
+
 lemma ss_iff' {R : Type} [CommRing R] [IsNoetherianRing R] {M : Type} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] (N₁ N₂ : ℒ R M) (hN : N₁ < N₂) : Semistable (Resμ ⟨(N₁, N₂), hN⟩ (μ R M)) ↔ @Semistable (@ℒ R _ _ (↥N₂ ⧸ N₁.submoduleOf N₂) (@quot_ntl R _ _ M _ _ _ _ N₁ N₂ hN)  _ _ _) (@quot_ntl' R _ _ M _ _ _ _ N₁ N₂ hN) _ _ (S R) _
 (@μ R _ _ (↥N₂ ⧸ Submodule.submoduleOf N₁ N₂) (@quot_ntl R _ _ M _ _ _ _ N₁ N₂ hN) _ _ _) := by
   refine ⟨fun h ↦ ?_,fun h ↦ ?_⟩
@@ -538,8 +545,79 @@ lemma ss_iff' {R : Type} [CommRing R] [IsNoetherianRing R] {M : Type} [Nontrivia
           unfold IsAssociatedPrime at *
           refine ⟨hp1.1,?_⟩
           rcases hp1.2 with ⟨q,hq1,hq2⟩
-
-          sorry
+          have wp : N₂.subtype (W.subtype q.out).out ∈ lift_quot N₁ N₂ W := by
+            unfold lift_quot
+            simp only [Submodule.subtype_apply, Submodule.mem_map, Submodule.mem_comap,
+              Submodule.mkQ_apply, SetLike.coe_eq_coe, exists_eq_right]
+            unfold Submodule.Quotient.mk Quotient.mk''
+            rw [Quotient.out_eq]
+            apply SetLike.coe_mem
+          use ((N₁).submoduleOf (lift_quot N₁ N₂ W)).mkQ ⟨N₂.subtype (W.subtype q.out).out,wp⟩
+          simp only [Submodule.subtype_apply, Submodule.mkQ_apply]
+          ext z
+          constructor
+          · intro hz
+            simp only [LinearMap.mem_ker, LinearMap.toSpanSingleton_apply] at *
+            rw [quot_hom]
+            apply (Submodule.Quotient.mk_eq_zero _).2
+            simp only [SetLike.mk_smul_mk]
+            have : z • (↑(Quotient.out (↑(Quotient.out q) : ↥N₂ ⧸ Submodule.submoduleOf N₁ N₂)) : M) ∈ N₁ := by
+              have : z • Quotient.out (Quotient.out q).val ∈ N₁.submoduleOf N₂ := by
+                have : z • Quotient.out (Quotient.out q).val - Quotient.out (z • Quotient.out q).val ∈ Submodule.submoduleOf N₁ N₂ := by
+                  apply (Submodule.Quotient.mk_eq_zero _).1
+                  simp only [SetLike.val_smul, Submodule.Quotient.mk_sub,
+                    Submodule.Quotient.mk_smul]
+                  unfold Submodule.Quotient.mk Quotient.mk''
+                  simp [Quotient.out_eq]
+                have this' : Quotient.out (z • Quotient.out q).val ∈ Submodule.submoduleOf N₁ N₂ := by
+                  have : z • q.out = 0 := by
+                    rw [← Quotient.out_eq (z • q)] at hz
+                    apply (Submodule.Quotient.mk_eq_zero _).1 at hz
+                    have : Submodule.submoduleOf ⊥ W = ⊥ := by
+                      unfold Submodule.submoduleOf
+                      simp only [Submodule.comap_bot, Submodule.ker_subtype]
+                    simp [this] at hz
+                    rw [← hz]
+                    have : z • q.out - (z • q).out ∈ (⊥: Submodule R ↥W) := by
+                      rw [← this]
+                      apply (Submodule.Quotient.mk_eq_zero _).1
+                      simp only [Submodule.Quotient.mk_sub, Submodule.Quotient.mk_smul]
+                      unfold Submodule.Quotient.mk Quotient.mk''
+                      simp only [Quotient.out_eq, sub_self]
+                    simp only [Submodule.mem_bot] at this
+                    exact sub_eq_zero.1 this
+                  rw [this]
+                  simp only [ZeroMemClass.coe_zero]
+                  apply (Submodule.Quotient.mk_eq_zero _).1
+                  unfold Submodule.Quotient.mk Quotient.mk''
+                  apply Quotient.out_eq
+                exact (Submodule.sub_mem_iff_left (Submodule.submoduleOf N₁ N₂) this').mp this
+              exact this
+            exact this
+          · intro hz
+            simp only [LinearMap.mem_ker, LinearMap.toSpanSingleton_apply] at *
+            rw [quot_hom] at hz
+            apply (Submodule.Quotient.mk_eq_zero _).1 at hz
+            have hz : z • (Quotient.out (Quotient.out q).val) ∈ Submodule.submoduleOf N₁ N₂ := hz
+            have : z • Quotient.out (Quotient.out q).val - Quotient.out (z • (Quotient.out q).val) ∈ Submodule.submoduleOf N₁ N₂ := by
+              apply (Submodule.Quotient.mk_eq_zero _).1
+              simp only [Submodule.Quotient.mk_sub, Submodule.Quotient.mk_smul]
+              unfold Submodule.Quotient.mk Quotient.mk''
+              simp only [Quotient.out_eq]
+              apply sub_self
+            have hz : Quotient.out (z • (Quotient.out q).val) ∈ Submodule.submoduleOf N₁ N₂ := by
+              exact (Submodule.sub_mem_iff_right (Submodule.submoduleOf N₁ N₂) hz).mp this
+            have hz : z • (Quotient.out q).val = 0 := by
+              apply (Submodule.Quotient.mk_eq_zero _).2 at hz
+              unfold Submodule.Quotient.mk Quotient.mk'' at hz
+              simp only [Quotient.out_eq] at hz
+              exact hz
+            have hz : z • q.out = 0 := Submodule.coe_eq_zero.mp hz
+            apply_fun (Submodule.submoduleOf ⊥ W).mkQ at hz
+            simp only [map_smul, Submodule.mkQ_apply, Submodule.Quotient.mk_zero] at hz
+            unfold Submodule.Quotient.mk Quotient.mk'' at hz
+            simp only [Quotient.out_eq] at hz
+            exact hz
         · intro hx
           simp only [ne_eq, gt_iff_lt, not_lt, Submodule.nontrivial_iff, Set.mem_setOf_eq] at *
           rcases hx with ⟨p,⟨hp1,hp2⟩⟩
