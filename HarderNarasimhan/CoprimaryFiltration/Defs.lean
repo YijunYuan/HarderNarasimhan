@@ -97,7 +97,7 @@ noncomputable abbrev μ (R : Type) [CommRing R] [IsNoetherianRing R]
 := fun I ↦ coe'.toFun ((_μ R M) I).toFinset
 
 class Coprimary (R : Type) [CommRing R] [IsNoetherianRing R](M : Type) [AddCommGroup M] [Module R M] : Prop where
-  coprimary : ∀ x : R, (∃ m : M, m ≠ 0 ∧ x • m = 0) → ∃ n : Nat, n > 0 ∧ x^n ∈ Module.annihilator R M
+  coprimary : ∃! p, p ∈ associatedPrimes R M
 
 open Classical
 
@@ -108,7 +108,25 @@ structure CoprimaryFiltration (R : Type) [CommRing R] [IsNoetherianRing R]
   monotone            : Monotone filtration
   first_eq_bot        : filtration 0 = ⊥
   fin_len             : ∃ n : ℕ, filtration n = ⊤
-  strict_mono         : ∀ i j : ℕ, i < j → j ≤ Nat.find (fin_len) → filtration i < filtration j
-  piecewise_coprimary : ∀ n : ℕ, n < Nat.find (fin_len) → Coprimary R (filtration (n+1)⧸ (Submodule.submoduleOf (filtration n) (filtration (n+1))))
+  strict_mono         :
+    ∀ i j : ℕ,
+      i < j → j ≤ Nat.find (fin_len) →
+        filtration i < filtration j
+  piecewise_coprimary :
+    ∀ n : ℕ, n < Nat.find (fin_len) →
+      Coprimary R (filtration (n+1)⧸ (Submodule.submoduleOf (filtration n) (filtration (n+1))))
+  strict_mono_associated_prime :
+    ∀ n : ℕ, (hn : n + 1 < Nat.find (fin_len)) →
+        @LT.lt (LinearExtension (PrimeSpectrum R)) Preorder.toLT
+        ({
+          asIdeal := (piecewise_coprimary (n+1) hn).coprimary.exists.choose,
+          isPrime := (piecewise_coprimary (n+1) hn).coprimary.exists.choose_spec.out.1
+          } : LinearExtension (PrimeSpectrum R))
+        --<
+        ({
+          asIdeal := (piecewise_coprimary n (Nat.lt_of_succ_lt hn)).coprimary.exists.choose,
+          isPrime := (piecewise_coprimary n (Nat.lt_of_succ_lt hn)).coprimary.exists.choose_spec.out.1
+          } : LinearExtension (PrimeSpectrum R))
+
 
 end HardarNarasimhan

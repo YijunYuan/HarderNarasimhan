@@ -235,11 +235,6 @@ lemma rmk4d14₁ {R : Type} [CommRing R] [IsNoetherianRing R]
     apply (S₀_order.2 _ _).1
     rw [h]
 
-
-
-theorem Coprimary_iff  {R : Type} [CommRing R] [IsNoetherianRing R] {M : Type} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] : Coprimary R M ↔ ∃! p, p ∈ associatedPrimes R M := sorry
-
-
 set_option maxHeartbeats 0
 lemma rmk4d14₂ {R : Type} [CommRing R] [IsNoetherianRing R]
 {M : Type} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] : Semistable (μ R M) ↔ ∃! p, p ∈ associatedPrimes R M := by
@@ -570,11 +565,9 @@ lemma ss_iff' {R : Type} [CommRing R] [IsNoetherianRing R] {M : Type} [Nontrivia
     sorry
 
 
-noncomputable instance {R : Type} [CommRing R] [IsNoetherianRing R]
-{M : Type} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] :
-Inhabited (CoprimaryFiltration R M) := by
-  have HNFil := (inferInstance : Inhabited (HardarNarasimhanFiltration (μ R M))).default
-  refine { default := { filtration := HNFil.filtration, monotone := HNFil.monotone, first_eq_bot := HNFil.first_eq_bot, fin_len := HNFil.fin_len, strict_mono := HNFil.strict_mono, piecewise_coprimary := ?_ } }
+lemma piecewise_coprimary {R : Type} [CommRing R] [IsNoetherianRing R]
+{M : Type} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] (HNFil : HardarNarasimhanFiltration (μ R M)):
+∀ n < Nat.find HNFil.fin_len, Coprimary R (↥(HNFil.filtration (n + 1)) ⧸ Submodule.submoduleOf (HNFil.filtration n) (HNFil.filtration (n + 1))) := by
   intro n hn
   have := HNFil.piecewise_semistable n hn
   have ntl : Nontrivial (↥(HNFil.filtration (n + 1)) ⧸ Submodule.submoduleOf (HNFil.filtration n) (HNFil.filtration (n + 1))) := by
@@ -587,9 +580,49 @@ Inhabited (CoprimaryFiltration R M) := by
       simp only [Submodule.submoduleOf, Submodule.mem_comap, Submodule.subtype_apply] at this
       exact this
     exact (not_lt_of_le h') <| HNFil.strict_mono n (n+1) (lt_add_one n) hn
-  refine Coprimary_iff.2 <| rmk4d14₂.1 <| ?_
-  rw [← ss_iff']
-  exact this
+  have ttt : Semistable (μ R (↥(HNFil.filtration (n + 1)) ⧸ Submodule.submoduleOf (HNFil.filtration n) (HNFil.filtration (n + 1)))) := by
+    rw [← ss_iff']
+    exact this
+  apply rmk4d14₂.1 at ttt
+  exact {coprimary := ttt}
+
+
+noncomputable instance {R : Type} [CommRing R] [IsNoetherianRing R]
+{M : Type} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] :
+Inhabited (CoprimaryFiltration R M) := by
+  have HNFil := (inferInstance : Inhabited (HardarNarasimhanFiltration (μ R M))).default
+  refine { default := { filtration := HNFil.filtration, monotone := HNFil.monotone, first_eq_bot := HNFil.first_eq_bot, fin_len := HNFil.fin_len, strict_mono := HNFil.strict_mono, piecewise_coprimary := fun n hn ↦ piecewise_coprimary HNFil n hn, strict_mono_associated_prime := ?_ } }
+  intro n hn
+  have := HNFil.μA_pseudo_strict_anti n hn
+  apply lt_of_not_le at this
+  repeat rw [prop3d12] at this
+  simp only [Int.reduceNeg, Int.rawCast.eq_1, Int.cast_eq, Nat.rawCast.eq_1, Int.cast_ofNat_Int,
+    Int.reduceAdd, Int.ofNat_eq_coe, Nat.cast_ofNat, Nat.cast_id, Int.natCast_add, eq_mp_eq_cast,
+    id_eq, Function.Embedding.toFun_eq_coe, RelEmbedding.coe_toEmbedding,
+    OrderEmbedding.lt_iff_lt] at this
+  apply S₀_order'.2 at this
+  have pcn := (piecewise_coprimary HNFil n <| Nat.lt_of_succ_lt hn).coprimary
+  have pcnp1 := (piecewise_coprimary HNFil (n+1) hn).coprimary
+  have t' : (_μ R M ⟨(HNFil.filtration (n + 1), HNFil.filtration (n + 2)), HNFil.strict_mono (n+1) (n+2) (Nat.lt_add_one (n + 1)) hn⟩).toFinset.min' (μ_nonempty
+      ⟨(HNFil.filtration (n + 1), HNFil.filtration (n + 2)),
+        HNFil.strict_mono (n + 1) (n + 2) (Nat.lt_add_one (n + 1)) hn⟩) = {asIdeal := pcnp1.exists.choose, isPrime := pcnp1.exists.choose_spec.out.1} := by
+    have := ((_μ R M ⟨(HNFil.filtration (n + 1), HNFil.filtration (n + 2)), HNFil.strict_mono (n+1) (n+2) (Nat.lt_add_one (n + 1)) hn⟩).toFinset.min'_mem (μ_nonempty
+      ⟨(HNFil.filtration (n + 1), HNFil.filtration (n + 2)),
+        HNFil.strict_mono (n + 1) (n + 2) (Nat.lt_add_one (n + 1)) hn⟩)).out
+    apply Set.mem_toFinset.mp at this
+    rcases this.out with ⟨p,hp1,hp2⟩
+    rw [← hp2]
+    simp only [pcnp1.unique pcnp1.exists.choose_spec hp1]
+  have t'' : (_μ R M ⟨(HNFil.filtration n, HNFil.filtration (n + 1)), HNFil.strict_mono n (n+1) (Nat.lt_add_one n) (Nat.le_of_succ_le hn)⟩).toFinset.min' (μ_nonempty ⟨(HNFil.filtration n, HNFil.filtration (n + 1)),
+        HNFil.strict_mono n (n + 1) (Nat.lt_add_one n) (Nat.le_of_succ_le hn)⟩) = {asIdeal := pcn.exists.choose, isPrime := pcn.exists.choose_spec.out.1} := by
+    have := ((_μ R M ⟨(HNFil.filtration n, HNFil.filtration (n + 1)), HNFil.strict_mono n (n+1) (Nat.lt_add_one n) <| le_of_lt hn⟩).toFinset.min'_mem (μ_nonempty
+      ⟨(HNFil.filtration n, HNFil.filtration (n + 1)),
+        HNFil.strict_mono n (n + 1) (Nat.lt_add_one n) <| le_of_lt hn⟩)).out
+    apply Set.mem_toFinset.mp at this
+    rcases this.out with ⟨p,hp1,hp2⟩
+    rw [← hp2]
+    simp only [pcn.unique pcn.exists.choose_spec hp1]
+  exact t' ▸ t'' ▸ this
 
 instance {R : Type} [CommRing R] [IsNoetherianRing R]
 {M : Type} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] :
@@ -611,7 +644,8 @@ lemma CP_HN {R : Type} [CommRing R] [IsNoetherianRing R]
             simp only [Submodule.submoduleOf, Submodule.mem_comap, Submodule.subtype_apply] at this
             exact this
           exact (not_lt_of_le h') <| a.strict_mono i (i+1) (lt_add_one i) hi
-        rw [Coprimary_iff,← rmk4d14₂,← ss_iff'] at this
+        have this := this.coprimary
+        rw [← rmk4d14₂,← ss_iff'] at this
         exact this
       · intro i hi
         have := a.piecewise_coprimary i (Nat.lt_of_succ_lt hi)
@@ -621,9 +655,18 @@ lemma CP_HN {R : Type} [CommRing R] [IsNoetherianRing R]
           Int.ofNat_eq_coe, Nat.cast_ofNat, Nat.cast_id, Int.natCast_add, eq_mp_eq_cast, id_eq,
           OrderEmbedding.le_iff_le, not_le, gt_iff_lt]
         apply S₀_order'.1
-
-
-        sorry
+        have := a.strict_mono_associated_prime i hi
+        convert this
+        · have := (_μ R M ⟨(a.filtration (i + 1), a.filtration (i + 2)), a.strict_mono (i+1) (i+2) (Nat.lt_add_one (i + 1)) hi⟩).toFinset.min'_mem (μ_nonempty ⟨(a.filtration (i + 1), a.filtration (i + 2)), a.strict_mono (i+1) (i+2) (Nat.lt_add_one (i + 1)) hi⟩)
+          apply Set.mem_toFinset.mp at this
+          rcases this.out with ⟨p,hp1,hp2⟩
+          rw [← hp2]
+          simp only [(a.piecewise_coprimary (i+1) hi).coprimary.unique ((a.piecewise_coprimary (i+1) hi).coprimary.exists.choose_spec) hp1]
+        · have := (_μ R M ⟨(a.filtration i, a.filtration (i + 1)), a.strict_mono i (i+1) (Nat.lt_add_one i) (Nat.le_of_succ_le hi)⟩).toFinset.min'_mem (μ_nonempty ⟨(a.filtration i, a.filtration (i + 1)), a.strict_mono i (i+1) (Nat.lt_add_one i) (Nat.le_of_succ_le hi)⟩)
+          apply Set.mem_toFinset.mp at this
+          rcases this.out with ⟨p,hp1,hp2⟩
+          rw [← hp2]
+          simp only [(a.piecewise_coprimary i (Nat.lt_of_succ_lt hi)).coprimary.unique ((a.piecewise_coprimary i (Nat.lt_of_succ_lt hi)).coprimary.exists.choose_spec) hp1]
   use ahn
 
 lemma CP_HN' {R : Type} [CommRing R] [IsNoetherianRing R]
