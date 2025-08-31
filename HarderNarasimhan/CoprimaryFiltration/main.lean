@@ -252,7 +252,7 @@ lemma rmk4d14₂ {R : Type} [CommRing R] [IsNoetherianRing R]
       simp
       convert hp1
       refine LinearEquiv.AssociatedPrimes.eq <| LinearEquiv.symm ?_
-      have t1 := @Submodule.quotEquivOfEqBot R ↥(⊤ : Submodule R M) _ _ _ (Submodule.submoduleOf (⊥: Submodule R M) (⊤: Submodule R M)) (id
+      have t1 := Submodule.quotEquivOfEqBot (Submodule.submoduleOf (⊥: Submodule R M) (⊤: Submodule R M)) (id
         (of_eq_true (Eq.trans (congrArg (fun x ↦ x = ⊥) (Submodule.ker_subtype ⊤)) (eq_self ⊥)))
         )
       exact LinearEquiv.trans t1 Submodule.topEquiv
@@ -264,7 +264,7 @@ lemma rmk4d14₂ {R : Type} [CommRing R] [IsNoetherianRing R]
         simp only [exists_prop, and_true]
         convert hJ
         refine LinearEquiv.AssociatedPrimes.eq <| ?_
-        have t1 := @Submodule.quotEquivOfEqBot R ↥(⊤ : Submodule R M) _ _ _ (Submodule.submoduleOf (⊥: Submodule R M) (⊤: Submodule R M)) (id
+        have t1 := Submodule.quotEquivOfEqBot (Submodule.submoduleOf (⊥: Submodule R M) (⊤: Submodule R M)) (id
         (of_eq_true (Eq.trans (congrArg (fun x ↦ x = ⊥) (Submodule.ker_subtype ⊤)) (eq_self ⊥)))
         )
         exact LinearEquiv.trans t1 Submodule.topEquiv
@@ -501,9 +501,15 @@ lemma quot_ntl' {R : Type} [CommRing R] [IsNoetherianRing R] {M : Type} [Nontriv
 (Submodule.nontrivial_iff R).mpr <| (@quot_ntl R _ _ M _ _ _ _ N₁ N₂ hN)
 
 
-lemma quot_hom {R : Type} [CommRing R] [IsNoetherianRing R] {M : Type} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] {N₁ N₂ : Submodule R M} {r : R} {x : N₂}:
-r • (@Submodule.Quotient.mk R ↥N₂ _ _ _ (N₁.submoduleOf N₂) x) = (@Submodule.Quotient.mk R ↥N₂ _ _ _ (N₁.submoduleOf N₂) (r • x)) := by
-  exact rfl
+
+lemma test {R : Type} [CommRing R] {M : Type} [AddCommGroup M] [Module R M]
+(N : Submodule R M) (N' : Submodule R ↥N)
+(x : M) (hx1 : x ∈ N) (hx2 : x ∈ Submodule.map N.subtype N')
+: ⟨x,hx1⟩ ∈ N' := by
+  simp only [Submodule.mem_map, Submodule.subtype_apply, Subtype.exists, exists_and_right,
+    exists_eq_right] at hx2
+  rcases hx2 with ⟨a,b⟩
+  exact b
 
 set_option synthInstance.maxHeartbeats 0
 
@@ -558,7 +564,7 @@ lemma ss_iff' {R : Type} [CommRing R] [IsNoetherianRing R] {M : Type} [Nontrivia
           constructor
           · intro hz
             simp only [LinearMap.mem_ker, LinearMap.toSpanSingleton_apply] at *
-            rw [quot_hom]
+            rw [← Submodule.Quotient.mk_smul]
             apply (Submodule.Quotient.mk_eq_zero _).2
             simp only [SetLike.mk_smul_mk]
             have : z • (↑(Quotient.out (↑(Quotient.out q) : ↥N₂ ⧸ Submodule.submoduleOf N₁ N₂)) : M) ∈ N₁ := by
@@ -596,7 +602,7 @@ lemma ss_iff' {R : Type} [CommRing R] [IsNoetherianRing R] {M : Type} [Nontrivia
             exact this
           · intro hz
             simp only [LinearMap.mem_ker, LinearMap.toSpanSingleton_apply] at *
-            rw [quot_hom] at hz
+            rw [← Submodule.Quotient.mk_smul] at hz
             apply (Submodule.Quotient.mk_eq_zero _).1 at hz
             have hz : z • (Quotient.out (Quotient.out q).val) ∈ Submodule.submoduleOf N₁ N₂ := hz
             have : z • Quotient.out (Quotient.out q).val - Quotient.out (z • (Quotient.out q).val) ∈ Submodule.submoduleOf N₁ N₂ := by
@@ -630,15 +636,137 @@ lemma ss_iff' {R : Type} [CommRing R] [IsNoetherianRing R] {M : Type} [Nontrivia
           unfold IsAssociatedPrime at *
           refine ⟨hp1.1,?_⟩
           rcases hp1.2 with ⟨q,hq1,hq2⟩
-
-          sorry
+          have : q.out.val ∈ N₂ := by
+            have : lift_quot N₁ N₂ W ≤ N₂ := Submodule.map_subtype_le N₂ (Submodule.comap (Submodule.submoduleOf N₁ N₂).mkQ W)
+            exact this q.out.prop
+          have this' : (N₁.submoduleOf N₂).mkQ ⟨q.out.val,this⟩ ∈ W := by
+            exact test N₂ ((Submodule.comap (Submodule.submoduleOf N₁ N₂).mkQ W)) q.out.val this q.out.prop
+          use ((⊥ : Submodule R (↥N₂ ⧸ Submodule.submoduleOf N₁ N₂)).submoduleOf W).mkQ (⟨(N₁.submoduleOf N₂).mkQ ⟨q.out.val,this⟩,this'⟩ : W)
+          simp only [Submodule.mkQ_apply]
+          have beb : Submodule.submoduleOf ⊥ W = ⊥ := by
+              unfold Submodule.submoduleOf
+              simp only [Submodule.comap_bot, Submodule.ker_subtype]
+          ext z
+          constructor
+          · intro hz
+            simp only [LinearMap.mem_ker, LinearMap.toSpanSingleton_apply] at *
+            rw [← Submodule.Quotient.mk_smul]
+            apply (Submodule.Quotient.mk_eq_zero _).2
+            rw [beb]
+            simp only [SetLike.mk_smul_mk, Submodule.mem_bot, Submodule.mk_eq_zero]
+            rw [← Submodule.Quotient.mk_smul]
+            apply (Submodule.Quotient.mk_eq_zero _).2
+            have : z • q.out ∈ (N₁.submoduleOf (lift_quot N₁ N₂ W)) := by
+              apply (Submodule.Quotient.mk_eq_zero _).1
+              simp only [Submodule.Quotient.mk_smul]
+              unfold Submodule.Quotient.mk Quotient.mk''
+              rw [Quotient.out_eq]
+              exact hz
+            exact this
+          · intro hz
+            simp only [LinearMap.mem_ker, LinearMap.toSpanSingleton_apply] at *
+            rw [← Submodule.Quotient.mk_smul] at hz
+            apply (Submodule.Quotient.mk_eq_zero _).1 at hz
+            rw [beb] at hz
+            simp only [SetLike.mk_smul_mk, Submodule.mem_bot, Submodule.mk_eq_zero] at hz
+            rw [← Submodule.Quotient.mk_smul] at hz
+            apply (Submodule.Quotient.mk_eq_zero _).1 at hz
+            simp only [SetLike.mk_smul_mk] at hz
+            have hz : z • q.out ∈ N₁.submoduleOf (lift_quot N₁ N₂ W) := hz
+            apply (Submodule.Quotient.mk_eq_zero _).2 at hz
+            rw [Submodule.Quotient.mk_smul] at hz
+            unfold Submodule.Quotient.mk Quotient.mk'' at hz
+            simpa [Quotient.out_eq] using hz
       simp only [this]
-    · sorry
+    · rw [prop3d12]
+      simp only [ne_eq, Function.Embedding.toFun_eq_coe, RelEmbedding.coe_toEmbedding, μA_res_intvl]
+      rw [prop3d12]
+      simp only [Function.Embedding.toFun_eq_coe, RelEmbedding.coe_toEmbedding,
+        EmbeddingLike.apply_eq_iff_eq, Finset.singleton_inj]
+      have : _μ R (↥N₂ ⧸ Submodule.submoduleOf N₁ N₂) ⟨(⊥, ⊤), bot_lt_top⟩ = _μ R M ⟨(N₁, N₂), hN⟩ := by
+        unfold _μ
+        simp only [ne_eq]
+        ext x
+        constructor
+        · intro hx
+          simp only [ne_eq, gt_iff_lt, not_lt, Set.mem_setOf_eq] at *
+          rcases hx with ⟨p,⟨hp1,hp2⟩⟩
+          use p
+          rw [← hp2]
+          simp only [exists_prop, and_true]
+          unfold associatedPrimes at *
+          simp only [Set.mem_setOf_eq] at *
+          simp only [Set.mem_setOf_eq] at hp1
+          unfold IsAssociatedPrime at *
+          refine ⟨hp1.1,?_⟩
+          rcases hp1.2 with ⟨q,hq1,hq2⟩
+          use q.out.val
+          ext z
+          simp only [LinearMap.mem_ker, LinearMap.toSpanSingleton_apply] at *
+          constructor
+          · intro hz
+            have : z • q.out.val = (z • q.out).val := rfl
+            rw [this]
+            have : z • q.out = 0 := by
+              have: ((⊥: ℒ R (↥N₂ ⧸ Submodule.submoduleOf N₁ N₂)).submoduleOf ⊤).mkQ (z • Quotient.out q) = z • q := by
+                simp only [map_smul, Submodule.mkQ_apply]
+                unfold Submodule.Quotient.mk Quotient.mk''
+                rw [Quotient.out_eq]
+              rw [hz] at this
+              apply (Submodule.Quotient.mk_eq_zero _).1 at this
+              have this' : ((⊥: ℒ R (↥N₂ ⧸ Submodule.submoduleOf N₁ N₂)).submoduleOf ⊤) = ⊥ := by
+                unfold Submodule.submoduleOf
+                simp only [Submodule.comap_bot, Submodule.ker_subtype]
+              simp only [this'] at this
+              exact this
+            rw [this]
+            rfl
+          · intro hz
+            have hz : z • q.out = 0 := Submodule.coe_eq_zero.mp hz
+            have: ((⊥: ℒ R (↥N₂ ⧸ Submodule.submoduleOf N₁ N₂)).submoduleOf ⊤).mkQ (z • Quotient.out q) = z • q := by
+              simp only [map_smul, Submodule.mkQ_apply]
+              unfold Submodule.Quotient.mk Quotient.mk''
+              rw [Quotient.out_eq]
+            rw [hz] at this
+            simp only [Submodule.mkQ_apply, Submodule.Quotient.mk_zero] at this
+            exact this.symm
+        · intro hx
+          simp only [ne_eq, gt_iff_lt, not_lt, Set.mem_setOf_eq] at *
+          rcases hx with ⟨p,⟨hp1,hp2⟩⟩
+          use p
+          rw [← hp2]
+          simp only [exists_prop, and_true]
+          unfold associatedPrimes at *
+          simp only [Set.mem_setOf_eq] at *
+          simp only [Set.mem_setOf_eq] at hp1
+          unfold IsAssociatedPrime at *
+          refine ⟨hp1.1,?_⟩
+          rcases hp1.2 with ⟨q,hq1,hq2⟩
+          have : (N₁.submoduleOf N₂).mkQ q.out ∈ (⊤ : ℒ R (↥N₂ ⧸ Submodule.submoduleOf N₁ N₂)) := by
+            simp only [Submodule.mkQ_apply, Submodule.mem_top]
+          use Submodule.Quotient.mk (⟨(N₁.submoduleOf N₂).mkQ q.out, this⟩ : ↥(⊤ : ℒ R (↥N₂ ⧸ Submodule.submoduleOf N₁ N₂)))
+          ext z
+          simp only [LinearMap.mem_ker, LinearMap.toSpanSingleton_apply] at *
+          rw [← Submodule.Quotient.mk_smul]
+          rw [Submodule.Quotient.mk_eq_zero]
+          have this' : ((⊥: ℒ R (↥N₂ ⧸ Submodule.submoduleOf N₁ N₂)).submoduleOf ⊤) = ⊥ := by
+            unfold Submodule.submoduleOf
+            simp only [Submodule.comap_bot, Submodule.ker_subtype]
+          rw [this']
+          simp only [Submodule.mkQ_apply, SetLike.mk_smul_mk, Submodule.mem_bot,
+            Submodule.mk_eq_zero]
+          rw [← Submodule.Quotient.mk_smul]
+          simp only [Submodule.Quotient.mk_smul]
+          unfold Submodule.Quotient.mk Quotient.mk''
+          simp only [Quotient.out_eq]
+      simp only [this]
+      rfl
   · have h := h.semistable
     have : Nontrivial (↥N₂ ⧸ Submodule.submoduleOf N₁ N₂) := quot_ntl hN
     have : Nontrivial (ℒ R (↥N₂ ⧸ Submodule.submoduleOf N₁ N₂)) := quot_ntl' hN
     refine {semistable := ?_ }
     intro W hW
+    simp only [gt_iff_lt, not_lt]
 
     sorry
 

@@ -79,7 +79,7 @@ abbrev _μ (R : Type) [CommRing R] [IsNoetherianRing R]
 Set (LinearExtension (PrimeSpectrum R))
 ------------
 :=
-{ {asIdeal := p, isPrime := h.out.1} | (p : Ideal R) (h : p ∈ associatedPrimes R (I.val.2⧸(Submodule.submoduleOf I.val.1 I.val.2))) }
+{ {asIdeal := p, isPrime := h.out.1} | (p : Ideal R) (h : p ∈ associatedPrimes R (I.val.2⧸(I.val.1.submoduleOf I.val.2))) }
 
 noncomputable instance {R : Type} [CommRing R] [IsNoetherianRing R]
 {M : Type} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]
@@ -87,7 +87,7 @@ noncomputable instance {R : Type} [CommRing R] [IsNoetherianRing R]
 ------------
 Fintype ((_μ R M) I)
 ------------
-:= (Set.Finite.dependent_image (associatedPrimes.finite R (I.val.2⧸(Submodule.submoduleOf I.val.1 I.val.2))) (fun I hI ↦ ({asIdeal := I, isPrime := hI.out.1} : LinearExtension (PrimeSpectrum R)))).fintype
+:= (Set.Finite.dependent_image (associatedPrimes.finite R (I.val.2⧸(I.val.1.submoduleOf I.val.2))) (fun I hI ↦ ({asIdeal := I, isPrime := hI.out.1} : LinearExtension (PrimeSpectrum R)))).fintype
 
 noncomputable abbrev μ (R : Type) [CommRing R] [IsNoetherianRing R]
 (M : Type) [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] :
@@ -114,7 +114,7 @@ structure CoprimaryFiltration (R : Type) [CommRing R] [IsNoetherianRing R]
         filtration i < filtration j
   piecewise_coprimary :
     ∀ n : ℕ, n < Nat.find (fin_len) →
-      Coprimary R (filtration (n+1)⧸ (Submodule.submoduleOf (filtration n) (filtration (n+1))))
+      Coprimary R (filtration (n+1)⧸ ((filtration n).submoduleOf (filtration (n+1))))
   strict_mono_associated_prime :
     ∀ n : ℕ, (hn : n + 1 < Nat.find (fin_len)) →
         @LT.lt (LinearExtension (PrimeSpectrum R)) Preorder.toLT
