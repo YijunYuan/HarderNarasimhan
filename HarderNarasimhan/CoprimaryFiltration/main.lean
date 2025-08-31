@@ -511,6 +511,16 @@ lemma test {R : Type} [CommRing R] {M : Type} [AddCommGroup M] [Module R M]
   rcases hx2 with ⟨a,b⟩
   exact b
 
+lemma quest {R : Type} [CommRing R]
+{M : Type} [Nontrivial M] [AddCommGroup M] [Module R M]
+(N₁ N₂ : Submodule R M) (hN : N₁ < N₂)
+(W : Interval ⟨(N₁, N₂), hN⟩)
+(hc : Submodule.map (Submodule.submoduleOf N₁ N₂).mkQ (Submodule.comap (Submodule.subtype N₂) ↑W) = ⊥) :
+W = ⊥ := by
+
+
+  sorry
+
 set_option synthInstance.maxHeartbeats 0
 
 lemma ss_iff' {R : Type} [CommRing R] [IsNoetherianRing R] {M : Type} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] (N₁ N₂ : ℒ R M) (hN : N₁ < N₂) : Semistable (Resμ ⟨(N₁, N₂), hN⟩ (μ R M)) ↔ @Semistable (@ℒ R _ _ (↥N₂ ⧸ N₁.submoduleOf N₂) (@quot_ntl R _ _ M _ _ _ _ N₁ N₂ hN)  _ _ _) (@quot_ntl' R _ _ M _ _ _ _ N₁ N₂ hN) _ _ (S R) _
@@ -766,9 +776,20 @@ lemma ss_iff' {R : Type} [CommRing R] [IsNoetherianRing R] {M : Type} [Nontrivia
     have : Nontrivial (ℒ R (↥N₂ ⧸ Submodule.submoduleOf N₁ N₂)) := quot_ntl' hN
     refine {semistable := ?_ }
     intro W hW
-    simp only [gt_iff_lt, not_lt]
+    simp only [gt_iff_lt, not_lt] at *
+    have : (Submodule.map (N₁.submoduleOf N₂).mkQ (Submodule.comap N₂.subtype W)) ≠ ⊥ := by
+      by_contra hc
+      refine hW ?_
 
-    sorry
+
+
+
+
+      sorry
+    have h := h (Submodule.map (N₁.submoduleOf N₂).mkQ (Submodule.comap N₂.subtype W)) this
+    convert h
+    · sorry
+    · sorry
 
 
 lemma piecewise_coprimary {R : Type} [CommRing R] [IsNoetherianRing R]
