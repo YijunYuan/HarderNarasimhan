@@ -12,7 +12,7 @@ import HarderNarasimhan.Convexity.Results
 import Mathlib.Data.Finite.Card
 open Classical
 
-namespace HardarNarasimhan
+namespace HarderNarasimhan
 
 namespace impl
 noncomputable def JHFil {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [hacc: WellFoundedGT ℒ]
@@ -750,4 +750,4 @@ lemma looooooooooooooooog_lemma : ∀ n : ℕ, ∀ ℒ : Type, ∀ ntl: Nontrivi
 
 end impl
 
-end HardarNarasimhan
+end HarderNarasimhan

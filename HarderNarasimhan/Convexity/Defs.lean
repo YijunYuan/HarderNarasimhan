@@ -1,7 +1,7 @@
 import HarderNarasimhan.Basic
 import HarderNarasimhan.Interval
 
-namespace HardarNarasimhan
+namespace HarderNarasimhan
 
 section
 
@@ -35,4 +35,4 @@ ConvexI I μ ↔ Convex (Resμ I μ) := by
 
 end
 
-end HardarNarasimhan
+end HarderNarasimhan

@@ -1,6 +1,6 @@
 import HarderNarasimhan.SlopeLike.Impl
 
-namespace HardarNarasimhan
+namespace HarderNarasimhan
 
 lemma proposition_4_6 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S]
@@ -84,4 +84,4 @@ SlopeLike μ → ∀ (x y z : ℒ), (h : x < y ∧ y < z) →
     · have := (Or.resolve_right <| Or.resolve_left h1 <| fun t ↦ (not_lt_of_gt t.2) h') fun t ↦ (lt_self_iff_false _).1 <| t.2 ▸ h'
       exact ⟨this.1,gt_trans this.1 this.2⟩
 
-end HardarNarasimhan
+end HarderNarasimhan

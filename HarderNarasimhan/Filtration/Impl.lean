@@ -1,6 +1,6 @@
 import HarderNarasimhan.Filtration.Defs
 
-namespace HardarNarasimhan
+namespace HarderNarasimhan
 
 namespace impl
 
@@ -200,4 +200,4 @@ theorem theorem3d10  {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
 
 end impl
 
-end HardarNarasimhan
+end HarderNarasimhan

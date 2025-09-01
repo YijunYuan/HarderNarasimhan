@@ -1,7 +1,7 @@
 import Mathlib.Order.CompleteLattice.Defs
 import Mathlib.Order.BoundedOrder.Basic
 
-namespace HardarNarasimhan
+namespace HarderNarasimhan
 
 def InIntvl {ℒ: Type} [PartialOrder ℒ]
 (I : {p : ℒ × ℒ // p.1 < p.2})
@@ -65,4 +65,4 @@ def IsAttained {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder �
 (I : {p : ℒ × ℒ // p.1 < p.2}) : Prop :=
   ∃ (a : ℒ) (haI : InIntvl I a) (ha : a ≠ I.val.2), μmax μ ⟨(a , I.val.2) , lt_of_le_of_ne haI.2 ha⟩ = μA μ I
 
-end HardarNarasimhan
+end HarderNarasimhan

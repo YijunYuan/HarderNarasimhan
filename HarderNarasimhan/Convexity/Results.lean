@@ -2,7 +2,7 @@ import HarderNarasimhan.Basic
 import HarderNarasimhan.Convexity.Defs
 import HarderNarasimhan.Convexity.Impl
 
-namespace HardarNarasimhan
+namespace HarderNarasimhan
 
 lemma lemma_2_4 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   {S : Type} [CompleteLattice S]
@@ -97,4 +97,4 @@ lemma proposition_2_8 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder 
 ------------
 := ⟨impl.prop2d8₁I TotIntvl μ hμcvx x (in_TotIntvl x) y (in_TotIntvl y) u (in_TotIntvl u) h,impl.prop2d8₂I TotIntvl μ hμcvx x (in_TotIntvl x) y (in_TotIntvl y) u (in_TotIntvl u) h⟩
 
-end HardarNarasimhan
+end HarderNarasimhan

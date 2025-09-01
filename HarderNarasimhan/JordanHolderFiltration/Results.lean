@@ -2,7 +2,7 @@ import HarderNarasimhan.JordanHolderFiltration.Impl
 
 open Classical
 
-namespace HardarNarasimhan
+namespace HarderNarasimhan
 
 --`Theorem 4.25`
 instance {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
@@ -26,4 +26,4 @@ theorem remark_4_26 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
 := fun JH1 JH2 ↦ eq_of_le_of_le (impl.looooooooooooooooog_lemma (Nat.find JH2.fin_len) ℒ _ _ _ _ _ _ μ inferInstance inferInstance inferInstance inferInstance inferInstance ⟨JH2,rfl.le⟩ JH1) <| impl.looooooooooooooooog_lemma (Nat.find JH1.fin_len) ℒ _ _ _ _ _ _ _ inferInstance inferInstance inferInstance inferInstance inferInstance ⟨JH1,rfl.le⟩ JH2
 
 
-end HardarNarasimhan
+end HarderNarasimhan

@@ -17,7 +17,7 @@ import HarderNarasimhan.Filtration.Results
 
 import HarderNarasimhan.CoprimaryFiltration.Defs
 
-namespace HardarNarasimhan
+namespace HarderNarasimhan
 
 namespace impl
 
@@ -514,9 +514,11 @@ lemma test {R : Type} [CommRing R] {M : Type} [AddCommGroup M] [Module R M]
 lemma quest {R : Type} [CommRing R]
 {M : Type} [Nontrivial M] [AddCommGroup M] [Module R M]
 (N₁ N₂ : Submodule R M) (hN : N₁ < N₂)
-(W : Interval ⟨(N₁, N₂), hN⟩)
-(hc : Submodule.map (Submodule.submoduleOf N₁ N₂).mkQ (Submodule.comap (Submodule.subtype N₂) ↑W) = ⊥) :
-W = ⊥ := by
+(W : Interval ⟨(N₁, N₂), hN⟩) (hW : W ≠ ⊥)
+(q : ↥(Submodule.map (Submodule.submoduleOf N₁ N₂).mkQ (Submodule.comap (Submodule.subtype N₂) ↑W)) ⧸
+  Submodule.submoduleOf ⊥ (Submodule.map (Submodule.submoduleOf N₁ N₂).mkQ (Submodule.comap (Submodule.subtype N₂) ↑W))) :
+Quotient.out q.out.val ∈ Submodule.submoduleOf (↑W) N₂ := by
+  have : q.out.val ∈ Submodule.map (N₁.submoduleOf N₂).mkQ (W.val.submoduleOf N₂) := Submodule.coe_mem q.out
 
 
   sorry
@@ -780,8 +782,25 @@ lemma ss_iff' {R : Type} [CommRing R] [IsNoetherianRing R] {M : Type} [Nontrivia
     have : (Submodule.map (N₁.submoduleOf N₂).mkQ (Submodule.comap N₂.subtype W)) ≠ ⊥ := by
       by_contra hc
       refine hW ?_
-
-      sorry
+      have : Submodule.comap N₂.subtype ↑W = N₁.submoduleOf N₂ := by
+        ext x
+        constructor
+        · intro hx
+          have : (N₁.submoduleOf N₂).mkQ x ∈ Submodule.map (N₁.submoduleOf N₂).mkQ (Submodule.comap N₂.subtype ↑W) := by
+            exact Submodule.mem_map_of_mem hx
+          rw [hc] at this
+          simpa only [Submodule.mkQ_apply, Submodule.mem_bot, Submodule.Quotient.mk_eq_zero] using this
+        · intro hx
+          exact W.prop.1 hx
+      apply Subtype.coe_inj.1
+      ext y
+      constructor
+      · intro hy
+        have this' : (⟨y, W.prop.2 hy⟩ : N₂) ∈ Submodule.comap N₂.subtype ↑W := hy
+        rw [this] at this'
+        exact this'
+      · intro hy
+        exact W.prop.1 hy
     have h := h (Submodule.map (N₁.submoduleOf N₂).mkQ (Submodule.comap N₂.subtype W)) this
     convert h
     · rw [prop3d12]
@@ -863,7 +882,30 @@ lemma ss_iff' {R : Type} [CommRing R] [IsNoetherianRing R] {M : Type} [Nontrivia
           rw [Quotient.out_eq]
           have : z • q.out = 0 ↔ z • q.out.val = 0 := beq_eq_beq.mp rfl
           rw [← this]
-          sorry
+          have : (z • q).out ∈ (⊥: Submodule R (↥N₂ ⧸ Submodule.submoduleOf N₁ N₂)).submoduleOf (Submodule.map (Submodule.submoduleOf N₁ N₂).mkQ (Submodule.comap (Submodule.subtype N₂) ↑W)) ↔ z • q = 0 := by
+            rw [← Submodule.Quotient.mk_eq_zero]
+            unfold Submodule.Quotient.mk Quotient.mk''
+            rw [Quotient.out_eq]
+          rw [← this]
+          unfold Submodule.submoduleOf
+          simp only [Submodule.comap_bot, Submodule.ker_subtype]
+          simp only [Submodule.mem_bot]
+          have : (z • q).out - z • q.out ∈ (⊥: ℒ R (↥N₂ ⧸ Submodule.submoduleOf N₁ N₂)).submoduleOf (Submodule.map (Submodule.submoduleOf N₁ N₂).mkQ (Submodule.comap (Submodule.subtype N₂) ↑W)) := by
+            rw [← Submodule.Quotient.mk_eq_zero]
+            simp only [Submodule.Quotient.mk_sub, Submodule.Quotient.mk_smul]
+            unfold Submodule.Quotient.mk Quotient.mk''
+            rw [Quotient.out_eq, Quotient.out_eq]
+            exact sub_self (z • q)
+          unfold Submodule.submoduleOf at this
+          simp only [Submodule.comap_bot, Submodule.ker_subtype] at this
+          simp only [Submodule.mem_bot] at this
+          constructor
+          · intro h
+            rw [h] at this
+            simpa only [zero_sub, neg_eq_zero] using this
+          · intro h
+            rw [h] at this
+            simpa only [sub_zero] using this
       simp only [this]
     · rw [prop3d12]
       simp only [ne_eq, Function.Embedding.toFun_eq_coe, RelEmbedding.coe_toEmbedding, μA_res_intvl]
@@ -875,7 +917,7 @@ lemma ss_iff' {R : Type} [CommRing R] [IsNoetherianRing R] {M : Type} [Nontrivia
 
 
 lemma piecewise_coprimary {R : Type} [CommRing R] [IsNoetherianRing R]
-{M : Type} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] (HNFil : HardarNarasimhanFiltration (μ R M)):
+{M : Type} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] (HNFil : HarderNarasimhanFiltration (μ R M)):
 ∀ n < Nat.find HNFil.fin_len, Coprimary R (↥(HNFil.filtration (n + 1)) ⧸ Submodule.submoduleOf (HNFil.filtration n) (HNFil.filtration (n + 1))) := by
   intro n hn
   have := HNFil.piecewise_semistable n hn
@@ -899,7 +941,7 @@ lemma piecewise_coprimary {R : Type} [CommRing R] [IsNoetherianRing R]
 noncomputable instance {R : Type} [CommRing R] [IsNoetherianRing R]
 {M : Type} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] :
 Inhabited (CoprimaryFiltration R M) := by
-  have HNFil := (inferInstance : Inhabited (HardarNarasimhanFiltration (μ R M))).default
+  have HNFil := (inferInstance : Inhabited (HarderNarasimhanFiltration (μ R M))).default
   refine { default := { filtration := HNFil.filtration, monotone := HNFil.monotone, first_eq_bot := HNFil.first_eq_bot, fin_len := HNFil.fin_len, strict_mono := HNFil.strict_mono, piecewise_coprimary := fun n hn ↦ piecewise_coprimary HNFil n hn, strict_mono_associated_prime := ?_ } }
   intro n hn
   have := HNFil.μA_pseudo_strict_anti n hn
@@ -938,8 +980,8 @@ instance {R : Type} [CommRing R] [IsNoetherianRing R]
 Nonempty (CoprimaryFiltration R M) := inferInstance
 
 lemma CP_HN {R : Type} [CommRing R] [IsNoetherianRing R]
-{M : Type} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] (a : CoprimaryFiltration R M) : ∃ HNFil : HardarNarasimhanFiltration (μ R M), a.filtration = HNFil.filtration := by
-  let ahn : HardarNarasimhanFiltration (μ R M) := by
+{M : Type} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] (a : CoprimaryFiltration R M) : ∃ HNFil : HarderNarasimhanFiltration (μ R M), a.filtration = HNFil.filtration := by
+  let ahn : HarderNarasimhanFiltration (μ R M) := by
       refine { filtration := a.filtration, monotone := a.monotone, first_eq_bot := a.first_eq_bot, piecewise_semistable := ?_, fin_len := a.fin_len, strict_mono := a.strict_mono, μA_pseudo_strict_anti := ?_ }
       · intro i hi
         have := a.piecewise_coprimary i hi
@@ -979,11 +1021,11 @@ lemma CP_HN {R : Type} [CommRing R] [IsNoetherianRing R]
   use ahn
 
 lemma CP_HN' {R : Type} [CommRing R] [IsNoetherianRing R]
-{M : Type} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] : ∀ CPFil : CoprimaryFiltration R M, CPFil.filtration = (inferInstance : Inhabited (HardarNarasimhanFiltration (μ R M))).default.filtration := by
+{M : Type} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] : ∀ CPFil : CoprimaryFiltration R M, CPFil.filtration = (inferInstance : Inhabited (HarderNarasimhanFiltration (μ R M))).default.filtration := by
   intro CPFil
   rcases (CP_HN CPFil) with ⟨HNFil, hfil⟩
-  have := @instUniqueHardarNarasimhanFiltration (ℒ R M) _ _ _ _ (S R) inferInstance (μ R M) (@prop3d13₂ R _ _ M _ _ _ _) _
-  rw [hfil,this.uniq HNFil, this.uniq (@default (HardarNarasimhanFiltration (μ R M)) inferInstance)]
+  have := @instUniqueHarderNarasimhanFiltration (ℒ R M) _ _ _ _ (S R) inferInstance (μ R M) (@prop3d13₂ R _ _ M _ _ _ _) _
+  rw [hfil,this.uniq HNFil, this.uniq (@default (HarderNarasimhanFiltration (μ R M)) inferInstance)]
 
 noncomputable instance {R : Type} [CommRing R] [IsNoetherianRing R]
 {M : Type} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] :
@@ -997,4 +1039,4 @@ Unique (CoprimaryFiltration R M) where
 
 end impl
 
-end HardarNarasimhan
+end HarderNarasimhan

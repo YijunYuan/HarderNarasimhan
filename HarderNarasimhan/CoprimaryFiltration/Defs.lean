@@ -15,7 +15,7 @@ import HarderNarasimhan.Filtration.Results
 import HarderNarasimhan.CoprimaryFiltration.Lex'Order
 import HarderNarasimhan.Filtration.Results
 
-namespace HardarNarasimhan
+namespace HarderNarasimhan
 
 abbrev S₀ (R : Type) [CommRing R] [IsNoetherianRing R] :
 ------------
@@ -129,4 +129,4 @@ structure CoprimaryFiltration (R : Type) [CommRing R] [IsNoetherianRing R]
           } : LinearExtension (PrimeSpectrum R))
 
 
-end HardarNarasimhan
+end HarderNarasimhan

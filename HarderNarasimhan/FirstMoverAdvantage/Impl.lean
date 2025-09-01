@@ -1,7 +1,7 @@
 import HarderNarasimhan.Semistability.Results
 import Mathlib.Data.Real.Basic
 
-namespace HardarNarasimhan
+namespace HarderNarasimhan
 
 namespace impl
 
@@ -235,4 +235,4 @@ lemma rmk4d4 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 
 end impl
 
-end HardarNarasimhan
+end HarderNarasimhan

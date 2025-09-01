@@ -1,6 +1,6 @@
 import HarderNarasimhan.CoprimaryFiltration.main
 
-namespace HardarNarasimhan
+namespace HarderNarasimhan
 
 lemma μ_nonempty {R : Type} [CommRing R] [IsNoetherianRing R]
 {M : Type} [Nontrivial M] [AddCommGroup M] [Module R M]  [Module.Finite R M] :
@@ -70,4 +70,4 @@ Unique (CoprimaryFiltration R M)
 ------------
 := inferInstance
 
-end HardarNarasimhan
+end HarderNarasimhan

@@ -5,7 +5,7 @@ import Mathlib.Data.NNReal.Basic
 import HarderNarasimhan.DedekindMacNeilleCompletion
 import HarderNarasimhan.Interval
 
-namespace HardarNarasimhan
+namespace HarderNarasimhan
 
 class SlopeLike {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S]
@@ -43,4 +43,4 @@ instance {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {z : {p : ℒ × ℒ // p.1 < p.2}} : SlopeLike (Resμ z μ)
 := { slopelike := fun x y z h ↦ hsl.slopelike x.val y.val z.val ⟨lt_iff_le_not_le.2 h.1,lt_iff_le_not_le.2 h.2⟩ }
 
-end HardarNarasimhan
+end HarderNarasimhan

@@ -1,7 +1,7 @@
 import HarderNarasimhan.Convexity.Defs
 import HarderNarasimhan.Interval
 
-namespace HardarNarasimhan
+namespace HarderNarasimhan
 
 class μA_DescendingChainCondition {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S] (μ : {p :ℒ × ℒ // p.1 < p.2} → S) : Prop where
@@ -59,4 +59,4 @@ def stable {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) : Prop :=
 stableI μ TotIntvl
 
-end HardarNarasimhan
+end HarderNarasimhan

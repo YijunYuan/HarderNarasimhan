@@ -1,7 +1,7 @@
 import HarderNarasimhan.Basic
 import HarderNarasimhan.Convexity.Defs
 
-namespace HardarNarasimhan
+namespace HarderNarasimhan
 
 namespace impl
 
@@ -297,4 +297,4 @@ end
 
 end impl
 
-end HardarNarasimhan
+end HarderNarasimhan

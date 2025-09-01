@@ -3,7 +3,7 @@ import HarderNarasimhan.Semistability.Defs
 import HarderNarasimhan.Interval
 import HarderNarasimhan.Semistability.Impl
 
-namespace HardarNarasimhan
+namespace HarderNarasimhan
 
 theorem semistable_iff {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S]
@@ -22,4 +22,4 @@ semistableI μ I ↔ Semistable (Resμ I μ)
 ------------
 := impl.semistableI_iff μ I
 
-end HardarNarasimhan
+end HarderNarasimhan

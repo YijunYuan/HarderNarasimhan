@@ -6,7 +6,7 @@ import HarderNarasimhan.Semistability.Translation
 import Mathlib.Tactic.TFAE
 import Mathlib.Data.List.TFAE
 
-namespace HardarNarasimhan
+namespace HarderNarasimhan
 
 namespace impl
 
@@ -433,4 +433,4 @@ List.TFAE [
 
 end impl
 
-end HardarNarasimhan
+end HarderNarasimhan

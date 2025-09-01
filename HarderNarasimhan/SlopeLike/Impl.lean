@@ -1,6 +1,6 @@
 import HarderNarasimhan.SlopeLike.Defs
 
-namespace HardarNarasimhan
+namespace HarderNarasimhan
 
 namespace impl
 lemma prop4d6 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
@@ -124,4 +124,4 @@ lemma prop4d8 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
           exact h4 ▸ ((smul_lt_smul_iff_of_pos_left <| Right.inv_pos.mpr h').2 <| (h₁ x y z h).1 ▸ lt_add_of_pos_right (d ⟨(x, y), h.1⟩) <| h₂ y z h.2 this)
 end impl
 
-end HardarNarasimhan
+end HarderNarasimhan

@@ -1,6 +1,6 @@
 import HarderNarasimhan.FirstMoverAdvantage.Impl
 
-namespace HardarNarasimhan
+namespace HarderNarasimhan
 
 class WeakAscendingChainCondition {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S] (μ : {p :ℒ × ℒ // p.1 < p.2} → S) : Prop where
@@ -24,4 +24,4 @@ class WeakSlopeLike₂ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) : Prop where
   wsl₂ : ∀ z : {p :ℒ × ℒ // p.1 < p.2}, (hz : ⊥ < z.val.1) → μ ⟨(⊥,z.val.2),lt_trans hz z.prop⟩ ≤ μ z ∨ μ ⟨(⊥,z.val.2),lt_trans hz z.prop⟩ ≤ μ ⟨(⊥,z.val.1),hz⟩
 
-end HardarNarasimhan
+end HarderNarasimhan
