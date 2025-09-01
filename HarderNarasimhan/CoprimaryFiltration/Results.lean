@@ -1,4 +1,4 @@
-import HarderNarasimhan.CoprimaryFiltration.main
+import HarderNarasimhan.CoprimaryFiltration.Impl
 
 namespace HarderNarasimhan
 

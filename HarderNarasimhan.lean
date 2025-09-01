@@ -24,3 +24,6 @@ import HarderNarasimhan.NashEquilibrium.Results
 
 import HarderNarasimhan.JordanHolderFiltration.Defs
 import HarderNarasimhan.JordanHolderFiltration.Results
+
+import HarderNarasimhan.CoprimaryFiltration.Defs
+import HarderNarasimhan.CoprimaryFiltration.Results
