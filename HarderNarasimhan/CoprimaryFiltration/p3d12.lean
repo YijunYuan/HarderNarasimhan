@@ -6,6 +6,8 @@ import Mathlib.RingTheory.Spectrum.Prime.Basic
 import Mathlib.Order.Extension.Linear
 import Mathlib.Algebra.Module.Submodule.Defs
 import Mathlib.RingTheory.Ideal.AssociatedPrime.Finiteness
+import Mathlib.Algebra.Module.LocalizedModule.Submodule
+import Mathlib.Algebra.Module.LocalizedModule.AtPrime
 
 import HarderNarasimhan.Basic
 import HarderNarasimhan.Convexity.Results
@@ -117,6 +119,63 @@ lemma noname {R : Type} [CommRing R] [IsNoetherianRing R]
       OrderEmbedding.le_iff_le]
     apply S₀_order.1
     exact Set.toFinset_subset_toFinset.mpr <| assinc (lt_of_le_of_ne hu1.1.1 hu1.2) hu1.1.2
+
+lemma prop3d12p1 {R : Type} [CommRing R] [IsNoetherianRing R]
+{M : Type} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]
+(I : {z: (ℒ R M) × (ℒ R M) // z.1 < z.2})
+(N'' : ℒ R M) (ha1 : InIntvl I N'') (ha2 : N'' ≠ I.val.2) : ∀ q : Ideal R, (hq : q ∈ associatedPrimes R (I.val.2⧸N''.submoduleOf I.val.2)) → {asIdeal := q, isPrime := hq.out.1 } ≥ (((_μ R M) I).toFinset.min' (μ_nonempty I)) := sorry
+
+noncomputable abbrev ker_of_quot_comp_localization {R : Type} [CommRing R] [IsNoetherianRing R]
+{M : Type} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]
+(I : {z: (ℒ R M) × (ℒ R M) // z.1 < z.2})
+: ℒ R M := by
+  let f1 := Submodule.toLocalized (((_μ R M) I).toFinset.min' (μ_nonempty I)).asIdeal.primeCompl  (⊤ : Submodule R (I.val.2⧸I.val.1.submoduleOf I.val.2))
+  let f2 : I.val.2 →ₗ[R] (⊤ : Submodule R (I.val.2⧸I.val.1.submoduleOf I.val.2)) :=
+    { toFun := fun x : I.val.2 ↦ ⟨(I.val.1.submoduleOf I.val.2).mkQ x, trivial⟩,
+      map_add' := fun x y => rfl,
+      map_smul' := fun r x => rfl }
+  exact Submodule.map I.val.2.subtype (LinearMap.ker (f1 ∘ₗ f2))
+
+lemma prop3d12p2 {R : Type} [CommRing R] [IsNoetherianRing R]
+{M : Type} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]
+(I : {z: (ℒ R M) × (ℒ R M) // z.1 < z.2})
+(N'' : ℒ R M) (ha1 : InIntvl I N'') (ha2 : N'' ≠ I.val.2) : _μ R M ⟨(N'', I.val.2), lt_of_le_of_ne ha1.2 ha2⟩ ≥ {(_μ R M I).toFinset.min' <| μ_nonempty I}  := by
+  conv_lhs =>
+    arg 0; unfold _μ
+  simp only [ge_iff_le, Set.le_eq_subset, Set.singleton_subset_iff, Set.mem_setOf_eq]
+  use (((_μ R M) I).toFinset.min' (μ_nonempty I)).asIdeal
+  have : ((_μ R M I).toFinset.min' (μ_nonempty I)).asIdeal ∈ associatedPrimes R (↥I.val.2 ⧸ Submodule.submoduleOf N'' I.val.2) := by
+    unfold associatedPrimes IsAssociatedPrime
+    simp only [Set.mem_setOf_eq]
+    refine ⟨((_μ R M I).toFinset.min' <| μ_nonempty I).isPrime,?_⟩
+    have := (_μ R M I).toFinset.min'_mem <| μ_nonempty I
+    simp only [Set.mem_toFinset, Set.mem_setOf_eq] at this
+    rcases this with ⟨p,hp1,hp2⟩
+    unfold associatedPrimes IsAssociatedPrime at hp1
+    simp only [Set.mem_setOf_eq] at hp1
+    rcases hp1.2 with ⟨m,hm⟩
+    use Submodule.Quotient.mk m.out
+    rw [← hp2]
+    simp only
+    rw [hm]
+    ext z
+    simp only [LinearMap.mem_ker, LinearMap.toSpanSingleton_apply]
+    rw [← Submodule.Quotient.mk_smul]
+    rw [Submodule.Quotient.mk_eq_zero]
+
+    sorry
+  exact Exists.intro this rfl
+
+lemma TBA {R : Type} [CommRing R] [IsNoetherianRing R]
+{M : Type} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]
+(I : {z: (ℒ R M) × (ℒ R M) // z.1 < z.2})
+:
+(
+InIntvl I (ker_of_quot_comp_localization I) ∧ (ker_of_quot_comp_localization I) ≠ I.val.2
+) ∧
+associatedPrimes R (I.val.2⧸(ker_of_quot_comp_localization I).submoduleOf I.val.2) = {(((_μ R M) I).toFinset.min' (μ_nonempty I)).asIdeal}
+:= sorry
+
 
 
 lemma prop3d12 {R : Type} [CommRing R] [IsNoetherianRing R]
