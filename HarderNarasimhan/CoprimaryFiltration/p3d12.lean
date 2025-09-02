@@ -139,32 +139,21 @@ noncomputable abbrev ker_of_quot_comp_localization {R : Type} [CommRing R] [IsNo
 lemma prop3d12p2 {R : Type} [CommRing R] [IsNoetherianRing R]
 {M : Type} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]
 (I : {z: (ℒ R M) × (ℒ R M) // z.1 < z.2})
-(N'' : ℒ R M) (ha1 : InIntvl I N'') (ha2 : N'' ≠ I.val.2) : _μ R M ⟨(N'', I.val.2), lt_of_le_of_ne ha1.2 ha2⟩ ≥ {(_μ R M I).toFinset.min' <| μ_nonempty I}  := by
-  conv_lhs =>
-    arg 0; unfold _μ
-  simp only [ge_iff_le, Set.le_eq_subset, Set.singleton_subset_iff, Set.mem_setOf_eq]
-  use (((_μ R M) I).toFinset.min' (μ_nonempty I)).asIdeal
-  have : ((_μ R M I).toFinset.min' (μ_nonempty I)).asIdeal ∈ associatedPrimes R (↥I.val.2 ⧸ Submodule.submoduleOf N'' I.val.2) := by
-    unfold associatedPrimes IsAssociatedPrime
-    simp only [Set.mem_setOf_eq]
-    refine ⟨((_μ R M I).toFinset.min' <| μ_nonempty I).isPrime,?_⟩
-    have := (_μ R M I).toFinset.min'_mem <| μ_nonempty I
-    simp only [Set.mem_toFinset, Set.mem_setOf_eq] at this
-    rcases this with ⟨p,hp1,hp2⟩
-    unfold associatedPrimes IsAssociatedPrime at hp1
-    simp only [Set.mem_setOf_eq] at hp1
-    rcases hp1.2 with ⟨m,hm⟩
-    use Submodule.Quotient.mk m.out
-    rw [← hp2]
-    simp only
-    rw [hm]
-    ext z
-    simp only [LinearMap.mem_ker, LinearMap.toSpanSingleton_apply]
-    rw [← Submodule.Quotient.mk_smul]
-    rw [Submodule.Quotient.mk_eq_zero]
-
-    sorry
-  exact Exists.intro this rfl
+(N'' : ℒ R M) (ha1 : InIntvl I N'') (ha2 : N'' ≠ I.val.2) : @LE.le (S₀ R) Preorder.toLE {(_μ R M I).toFinset.min' <| μ_nonempty I} (_μ R M ⟨(N'', I.val.2), lt_of_le_of_ne ha1.2 ha2⟩).toFinset   := by
+  have : @LE.le (S₀ R) Preorder.toLE {(_μ R M I).toFinset.min' <| μ_nonempty I} {(_μ R M ⟨(N'', I.val.2), lt_of_le_of_ne ha1.2 ha2⟩).toFinset.min' <| μ_nonempty ⟨(N'', I.val.2), lt_of_le_of_ne ha1.2 ha2⟩} := by
+    rw [← S₀_order.2]
+    have this' : ((_μ R M ⟨(N'', I.val.2), lt_of_le_of_ne ha1.2 ha2⟩).toFinset.min' <| μ_nonempty ⟨(N'', I.val.2), lt_of_le_of_ne ha1.2 ha2⟩).asIdeal ∈ associatedPrimes R (↥I.val.2 ⧸ Submodule.submoduleOf N'' I.val.2) := by
+      simp only [Set.mem_setOf_eq]
+      have := ((_μ R M ⟨(N'', I.val.2), lt_of_le_of_ne ha1.2 ha2⟩).toFinset.min'_mem <| μ_nonempty ⟨(N'', I.val.2), lt_of_le_of_ne ha1.2 ha2⟩).out
+      simp only [Finset.mem_val, Set.mem_toFinset, Set.mem_setOf_eq] at this
+      rcases this with ⟨p,⟨hp1,hp2⟩⟩
+      rw [← hp2]
+      exact hp1
+    exact prop3d12p1 I N'' ha1 ha2 (((_μ R M ⟨(N'', I.val.2), lt_of_le_of_ne ha1.2 ha2⟩).toFinset.min' <| μ_nonempty ⟨(N'', I.val.2), lt_of_le_of_ne ha1.2 ha2⟩).asIdeal) this'
+  refine le_trans this ?_
+  apply S₀_order.1
+  simp only [Set.subset_toFinset, Finset.coe_singleton, Set.singleton_subset_iff]
+  exact Set.mem_toFinset.mp <| (_μ R M ⟨(N'', I.val.2), lt_of_le_of_ne ha1.2 ha2⟩).toFinset.min'_mem <| μ_nonempty ⟨(N'', I.val.2), lt_of_le_of_ne ha1.2 ha2⟩
 
 lemma TBA {R : Type} [CommRing R] [IsNoetherianRing R]
 {M : Type} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]
@@ -176,8 +165,6 @@ InIntvl I (ker_of_quot_comp_localization I) ∧ (ker_of_quot_comp_localization I
 associatedPrimes R (I.val.2⧸(ker_of_quot_comp_localization I).submoduleOf I.val.2) = {(((_μ R M) I).toFinset.min' (μ_nonempty I)).asIdeal}
 := sorry
 
-
-
 lemma prop3d12 {R : Type} [CommRing R] [IsNoetherianRing R]
 {M : Type} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] : ∀ I : {z: (ℒ R M) × (ℒ R M) // z.1 < z.2}, μA (μ R M) I = ({(((_μ R M) I).toFinset.min' (μ_nonempty I))} : S₀ R) := by
   intro I
@@ -186,8 +173,23 @@ lemma prop3d12 {R : Type} [CommRing R] [IsNoetherianRing R]
   simp only [noname, ne_eq]
   unfold μ
   simp only [ne_eq, Function.Embedding.toFun_eq_coe, RelEmbedding.coe_toEmbedding]
-
-  sorry
+  have res1 : (coe' {(_μ R M I).toFinset.min' (μ_nonempty I)} : S R) ∈ {x | ∃ a, ∃ (h : InIntvl I a ∧ ¬a = I.val.2), coe' (_μ R M ⟨(a, I.val.2), lt_of_le_of_ne h.1.2 h.2⟩).toFinset = x} := by
+    simp only [exists_prop, Set.mem_setOf_eq, EmbeddingLike.apply_eq_iff_eq]
+    use ker_of_quot_comp_localization I
+    constructor
+    · conv_lhs => unfold _μ
+      simp only [(TBA I).2, Set.mem_singleton_iff, exists_prop_eq, Set.setOf_eq_eq_singleton',
+        Set.toFinset_singleton, Finset.singleton_inj]
+      rfl
+    · exact (TBA I).1
+  apply IsLeast.csInf_eq
+  refine ⟨res1,?_⟩
+  apply mem_lowerBounds.2
+  intro N hN
+  rcases hN with ⟨a,ha1,ha2⟩
+  rw [← ha2]
+  simp only [OrderEmbedding.le_iff_le]
+  exact prop3d12p2 I a ha1.1 ha1.2
 
 
 end impl
