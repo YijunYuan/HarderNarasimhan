@@ -184,16 +184,19 @@ lemma prop3d12p1 {R : Type} [CommRing R] [IsNoetherianRing R]
     )
   exact le_trans this <|  toLinearExtension.monotone' hr'
 
+noncomputable abbrev f1 {R : Type} [CommRing R] [IsNoetherianRing R]
+{M : Type} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]
+(I : {z: (ℒ R M) × (ℒ R M) // z.1 < z.2}) := LocalizedModule.mkLinearMap (((_μ R M) I).toFinset.min' (μ_nonempty I)).asIdeal.primeCompl (I.val.2⧸I.val.1.submoduleOf I.val.2)
+
+abbrev f2 {R : Type} [CommRing R] [IsNoetherianRing R]
+{M : Type} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]
+(I : {z: (ℒ R M) × (ℒ R M) // z.1 < z.2}) : I.val.2 →ₗ[R] (I.val.2⧸I.val.1.submoduleOf I.val.2) := { toFun := fun x : I.val.2 ↦ (I.val.1.submoduleOf I.val.2).mkQ x, map_add' := fun _ _ => rfl, map_smul' := fun _ _ => rfl }
+
 noncomputable abbrev ker_of_quot_comp_localization {R : Type} [CommRing R] [IsNoetherianRing R]
 {M : Type} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]
 (I : {z: (ℒ R M) × (ℒ R M) // z.1 < z.2})
-: ℒ R M := by
-  let f1 := LocalizedModule.mkLinearMap (((_μ R M) I).toFinset.min' (μ_nonempty I)).asIdeal.primeCompl (I.val.2⧸I.val.1.submoduleOf I.val.2)
-  let f2 : I.val.2 →ₗ[R] (I.val.2⧸I.val.1.submoduleOf I.val.2) :=
-    { toFun := fun x : I.val.2 ↦ (I.val.1.submoduleOf I.val.2).mkQ x,
-      map_add' := fun x y => rfl,
-      map_smul' := fun r x => rfl }
-  exact Submodule.map I.val.2.subtype (LinearMap.ker (f1 ∘ₗ f2))
+: ℒ R M :=
+Submodule.map I.val.2.subtype (LinearMap.ker ((f1 I) ∘ₗ (f2 I)))
 
 lemma prop3d12p2 {R : Type} [CommRing R] [IsNoetherianRing R]
 {M : Type} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]
@@ -216,11 +219,7 @@ lemma prop3d12p2 {R : Type} [CommRing R] [IsNoetherianRing R]
 
 lemma TBA {R : Type} [CommRing R] [IsNoetherianRing R]
 {M : Type} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]
-(I : {z: (ℒ R M) × (ℒ R M) // z.1 < z.2})
-:
-(
-InIntvl I (ker_of_quot_comp_localization I) ∧ (ker_of_quot_comp_localization I) ≠ I.val.2
-) ∧
+(I : {z: (ℒ R M) × (ℒ R M) // z.1 < z.2}) :
 associatedPrimes R (I.val.2⧸(ker_of_quot_comp_localization I).submoduleOf I.val.2) = {(((_μ R M) I).toFinset.min' (μ_nonempty I)).asIdeal}
 := sorry
 
@@ -237,13 +236,12 @@ lemma prop3d12 {R : Type} [CommRing R] [IsNoetherianRing R]
     use ker_of_quot_comp_localization I
     constructor
     · conv_lhs => unfold _μ
-      simp only [(TBA I).2, Set.mem_singleton_iff, exists_prop_eq, Set.setOf_eq_eq_singleton',
+      simp only [TBA I, Set.mem_singleton_iff, exists_prop_eq, Set.setOf_eq_eq_singleton',
         Set.toFinset_singleton, Finset.singleton_inj]
       rfl
     · constructor
       · constructor
         · unfold ker_of_quot_comp_localization
-          simp only [Submodule.mkQ_apply]
           intro z hz
           simp only [Submodule.mem_map, LinearMap.mem_ker, LinearMap.coe_comp, LinearMap.coe_mk,
             AddHom.coe_mk, Function.comp_apply, Submodule.subtype_apply, Subtype.exists,
@@ -252,8 +250,8 @@ lemma prop3d12 {R : Type} [CommRing R] [IsNoetherianRing R]
           have : Submodule.Quotient.mk ⟨z, (Iff.of_eq (Eq.refl (z ∈ I.val.2))).mpr (le_of_lt (Subtype.prop I) hz) ⟩ = (0 : ↥I.val.2 ⧸ Submodule.submoduleOf I.val.1 I.val.2) := by
             simp only [Submodule.Quotient.mk_eq_zero]
             exact hz
-          simp only [this]
-          exact rfl
+          simp only [Submodule.mkQ_apply, this, LocalizedModule.mkLinearMap_apply,
+            LocalizedModule.zero_mk]
         · unfold ker_of_quot_comp_localization
           simp only [Submodule.map_subtype_le]
       · by_contra hc
@@ -262,15 +260,35 @@ lemma prop3d12 {R : Type} [CommRing R] [IsNoetherianRing R]
         rcases this with ⟨p,⟨hp1,hp2⟩⟩
         apply mem_support_of_mem_associatedPrimes at hp1
         have hp1 := hp1.out
-        have : LinearMap.ker (LocalizedModule.mkLinearMap (((_μ R M) I).toFinset.min' (μ_nonempty I)).asIdeal.primeCompl (I.val.2⧸I.val.1.submoduleOf I.val.2)) ≠ ⊤ := by
+        have : LinearMap.ker (f1 I) ≠ ⊤ := by
           by_contra hc
           apply LocalizedModule.subsingleton_iff_ker_eq_top.2 at hc
           rw [hp2] at hp1
           exact false_of_nontrivial_of_subsingleton (LocalizedModule ((_μ R M I).toFinset.min' (μ_nonempty I)).asIdeal.primeCompl (↥I.val.2 ⧸ Submodule.submoduleOf I.val.1 I.val.2))
-
-
-
-        sorry
+        have : ∃ m : (↥I.val.2 ⧸ Submodule.submoduleOf I.val.1 I.val.2), (f1 I) m ≠ 0 := by
+          by_contra hc
+          push_neg at hc
+          have this' : LinearMap.ker (f1 I) = ⊤ := Submodule.ext fun z ↦ { mp := fun hz ↦ True.intro, mpr := fun hz ↦ hc z }
+          exact this this'
+        rcases this with ⟨m,hm⟩
+        unfold ker_of_quot_comp_localization at hc
+        have this' : (f1 I ∘ₗ f2 I) m.out = 0 := by
+          have : m.out.val ∈ Submodule.map (Submodule.subtype I.val.2) (LinearMap.ker (f1 I ∘ₗ f2 I)) := by
+            have := m.out.prop
+            conv at this =>
+              arg 1; simp [← hc]
+            exact this
+          simp only [ne_eq, LinearMap.ker_eq_top, LocalizedModule.mkLinearMap_apply,
+            Submodule.mem_map, LinearMap.mem_ker, LinearMap.coe_comp, LinearMap.coe_mk,
+            Submodule.mkQ_apply, AddHom.coe_mk, Function.comp_apply, Submodule.subtype_apply,
+            SetLike.coe_eq_coe, exists_eq_right] at *
+          exact this
+        unfold f2 at this'
+        simp only [Submodule.mkQ_apply, LinearMap.coe_comp, LinearMap.coe_mk, AddHom.coe_mk,
+          Function.comp_apply] at this'
+        unfold Submodule.Quotient.mk Quotient.mk'' at this'
+        rw [Quotient.out_eq] at this'
+        exact hm this'
   apply IsLeast.csInf_eq
   refine ⟨res1,?_⟩
   apply mem_lowerBounds.2
