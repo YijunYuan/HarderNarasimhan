@@ -25,7 +25,7 @@ namespace HarderNarasimhan
 namespace impl
 
 lemma μ_nonempty {R : Type} [CommRing R] [IsNoetherianRing R]
-{M : Type} [Nontrivial M] [AddCommGroup M] [Module R M]  [Module.Finite R M]:
+{M : Type} [Nontrivial M] [AddCommGroup M] [Module R M]  [Module.Finite R M] :
 ∀ I : {z: (ℒ R M) × (ℒ R M) // z.1 < z.2}, (_μ R M I).toFinset.Nonempty := by
   intro I
   simp only [Set.toFinset_nonempty]
@@ -137,7 +137,7 @@ lemma TBA' {R : Type} [CommRing R]
 (N₁ N₂ N₃ : Submodule R M) (h : N₁ ≤ N₂)
 : Module.support R (N₃⧸ N₂.submoduleOf N₃) ⊆ Module.support R (N₃⧸ N₁.submoduleOf N₃) := by
   intro p hp
-  simp [Module.mem_support_iff_exists_annihilator] at *
+  simp only [Module.mem_support_iff_exists_annihilator] at *
   rcases hp with ⟨m,hm⟩
   use Submodule.Quotient.mk m.out
   intro z hz
@@ -160,6 +160,7 @@ lemma TBA' {R : Type} [CommRing R]
     exact (Submodule.sub_mem_iff_right (N₂.submoduleOf N₃) (h this)).mp this'
   exact hm this
 
+-- `https://stacks.math.columbia.edu/tag/02CE`
 lemma min_associated_prime_iff_min_supp {R : Type} [CommRing R] [IsNoetherianRing R]
 {M : Type} [AddCommGroup M] [Module R M] [Module.Finite R M]
 {I : PrimeSpectrum R} :
@@ -168,12 +169,16 @@ Minimal (fun J ↦ J ∈ associatedPrimes R M) I.asIdeal ↔ Minimal (fun J ↦ 
 
 lemma exists_minimal_prime_contained_supp {R : Type} [CommRing R] [IsNoetherianRing R]
 {M : Type} [AddCommGroup M] [Module R M] [Module.Finite R M] :
-∀ q : PrimeSpectrum R, q ∈ Module.support R M → ∃ p : PrimeSpectrum R, Minimal (fun J ↦ J ∈ Module.support R M) p ∧ p ≤ q := by sorry
+∀ q : PrimeSpectrum R, q ∈ Module.support R M → ∃ p : PrimeSpectrum R, Minimal (fun J ↦ J ∈ Module.support R M) p ∧ p ≤ q := by
+  intro q hq
+
+  sorry
 
 lemma prop3d12p1 {R : Type} [CommRing R] [IsNoetherianRing R]
 {M : Type} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]
 (I : {z: (ℒ R M) × (ℒ R M) // z.1 < z.2})
-(N'' : ℒ R M) (ha1 : InIntvl I N'') (ha2 : N'' ≠ I.val.2) : ∀ q : Ideal R, (hq : q ∈ associatedPrimes R (I.val.2⧸N''.submoduleOf I.val.2)) → {asIdeal := q, isPrime := hq.out.1 } ≥ (((_μ R M) I).toFinset.min' (μ_nonempty I)) := by
+(N'' : ℒ R M) (ha1 : InIntvl I N'') :
+∀ q : Ideal R, (hq : q ∈ associatedPrimes R (I.val.2⧸N''.submoduleOf I.val.2)) → {asIdeal := q, isPrime := hq.out.1 } ≥ (((_μ R M) I).toFinset.min' (μ_nonempty I)) := by
   intro q hq
   have hq' := TBA' I.val.1 N'' I.val.2 (ha1.1) <| mem_support_of_mem_associatedPrimes hq
   obtain ⟨r,hr,hr'⟩ := exists_minimal_prime_contained_supp {asIdeal := q, isPrime := hq.out.1 } hq'
@@ -211,11 +216,20 @@ lemma prop3d12p2 {R : Type} [CommRing R] [IsNoetherianRing R]
       rcases this with ⟨p,⟨hp1,hp2⟩⟩
       rw [← hp2]
       exact hp1
-    exact prop3d12p1 I N'' ha1 ha2 (((_μ R M ⟨(N'', I.val.2), lt_of_le_of_ne ha1.2 ha2⟩).toFinset.min' <| μ_nonempty ⟨(N'', I.val.2), lt_of_le_of_ne ha1.2 ha2⟩).asIdeal) this'
+    exact prop3d12p1 I N'' ha1 (((_μ R M ⟨(N'', I.val.2), lt_of_le_of_ne ha1.2 ha2⟩).toFinset.min' <| μ_nonempty ⟨(N'', I.val.2), lt_of_le_of_ne ha1.2 ha2⟩).asIdeal) this'
   refine le_trans this ?_
   apply S₀_order.1
   simp only [Set.subset_toFinset, Finset.coe_singleton, Set.singleton_subset_iff]
   exact Set.mem_toFinset.mp <| (_μ R M ⟨(N'', I.val.2), lt_of_le_of_ne ha1.2 ha2⟩).toFinset.min'_mem <| μ_nonempty ⟨(N'', I.val.2), lt_of_le_of_ne ha1.2 ha2⟩
+
+lemma bourbaki_elements_math_alg_comm_chIV_sec1_no2_prop6
+{R : Type} [CommRing R] [IsNoetherianRing R]
+{M : Type} [AddCommGroup M] [Module R M]
+{S : Submonoid R} {N : Submodule R M} :
+  (associatedPrimes R N) = (associatedPrimes R M) \ { p ∈ associatedPrimes R M | p.carrier ∩ S = ∅ } ∧
+  (associatedPrimes R (M⧸N)) = { p ∈ associatedPrimes R M | p.carrier ∩ S = ∅ }
+↔ N = LinearMap.ker (LocalizedModule.mkLinearMap S M)
+:= by admit
 
 lemma TBA {R : Type} [CommRing R] [IsNoetherianRing R]
 {M : Type} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]
