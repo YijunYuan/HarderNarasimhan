@@ -170,8 +170,11 @@ lemma exists_minimal_prime_contained_supp {R : Type} [CommRing R] [IsNoetherianR
 {M : Type} [AddCommGroup M] [Module R M] [Module.Finite R M] :
 ∀ q : PrimeSpectrum R, q ∈ Module.support R M → ∃ p : PrimeSpectrum R, Minimal (fun J ↦ J ∈ Module.support R M) p ∧ p ≤ q := by
   intro q hq
-
-  sorry
+  rcases Ideal.exists_minimalPrimes_le <| Module.mem_support_iff_of_finite.1 hq with ⟨r,hr⟩
+  use ⟨r, hr.1.out.1.1⟩
+  refine ⟨?_,hr.2⟩
+  simp only [Module.mem_support_iff_of_finite]
+  exact ⟨hr.1.out.1.2, fun y hy1 hy2 ↦ hr.1.out.2 ⟨y.isPrime,hy1⟩ hy2⟩
 
 lemma prop3d12p1 {R : Type} [CommRing R] [IsNoetherianRing R]
 {M : Type} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]
