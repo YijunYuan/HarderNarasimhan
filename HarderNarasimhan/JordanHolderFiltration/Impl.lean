@@ -575,16 +575,50 @@ lemma looooooooooooooooog_lemma : ∀ n : ℕ, ∀ ℒ : Type, ∀ ntl: Nontrivi
           if hjbot : ⊥ = JHy.filtration j  then
             simp only [← hjbot, bot_le, sup_of_le_left]
             rw [← μA_eq_μmin μ]
-
-
-            sorry
+            have := JHx.step_cond₁ (Nat.find JHx.fin_len -1) (by omega)
+            rw [← this]
+            unfold μmin
+            apply le_sInf
+            intro b hb
+            rcases hb with ⟨u,hu1,hu2⟩
+            rw [← hu2]
+            have := JHx.step_cond₂ (Nat.find JHx.fin_len -1) (by omega) u
+            simp only [Nat.sub_one_add_one <| JH_pos_len JHx, Nat.find_spec JHx.fin_len] at *
+            if ubot : u = ⊥ then
+              simp only [ubot]
+              exact le_rfl
+            else
+              apply bot_lt_iff_ne_bot.2 at ubot
+              have := this ubot (lt_of_le_of_ne hu1.1.2 hu1.2)
+              exact le_of_lt <| ((seesaw_useful μ hsl ⊥ u (JHx.filtration (Nat.find JHx.fin_len - 1)) ⟨ubot,lt_of_le_of_ne hu1.1.2 hu1.2⟩).1.1 this).2
           else
           have := (proposition_2_8 μ inferInstance (JHx.filtration (Nat.find JHx.fin_len - 1)) (JHy.filtration j) ⊥ ⟨bot_lt_iff_ne_bot.mpr (Nat.find_min JHx.fin_len (Nat.sub_one_lt (JH_pos_len JHx))),bot_lt_iff_ne_bot.2 fun a ↦ hjbot (id (Eq.symm a))⟩).1
           convert this.le
           have t1 : μ TotIntvl = μA μ ⟨(⊥, JHx.filtration (Nat.find JHx.fin_len - 1)), bot_lt_iff_ne_bot.mpr (Nat.find_min JHx.fin_len (Nat.sub_one_lt (JH_pos_len JHx)))⟩ := by
             rw [← μA_eq_μmin μ]
+            have := JHx.step_cond₁ (Nat.find JHx.fin_len -1) (by omega)
+            simp only [Nat.sub_one_add_one <| JH_pos_len JHx, Nat.find_spec JHx.fin_len] at this
+            unfold TotIntvl
+            rw [← this]
+            unfold μmin
+            refine eq_of_le_of_le ?_ ?_
+            · apply le_sInf
+              intro b hb
+              simp only [ne_eq, Set.mem_setOf_eq] at hb
+              rcases hb with ⟨u,hu1,hu2⟩
+              rw [← hu2]
 
-            sorry
+              sorry
+            · apply sInf_le
+              simp only [ne_eq, Set.mem_setOf_eq]
+              use ⊥
+              simp only [exists_prop, and_true]
+              refine ⟨⟨le_rfl,bot_le⟩,?_⟩
+              apply Ne.symm
+              apply bot_lt_iff_ne_bot.1
+              have := JHx.strict_anti  (Nat.find JHx.fin_len -1) (Nat.find JHx.fin_len) (by omega) le_rfl
+              rw [Nat.find_spec JHx.fin_len] at this
+              exact this
           have t2 : μ TotIntvl = μA μ ⟨(⊥, JHy.filtration j), bot_lt_iff_ne_bot.2 fun a ↦ hjbot (id (Eq.symm a))⟩ := by
             rw [← μA_eq_μmin μ]
             sorry
