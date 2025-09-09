@@ -498,6 +498,50 @@ lemma μA_eq_μmin {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ
         rcases hy with ⟨a,ha1,ha2⟩
         use a, ⟨⟨ha1.1.1,a.prop.2⟩,fun hc ↦ ha1.right (Subtype.coe_inj.mp hc)⟩
 
+lemma μ_bot_JH_eq_μ_tot {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
+{S : Type} [CompleteLinearOrder S]
+{μ : {p : ℒ × ℒ // p.1 < p.2} → S}
+[hftp : FiniteTotalPayoff μ] [hsl : SlopeLike μ] [hst : Semistable μ] [hwdcc' : WeakDescendingChainCondition' μ] (JH : JordanHolderFiltration μ) : ∀ i : ℕ, (hi : i < Nat.find JH.fin_len) → μ ⟨(⊥, JH.filtration i), by
+  rw [← Nat.find_spec JH.fin_len]
+  apply JH.strict_anti
+  exact hi
+  exact le_rfl
+  ⟩ = μ ⟨(⊥, ⊤), bot_lt_top⟩ := by
+  intro i hi
+  induction' i with i hi'
+  · simp only [JH.first_eq_top]
+  · have := seesaw_useful μ hsl ⊥ (JH.filtration (i + 1)) ⊤ ⟨by
+      rw [← Nat.find_spec JH.fin_len]
+      apply JH.strict_anti
+      exact hi
+      exact le_rfl
+      ,by
+      rw [← JH.first_eq_top]
+      apply JH.strict_anti
+      exact Nat.zero_lt_succ i
+      exact le_of_lt hi
+      ⟩
+    refine (this.2.2.2.2 ?_).1
+    rw [← JH.step_cond₁ i <| Nat.lt_of_succ_lt hi]
+    if htop : JH.filtration i = ⊤ then
+      simp only [htop]
+    else
+    have := seesaw_useful μ hsl (JH.filtration (i + 1)) (JH.filtration i) ⊤ ⟨by
+      apply JH.strict_anti
+      exact lt_add_one i
+      exact Nat.le_of_succ_le hi
+      ,Ne.lt_top' fun a ↦ htop (id (Eq.symm a))
+      ⟩
+    refine (this.2.2.2.1 ?_).1
+    have hi' := hi' (Nat.lt_of_succ_lt hi)
+    have := seesaw_useful μ hsl ⊥ (JH.filtration i) ⊤ ⟨by
+      rw [← Nat.find_spec JH.fin_len]
+      apply JH.strict_anti
+      · exact Nat.lt_of_succ_lt hi
+      · exact le_rfl
+      ,Ne.lt_top' fun a ↦ htop (id (Eq.symm a))⟩
+    rw [← (this.2.2.1 hi').2,JH.step_cond₁ i <| Nat.lt_of_succ_lt hi]
+
 --set_option maxHeartbeats 0
 lemma looooooooooooooooog_lemma : ∀ n : ℕ, ∀ ℒ : Type, ∀ ntl: Nontrivial ℒ, ∀ l : Lattice ℒ, ∀ bo : BoundedOrder ℒ, ∀ wacc : WellFoundedGT ℒ,
 ∀ S : Type, ∀ clo : CompleteLinearOrder S, ∀ μ : {p : ℒ × ℒ // p.1 < p.2} → S,
@@ -621,7 +665,23 @@ lemma looooooooooooooooog_lemma : ∀ n : ℕ, ∀ ℒ : Type, ∀ ntl: Nontrivi
               exact this
           have t2 : μ TotIntvl = μA μ ⟨(⊥, JHy.filtration j), bot_lt_iff_ne_bot.2 fun a ↦ hjbot (id (Eq.symm a))⟩ := by
             rw [← μA_eq_μmin μ]
-            sorry
+            unfold TotIntvl
+            have := μ_bot_JH_eq_μ_tot JHy j sorry
+            rw [← this]
+            unfold μmin
+            refine eq_of_le_of_le ?_ ?_
+            · apply le_sInf
+              intro h hb
+              simp only [ne_eq, id_eq, Set.mem_setOf_eq] at hb
+              rcases hb with ⟨u,hu1,hu2⟩
+              rw [← hu2]
+
+              sorry
+            · apply sInf_le
+              simp only [ne_eq, id_eq, Set.mem_setOf_eq]
+              use ⊥
+              simp only [exists_prop, and_true]
+              exact ⟨⟨le_rfl,bot_le⟩,hjbot⟩
           rw [← t1,← t2]
           exact Eq.symm (min_self (μ TotIntvl))
       have tj1 := hj' j (le_of_lt <| lt_of_lt_of_le hj <| Nat.find_min' ((⟨Nat.find JHy.fin_len,JH_raw_fin_len⟩) : ∃ k, JH_raw k = ⊥) JH_raw_fin_len)
