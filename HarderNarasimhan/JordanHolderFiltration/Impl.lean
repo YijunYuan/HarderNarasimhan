@@ -10,6 +10,7 @@ import HarderNarasimhan.SlopeLike.Result
 import HarderNarasimhan.FirstMoverAdvantage.Results
 import HarderNarasimhan.Convexity.Results
 import Mathlib.Data.Finite.Card
+
 open Classical
 
 namespace HarderNarasimhan
@@ -146,8 +147,7 @@ lemma JHFil_prop₂ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
   μ ⟨(JHFil μ hμ hμsl hst hdc (k + 1), z), h'⟩ < μ ⟨(JHFil μ hμ hμsl hst hdc (k + 1), JHFil μ hμ hμsl hst hdc k), JHFil_anti_mono μ hμ hμsl hst hdc k hk⟩ := by
   intro k hk z h' h''
   have this_new : Semistable μ → μmax μ TotIntvl = μ TotIntvl := by
-    have : WeakAscendingChainCondition μ := {wacc := (fun f smf ↦ False.elim (not_strictMono_of_wellFoundedGT f smf))}
-    exact fun a ↦ (List.TFAE.out (impl.thm4d21 μ hμsl this inferInstance).1 0 3).2 ((impl.thm4d21 μ hμsl this inferInstance).2.1 a)
+    exact fun a ↦ (List.TFAE.out (impl.thm4d21 μ hμsl inferInstance inferInstance).1 0 3).2 ((impl.thm4d21 μ hμsl inferInstance inferInstance).2.1 a)
   have this_new := this_new hst
   simp only [μmax, TotIntvl, ne_eq] at this_new
   have this_q: μ ⟨(⊥, z), lt_of_le_of_lt bot_le h'⟩ ≤ μ ⟨(⊥, ⊤), bot_lt_top⟩ := by
@@ -437,7 +437,7 @@ lemma μA_eq_μmin {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ
 (μ : {p : ℒ × ℒ // p.1 < p.2} → S)
 [SlopeLike μ] (I : {p : ℒ × ℒ // p.1 < p.2}) :
 μmin μ I = μA μ I := by
-  convert Eq.symm <| (proposition_4_1 (Resμ I μ) {wacc := (fun f smf ↦ False.elim (not_strictMono_of_wellFoundedGT f smf))} inferInstance).1
+  convert Eq.symm <| (proposition_4_1 (Resμ I μ) inferInstance inferInstance).1
   · unfold μmin
     congr
     ext x
@@ -501,7 +501,7 @@ lemma μA_eq_μmin {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ
 lemma μ_bot_JH_eq_μ_tot {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type} [CompleteLinearOrder S]
 {μ : {p : ℒ × ℒ // p.1 < p.2} → S}
-[hftp : FiniteTotalPayoff μ] [hsl : SlopeLike μ] [hst : Semistable μ] [hwdcc' : WeakDescendingChainCondition' μ] (JH : JordanHolderFiltration μ) : ∀ i : ℕ, (hi : i < Nat.find JH.fin_len) → μ ⟨(⊥, JH.filtration i), by
+[hsl : SlopeLike μ] (JH : JordanHolderFiltration μ) : ∀ i : ℕ, (hi : i < Nat.find JH.fin_len) → μ ⟨(⊥, JH.filtration i), by
   rw [← Nat.find_spec JH.fin_len]
   apply JH.strict_anti
   exact hi
@@ -602,8 +602,7 @@ lemma looooooooooooooooog_lemma : ∀ n : ℕ, ∀ ℒ : Type, ∀ ntl: Nontrivi
       have hj': ∀ j: ℕ, j ≤ Nat.find JHy.fin_len → μ ⟨(⊥,JHx.filtration (Nat.find JHx.fin_len -1) ⊔ JHy.filtration j), lt_of_lt_of_le (bot_lt_iff_ne_bot.2 <| Nat.find_min JHx.fin_len <| Nat.sub_one_lt <| JH_pos_len JHx) le_sup_left⟩ = μ ⟨(⊥,⊤),bot_lt_top⟩ := by
         refine fun j hj ↦ eq_of_le_of_le ?_ ?_
         · have : Semistable μ → μmax μ TotIntvl = μ TotIntvl := by
-            have : WeakAscendingChainCondition μ := {wacc := (fun f smf ↦ False.elim (not_strictMono_of_wellFoundedGT f smf))}
-            exact fun a ↦ (List.TFAE.out (impl.thm4d21 μ hsl this inferInstance).1 0 3).2 ((impl.thm4d21 μ hsl this inferInstance).2.1 a)
+            exact fun a ↦ (List.TFAE.out (impl.thm4d21 μ hsl inferInstance inferInstance).1 0 3).2 ((impl.thm4d21 μ hsl inferInstance inferInstance).2.1 a)
           have := this hst
           unfold TotIntvl at this
           rw [← this]
@@ -640,38 +639,9 @@ lemma looooooooooooooooog_lemma : ∀ n : ℕ, ∀ ℒ : Type, ∀ ntl: Nontrivi
           convert this.le
           have t1 : μ TotIntvl = μA μ ⟨(⊥, JHx.filtration (Nat.find JHx.fin_len - 1)), bot_lt_iff_ne_bot.mpr (Nat.find_min JHx.fin_len (Nat.sub_one_lt (JH_pos_len JHx)))⟩ := by
             rw [← μA_eq_μmin μ]
-            have := JHx.step_cond₁ (Nat.find JHx.fin_len -1) (by omega)
-            simp only [Nat.sub_one_add_one <| JH_pos_len JHx, Nat.find_spec JHx.fin_len] at this
             unfold TotIntvl
-            rw [← this]
-            unfold μmin
-            refine eq_of_le_of_le ?_ ?_
-            · apply le_sInf
-              intro b hb
-              simp only [ne_eq, Set.mem_setOf_eq] at hb
-              rcases hb with ⟨u,hu1,hu2⟩
-              rw [← hu2]
-
-              sorry
-            · apply sInf_le
-              simp only [ne_eq, Set.mem_setOf_eq]
-              use ⊥
-              simp only [exists_prop, and_true]
-              refine ⟨⟨le_rfl,bot_le⟩,?_⟩
-              apply Ne.symm
-              apply bot_lt_iff_ne_bot.1
-              have := JHx.strict_anti  (Nat.find JHx.fin_len -1) (Nat.find JHx.fin_len) (by omega) le_rfl
-              rw [Nat.find_spec JHx.fin_len] at this
-              exact this
-          have t2 : μ TotIntvl = μA μ ⟨(⊥, JHy.filtration j), bot_lt_iff_ne_bot.2 fun a ↦ hjbot (id (Eq.symm a))⟩ := by
-            rw [← μA_eq_μmin μ]
-            unfold TotIntvl
-            have := μ_bot_JH_eq_μ_tot JHy j (by
-              refine lt_of_le_of_ne hj ?_
-              by_contra hc
-              exact hjbot (hc ▸ Nat.find_spec JHy.fin_len).symm
-            )
-            rw [← this]
+            have hess := μ_bot_JH_eq_μ_tot JHx (Nat.find JHx.fin_len -1) (by omega)
+            rw [← hess]
             unfold μmin
             refine eq_of_le_of_le ?_ ?_
             · apply le_sInf
@@ -679,8 +649,65 @@ lemma looooooooooooooooog_lemma : ∀ n : ℕ, ∀ ℒ : Type, ∀ ntl: Nontrivi
               simp only [ne_eq, id_eq, Set.mem_setOf_eq] at hb
               rcases hb with ⟨u,hu1,hu2⟩
               rw [← hu2]
-
-              sorry
+              if hubot : u = ⊥ then
+                simp only [hubot, le_refl]
+              else
+              by_contra hc
+              simp only [not_le] at hc
+              have := seesaw_useful μ hsl ⊥ u (JHx.filtration (Nat.find JHx.fin_len - 1)) ⟨bot_lt_iff_ne_bot.2 hubot,lt_of_le_of_ne hu1.1.2 hu1.2⟩
+              have hc := (this.2.1.2.2 hc).1
+              rw [hess] at hc
+              have := (List.TFAE.out (impl.thm4d21 μ hsl inferInstance inferInstance).1 0 3).2 ((impl.thm4d21 μ hsl inferInstance inferInstance).2.1 hst)
+              have this' : μ ⟨(⊥, u), bot_lt_iff_ne_bot.mpr hubot⟩ ≤ μmax μ TotIntvl := by
+                apply le_sSup
+                simp only [ne_eq, Set.mem_setOf_eq]
+                use u, ⟨in_TotIntvl _,Ne.symm hubot⟩
+                rfl
+              rw [this] at this'
+              unfold TotIntvl at this'
+              exact (not_le_of_lt hc this').elim
+            · apply sInf_le
+              simp only [ne_eq, id_eq, Set.mem_setOf_eq]
+              use ⊥
+              simp only [exists_prop, and_true]
+              refine ⟨⟨le_rfl,bot_le⟩, ?_⟩
+              by_contra hc
+              have := (Nat.find_spec JHx.fin_len) ▸ JHx.strict_anti (Nat.find JHx.fin_len -1) (Nat.find JHx.fin_len) (by omega) le_rfl
+              rw [← hc] at this
+              exact lt_irrefl _ this
+          have t2 : μ TotIntvl = μA μ ⟨(⊥, JHy.filtration j), bot_lt_iff_ne_bot.2 fun a ↦ hjbot (id (Eq.symm a))⟩ := by
+            rw [← μA_eq_μmin μ]
+            unfold TotIntvl
+            have hess := μ_bot_JH_eq_μ_tot JHy j (by
+              refine lt_of_le_of_ne hj ?_
+              by_contra hc
+              exact hjbot (hc ▸ Nat.find_spec JHy.fin_len).symm
+            )
+            rw [← hess]
+            unfold μmin
+            refine eq_of_le_of_le ?_ ?_
+            · apply le_sInf
+              intro h hb
+              simp only [ne_eq, id_eq, Set.mem_setOf_eq] at hb
+              rcases hb with ⟨u,hu1,hu2⟩
+              rw [← hu2]
+              if hubot : u = ⊥ then
+                simp only [hubot, le_refl]
+              else
+              by_contra hc
+              simp only [not_le] at hc
+              have := seesaw_useful μ hsl ⊥ u (JHy.filtration j) ⟨bot_lt_iff_ne_bot.2 hubot,lt_of_le_of_ne hu1.1.2 hu1.2⟩
+              have hc := (this.2.1.2.2 hc).1
+              rw [hess] at hc
+              have := (List.TFAE.out (impl.thm4d21 μ hsl inferInstance inferInstance).1 0 3).2 ((impl.thm4d21 μ hsl inferInstance inferInstance).2.1 hst)
+              have this' : μ ⟨(⊥, u), bot_lt_iff_ne_bot.mpr hubot⟩ ≤ μmax μ TotIntvl := by
+                apply le_sSup
+                simp only [ne_eq, Set.mem_setOf_eq]
+                use u, ⟨in_TotIntvl _,Ne.symm hubot⟩
+                rfl
+              rw [this] at this'
+              unfold TotIntvl at this'
+              exact (not_le_of_lt hc this').elim
             · apply sInf_le
               simp only [ne_eq, id_eq, Set.mem_setOf_eq]
               use ⊥

@@ -76,8 +76,7 @@ instance {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFou
   simp only [Resμ]
   by_contra h
   have : Semistable μ → μmax μ TotIntvl = μ TotIntvl := by
-    have : WeakAscendingChainCondition μ := {wacc := (fun f smf ↦ False.elim (not_strictMono_of_wellFoundedGT f smf))}
-    exact fun a ↦ (List.TFAE.out (impl.thm4d21 μ hsl this inferInstance).1 0 3).2 ((impl.thm4d21 μ hsl this inferInstance).2.1 a)
+    exact fun a ↦ (List.TFAE.out (impl.thm4d21 μ hsl inferInstance inferInstance).1 0 3).2 ((impl.thm4d21 μ hsl inferInstance inferInstance).2.1 a)
   have := this hst
   simp [μmax, TotIntvl] at this
   have this_q: μ ⟨(⊥, x), hx⟩ ≤ μ ⟨(⊥, ⊤), bot_lt_top⟩ := by
