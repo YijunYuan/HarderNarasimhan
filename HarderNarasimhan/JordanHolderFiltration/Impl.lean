@@ -666,7 +666,11 @@ lemma looooooooooooooooog_lemma : ∀ n : ℕ, ∀ ℒ : Type, ∀ ntl: Nontrivi
           have t2 : μ TotIntvl = μA μ ⟨(⊥, JHy.filtration j), bot_lt_iff_ne_bot.2 fun a ↦ hjbot (id (Eq.symm a))⟩ := by
             rw [← μA_eq_μmin μ]
             unfold TotIntvl
-            have := μ_bot_JH_eq_μ_tot JHy j sorry
+            have := μ_bot_JH_eq_μ_tot JHy j (by
+              refine lt_of_le_of_ne hj ?_
+              by_contra hc
+              exact hjbot (hc ▸ Nat.find_spec JHy.fin_len).symm
+            )
             rw [← this]
             unfold μmin
             refine eq_of_le_of_le ?_ ?_
