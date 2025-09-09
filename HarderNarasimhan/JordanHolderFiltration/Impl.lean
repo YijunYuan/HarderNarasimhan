@@ -542,7 +542,31 @@ lemma μ_bot_JH_eq_μ_tot {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOr
       ,Ne.lt_top' fun a ↦ htop (id (Eq.symm a))⟩
     rw [← (this.2.2.1 hi').2,JH.step_cond₁ i <| Nat.lt_of_succ_lt hi]
 
---set_option maxHeartbeats 0
+lemma res_ss {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
+{S : Type} [CompleteLinearOrder S]
+{μ : {p : ℒ × ℒ // p.1 < p.2} → S}
+[FiniteTotalPayoff μ] [SlopeLike μ] [Semistable μ]
+[WeakDescendingChainCondition' μ] [Affine μ] (JH : JordanHolderFiltration μ) (h : JH.filtration (Nat.find JH.fin_len - 1) < ⊤) : Semistable (Resμ ⟨(JH.filtration (Nat.find JH.fin_len - 1),⊤),h⟩ μ) := by
+  apply (thm4d21 (Resμ ⟨(JH.filtration (Nat.find JH.fin_len - 1),⊤),h⟩ μ) inferInstance inferInstance inferInstance).2.2 (fun _ _ ↦ inferInstance)
+  apply (List.TFAE.out (thm4d21 (Resμ ⟨(JH.filtration (Nat.find JH.fin_len - 1),⊤),h⟩ μ) inferInstance inferInstance inferInstance).1 1 3).1
+  unfold TotIntvl
+  rw [μmin_res_intvl, μ_res_intvl]
+  simp only [μmin]
+  apply eq_of_le_of_le ?_ ?_
+  · apply sInf_le
+    simp only [ne_eq, Set.mem_setOf_eq]
+    use JH.filtration (Nat.find JH.fin_len - 1)
+    use ⟨⟨le_rfl,le_top⟩,lt_top_iff_ne_top.1 h⟩
+    rfl
+  · apply le_sInf
+    intro z hz
+    simp only [ne_eq, Set.mem_setOf_eq] at hz
+    rcases hz with ⟨u,⟨hu1,hu2⟩⟩
+    rw [← hu2]
+
+    sorry
+
+
 lemma looooooooooooooooog_lemma : ∀ n : ℕ, ∀ ℒ : Type, ∀ ntl: Nontrivial ℒ, ∀ l : Lattice ℒ, ∀ bo : BoundedOrder ℒ, ∀ wacc : WellFoundedGT ℒ,
 ∀ S : Type, ∀ clo : CompleteLinearOrder S, ∀ μ : {p : ℒ × ℒ // p.1 < p.2} → S,
 ∀ hftp : FiniteTotalPayoff μ, ∀ hsl : SlopeLike μ,
@@ -896,7 +920,7 @@ lemma looooooooooooooooog_lemma : ∀ n : ℕ, ∀ ℒ : Type, ∀ ntl: Nontrivi
         simp only [JHfun]; simp only [Eq.mpr (id (congrArg (fun _a ↦ i + 1 ≤ _a) hhard.symm)) hi,
           ↓reduceDIte, le_of_lt <| hhard ▸ hi, gt_iff_lt, JHfun]
         exact JHx.step_cond₂ i (Nat.lt_of_lt_pred <| hhard ▸ hi) z htemp htemp2
-    exact Nat.le_add_of_sub_le <| hhard ▸ hn (Interval Ires) inferInstance inferInstance inferInstance inferInstance S clo (Resμ Ires μ) ftpLres inferInstance sorry inferInstance inferInstance ⟨JH_FINAL,Nat.le_of_lt_succ <| Nat.lt_of_lt_of_le ha hJHy⟩ JHres
+    exact Nat.le_add_of_sub_le <| hhard ▸ hn (Interval Ires) inferInstance inferInstance inferInstance inferInstance S clo (Resμ Ires μ) ftpLres inferInstance (res_ss _ _) inferInstance inferInstance ⟨JH_FINAL,Nat.le_of_lt_succ <| Nat.lt_of_lt_of_le ha hJHy⟩ JHres
 
 
 end impl
