@@ -607,11 +607,11 @@ lemma looooooooooooooooog_lemma : ∀ n : ℕ, ∀ ℒ : Type, ∀ ntl: Nontrivi
           unfold TotIntvl at this
           rw [← this]
           apply le_sSup
-          simp
+          simp only [ne_eq, Set.mem_setOf_eq]
           use JHx.filtration (Nat.find JHx.fin_len -1) ⊔ JHy.filtration j, ⟨in_TotIntvl _,Ne.symm <| bot_lt_iff_ne_bot.1<| lt_of_lt_of_le (bot_lt_iff_ne_bot.2 <| Nat.find_min JHx.fin_len <| Nat.sub_one_lt <| JH_pos_len JHx) le_sup_left⟩
         · have : μmin μ ⟨(⊥,JHx.filtration (Nat.find JHx.fin_len -1) ⊔ JHy.filtration j),lt_of_lt_of_le (bot_lt_iff_ne_bot.2 <| Nat.find_min JHx.fin_len <| Nat.sub_one_lt <| JH_pos_len JHx) le_sup_left⟩ ≤ μ ⟨(⊥,JHx.filtration (Nat.find JHx.fin_len -1) ⊔ JHy.filtration j),lt_of_lt_of_le (bot_lt_iff_ne_bot.2 <| Nat.find_min JHx.fin_len <| Nat.sub_one_lt <| JH_pos_len JHx) le_sup_left⟩ := by
             apply sInf_le
-            simp
+            simp only [ne_eq, Set.mem_setOf_eq]
             use ⊥, ⟨⟨le_rfl, le_of_lt <| lt_of_lt_of_le (bot_lt_iff_ne_bot.2 <| Nat.find_min JHx.fin_len <| Nat.sub_one_lt <| JH_pos_len JHx) le_sup_left⟩,Ne.symm <| bot_lt_iff_ne_bot.1<| lt_of_lt_of_le (bot_lt_iff_ne_bot.2 <| Nat.find_min JHx.fin_len <| Nat.sub_one_lt <| JH_pos_len JHx) le_sup_left⟩
           refine le_trans ?_ this
           rw [μA_eq_μmin μ ⟨(⊥, JHx.filtration (Nat.find JHx.fin_len - 1) ⊔ JHy.filtration j), lt_of_lt_of_le (bot_lt_iff_ne_bot.mpr (Nat.find_min JHx.fin_len (Nat.sub_one_lt (JH_pos_len JHx)))) le_sup_left⟩]
@@ -729,11 +729,36 @@ lemma looooooooooooooooog_lemma : ∀ n : ℕ, ∀ ℒ : Type, ∀ ntl: Nontrivi
         rw [this]
         have hproblem : JHy.filtration (j + 1) ≠ JHy.filtration j ⊓ ↑w := sorry
         have hnle : ¬ (JHy.filtration j ≤ w) := by
-          by_contra!
+          by_contra hc
           simp only [JH_raw] at hw2
-          sorry
+          refine (not_le_of_lt hw2) ?_
+          apply sup_le_iff.2
+          refine ⟨?_,hc⟩
+          simp only [JH_raw] at hw1
+          have hw1 : JHx.filtration (Nat.find JHx.fin_len - 1) ⊔ JHy.filtration (j + 1) < w.val := by
+            exact lt_iff_le_not_le.mpr hw1
+          apply le_of_lt <| lt_of_le_of_lt le_sup_left hw1
         have heqs : μ ⟨(↑w, ↑(JH_raw j)), lt_iff_le_not_le.mpr hw2⟩ = μ ⟨(JHy.filtration j ⊓ w,JHy.filtration j),inf_lt_left.2 hnle⟩ := by
-          sorry
+          rw [affine.affine (JHy.filtration j) w.val hnle]
+          have : ↑(JH_raw j) = JHy.filtration j ⊔ w.val := by
+            simp only [JH_raw]
+            apply eq_of_le_of_le ?_ ?_
+            · simp only [JH_raw] at hw1
+              have hw1 := lt_iff_le_not_le.mpr hw1
+              have hw1 := sup_le_sup_right (le_of_lt hw1) (JHy.filtration j)
+              have := left_eq_sup.2 <| JHy.antitone (Nat.le_add_right j 1)
+              rw [sup_comm] at this
+              rw [sup_assoc, ← this] at hw1
+              nth_rw 2 [sup_comm] at hw1
+              exact hw1
+            · simp only [JH_raw] at hw2
+              have hw2 := lt_iff_le_not_le.mpr hw2
+              have hw2 := sup_le_sup_right (le_of_lt hw2) (JHy.filtration j)
+              nth_rw 1 [sup_assoc,sup_comm] at hw2
+              simp only [Nat.find_le_iff, forall_exists_index, and_imp, Nat.lt_find_iff, ne_eq,
+                le_refl, sup_of_le_left, sup_le_iff, le_sup_right, true_and, ge_iff_le, JH_raw] at *
+              exact hw2
+          simp only [this]
         rw [heqs,((by rfl):μ ⟨(↑(⊥: Interval Ires), ↑(⊤: Interval Ires)), nt⟩ = μ ⟨(JHx.filtration (Nat.find JHx.fin_len - 1), ⊤), nt⟩),← this',← JHy.step_cond₁ j <| lt_of_lt_of_le hj <| Nat.find_le JH_raw_fin_len]
         have hlt : JHy.filtration (j+1) < JHy.filtration j ⊓ w := by
           refine lt_of_le_of_ne (le_inf (JHy.antitone <| Nat.le_add_right j 1) ?_) hproblem
