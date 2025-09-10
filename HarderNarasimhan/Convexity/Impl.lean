@@ -41,7 +41,7 @@ lemma lem2d4₂I
         refine le_antisymm ?_ <| inf_le_inf_right w hb.2
         nth_rw 1 [← inf_idem w, ← inf_assoc]
         exact inf_le_inf_right w <| le_of_lt hb.1
-      simp [hh]
+      simp only [hh, ge_iff_le]
       have hbnlew : ¬ b ≤ w := inf_lt_left.mp
         ((congrArg (fun _a ↦ _a < b) (hh.symm)) ▸ hb.1)
       have hfinal : μ ⟨(w, b ⊔ w), by aesop⟩ ≤ μmax μ ⟨(w, t), gt_of_ge_of_gt hxwt (right_lt_sup.2 hxw)⟩ := by
@@ -183,7 +183,7 @@ lemma comparable_iff {L : Type} [PartialOrder L]
 (x : L) (y : L)
 (h : IsComparable x y) :
 x < y ∨ y ≤ x := by
-  simp [IsComparable] at h
+  simp only [IsComparable] at h
   rw [le_iff_eq_or_lt, le_iff_eq_or_lt] at h
   nth_rw 2 [or_comm] at h
   rw [or_assoc] at h

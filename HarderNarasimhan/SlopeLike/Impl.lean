@@ -52,8 +52,8 @@ lemma not_top_of_Nontrivial_TotallyOrderedRealVectorSpace {V : Type} [TotallyOrd
   let v₀ := if v₁ < v₂ then v₂ - v₁ else v₁ - v₂
   have hpos : v₀ > 0 := by
     by_cases h : v₁ < v₂
-    · simp [v₀,h]
-    · simp [v₀,h]
+    · simp only [h, ↓reduceIte, gt_iff_lt, sub_pos, v₀]
+    · simp only [h, ↓reduceIte, gt_iff_lt, sub_pos, v₀]
       exact (eq_or_lt_of_not_lt h).resolve_left hne
   by_contra!
   exact not_top_lt <| top_le_iff.1 this ▸ (OrderTheory.coe'.lt_iff_lt.2 <| lt_add_of_pos_right v hpos)
@@ -63,7 +63,8 @@ lemma μQuotient_helper {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [Bounde
 {V : Type} [TotallyOrderedRealVectorSpace V]
 (r : {p :ℒ × ℒ // p.1 < p.2} → NNReal)
 (d : {p :ℒ × ℒ // p.1 < p.2} → V): ∀ z : {p :ℒ × ℒ // p.1 < p.2}, r z > 0 → ∃ (μ : V), (μQuotient r d) z = OrderTheory.coe' μ ∧ (r z) • μ = (d z) :=
-  fun z h ↦ ⟨(r z)⁻¹ • d z,⟨by simp [μQuotient, OrderTheory.coe', h], smul_inv_smul₀ (by aesop) (d z)⟩⟩
+  fun z h ↦ ⟨(r z)⁻¹ • d z,⟨by simp only [μQuotient, gt_iff_lt, h, ↓reduceDIte,
+    OrderTheory.coe', RelEmbedding.coe_mk, Function.Embedding.coeFn_mk], smul_inv_smul₀ (by aesop) (d z)⟩⟩
 
 
 lemma prop4d8 {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
@@ -80,47 +81,52 @@ lemma prop4d8 {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ
     have : ¬ r ⟨(y, z), h.2⟩ > 0 ∧ ¬ r ⟨(x,y), h.1⟩ > 0 := by aesop
     have : μ ⟨(x, z), lt_trans h.1 h.2⟩ = ⊤ ∧ μ ⟨(x, y), h.1⟩ = ⊤ ∧ μ ⟨(y, z), h.2⟩ = ⊤ := by
       refine ⟨?_,⟨?_,?_⟩⟩
-      · simp [μ,μQuotient, h']
-      · simp [μ,μQuotient,this.2]
-      · simp [μ,μQuotient,this.1]
+      · simp only [μQuotient, h', gt_iff_lt, lt_self_iff_false, ↓reduceDIte, μ]
+      · simp only [μQuotient, gt_iff_lt, this.2, ↓reduceDIte, μ]
+      · simp only [μQuotient, gt_iff_lt, this.1, ↓reduceDIte, μ]
     aesop
   · by_cases h'' : r ⟨(x, y), h.1⟩ > 0 ∧ r ⟨(y, z), h.2⟩ > 0
     · rcases μQuotient_helper r d ⟨(x, y), h.1⟩ h''.1 with ⟨μxy,⟨hxy₁,hxy₂⟩⟩
       rcases μQuotient_helper r d ⟨(y, z), h.2⟩ h''.2 with ⟨μyz,⟨hyz₁,hyz₂⟩⟩
       rcases μQuotient_helper r d ⟨(x, z), lt_trans h.1 h.2⟩ h' with ⟨μxz,⟨hxz₁,hxz₂⟩⟩
       have := add_smul (r ⟨(x, y), h.1⟩) (r ⟨(y, z), h.2⟩) μxz ▸ (h₁ x y z h).2 ▸ hxy₂ ▸ hyz₂ ▸ hxz₂ ▸ (h₁ x y z h).1
-      simp [μ,hxy₁,hyz₁,hxz₁]
+      simp only [hxy₁, hxz₁, OrderEmbedding.lt_iff_lt, hyz₁, gt_iff_lt,
+        EmbeddingLike.apply_eq_iff_eq, μ]
       by_cases hs : μxy < μxz
       · exact Or.inl ⟨hs,(smul_lt_smul_iff_of_pos_left h''.2).1 <| (add_lt_add_iff_left <| r ⟨(x, y), h.1⟩ • μxy).1 <| lt_sub_iff_add_lt.1 <| (eq_sub_of_add_eq this) ▸ (smul_lt_smul_iff_of_pos_left h''.1).2 hs⟩
       · by_cases hs' : μxy = μxz
         · refine Or.inr <| Or.inr <| ⟨hs',?_⟩
-          simp [hs'] at this
+          simp only [hs', add_right_inj, μ] at this
           exact smul_right_injective V (ne_of_lt h''.2).symm this
         · have hs' : μxz < μxy := lt_of_not_le (Eq.mpr (id (congrArg (fun _a ↦ ¬_a) (propext le_iff_eq_or_lt))) (not_or.mpr ⟨hs', hs⟩))
           exact Or.inr <| Or.inl <| ⟨hs',(smul_lt_smul_iff_of_pos_left h''.2).1 <| (add_lt_add_iff_left <| r ⟨(x, y), h.1⟩ • μxy).1 <| sub_lt_iff_lt_add.1 <| (eq_sub_of_add_eq this) ▸ (smul_lt_smul_iff_of_pos_left h''.1).2 hs'⟩
     · by_cases h''' : r ⟨(x, y), h.1⟩ = 0 ∧ r ⟨(y, z), h.2⟩ > 0
-      · have h2 : μ ⟨(x, y), h.1⟩ = ⊤ := by simp [μ, μQuotient, h'''.1]
+      · have h2 : μ ⟨(x, y), h.1⟩ = ⊤ := by simp only [μQuotient, h'''.1, gt_iff_lt,
+        lt_self_iff_false, ↓reduceDIte, μ]
         have h4 := (zero_add <| r ⟨(y, z), h.2⟩) ▸ h'''.1 ▸ (h₁ x y z h).2
         cases' le_iff_eq_or_lt.1 (h2 ▸ le_top : μ ⟨(x, z), lt_trans h.1 h.2⟩ ≤ μ ⟨(x, y), h.1⟩) with h3 h3
         · rcases μQuotient_helper r d ⟨(x,z),lt_trans h.1 h.2⟩ (h4 ▸ h'''.2) with ⟨w,⟨hw₁,_⟩⟩
-          simp [μ] at h3; simp [μ] at h2
+          simp only [μ] at h3; simp only [μ] at h2
           exact False.elim (not_top_lt ((h2 ▸ h3 ▸ hw₁).symm ▸ not_top_of_Nontrivial_TotallyOrderedRealVectorSpace w))
         · refine Or.inr <| Or.inl <| ⟨h3,?_⟩
-          simp [μ,μQuotient,Eq.mpr (id (congrArg (fun _a ↦ _a > 0) h4)) h'''.right,h'''.2]
+          simp only [μQuotient, gt_iff_lt, Eq.mpr (id (congrArg (fun _a ↦ _a > 0) h4)) h'''.right,
+            ↓reduceDIte, h'''.2, OrderEmbedding.lt_iff_lt, μ]
           exact h4 ▸ ((smul_lt_smul_iff_of_pos_left <| Right.inv_pos.mpr h').2 <| (h₁ x y z h).1 ▸ lt_add_of_pos_left (d ⟨(y, z), h.right⟩) <| h₂ x y h.1 h'''.1)
       · apply not_and_or.1 at h''
         apply not_and_or.1 at h'''
-        simp [pos_iff_ne_zero.symm] at h'''
+        simp only [pos_iff_ne_zero.symm, gt_iff_lt, not_lt, nonpos_iff_eq_zero, μ] at h'''
         have : r ⟨(y, z), h.2⟩ = 0 := by aesop
         have this' := (add_zero <| r ⟨(x, y), h.1⟩) ▸ (this ▸ (h₁ x y z h).2) ▸ h'
-        have h2 : μ ⟨(y, z), h.2⟩ = ⊤ := by simp [μ, μQuotient, this]
+        have h2 : μ ⟨(y, z), h.2⟩ = ⊤ := by simp only [μQuotient, this, gt_iff_lt,
+          lt_self_iff_false, ↓reduceDIte, μ]
         have h4 := (add_zero <| r ⟨(x, y), h.1⟩) ▸ this ▸ (h₁ x y z h).2
         cases' le_iff_eq_or_lt.1 (h2 ▸ le_top : μ ⟨(x, z), lt_trans h.1 h.2⟩ ≤ μ ⟨(y, z), h.2⟩) with h3 h3
         · rcases μQuotient_helper r d ⟨(x,z),lt_trans h.1 h.2⟩ (h4 ▸ this') with ⟨w,hw₁,_⟩
-          simp [μ] at h3; simp [μ] at h2
+          simp only [μ] at h3; simp only [μ] at h2
           exact False.elim (not_top_lt ((h2 ▸ h3 ▸ hw₁).symm ▸ not_top_of_Nontrivial_TotallyOrderedRealVectorSpace w))
         · refine Or.inl <| ⟨?_,h3⟩
-          simp [μ,μQuotient,this',Eq.mpr (id (congrArg (fun _a ↦ _a > 0) h4))]
+          simp only [μQuotient, gt_iff_lt, this', ↓reduceDIte,
+            Eq.mpr (id (congrArg (fun _a ↦ _a > 0) h4)), OrderEmbedding.lt_iff_lt, μ]
           exact h4 ▸ ((smul_lt_smul_iff_of_pos_left <| Right.inv_pos.mpr h').2 <| (h₁ x y z h).1 ▸ lt_add_of_pos_right (d ⟨(x, y), h.1⟩) <| h₂ y z h.2 this)
 end impl
 

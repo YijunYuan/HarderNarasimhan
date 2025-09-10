@@ -400,7 +400,7 @@ lemma prop3d12 {R : Type} [CommRing R] [IsNoetherianRing R]
           have : m.out.val ∈ Submodule.map (Submodule.subtype I.val.2) (LinearMap.ker (f1 I ∘ₗ f2 I)) := by
             have := m.out.prop
             conv at this =>
-              arg 1; simp [← hc]
+              arg 1; simp only [← hc]
             exact this
           simp only [ne_eq, LinearMap.ker_eq_top, LocalizedModule.mkLinearMap_apply,
             Submodule.mem_map, LinearMap.mem_ker, LinearMap.coe_comp, LinearMap.coe_mk,
@@ -837,7 +837,7 @@ lemma ss_iff' {R : Type} [CommRing R] [IsNoetherianRing R] {M : Type} [Nontrivia
                   simp only [SetLike.val_smul, Submodule.Quotient.mk_sub,
                     Submodule.Quotient.mk_smul]
                   unfold Submodule.Quotient.mk Quotient.mk''
-                  simp [Quotient.out_eq]
+                  simp only [Quotient.out_eq, sub_self]
                 have this' : Quotient.out (z • Quotient.out q).val ∈ Submodule.submoduleOf N₁ N₂ := by
                   have : z • q.out = 0 := by
                     rw [← Quotient.out_eq (z • q)] at hz
@@ -845,7 +845,7 @@ lemma ss_iff' {R : Type} [CommRing R] [IsNoetherianRing R] {M : Type} [Nontrivia
                     have : Submodule.submoduleOf ⊥ W = ⊥ := by
                       unfold Submodule.submoduleOf
                       simp only [Submodule.comap_bot, Submodule.ker_subtype]
-                    simp [this] at hz
+                    simp only [this, Submodule.mem_bot] at hz
                     rw [← hz]
                     have : z • q.out - (z • q).out ∈ (⊥: Submodule R ↥W) := by
                       rw [← this]
@@ -1206,7 +1206,7 @@ lemma ss_iff' {R : Type} [CommRing R] [IsNoetherianRing R] {M : Type} [Nontrivia
             simp only [Submodule.Quotient.mk_sub, Submodule.Quotient.mk_smul]
             unfold Submodule.Quotient.mk Quotient.mk''
             simp only [Quotient.out_eq, sub_self]
-          simp [this] at this'
+          simp only [this, Submodule.mem_bot] at this'
           constructor
           · intro h
             rw [h] at this'

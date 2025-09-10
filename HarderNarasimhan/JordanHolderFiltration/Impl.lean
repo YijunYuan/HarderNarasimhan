@@ -561,7 +561,6 @@ lemma res_ss {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [Wel
     rw [← hu2]
     have := (thm4d21 μ inferInstance inferInstance inferInstance).2.1 inferInstance
     have := (List.TFAE.out (thm4d21 μ inferInstance inferInstance inferInstance).1 1 3).2 this
-    unfold TotIntvl at this
     have this' : μ ⟨(u,⊤),lt_top_iff_ne_top.2 hu1.2⟩ ≥ μ ⟨(⊥,⊤),bot_lt_top⟩ := by
       rw [← this]
       apply sInf_le
@@ -643,9 +642,7 @@ lemma looooooooooooooooog_lemma : ∀ n : ℕ, ∀ ℒ : Type, ∀ _: Nontrivial
         refine fun j hj ↦ eq_of_le_of_le ?_ ?_
         · have : Semistable μ → μmax μ TotIntvl = μ TotIntvl := by
             exact fun a ↦ (List.TFAE.out (impl.thm4d21 μ hsl inferInstance inferInstance).1 0 3).2 ((impl.thm4d21 μ hsl inferInstance inferInstance).2.1 a)
-          have := this hst
-          unfold TotIntvl at this
-          rw [← this]
+          rw [← this hst]
           apply le_sSup
           simp only [ne_eq, Set.mem_setOf_eq]
           use JHx.filtration (Nat.find JHx.fin_len -1) ⊔ JHy.filtration j, ⟨in_TotIntvl _,Ne.symm <| bot_lt_iff_ne_bot.1<| lt_of_lt_of_le (bot_lt_iff_ne_bot.2 <| Nat.find_min JHx.fin_len <| Nat.sub_one_lt <| JH_pos_len JHx) le_sup_left⟩
@@ -679,7 +676,6 @@ lemma looooooooooooooooog_lemma : ∀ n : ℕ, ∀ ℒ : Type, ∀ _: Nontrivial
           convert this.le
           have t1 : μ TotIntvl = μA μ ⟨(⊥, JHx.filtration (Nat.find JHx.fin_len - 1)), bot_lt_iff_ne_bot.mpr (Nat.find_min JHx.fin_len (Nat.sub_one_lt (JH_pos_len JHx)))⟩ := by
             rw [← μA_eq_μmin μ]
-            unfold TotIntvl
             have hess := μ_bot_JH_eq_μ_tot JHx (Nat.find JHx.fin_len -1) (by omega)
             rw [← hess]
             unfold μmin
@@ -703,7 +699,6 @@ lemma looooooooooooooooog_lemma : ∀ n : ℕ, ∀ ℒ : Type, ∀ _: Nontrivial
                 simp only [ne_eq, Set.mem_setOf_eq]
                 use u, ⟨in_TotIntvl _,Ne.symm hubot⟩
               rw [this] at this'
-              unfold TotIntvl at this'
               exact (not_le_of_lt hc this').elim
             · apply sInf_le
               simp only [ne_eq, id_eq, Set.mem_setOf_eq]
@@ -716,7 +711,6 @@ lemma looooooooooooooooog_lemma : ∀ n : ℕ, ∀ ℒ : Type, ∀ _: Nontrivial
               exact lt_irrefl _ this
           have t2 : μ TotIntvl = μA μ ⟨(⊥, JHy.filtration j), bot_lt_iff_ne_bot.2 fun a ↦ hjbot (id (Eq.symm a))⟩ := by
             rw [← μA_eq_μmin μ]
-            unfold TotIntvl
             have hess := μ_bot_JH_eq_μ_tot JHy j (by
               refine lt_of_le_of_ne hj ?_
               by_contra hc
@@ -744,7 +738,6 @@ lemma looooooooooooooooog_lemma : ∀ n : ℕ, ∀ ℒ : Type, ∀ _: Nontrivial
                 simp only [ne_eq, Set.mem_setOf_eq]
                 use u, ⟨in_TotIntvl _,Ne.symm hubot⟩
               rw [this] at this'
-              unfold TotIntvl at this'
               exact (not_le_of_lt hc this').elim
             · apply sInf_le
               simp only [ne_eq, id_eq, Set.mem_setOf_eq]

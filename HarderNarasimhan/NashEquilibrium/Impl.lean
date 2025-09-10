@@ -28,11 +28,11 @@ lemma rmk4d10₁ {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder 
 μBstar μ ≤ μAstar μ ↔ ∀ x : ℒ, (hx : x ≠ ⊤) → ∀ y : ℒ, (hy : ⊥ < y) → μmin μ ⟨(⊥,y),hy⟩ ≤ μmax μ ⟨(x,⊤),lt_top_iff_ne_top.2 hx⟩ := by
   constructor
   · intro h x hx y hy
-    simp [μAstar,μBstar] at h
+    simp only [μBstar, μAstar] at h
     unfold μA at h
     unfold μB at h
     apply sSup_le_iff.1 at h
-    simp [le_sInf_iff.1] at h
+    simp only [ne_eq, Set.mem_setOf_eq, le_sInf_iff, forall_exists_index] at h
     refine (((fun (x : ℒ) (hx : ¬ ⊥ = x) ↦ h (μmin μ ⟨(⊥, x), bot_lt_iff_ne_bot.2 (by tauto)⟩) <| x) y <| ne_of_lt hy) ⟨in_TotIntvl y,by aesop⟩ <| rfl) (μmax μ ⟨(x, ⊤), lt_top_iff_ne_top.2 hx⟩) x ⟨in_TotIntvl x, hx⟩ rfl
   · refine fun h ↦ sSup_le_iff.2 ?_
     simp
@@ -51,18 +51,16 @@ NashEquilibrium μ ↔ ∀ y : ℒ, (hy : y ≠ ⊥) → μmin μ ⟨(⊥,y),bot
     have h := h.nash_eq
     unfold NashEquilibrium at h
     rw [impl.prop4d1₁ ℒ S μ h₁.wacc h₂.wsl₁] at h
-    simp [μBstar,TotIntvl,μB] at h
-    unfold TotIntvl
+    simp only [TotIntvl, μBstar, μB, ne_eq] at h
     rw [h]
     apply le_sSup
     use y, ⟨in_TotIntvl y,Ne.symm hy⟩
   · intro h
     refine {nash_eq := ?_}
     rw [impl.prop4d1₁ ℒ S μ h₁.wacc h₂.wsl₁]
-    simp [μBstar,μB]
+    simp only [μBstar, μB, ne_eq]
     apply eq_of_le_of_le
     · apply le_sSup
-      unfold TotIntvl
       use ⊤, ⟨in_TotIntvl ⊤, bot_ne_top⟩
     · apply sSup_le
       rintro b ⟨h1,⟨h2,h3⟩⟩
@@ -78,8 +76,7 @@ NashEquilibrium μ ↔ ∀ y : ℒ, (hy : y ≠ ⊤) → μmax μ TotIntvl ≤ �
   · intro h y hy
     have h := h.nash_eq
     rw [impl.prop4d3₁ μ h₁.wdcc h₂.wsl₂] at h
-    simp [μBstar,TotIntvl,μB] at h
-    unfold TotIntvl
+    simp only [TotIntvl] at h
     rw [← h]
     unfold μAstar μA
     apply sInf_le
@@ -87,10 +84,9 @@ NashEquilibrium μ ↔ ∀ y : ℒ, (hy : y ≠ ⊤) → μmax μ TotIntvl ≤ �
   · intro h
     refine {nash_eq := ?_}
     rw [impl.prop4d3₁ μ h₁.wdcc h₂.wsl₂]
-    simp [μAstar,μA]
+    simp only [μAstar, μA, ne_eq]
     apply eq_of_le_of_le
     · apply sInf_le
-      unfold TotIntvl
       use ⊥, ⟨in_TotIntvl ⊥, bot_ne_top⟩
     · apply le_sInf
       rintro b ⟨h1,⟨h2,h3⟩⟩
@@ -134,7 +130,7 @@ lemma prop4d12 {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder �
     rintro b ⟨hb1,⟨hb2,hb3⟩⟩
     rw [← hb3]
     by_cases hbot : hb1 = ⊥
-    · simp [hbot]
+    · simp only [hbot, le_refl]
     refine Or.resolve_left (h hb1 <| ⟨hbot,hb2.2⟩) ?_
     rw [not_not]
     refine h' ▸ (le_sSup ?_)
@@ -162,7 +158,7 @@ lemma prop4d14 {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder �
     rintro b ⟨hb1,⟨hb2,hb3⟩⟩
     rw [← hb3]
     by_cases htop : hb1 = ⊤
-    · simp [htop]
+    · simp only [htop, le_refl]
     refine Or.resolve_right (h hb1 ⟨by tauto,htop⟩) ?_
     rw [not_not]
     refine h' ▸ (sInf_le ?_)
@@ -268,7 +264,7 @@ NashEquilibrium μ → Semistable μ := by
       rw [← hx']
       use x, ⟨in_TotIntvl _,Ne.symm hx⟩
       refine impl.stupid_helper ?_ (Eq.symm <| impl.prop4d1₁ (Interval ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx⟩) S (Resμ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx⟩ μ) (h₁ x hx).wacc (h₂ x hx).wsl₁) ?_
-      · simp [μmin]
+      · simp only [μmin, ne_eq]
         congr 1; ext
         constructor
         · rintro ⟨ha1,⟨ha2,ha3⟩⟩
@@ -279,13 +275,13 @@ NashEquilibrium μ → Semistable μ := by
           use ha1, ⟨in_TotIntvl ha1,Subtype.coe_ne_coe.2 ha2.2⟩
           rw [← ha3]
           congr 1
-      · simp [μAstar,μA]
+      · simp only [μAstar, μA, ne_eq]
         congr 1; ext
         constructor
         · rintro ⟨ha1,⟨ha2,ha3⟩⟩
           use ha1, ⟨in_TotIntvl ha1,Subtype.coe_ne_coe.2 ha2.2⟩
           rw [← ha3]
-          simp [μmax]
+          simp only [μmax, ne_eq]
           congr 1; ext
           constructor
           · rintro ⟨hb1,⟨hb2,hb3⟩⟩
@@ -299,13 +295,13 @@ NashEquilibrium μ → Semistable μ := by
         · rintro ⟨ha1,⟨ha2,ha3⟩⟩
           use ⟨ha1,ha2.1⟩, ⟨in_TotIntvl _,Subtype.coe_ne_coe.1 ha2.2⟩
           rw [← ha3]
-          simp [μmax]
+          simp only [μmax, ne_eq]
           congr 1; ext
           constructor
           · rintro ⟨hb1,⟨hb2,hb3⟩⟩
             use hb1, ⟨hb2.1,Subtype.coe_ne_coe.2 hb2.2⟩
             rw [← hb3]
-            simp [Resμ]
+            simp only [Resμ]
           · rintro ⟨hb1,⟨hb2,hb3⟩⟩
             use ⟨hb1,⟨bot_le,hb2.1.2⟩⟩, ⟨hb2.1,Subtype.coe_ne_coe.1 hb2.2⟩
             rw [← hb3]
@@ -315,19 +311,19 @@ NashEquilibrium μ → Semistable μ := by
       rw [← hx']
       use x, Ne.symm hx.2
       refine impl.stupid_helper ?_ (impl.prop4d1₁ (Interval ⟨(⊥,x),bot_lt_iff_ne_bot.2 <| Ne.symm hx.2⟩) S (Resμ ⟨(⊥,x),bot_lt_iff_ne_bot.2 <| Ne.symm hx.2⟩ μ) (h₁ x <| Ne.symm hx.2).wacc (h₂ x <| Ne.symm hx.2).wsl₁) ?_
-      · simp [μAstar,μA,Resμ]
+      · simp only [μA, ne_eq, μAstar]
         congr 1; ext
         constructor
         · rintro ⟨ha1,⟨ha2,ha3⟩⟩
           use ⟨ha1,ha2.1⟩, ⟨in_TotIntvl _,Subtype.coe_ne_coe.1 ha2.2⟩
           rw [← ha3]
-          simp [μmax]
+          simp only [μmax, ne_eq]
           congr 1; ext
           constructor
           · rintro ⟨hb1,⟨hb2,hb3⟩⟩
             use hb1, ⟨hb2.1,Subtype.coe_ne_coe.2 hb2.2⟩
             rw [← hb3]
-            simp [Resμ]
+            simp only [Resμ]
           · rintro ⟨hb1,⟨hb2,hb3⟩⟩
             use ⟨hb1,⟨bot_le,hb2.1.2⟩⟩, ⟨hb2.1,Subtype.coe_ne_coe.1 hb2.2⟩
             rw [← hb3]
@@ -335,7 +331,7 @@ NashEquilibrium μ → Semistable μ := by
         · rintro ⟨ha1,⟨ha2,ha3⟩⟩
           use ha1, ⟨in_TotIntvl ha1,Subtype.coe_ne_coe.2 ha2.2⟩
           rw [← ha3]
-          simp [μmax]
+          simp only [μmax, ne_eq]
           congr 1; ext
           constructor
           · rintro ⟨hb1,⟨hb2,hb3⟩⟩
@@ -346,7 +342,7 @@ NashEquilibrium μ → Semistable μ := by
             use hb1, ⟨hb2.1,Subtype.coe_ne_coe.2 hb2.2⟩
             rw [← hb3]
             congr 1
-      · simp [μmin]
+      · simp only [μmin, ne_eq]
         congr 1; ext
         constructor
         · rintro ⟨ha1,⟨ha2,ha3⟩⟩
@@ -359,9 +355,8 @@ NashEquilibrium μ → Semistable μ := by
           congr 1
   have : ∀ x : ℒ, (hx : x ≠ ⊥) → μA μ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx⟩ ≤ μA μ TotIntvl := by
     rw [← h] at this
-    simp [μAstar] at this
+    simp only [ne_eq, μAstar] at this
     intro x hx
-    unfold TotIntvl
     rw [← this]
     apply le_sSup
     use x, hx
@@ -420,7 +415,7 @@ List.TFAE [
   intro h₁
   refine prop4d20 μ h₁ ?_
   intro x hx
-  simp [WeakSlopeLike₁,Resμ]
+  simp only [ne_eq]
   refine {wsl₁ := ?_}
   intro a b
   cases' (hμ.slopelike a.val.1 a.val.2 x ⟨lt_iff_le_not_le.2 (by aesop),lt_iff_le_not_le.2 (by aesop)⟩).1 with this this

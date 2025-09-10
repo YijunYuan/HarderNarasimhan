@@ -78,7 +78,7 @@ instance {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFou
   have : Semistable μ → μmax μ TotIntvl = μ TotIntvl := by
     exact fun a ↦ (List.TFAE.out (impl.thm4d21 μ hsl inferInstance inferInstance).1 0 3).2 ((impl.thm4d21 μ hsl inferInstance inferInstance).2.1 a)
   have := this hst
-  simp [μmax, TotIntvl] at this
+  simp only [μmax, TotIntvl, ne_eq] at this
   have this_q: μ ⟨(⊥, x), hx⟩ ≤ μ ⟨(⊥, ⊤), bot_lt_top⟩ := by
     rw [← this]
     apply le_sSup

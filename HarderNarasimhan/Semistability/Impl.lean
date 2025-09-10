@@ -106,7 +106,7 @@ lemma prop3d4₀func_defprop2 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [Bound
     have h'' : z < (prop3d4₀func μ I i).val := by
       apply lt_of_le_of_ne hz.2
       by_contra hcontra'
-      simp [hcontra'] at hcontra
+      simp only [hcontra', ↓reduceDIte, gt_iff_lt, ge_iff_le] at hcontra
       exact (inst_3.wf.has_min (ℒₛ μ I (prop3d4₀func μ I i) <| prop3d4₀func_helper μ I i hi) hne).choose_spec.1.out.choose_spec.choose_spec.not_le hcontra
     use ⟨ne_of_lt <| lt_of_le_of_lt (prop3d4₀func μ I (i+1)).prop.1 hz.1,h''⟩, gt_of_ge_of_gt hcontra.ge (inst_3.wf.has_min (ℒₛ μ I (prop3d4₀func μ I i) <| prop3d4₀func_helper μ I i hi) hne).choose_spec.1.out.choose_spec.choose_spec
   simp only [prop3d4₀func, prop3d4₀func_helper μ I i hi, hne] at hz
@@ -121,9 +121,9 @@ lemma prop3d4₀func_strict_decreasing {ℒ : Type} [Nontrivial ℒ] [Lattice �
 (prop3d4₀func μ I i).val > (prop3d4₀func μ I (i+1)).val := by
   intro i hi
   by_cases h: I.val.1 = (prop3d4₀func μ I (i+1)).val
-  · simp [prop3d4₀func, hi] at h
+  · simp only [prop3d4₀func, hi, ↓reduceDIte, gt_iff_lt] at h
     by_cases hne : (ℒₛ μ I (prop3d4₀func μ I i) hi).Nonempty
-    · simp [hne] at h
+    · simp only [hne, ↓reduceDIte] at h
       exact False.elim ((inst_3.wf.has_min (ℒₛ μ I (prop3d4₀func μ I i) hi) hne).choose_spec.1.out.choose_spec.choose.1 h)
     · simp only [prop3d4₀func, hi, hne]
       exact lt_of_le_of_ne (prop3d4₀func μ I i).prop.1 hi
@@ -201,7 +201,7 @@ lemma prop3d4₀func_defprop3 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [Bound
       have triv : len - 1 + 1 = len :=  Nat.sub_one_add_one <| prop3d4₀func_len_nonzero μ I hμDCC
       rw [← (triv)] at h₂
       simp only [prop3d4₀func, ne_of_lt <| prop3d4₀func_defprop3₀ μ I hμDCC (len - 1) (Nat.sub_one_lt <| prop3d4₀func_len_nonzero μ I hμDCC)] at h₂
-      simp [hcontra'] at h₂
+      simp only [↓reduceDIte, hcontra', gt_iff_lt] at h₂
       apply (inst_3.wf.has_min (ℒₛ μ I (prop3d4₀func μ I (len-1)) (ne_of_lt <| prop3d4₀func_defprop3₀ μ I hμDCC (len - 1) (Nat.sub_one_lt <| prop3d4₀func_len_nonzero μ I hμDCC))) hcontra').choose_spec.1.out.choose_spec.choose.1 h₂.symm
     refine h₃ ?_
     use y, ⟨le_of_lt hy.1,le_trans hy.2 (prop3d4₀func μ I (prop3d4₀func_len μ I hμDCC - 1)).prop.2⟩, ⟨ne_of_lt hy.1,hcases⟩
@@ -224,7 +224,7 @@ lemma prop3d4 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [We
     have h' := (congrArg (fun _a ↦ (func (_a - 1)).val = I.val.2) h) ▸ (of_eq_true (eq_self I.val.2))
     have h'' : ¬ μA μ ⟨(I.val.1, y), lt_of_le_of_ne hyI.1 hy⟩ > μA μ ⟨(I.val.1, (func (len-1)).val), prop3d4₀func_defprop3₀ μ I hμDCC (len - 1) <| Nat.sub_one_lt <| prop3d4₀func_len_nonzero μ I hμDCC⟩
         := prop3d4₀func_defprop3 μ I hμDCC y ⟨lt_of_le_of_ne hyI.left hy,h' ▸ hyI.2⟩
-    simp [h'] at h''
+    simp only [h', Prod.mk.eta, Subtype.coe_eta, gt_iff_lt] at h''
     exact h''
   · have h₂ : ∀ i : ℕ, i ≤ len -1 → I.val.1 ≠ (func i).val := by
       intro i hi
@@ -243,7 +243,8 @@ lemma prop3d4 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [We
       have h₃''' : ∀ (hi' : I.val.1 ≠ (func i).val) (z : ℒ) (hz : (func i).val < z ∧ z ≤ (func (i - 1)).val),
         ¬ μA μ ⟨(I.val.1, z), lt_of_le_of_lt (func i).prop.1 hz.1⟩ ≥ μA μ ⟨(I.val.1, (func (i - 1 + 1)).val), lt_of_le_of_ne ((func (i - 1 + 1)).prop).1 ((Nat.sub_one_add_one <| Nat.one_le_iff_ne_zero.1 hi.1) ▸ h₂ i hi.2)⟩ :=
         fun hi' z hz ↦ prop3d4₀func_defprop2 μ I (i - 1) ( (Nat.sub_one_add_one <| Nat.one_le_iff_ne_zero.1 hi.1) ▸ h₂ i hi.2) z ((Nat.sub_one_add_one <| Nat.one_le_iff_ne_zero.1 hi.1) ▸ hz)
-      simp [*] at h₃'''
+      simp only [ne_eq, not_false_eq_true, Nat.sub_add_cancel, ge_iff_le, forall_const, hi,
+        h₂] at h₃'''
       exact (h₃''' (y ⊔ func i) h₃') <| inf_eq_right.2 hy'.2 ▸ impl.prop2d8₁I I μ hμcvx y hyI (func i) (func i).prop I.val.1 ⟨le_rfl,le_of_lt I.prop⟩  ⟨lt_of_le_of_ne hyI.1 hy,lt_of_le_of_ne (func i).prop.1 <| h₂ i hi.2⟩
     have h₄ : ∀ y : ℒ, (hyI : InIntvl I y) → (hy : I.val.1 ≠ y) → μA μ ⟨(I.val.1, y) , lt_of_le_of_ne hyI.1 hy⟩ ≥ μA μ ⟨(I.val.1, (func (len - 1)).val) , lt_of_le_of_ne (func (len - 1)).prop.1 <| h₂ (len - 1) le_rfl⟩ → (∀ i : ℕ, i ≤ len - 1 → y ≤ (func i).val) := by
       intro y hyI hy hy' i hi
@@ -367,7 +368,8 @@ theorem semistable_iff {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) :
   Semistable μ ↔ semistableI μ TotIntvl := by
-  simp [semistableI, TotIntvl,StI,S₁I,S₂I]
+  simp only [semistableI, StI, S₁I, TotIntvl, ne_eq, gt_iff_lt, S₂I, Set.mem_setOf_eq, le_top,
+    implies_true, and_true, bot_ne_top, not_false_eq_true, exists_true_left]
   constructor
   · intro h
     use in_TotIntvl _
@@ -386,21 +388,21 @@ theorem semistableI_iff {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrde
   unfold Resμ
   constructor
   · intro h
-    simp [semistableI]
-    simp [semistableI] at h
+    simp only [semistableI]
+    simp only [semistableI] at h
     rcases h.out with ⟨h1,h2,h3,h4⟩
     apply Set.mem_def.2
     refine Set.setOf_app_iff.mpr ?_
     use in_TotIntvl (TotIntvl.val).2
     use ne_of_lt (TotIntvl.prop)
     constructor
-    · simp [S₁I] at *
+    · simp only [S₁I, ne_eq, Prod.mk.eta, Subtype.coe_eta, gt_iff_lt] at *
       intro y hyI hy
       have := h3 y hyI (Subtype.coe_ne_coe.2 hy)
       by_contra fuck
       refine this ?_
       refine lt_of_eq_of_lt ?_ (lt_of_lt_of_eq fuck ?_)
-      · simp [μA]
+      · simp only [μA, ne_eq]
         congr 1
         ext
         simp only [Set.mem_setOf_eq, Subtype.coe_mk]
@@ -408,7 +410,7 @@ theorem semistableI_iff {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrde
         · rintro ⟨a,⟨ha1,ha2⟩⟩
           rw [← ha2]
           use ⟨a,ha1.1⟩, ⟨in_TotIntvl _,Subtype.coe_ne_coe.1 ha1.2⟩
-          simp [μmax]
+          simp only [μmax, ne_eq]
           congr 1; ext
           simp only [Set.mem_setOf_eq, Subtype.coe_mk]
           constructor
@@ -427,7 +429,7 @@ theorem semistableI_iff {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrde
           refine ⟨⟨hb1.1,?_⟩,?_⟩
           · by_contra h'
             exact hb1.2 <| Subtype.coe_eq_of_eq_mk h'
-          · simp [μmax]
+          · simp only [μmax, ne_eq]
             congr 1; ext
             constructor
             · rintro ⟨c,⟨hc1,hc2⟩⟩
@@ -436,13 +438,13 @@ theorem semistableI_iff {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrde
             · rintro ⟨c,⟨hc1,hc2⟩⟩
               rw [← hc2]
               use c.val, ⟨hc1.1,Subtype.coe_ne_coe.2 hc1.2⟩
-      · simp [μA]
+      · simp only [μA, ne_eq]
         congr 1; ext
         constructor
         · rintro ⟨a,⟨ha1,ha2⟩⟩
           rw [← ha2]
           use a.val, ⟨ha1.1,Subtype.coe_ne_coe.2 ha1.2⟩
-          simp [μmax]
+          simp only [μmax, ne_eq]
           congr 1; ext
           constructor
           · rintro ⟨b,⟨hb1,hb2⟩⟩
@@ -455,7 +457,7 @@ theorem semistableI_iff {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrde
         · rintro ⟨a,⟨ha1,ha2⟩⟩
           rw [← ha2]
           use ⟨a,⟨ha1.1.1,le_trans ha1.1.2 y.prop.2⟩⟩, ⟨ha1.1,Subtype.coe_ne_coe.1 ha1.2⟩
-          simp [μmax]
+          simp only [μmax, ne_eq]
           congr 1; ext
           constructor
           · rintro ⟨b,⟨hb1,hb2⟩⟩
@@ -464,24 +466,24 @@ theorem semistableI_iff {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrde
           · rintro ⟨b,⟨hb1,hb2⟩⟩
             rw [← hb2]
             use ⟨b,⟨le_trans ha1.1.1 hb1.1.1,le_trans hb1.1.2 y.prop.2⟩⟩, ⟨hb1.1,Subtype.coe_ne_coe.1 hb1.2⟩
-    · simp [S₂I] at *
+    · simp only [S₂I, ne_eq, Prod.mk.eta, Subtype.coe_eta, le_top, implies_true] at *
   · rintro ⟨h1,⟨h3,⟨h4,h5⟩⟩⟩
-    simp [semistableI,StI]
+    simp only [semistableI, StI, ne_eq, Set.mem_setOf_eq]
     use ⟨le_of_lt I.prop,le_rfl⟩, ne_of_lt I.prop
     constructor
-    · simp [S₁I] at *
+    · simp only [S₁I, ne_eq, gt_iff_lt, Prod.mk.eta, Subtype.coe_eta] at *
       intro y hyI hy
       have := h4 ⟨y,hyI⟩ (in_TotIntvl _) (Subtype.coe_ne_coe.1 hy)
       by_contra h
       refine this ?_
       refine lt_of_eq_of_lt ?_ (lt_of_lt_of_eq h ?_)
-      · simp [μA]
+      · simp only [μA, ne_eq]
         congr 1; ext
         constructor
         · rintro ⟨a,⟨ha1,ha2⟩⟩
           rw [← ha2]
           use a.val, ⟨ha1.1,Subtype.coe_ne_coe.2 ha1.2⟩
-          simp [μmax]
+          simp only [μmax, ne_eq]
           congr 1; ext
           constructor
           · intro h
@@ -496,7 +498,7 @@ theorem semistableI_iff {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrde
           rcases h with ⟨a,⟨ha1,ha2⟩⟩
           rw [← ha2]
           use ⟨a,⟨ha1.1.1,ha1.1.2⟩⟩, ⟨ha1.1,Subtype.coe_ne_coe.1 ha1.2⟩
-          simp [μmax]
+          simp only [μmax, ne_eq]
           congr 1; ext
           constructor
           · rintro ⟨b,⟨hb1,hb2⟩⟩
@@ -505,13 +507,13 @@ theorem semistableI_iff {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrde
           · rintro ⟨b,⟨hb1,hb2⟩⟩
             rw [← hb2]
             use ⟨b,⟨le_trans ha1.1.1 hb1.1.1,hb1.1.2⟩⟩, ⟨hb1.1,Subtype.coe_ne_coe.1 hb1.2⟩
-      · simp [μA]
+      · simp only [μA, ne_eq]
         congr 1; ext
         constructor
         · rintro ⟨a,⟨ha1,ha2⟩⟩
           rw [← ha2]
           use ⟨a,⟨ha1.1.1,le_trans ha1.1.2 hyI.2⟩⟩, ⟨ha1.1,Subtype.coe_ne_coe.1 ha1.2⟩
-          simp [μmax]
+          simp only [μmax, ne_eq]
           congr 1; ext
           constructor
           · rintro ⟨b,⟨hb1,hb2⟩⟩
@@ -524,7 +526,7 @@ theorem semistableI_iff {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrde
           rcases h with ⟨a,⟨ha1,ha2⟩⟩
           rw [← ha2]
           use a.val, ⟨ha1.1,Subtype.coe_ne_coe.2 ha1.2⟩
-          simp [μmax]
+          simp only [μmax, ne_eq]
           congr 1; ext
           constructor
           · rintro ⟨b,⟨hb1,hb2⟩⟩
@@ -533,7 +535,7 @@ theorem semistableI_iff {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrde
           · rintro ⟨b,⟨hb1,hb2⟩⟩
             rw [← hb2]
             use b.val, ⟨hb1.1,Subtype.coe_ne_coe.2 hb1.2⟩
-    · simp [S₂I] at *
+    · simp only [S₂I, ne_eq, le_top, implies_true, Prod.mk.eta, Subtype.coe_eta] at *
       intro y hyI hy h
       exact hyI.2
 

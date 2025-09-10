@@ -95,14 +95,14 @@ noncomputable instance {α : Type} [LinearOrder α] : LinearOrder (DedekindMacNe
   toDecidableLE := Classical.decRel LE.le
   min_def a b := by
     by_cases h : a ≤ b
-    · simp [h]
-    · simp [h]
+    · simp only [h, inf_of_le_left, ↓reduceIte]
+    · simp only [h, ↓reduceIte, inf_eq_right]
       simpa [h] using instIsTotalDedekindMacNeilleCompletionLe.total a b
   max_def a b := by
     by_cases h : a ≤ b
-    · simp [h]
-    · simp [h]
-      simpa [h] using instIsTotalDedekindMacNeilleCompletionLe.total a b
+    · simp only [h, sup_of_le_right, ↓reduceIte]
+    · simp only [h, ↓reduceIte, sup_eq_left]
+      simpa only [h, false_or] using instIsTotalDedekindMacNeilleCompletionLe.total a b
   }
 
 noncomputable instance {α : Type} [LinearOrder α] : CompleteLinearOrder (DedekindMacNeilleCompletion α) :=
@@ -110,7 +110,9 @@ noncomputable instance {α : Type} [LinearOrder α] : CompleteLinearOrder (Dedek
 
 
 def coe' {α : Type} [PartialOrder α] : α ↪o DedekindMacNeilleCompletion α := by
-  have inj: ∀ x : α, (DedekindMacNeilleClosureOperator α).IsClosed (Set.Iic x) := fun x ↦ Set.ext fun y ↦ ⟨fun hy ↦ hy (by simp [upperBounds]),fun hy x_1 ha ↦ ha hy⟩
+  have inj: ∀ x : α, (DedekindMacNeilleClosureOperator α).IsClosed (Set.Iic x) := fun x ↦ Set.ext fun y ↦ ⟨fun hy ↦ hy (by simp only [upperBounds,
+    GaloisConnection.lowerAdjoint_toFun, Set.mem_Iic, OrderDual.ofDual_toDual, Set.mem_setOf_eq,
+    imp_self, implies_true]),fun hy x_1 ha ↦ ha hy⟩
   have : Function.Injective fun x ↦ (⟨Set.Iic x,inj x⟩ : DedekindMacNeilleCompletion α) := by
     intro a b hab
     simp at hab
@@ -136,19 +138,23 @@ theorem DedekindMacNeilleCompletion_minimality {α : Type} [PartialOrder α] {β
       have h₁ : f a ≤ g A := le_sSup fun u hu ↦ hu (Exists.intro a ⟨haA, rfl⟩)
       have h₂ : g B ≤ f (this.choose) := by
         refine sSup_le fun y hy ↦ hy ?_
-        simp [upperBounds]
+        simp only [upperBounds, Set.mem_image, forall_exists_index, and_imp,
+          forall_apply_eq_imp_iff₂, Set.mem_setOf_eq, OrderEmbedding.le_iff_le]
         exact this.choose_spec.1.out
       exact le_trans h₁ <| le_trans h h₂
     · intro h
-      simp [g,upperBounds]
+      simp only [upperBounds, Set.mem_image, forall_exists_index, and_imp, forall_apply_eq_imp_iff₂,
+        sSup_le_iff, g]
       exact fun y hy ↦ hy.out fun w hw ↦ le_sSup fun ⦃a⦄ a ↦ a w (h hw)
   refine ⟨⟨⟨g,fun x y h ↦ le_antisymm ((this x y).1 <| (le_antisymm_iff.1 h).1) ((this y x).1 <| (le_antisymm_iff.1 h).2)⟩,?_⟩,?_⟩
   · simp
     exact fun x hx y hy ↦ this ⟨x, hx⟩ ⟨y, hy⟩
   · refine funext fun x ↦ ?_
-    simp [g,coe']
+    simp only [RelEmbedding.coe_mk, Function.Embedding.coeFn_mk, coe', Function.comp_apply, g]
     refine le_antisymm (le_sSup fun a ha ↦ ha.out <| Set.mem_image_of_mem f Set.right_mem_Iic) <| sSup_le fun _ hb ↦ hb ?_
-    simp [upperBounds]
+    simp only [upperBounds, Set.mem_image, Set.mem_Iic, forall_exists_index, and_imp,
+      forall_apply_eq_imp_iff₂, Set.mem_setOf_eq, OrderEmbedding.le_iff_le, imp_self, implies_true,
+      g]
 
 --TODO: joint-dense, meet-dense
 end DedekindMacNeille

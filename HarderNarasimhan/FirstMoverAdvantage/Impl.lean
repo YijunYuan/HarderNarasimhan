@@ -21,7 +21,7 @@ noncomputable def prop4d1₁_seq {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ
     have h''' := prop4d1₁_seqkp1.choose_spec.choose_spec
     have h' : prop4d1₁_seqkp1.choose < ⊤ := by
       by_contra! hcon
-      simp [not_lt_top_iff.mp hcon] at h'''
+      simp only [Set.mem_setOf_eq, not_lt_top_iff.mp hcon, le_refl, not_true_eq_false] at h'''
     by_contra!
     simp at this
     rcases this h' with ⟨xA,⟨hxA,hh⟩⟩
@@ -33,7 +33,6 @@ noncomputable def prop4d1₁_seq {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ
 lemma prop4d1_helper {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) : sInf {x | ∃ x_1, ∃ (hx : x_1 < ⊤), μ ⟨(x_1, ⊤), hx⟩ = x} = μmin μ TotIntvl := by
-    unfold TotIntvl
     refine congrArg sInf <| Set.ext fun x ↦ ?_
     constructor
     · rintro ⟨w, hw, hw'⟩
@@ -124,7 +123,7 @@ lemma dualμAstar_eq_μBstar {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [B
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) :
 OrderDual.ofDual <| μAstar (fun (p : {p : ℒᵒᵈ × ℒᵒᵈ // p.1 < p.2}) ↦ OrderDual.toDual <| μ ⟨(p.val.2, p.val.1), p.prop⟩) = μBstar μ
 := by
-  simp [*, μBstar, μAstar,μA,μB,sInf]
+  simp only [μAstar, μA, sInf, ne_eq, OrderDual.exists, μBstar, μB]
   refine congrArg (@sSup S _) <| Set.ext fun x ↦ ?_
   constructor
   · rintro ⟨a, ha, ha'⟩
@@ -150,7 +149,7 @@ lemma dualμBstar_eq_μAstar {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [B
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) :
 OrderDual.ofDual <| μBstar (fun (p : {p : ℒᵒᵈ × ℒᵒᵈ // p.1 < p.2}) ↦ OrderDual.toDual <| μ ⟨(p.val.2, p.val.1), p.prop⟩) = μAstar μ
 := by
-  simp [μAstar,μBstar,μA,μB,sSup]
+  simp only [μBstar, μB, sSup, ne_eq, OrderDual.exists, μAstar, μA]
   refine congrArg (@sInf S _) <| Set.ext fun x ↦ ?_
   constructor
   · rintro ⟨a, ha, ha'⟩
@@ -174,7 +173,6 @@ OrderDual.ofDual <| μBstar (fun (p : {p : ℒᵒᵈ × ℒᵒᵈ // p.1 < p.2})
 lemma prop4d3_helper {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) : sSup {μ ⟨(⊥, y),hy⟩ | (y : ℒ) (hy : ⊥ < y) } = μmax μ TotIntvl := by
-    unfold TotIntvl
     refine congrArg sSup <| Set.ext fun x ↦ ?_
     constructor
     · rintro ⟨w, hw, hw'⟩
@@ -192,7 +190,7 @@ lemma prop4d3₁ {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder 
   have := prop4d1₁ ℒᵒᵈ Sᵒᵈ (fun (p : {p : ℒᵒᵈ × ℒᵒᵈ // p.1 < p.2}) ↦ OrderDual.toDual <| μ ⟨(p.val.2, p.val.1), p.prop⟩) (h₁_dual_of_h₁ h₁) (h₂_dual_of_h₂ h₂)
   rw [← prop4d1_helper] at this
   rw [← prop4d3_helper]
-  simp [*] at this
+  simp only [OrderDual.exists] at this
   rw [← dualμAstar_eq_μBstar, this]
   refine congrArg sSup <| Set.ext fun r ↦ ?_
   constructor
