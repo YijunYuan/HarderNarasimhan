@@ -6,8 +6,8 @@ open Classical
 
 namespace HarderNarasimhan
 
-noncomputable instance {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
-{S : Type} [CompleteLattice S]
+noncomputable instance {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
+{S : Type*} [CompleteLattice S]
 {μ : {p :ℒ × ℒ // p.1 < p.2} → S} [hμ : μA_DescendingChainCondition μ] [hμcvx : Convex μ] [h : μ_Admissible μ] :
 ------------
 Inhabited (HarderNarasimhanFiltration μ)
@@ -25,8 +25,8 @@ Inhabited (HarderNarasimhanFiltration μ)
          } }
 
 
-instance {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
-{S : Type} [CompleteLattice S]
+instance {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
+{S : Type*} [CompleteLattice S]
 {μ : {p :ℒ × ℒ // p.1 < p.2} → S} [hμ : μA_DescendingChainCondition μ] [hμcvx : Convex μ] [h : μ_Admissible μ] :
 ------------
 Nonempty (HarderNarasimhanFiltration μ)
@@ -34,8 +34,8 @@ Nonempty (HarderNarasimhanFiltration μ)
 := inferInstance
 
 
-noncomputable instance {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
-{S : Type} [CompleteLinearOrder S]
+noncomputable instance {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
+{S : Type*} [CompleteLinearOrder S]
 {μ : {p :ℒ × ℒ // p.1 < p.2} → S} [hμ : μA_DescendingChainCondition μ] [hμcvx : Convex μ] :
 ------------
 Unique (HarderNarasimhanFiltration μ)

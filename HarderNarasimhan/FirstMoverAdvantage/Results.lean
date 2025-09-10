@@ -2,8 +2,8 @@ import HarderNarasimhan.FirstMoverAdvantage.Defs
 
 namespace HarderNarasimhan
 
-lemma proposition_4_1 {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
-{S : Type} [CompleteLattice S]
+lemma proposition_4_1 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
+{S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
 (h₁ : WeakAscendingChainCondition μ) (h₂ : WeakSlopeLike₁ μ) :
 ------------
@@ -16,8 +16,8 @@ lemma proposition_4_1 {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedO
 := ⟨impl.prop4d1₁ ℒ S μ h₁.wacc h₂.wsl₁, impl.prop4d1₂ ℒ S μ h₁.wacc h₂.wsl₁⟩
 
 
-lemma dualμAstar_eq_μBstar {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
-{S : Type} [CompleteLattice S]
+lemma dualμAstar_eq_μBstar {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
+{S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) :
 ------------
 OrderDual.ofDual <| μAstar (fun (p : {p : ℒᵒᵈ × ℒᵒᵈ // p.1 < p.2}) ↦ OrderDual.toDual <| μ ⟨(p.val.2, p.val.1), p.prop⟩) = μBstar μ
@@ -25,8 +25,8 @@ OrderDual.ofDual <| μAstar (fun (p : {p : ℒᵒᵈ × ℒᵒᵈ // p.1 < p.2})
 := impl.dualμAstar_eq_μBstar μ
 
 
-lemma dualμBstar_eq_μAstar {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
-{S : Type} [CompleteLattice S]
+lemma dualμBstar_eq_μAstar {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
+{S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) :
 ------------
 OrderDual.ofDual <| μBstar (fun (p : {p : ℒᵒᵈ × ℒᵒᵈ // p.1 < p.2}) ↦ OrderDual.toDual <| μ ⟨(p.val.2, p.val.1), p.prop⟩) = μAstar μ
@@ -34,8 +34,8 @@ OrderDual.ofDual <| μBstar (fun (p : {p : ℒᵒᵈ × ℒᵒᵈ // p.1 < p.2})
 := impl.dualμBstar_eq_μAstar μ
 
 
-lemma proposition_4_3 {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
-{S : Type} [CompleteLattice S]
+lemma proposition_4_3 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
+{S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
 (h₁ : WeakDescendingChainCondition μ) (h₂ : WeakSlopeLike₂ μ) :
 ------------
@@ -48,8 +48,8 @@ lemma proposition_4_3 {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedO
 := ⟨impl.prop4d3₁ μ h₁.wdcc h₂.wsl₂, impl.prop4d3₂ μ h₁.wdcc h₂.wsl₂⟩
 
 
-lemma remark_4_4 {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
-{S : Type} [CompleteLattice S]
+lemma remark_4_4 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
+{S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
 (r : ℒ → ℝ) (hr₁ : Monotone r) (hr₂ : IsWellOrder (Set.range r) (· < ·))
 (h : ∀ z : {p :ℒ × ℒ // p.1 < p.2}, r z.val.1 = r z.val.2 → μ z = ⊤) :

@@ -4,16 +4,16 @@ open Classical
 
 namespace HarderNarasimhan
 
-class μ_Admissible {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
-{S : Type} [CompleteLattice S]
+class μ_Admissible {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
+{S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) where
   μ_adm : (IsTotal S (· ≤ ·)) ∨ ∀ I : {p : ℒ × ℒ // p.1 < p.2},  IsAttained μ I
 
 
 @[ext]
 structure HarderNarasimhanFiltration
-{ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
-{S : Type} [CompleteLattice S]
+{ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
+{S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) [hμ : μA_DescendingChainCondition μ] [hμcvx : Convex μ] [h : μ_Admissible μ] where
   filtration           : ℕ → ℒ
   monotone             : Monotone filtration

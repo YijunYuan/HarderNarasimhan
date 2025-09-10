@@ -2,8 +2,8 @@ import HarderNarasimhan.NashEquilibrium.Impl
 
 namespace HarderNarasimhan
 
-lemma μmin_lt_μ_lt_μmax {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
-{S : Type} [CompleteLattice S]
+lemma μmin_lt_μ_lt_μmax {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
+{S : Type*} [CompleteLattice S]
 (μ : {p : ℒ × ℒ // p.1 < p.2} → S) :
 ------------
 ∀ I : {p : ℒ × ℒ // p.1 < p.2}, μmin μ I ≤ μ I ∧ μ I ≤ μmax μ I
@@ -11,8 +11,8 @@ lemma μmin_lt_μ_lt_μmax {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [Bou
 := impl.rmk4d10₀ μ
 
 
-lemma remark_4_10 {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
-{S : Type} [CompleteLattice S]
+lemma remark_4_10 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
+{S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) :
 ------------
 (
@@ -33,8 +33,8 @@ lemma remark_4_10 {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder
 := ⟨impl.rmk4d10₁ μ,⟨impl.rmk4d10₂ μ,impl.rmk4d10₃ μ⟩⟩
 
 
-lemma proposition_4_11 {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
-{S : Type} [CompleteLattice S]
+lemma proposition_4_11 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
+{S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) :
 ------------
 (
@@ -48,8 +48,8 @@ lemma proposition_4_11 {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [Bounded
 := ⟨impl.prop4d11₁ μ,impl.prop4d11₂ μ⟩
 
 
-lemma proposition_4_12 {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
-{S : Type} [CompleteLattice S]
+lemma proposition_4_12 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
+{S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
 (h : ∀ x : ℒ, (hx : x ≠ ⊥ ∧ x ≠ ⊤) → ¬ μ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx.1⟩ ≤ μ TotIntvl ∨ μ TotIntvl ≤ μ ⟨(x,⊤),lt_top_iff_ne_top.2 hx.2⟩) :
 ------------
@@ -58,8 +58,8 @@ lemma proposition_4_12 {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [Bounded
 := impl.prop4d12 μ h
 
 
-lemma remark_4_13 {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
-{S : Type} [CompleteLattice S]
+lemma remark_4_13 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
+{S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : SlopeLike μ):
 ------------
 ∀ x : ℒ, (hx : x ≠ ⊥ ∧ x ≠ ⊤) →
@@ -68,8 +68,8 @@ lemma remark_4_13 {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder
 := impl.rmk4d13 μ hμ
 
 
-lemma proposition_4_14 {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
-{S : Type} [CompleteLattice S]
+lemma proposition_4_14 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
+{S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
 (h : ∀ x : ℒ, (hx : x ≠ ⊥ ∧ x ≠ ⊤) → μ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx.1⟩ ≤ μ TotIntvl ∨ ¬ μ TotIntvl ≤ μ ⟨(x,⊤),lt_top_iff_ne_top.2 hx.2⟩) :
 ------------
@@ -78,8 +78,8 @@ lemma proposition_4_14 {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [Bounded
 := impl.prop4d14 μ h
 
 
-lemma remark_4_15 {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
-{S : Type} [CompleteLattice S]
+lemma remark_4_15 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
+{S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : SlopeLike μ) :
 ------------
 ∀ x : ℒ, (hx : x ≠ ⊥ ∧ x ≠ ⊤) →
@@ -89,8 +89,8 @@ lemma remark_4_15 {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder
 := impl.rmk4d15 μ hμ
 
 
-lemma proposition_4_16 {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
-{S : Type} [CompleteLattice S]
+lemma proposition_4_16 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
+{S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : SlopeLike μ):
 ------------
 (
@@ -117,8 +117,8 @@ lemma proposition_4_16 {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [Bounded
   tfae_finish
 
 
-lemma proposition_4_18 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-{S : Type} [CompleteLinearOrder S]
+lemma proposition_4_18 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+{S : Type*} [CompleteLinearOrder S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : Semistable μ) :
 ------------
 (
@@ -131,8 +131,8 @@ lemma proposition_4_18 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder
 := ⟨impl.prop4d18₁ μ hμ,impl.prop4d18₂ μ hμ⟩
 
 
-lemma proposition_4_20 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-{S : Type} [CompleteLattice S]
+lemma proposition_4_20 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+{S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
 (h₁ : ∀ x : ℒ, (hx : x ≠ ⊥) →
   WeakAscendingChainCondition (Resμ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx⟩ μ))
@@ -144,8 +144,8 @@ NashEquilibrium μ → Semistable μ
 := impl.prop4d20 μ h₁ h₂
 
 
-theorem theorem_4_21 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-{S : Type} [CompleteLinearOrder S]
+theorem theorem_4_21 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+{S : Type*} [CompleteLinearOrder S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : SlopeLike μ)
 (h₁ : WeakAscendingChainCondition μ) (h₂ : WeakDescendingChainCondition μ) :
 ------------

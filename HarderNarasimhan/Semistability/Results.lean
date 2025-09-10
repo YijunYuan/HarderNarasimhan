@@ -3,8 +3,8 @@ import HarderNarasimhan.Semistability.Translation
 
 namespace HarderNarasimhan
 
-lemma proposition_3_2 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-  {S : Type} [CompleteLattice S]
+lemma proposition_3_2 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+  {S : Type*} [CompleteLattice S]
   (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : Convex μ)
   (x : ℒ) (z : ℒ) (h : x < z)
   (h' : μA μ ⟨(x , z) , h⟩ = ⊤)
@@ -18,8 +18,8 @@ lemma proposition_3_2 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder 
 alias corollary_3_3 := impl.cor3d3
 
 
-lemma proposition_3_4 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
-  {S : Type} [CompleteLattice S]
+lemma proposition_3_4 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
+  {S : Type*} [CompleteLattice S]
   (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
   (hμDCC : μA_DescendingChainCondition μ) (hμcvx : Convex μ) :
 ------------
@@ -28,8 +28,8 @@ lemma proposition_3_4 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder 
   := impl.prop3d4 μ hμDCC TotIntvl hμcvx
 
 
-lemma remark_3_5 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
-  {S : Type} [CompleteLinearOrder S]
+lemma remark_3_5 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
+  {S : Type*} [CompleteLinearOrder S]
   (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
   (x : ℒ) (hxSt : x ∈ St μ)
   (y : ℒ) (hySt : y ∈ St μ) :
@@ -39,8 +39,8 @@ lemma remark_3_5 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] 
   := impl.rmk3d5 μ TotIntvl x hxSt y hySt
 
 
-lemma proposition_3_7 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-  {S : Type} [CompleteLattice S]
+lemma proposition_3_7 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+  {S : Type*} [CompleteLattice S]
   (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : Convex μ)
   (x : ℒ) (hxSt : x ∈ St μ) :
 ------------
@@ -56,8 +56,8 @@ lemma proposition_3_7 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder 
     · exact fun y hy ↦ impl.prop3d7₂ μ TotIntvl hμcvx x hxSt y (in_TotIntvl y) hy
 
 
-lemma proposition_3_8 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
-  {S : Type} [CompleteLattice S]
+lemma proposition_3_8 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
+  {S : Type*} [CompleteLattice S]
   (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : Convex μ)
   (h : (IsTotal S (· ≤ ·)) ∨
      ∀ z : ℒ, (hz : ⊥ ≠ z) → IsAttained μ ⟨(⊥ , z) , lt_of_le_of_ne bot_le hz⟩) :

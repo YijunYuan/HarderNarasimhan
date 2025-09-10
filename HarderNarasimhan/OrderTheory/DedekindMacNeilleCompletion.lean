@@ -2,7 +2,7 @@ import Mathlib.SetTheory.Cardinal.Aleph
 import Mathlib.Order.Closure
 
 namespace OrderTheory
-instance {α : Type} [PartialOrder α] (T : ClosureOperator (Set α)): CompleteLattice (ClosureOperator.Closeds T) where
+instance {α : Type*} [PartialOrder α] (T : ClosureOperator (Set α)): CompleteLattice (ClosureOperator.Closeds T) where
   top :=⟨Set.univ,ClosureOperator.isClosed_iff_closure_le.mpr fun ⦃a⦄ a ↦ trivial⟩
   le_top A := fun ⦃a⦄ a ↦ trivial
   bot := ⟨T ∅, ClosureOperator.isClosed_closure T ∅⟩
@@ -52,18 +52,18 @@ instance {α : Type} [PartialOrder α] (T : ClosureOperator (Set α)): CompleteL
 
 
 section DedekindMacNeille
-lemma DedekindMacNeilleConnection (α : Type) [PartialOrder α] : GaloisConnection (fun A ↦ (OrderDual.toDual (upperBounds A))) (fun A : (Set α)ᵒᵈ ↦ lowerBounds A.ofDual) := fun _ _ ↦ ⟨fun h _ ha ⦃_⦄ a_3 ↦ h a_3 ha, fun h _ ha ⦃_⦄ a_2 ↦ h a_2 ha⟩
+lemma DedekindMacNeilleConnection (α : Type*) [PartialOrder α] : GaloisConnection (fun A ↦ (OrderDual.toDual (upperBounds A))) (fun A : (Set α)ᵒᵈ ↦ lowerBounds A.ofDual) := fun _ _ ↦ ⟨fun h _ ha ⦃_⦄ a_3 ↦ h a_3 ha, fun h _ ha ⦃_⦄ a_2 ↦ h a_2 ha⟩
 
 
-def DedekindMacNeilleClosureOperator (α : Type) [PartialOrder α] : ClosureOperator (Set α) := GaloisConnection.closureOperator <| DedekindMacNeilleConnection α
+def DedekindMacNeilleClosureOperator (α : Type*) [PartialOrder α] : ClosureOperator (Set α) := GaloisConnection.closureOperator <| DedekindMacNeilleConnection α
 
 
-abbrev DedekindMacNeilleCompletion (α : Type) [PartialOrder α] := (DedekindMacNeilleClosureOperator α).Closeds
+abbrev DedekindMacNeilleCompletion (α : Type*) [PartialOrder α] := (DedekindMacNeilleClosureOperator α).Closeds
 
 
-instance {α : Type} [PartialOrder α] : CompleteLattice (DedekindMacNeilleCompletion α) := inferInstance
+instance {α : Type*} [PartialOrder α] : CompleteLattice (DedekindMacNeilleCompletion α) := inferInstance
 
-instance {α : Type} [LinearOrder α] : IsTotal (DedekindMacNeilleCompletion α) instCompleteLatticeDedekindMacNeilleCompletion.le := by
+instance {α : Type*} [LinearOrder α] : IsTotal (DedekindMacNeilleCompletion α) instCompleteLatticeDedekindMacNeilleCompletion.le := by
   refine { total := ?_ }
   intro a b
   rcases a with ⟨A, hA⟩
@@ -89,7 +89,7 @@ instance {α : Type} [LinearOrder α] : IsTotal (DedekindMacNeilleCompletion α)
 
 --open Classical
 
-noncomputable instance {α : Type} [LinearOrder α] : LinearOrder (DedekindMacNeilleCompletion α) := {
+noncomputable instance {α : Type*} [LinearOrder α] : LinearOrder (DedekindMacNeilleCompletion α) := {
   instCompleteLatticeDedekindMacNeilleCompletion with
   le_total := instIsTotalDedekindMacNeilleCompletionLe.total
   toDecidableLE := Classical.decRel LE.le
@@ -105,11 +105,11 @@ noncomputable instance {α : Type} [LinearOrder α] : LinearOrder (DedekindMacNe
       simpa only [h, false_or] using instIsTotalDedekindMacNeilleCompletionLe.total a b
   }
 
-noncomputable instance {α : Type} [LinearOrder α] : CompleteLinearOrder (DedekindMacNeilleCompletion α) :=
+noncomputable instance {α : Type*} [LinearOrder α] : CompleteLinearOrder (DedekindMacNeilleCompletion α) :=
   {instLinearOrderDedekindMacNeilleCompletion , LinearOrder.toBiheytingAlgebra, instCompleteLatticeDedekindMacNeilleCompletion with}
 
 
-def coe' {α : Type} [PartialOrder α] : α ↪o DedekindMacNeilleCompletion α := by
+def coe' {α : Type*} [PartialOrder α] : α ↪o DedekindMacNeilleCompletion α := by
   have inj: ∀ x : α, (DedekindMacNeilleClosureOperator α).IsClosed (Set.Iic x) := fun x ↦ Set.ext fun y ↦ ⟨fun hy ↦ hy (by simp only [upperBounds,
     GaloisConnection.lowerAdjoint_toFun, Set.mem_Iic, OrderDual.ofDual_toDual, Set.mem_setOf_eq,
     imp_self, implies_true]),fun hy x_1 ha ↦ ha hy⟩
@@ -121,10 +121,10 @@ def coe' {α : Type} [PartialOrder α] : α ↪o DedekindMacNeilleCompletion α 
   simp
 
 
-instance {α : Type} [PartialOrder α]: Coe α (DedekindMacNeilleCompletion α) := ⟨coe'.toFun⟩
+instance {α : Type*} [PartialOrder α]: Coe α (DedekindMacNeilleCompletion α) := ⟨coe'.toFun⟩
 
 
-theorem DedekindMacNeilleCompletion_minimality {α : Type} [PartialOrder α] {β : Type} [CompleteLattice β] (f : α ↪o β) : ∃ f' : DedekindMacNeilleCompletion α ↪o β, f = f' ∘ coe' := by
+theorem DedekindMacNeilleCompletion_minimality {α : Type*} [PartialOrder α] {β : Type*} [CompleteLattice β] (f : α ↪o β) : ∃ f' : DedekindMacNeilleCompletion α ↪o β, f = f' ∘ coe' := by
   let g := fun x : DedekindMacNeilleCompletion α ↦ sSup <| lowerBounds <| upperBounds <| f '' x.val
   have : ∀ (A B : DedekindMacNeilleCompletion α), g A ≤ g B ↔ A ≤ B := by
     refine fun A B ↦ ⟨?_,?_⟩

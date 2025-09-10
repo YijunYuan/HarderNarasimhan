@@ -4,8 +4,8 @@ import HarderNarasimhan.Convexity.Impl
 
 namespace HarderNarasimhan
 
-lemma lemma_2_4 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-  {S : Type} [CompleteLattice S]
+lemma lemma_2_4 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+  {S : Type*} [CompleteLattice S]
   (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : Convex μ)
   (x : ℒ) (w : ℒ) (hxw : ¬ x ≤ w)
   (u : ℒ) (t : ℒ)
@@ -22,8 +22,8 @@ lemma lemma_2_4 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   := ⟨⟨impl.lem2d4₁ μ x w hxw u huxw,impl.lem2d4₂I TotIntvl μ hμcvx x (in_TotIntvl x) w (in_TotIntvl w) hxw t hxwt⟩,impl.lem2d4₃I TotIntvl μ hμcvx x (in_TotIntvl x) w (in_TotIntvl w) hxw u huxw⟩
 
 
-lemma remark_2_5 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-  {S : Type} [CompleteLattice S]
+lemma remark_2_5 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+  {S : Type*} [CompleteLattice S]
   (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : Convex μ) :
 ------------
   Convex (μmax μ) ∧
@@ -33,8 +33,8 @@ lemma remark_2_5 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   := ⟨impl.rmk2d5₁ TotIntvl μ hμcvx,fun I ↦ ⟨impl.rmk2d5₂ I μ (Convex_of_Convex_large TotIntvl I ⟨bot_le,le_top⟩ μ hμcvx),impl.rmk2d5₃ I μ (Convex_of_Convex_large TotIntvl I ⟨bot_le,le_top⟩ μ hμcvx)⟩⟩
 
 
-lemma proposition_2_6 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-  {S : Type} [CompleteLattice S]
+lemma proposition_2_6 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+  {S : Type*} [CompleteLattice S]
   (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
   (x : ℒ) (y : ℒ) (z : ℒ)
   (h : x < y ∧ y < z) :
@@ -68,8 +68,8 @@ lemma proposition_2_6 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder 
 := ⟨impl.prop2d6₀ μ x y z h, fun hμcvx ↦ ⟨impl.prop2d6₁I TotIntvl μ hμcvx x (in_TotIntvl x) y (in_TotIntvl y) z (in_TotIntvl z) h,⟨⟨impl.prop2d6₂I₁ TotIntvl μ hμcvx x (in_TotIntvl x) y (in_TotIntvl y) z (in_TotIntvl z) h,impl.prop2d6₂I₂ TotIntvl μ hμcvx x (in_TotIntvl x) y (in_TotIntvl y) z (in_TotIntvl z) h⟩,impl.prop2d6₃I TotIntvl μ hμcvx x (in_TotIntvl x) y (in_TotIntvl y) z (in_TotIntvl z) h⟩⟩⟩
 
 
-lemma remark_2_7 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-  {S : Type} [CompleteLinearOrder S]
+lemma remark_2_7 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+  {S : Type*} [CompleteLinearOrder S]
   (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : Convex μ)
   (x : ℒ) (h : ⊥ < x ∧ x < ⊤)
   (h' : μA μ ⟨(⊥, x), h.1⟩ > μA μ TotIntvl) :
@@ -79,8 +79,8 @@ lemma remark_2_7 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 := impl.rmk2d7 μ hμcvx x h h'
 
 
-lemma proposition_2_8 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-  {S : Type} [CompleteLattice S]
+lemma proposition_2_8 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+  {S : Type*} [CompleteLattice S]
   (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : Convex μ)
   (x : ℒ) (y : ℒ) (u : ℒ)
   (h : u < x ∧ u < y) :

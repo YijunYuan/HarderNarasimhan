@@ -10,8 +10,8 @@ namespace HarderNarasimhan
 
 namespace impl
 
-lemma rmk4d10₀ {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
-{S : Type} [CompleteLattice S]
+lemma rmk4d10₀ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
+{S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) :
 ∀ I : {p :ℒ × ℒ // p.1 < p.2}, μmin μ I ≤ μ I ∧ μ I ≤ μmax μ I := by
   intro I
@@ -22,8 +22,8 @@ lemma rmk4d10₀ {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder 
     use I.val.2, ⟨⟨le_of_lt I.prop,le_rfl⟩,ne_of_lt I.prop⟩
 
 
-lemma rmk4d10₁ {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
-{S : Type} [CompleteLattice S]
+lemma rmk4d10₁ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
+{S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) :
 μBstar μ ≤ μAstar μ ↔ ∀ x : ℒ, (hx : x ≠ ⊤) → ∀ y : ℒ, (hy : ⊥ < y) → μmin μ ⟨(⊥,y),hy⟩ ≤ μmax μ ⟨(x,⊤),lt_top_iff_ne_top.2 hx⟩ := by
   constructor
@@ -41,8 +41,8 @@ lemma rmk4d10₁ {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder 
     exact fun _ x' _ h'' ↦ h'' ▸ h x' (by tauto) x _
 
 
-lemma rmk4d10₂ {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
-{S : Type} [CompleteLattice S]
+lemma rmk4d10₂ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
+{S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
 (h₁ : WeakAscendingChainCondition μ) (h₂ : WeakSlopeLike₁ μ):
 NashEquilibrium μ ↔ ∀ y : ℒ, (hy : y ≠ ⊥) → μmin μ ⟨(⊥,y),bot_lt_iff_ne_bot.2 hy⟩ ≤ μmin μ TotIntvl := by
@@ -67,8 +67,8 @@ NashEquilibrium μ ↔ ∀ y : ℒ, (hy : y ≠ ⊥) → μmin μ ⟨(⊥,y),bot
       exact h3 ▸ (h h1 <| Ne.symm h2.2)
 
 
-lemma rmk4d10₃ {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
-{S : Type} [CompleteLattice S]
+lemma rmk4d10₃ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
+{S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
 (h₁ : WeakDescendingChainCondition μ) (h₂ : WeakSlopeLike₂ μ):
 NashEquilibrium μ ↔ ∀ y : ℒ, (hy : y ≠ ⊤) → μmax μ TotIntvl ≤ μmax μ ⟨(y,⊤),lt_top_iff_ne_top.2 hy⟩ := by
@@ -93,8 +93,8 @@ NashEquilibrium μ ↔ ∀ y : ℒ, (hy : y ≠ ⊤) → μmax μ TotIntvl ≤ �
       exact h3 ▸ (h h1 h2.2)
 
 
-lemma prop4d11₁ {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
-{S : Type} [CompleteLattice S]
+lemma prop4d11₁ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
+{S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) :
 μmin μ TotIntvl = μmax μ TotIntvl → μBstar μ ≤ μAstar μ := by
   have h₁ : μBstar μ ≤ μmax μ TotIntvl := by
@@ -112,16 +112,16 @@ lemma prop4d11₁ {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder
   exact fun h ↦ le_trans h₁ (h ▸ h₂)
 
 
-lemma prop4d11₂ {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
-{S : Type} [CompleteLattice S]
+lemma prop4d11₂ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
+{S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
 (h₁ : WeakAscendingChainCondition μ) (h₂ : WeakSlopeLike₁ μ)
 (h₁' : WeakDescendingChainCondition μ) (h₂' : WeakSlopeLike₂ μ):
 μBstar μ ≤ μAstar μ → μmin μ TotIntvl = μmax μ TotIntvl := fun h ↦ eq_of_le_of_le (le_trans (rmk4d10₀ μ TotIntvl).1 (rmk4d10₀ μ ⟨(⊥,⊤),bot_lt_top⟩).2) <| (impl.prop4d3₁ μ h₁'.wdcc h₂'.wsl₂) ▸ (impl.prop4d1₁ ℒ S μ h₁.wacc h₂.wsl₁) ▸ h
 
 
-lemma prop4d12 {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
-{S : Type} [CompleteLattice S]
+lemma prop4d12 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
+{S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
 (h : ∀ x : ℒ, (hx : x ≠ ⊥ ∧ x ≠ ⊤) → ¬ μ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx.1⟩ ≤ μ TotIntvl ∨ μ TotIntvl ≤ μ ⟨(x,⊤),lt_top_iff_ne_top.2 hx.2⟩) :
 μmax μ TotIntvl = μ TotIntvl → μmin μ TotIntvl = μmax μ TotIntvl := by
@@ -137,8 +137,8 @@ lemma prop4d12 {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder �
     use hb1, ⟨in_TotIntvl hb1, Ne.symm hbot⟩
 
 
-lemma rmk4d13 {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
-{S : Type} [CompleteLattice S]
+lemma rmk4d13 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
+{S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : SlopeLike μ):
 ∀ x : ℒ, (hx : x ≠ ⊥ ∧ x ≠ ⊤) → ¬ μ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx.1⟩ ≤ μ TotIntvl ∨ μ TotIntvl ≤ μ ⟨(x,⊤),lt_top_iff_ne_top.2 hx.2⟩ := by
   intro x hx
@@ -148,8 +148,8 @@ lemma rmk4d13 {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ
   · exact Or.inr this
 
 
-lemma prop4d14 {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
-{S : Type} [CompleteLattice S]
+lemma prop4d14 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
+{S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
 (h : ∀ x : ℒ, (hx : x ≠ ⊥ ∧ x ≠ ⊤) → μ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx.1⟩ ≤ μ TotIntvl ∨ ¬ μ TotIntvl ≤ μ ⟨(x,⊤),lt_top_iff_ne_top.2 hx.2⟩) :
 μmin μ TotIntvl = μ TotIntvl → μmax μ TotIntvl = μmin μ TotIntvl := by
@@ -165,8 +165,8 @@ lemma prop4d14 {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder �
     use hb1, ⟨in_TotIntvl hb1, htop⟩
 
 
-lemma rmk4d15 {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
-{S : Type} [CompleteLattice S]
+lemma rmk4d15 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
+{S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : SlopeLike μ):
 ∀ x : ℒ, (hx : x ≠ ⊥ ∧ x ≠ ⊤) → μ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx.1⟩ ≤ μ TotIntvl ∨ ¬ μ TotIntvl ≤ μ ⟨(x,⊤),lt_top_iff_ne_top.2 hx.2⟩ := by
   intro x hx
@@ -176,8 +176,8 @@ lemma rmk4d15 {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ
   · exact Or.inr <| not_le_of_lt this
 
 
-lemma prop4d16₁ {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
-{S : Type} [CompleteLattice S]
+lemma prop4d16₁ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
+{S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : SlopeLike μ):
 List.TFAE [
   μmax μ TotIntvl = μ TotIntvl,
@@ -197,8 +197,8 @@ List.TFAE [
   tfae_finish
 
 
-lemma prop4d16₂ {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
-{S : Type} [CompleteLattice S]
+lemma prop4d16₂ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
+{S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : SlopeLike μ)
 (h₁ : WeakAscendingChainCondition μ) (h₂ : WeakDescendingChainCondition μ) :
 μmin μ TotIntvl = μmax μ TotIntvl ↔ NashEquilibrium μ := by
@@ -213,8 +213,8 @@ lemma prop4d16₂ {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder
   · exact Or.inl <| this
 
 
-lemma prop4d18₁ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-{S : Type} [CompleteLinearOrder S]
+lemma prop4d18₁ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+{S : Type*} [CompleteLinearOrder S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : Semistable μ) : μBstar μ ≤ μAstar μ := by
   rw [semistable_iff] at hμ
   have : sSup {μA μ ⟨(⊥,x),hx⟩ | (x : ℒ) (hx : ⊥ < x)} ≤ μAstar μ := by
@@ -236,8 +236,8 @@ lemma prop4d18₁ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
     · exact hy3 ▸ (rmk4d10₀ μ ⟨(hy1,hx1), lt_of_le_of_ne hy2.1.2 hy2.2⟩).2
 
 
-lemma prop4d18₂ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-{S : Type} [CompleteLinearOrder S]
+lemma prop4d18₂ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+{S : Type*} [CompleteLinearOrder S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : Semistable μ)
 (h : (WeakAscendingChainCondition μ ∧ WeakSlopeLike₁ μ) ∨ (WeakDescendingChainCondition μ ∧ WeakSlopeLike₂ μ)) :
 NashEquilibrium μ := by
@@ -247,8 +247,8 @@ NashEquilibrium μ := by
   · exact impl.prop4d3₂ μ h.1.wdcc h.2.wsl₂
 
 
-lemma prop4d20 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-{S : Type} [CompleteLattice S]
+lemma prop4d20 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+{S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
 (h₁ : ∀ x : ℒ, (hx : x ≠ ⊥) → WeakAscendingChainCondition (Resμ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx⟩ μ))
 (h₂ :  ∀ x : ℒ, (hx : x ≠ ⊥) → WeakSlopeLike₁ (Resμ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx⟩ μ)) :
@@ -363,8 +363,8 @@ NashEquilibrium μ → Semistable μ := by
   exact {semistable := fun x hx ↦ LE.le.not_lt <| this x hx}
 
 
-instance {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
-{S : Type} [CompleteLinearOrder S]
+instance {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
+{S : Type*} [CompleteLinearOrder S]
 {μ : {p :ℒ × ℒ // p.1 < p.2} → S} [hμ : SlopeLike μ]:
 WeakSlopeLike₁ μ := by
   refine { wsl₁ := fun z hz ↦ ?_ }
@@ -373,8 +373,8 @@ WeakSlopeLike₁ μ := by
   · exact Or.inr <| le_of_lt this
 
 
-instance {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
-{S : Type} [CompleteLinearOrder S]
+instance {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
+{S : Type*} [CompleteLinearOrder S]
 {μ : {p :ℒ × ℒ // p.1 < p.2} → S} [hμ : SlopeLike μ]:
 WeakSlopeLike₂ μ := by
   refine { wsl₂ := fun z hz ↦ ?_ }
@@ -383,8 +383,8 @@ WeakSlopeLike₂ μ := by
   · exact Or.inl this
 
 
-theorem thm4d21 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-{S : Type} [CompleteLinearOrder S]
+theorem thm4d21 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+{S : Type*} [CompleteLinearOrder S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : SlopeLike μ)
 (h₁ : WeakAscendingChainCondition μ) (h₂ : WeakDescendingChainCondition μ) :
 List.TFAE [

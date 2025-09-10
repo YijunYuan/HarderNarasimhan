@@ -3,24 +3,24 @@ import Mathlib.Data.Finset.Sort
 
 namespace Lex'Order
 
-scoped instance (priority := 114514) LexLE {α : Type} [LinearOrder α] : LE (Finset α) where
+scoped instance (priority := 114514) LexLE {α : Type*} [LinearOrder α] : LE (Finset α) where
   le A B := (A.card < B.card) ∨ (A.card = B.card) ∧ (A.sort (LE.le) ≤ B.sort (LE.le))
 
-scoped instance (priority := 114514) LexLT {α : Type} [LinearOrder α] : LT (Finset α) where
+scoped instance (priority := 114514) LexLT {α : Type*} [LinearOrder α] : LT (Finset α) where
   lt A B := A ≤ B ∧ A ≠ B
 
-scoped instance (priority := 114513) {α : Type} [LinearOrder α] (A B : Finset α) : Decidable (A ≤ B) := id (id instDecidableOr)
+scoped instance (priority := 114513) {α : Type*} [LinearOrder α] (A B : Finset α) : Decidable (A ≤ B) := id (id instDecidableOr)
 
 private lemma helper {P Q : Prop} : P ∨ Q ↔ P ∨ ((¬ P) ∧ Q) := by
   tauto
 
-private lemma inj_sort {α : Type} (r : α → α → Prop) [DecidableRel r] [IsTrans α r] [IsAntisymm α r] [IsTotal α r] : Function.Injective (Finset.sort r) := by
+private lemma inj_sort {α : Type*} (r : α → α → Prop) [DecidableRel r] [IsTrans α r] [IsAntisymm α r] [IsTotal α r] : Function.Injective (Finset.sort r) := by
   intro _ _ h
   refine Finset.ext fun x ↦ ⟨fun h' ↦ ?_, fun h' ↦ ?_⟩
   · exact (Finset.mem_sort r).1 <| h ▸ (Finset.mem_sort r).2 h'
   · exact (Finset.mem_sort r).1 <| h ▸ (Finset.mem_sort r).2 h'
 
-private lemma le_antisymm {α : Type} [LinearOrder α] : ∀ (a b : Finset α), a ≤ b → b ≤ a → a = b := by
+private lemma le_antisymm {α : Type*} [LinearOrder α] : ∀ (a b : Finset α), a ≤ b → b ≤ a → a = b := by
   intro A B h1 h2
   unfold LE.le LexLE at h1 h2
   simp only at *
@@ -32,7 +32,7 @@ private lemma le_antisymm {α : Type} [LinearOrder α] : ∀ (a b : Finset α), 
     · linarith
     · exact inj_sort _ <| eq_of_le_of_le h1.2 h2.2
 
-private lemma le_card {α : Type} [LinearOrder α] (A B : Finset α) : A ≤ B → A.card ≤ B.card := by
+private lemma le_card {α : Type*} [LinearOrder α] (A B : Finset α) : A ≤ B → A.card ≤ B.card := by
   intro h
   have h' := h
   by_contra!
@@ -40,7 +40,7 @@ private lemma le_card {α : Type} [LinearOrder α] (A B : Finset α) : A ≤ B �
   · linarith
   · exact (lt_self_iff_false B.card).mp <| (le_antisymm A B h' <| id (id (id (Or.inl this)))) ▸ this
 
-private def Lex'LinearOrder {α : Type} [LinearOrder α] : LinearOrder (Finset α) where
+private def Lex'LinearOrder {α : Type*} [LinearOrder α] : LinearOrder (Finset α) where
   le := LexLE.le
   le_antisymm := le_antisymm
   le_refl := by
@@ -113,7 +113,7 @@ private def Lex'LinearOrder {α : Type} [LinearOrder α] : LinearOrder (Finset �
       simp only [not_lt] at h1
       exact h2.1.symm
 
-theorem Lex'Order_prop (α : Type) [lo : LinearOrder α] : ∃ lo : LinearOrder (Finset α),
+theorem Lex'Order_prop (α : Type*) [lo : LinearOrder α] : ∃ lo : LinearOrder (Finset α),
 (∀ A B : Finset α, A ⊆ B → lo.le A B) ∧
 (∀ a b : α, a ≤ b ↔ lo.le {a} {b}) := by
   use Lex'LinearOrder

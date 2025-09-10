@@ -4,21 +4,21 @@ open Classical
 
 namespace HarderNarasimhan
 
-class FiniteTotalPayoff {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-{S : Type} [CompleteLattice S]
+class FiniteTotalPayoff {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+{S : Type*} [CompleteLattice S]
 (μ : {p : ℒ × ℒ // p.1 < p.2} → S) : Prop where
   fin_tot_payoff : μ ⟨(⊥,⊤),bot_lt_top⟩ ≠ ⊤
 
 
-class WeakDescendingChainCondition' {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-{S : Type} [CompleteLattice S]
+class WeakDescendingChainCondition' {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+{S : Type*} [CompleteLattice S]
 (μ : {p : ℒ × ℒ // p.1 < p.2} → S) : Prop where
   wdcc' : ∀ x : ℕ → ℒ, (sax : StrictAnti x) → ∃ N : ℕ, μ ⟨(x (N +1), x N), sax <| by linarith⟩ = ⊤
 
 
 @[ext]
-structure JordanHolderFiltration {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
-{S : Type} [CompleteLinearOrder S]
+structure JordanHolderFiltration {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
+{S : Type*} [CompleteLinearOrder S]
 (μ : {p : ℒ × ℒ // p.1 < p.2} → S)
 --[FiniteTotalPayoff μ] [SlopeLike μ] [Semistable μ] [WeakDescendingChainCondition' μ]
 where
@@ -33,8 +33,8 @@ where
     μ ⟨(filtration (i+1), z), h'⟩ < μ ⟨(filtration (i+1), filtration i), strict_anti i (i+1) (by omega) hi⟩
 
 
-instance {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-{S : Type} [CompleteLattice S]
+instance {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+{S : Type*} [CompleteLattice S]
 {μ : {p : ℒ × ℒ // p.1 < p.2} → S} [h : WeakDescendingChainCondition' μ] :
 WeakDescendingChainCondition μ where
   wdcc := by
@@ -44,32 +44,32 @@ WeakDescendingChainCondition μ where
     exact hN ▸ le_top
 
 
-instance {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-{S : Type} [CompleteLattice S]
+instance {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+{S : Type*} [CompleteLattice S]
 {μ : {p : ℒ × ℒ // p.1 < p.2} → S} [h : WeakDescendingChainCondition' μ] {I : {p : ℒ × ℒ // p.1 < p.2}} : WeakDescendingChainCondition' (Resμ I μ) where
   wdcc' := fun f saf ↦ h.wdcc' (fun n ↦ (f n).val) fun ⦃_ _⦄ hn ↦ lt_iff_le_not_le.mpr (saf hn)
 
 
-class Affine {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-{S : Type} [CompleteLattice S]
+class Affine {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+{S : Type*} [CompleteLattice S]
 (μ : {p : ℒ × ℒ // p.1 < p.2} → S) : Prop where
   affine : ∀ a b : ℒ, (h : ¬ a ≤ b) → μ ⟨(a ⊓ b, a), inf_lt_left.2 h⟩ = μ ⟨(b, a ⊔ b), right_lt_sup.2 h⟩
 
 
-instance {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-{S : Type} [CompleteLattice S]
+instance {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+{S : Type*} [CompleteLattice S]
 {μ : {p : ℒ × ℒ // p.1 < p.2} → S} [haff : Affine μ] {I : {p : ℒ × ℒ // p.1 < p.2}} : Affine (Resμ I μ) where
   affine := fun a b h ↦ haff.affine a b h
 
-instance {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-{S : Type} [CompleteLattice S]
+instance {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+{S : Type*} [CompleteLattice S]
 {μ : {p : ℒ × ℒ // p.1 < p.2} → S} [haff : Affine μ] : Convex μ := by
   refine { convex := ?_ }
   intro x y hx hy hxy
   rw [haff.affine x y hxy]
 
-instance {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
-{S : Type} [CompleteLinearOrder S]
+instance {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
+{S : Type*} [CompleteLinearOrder S]
 {μ : {p : ℒ × ℒ // p.1 < p.2} → S}
 [hftp : FiniteTotalPayoff μ] [hsl : SlopeLike μ] [hst : Semistable μ] [hwdcc' : WeakDescendingChainCondition' μ] {x : ℒ} {hx : ⊥ < x}: FiniteTotalPayoff (Resμ ⟨(⊥, x), hx⟩ μ) := by
   refine { fin_tot_payoff := ?_ }

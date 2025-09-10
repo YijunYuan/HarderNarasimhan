@@ -16,8 +16,8 @@ open Classical
 namespace HarderNarasimhan
 
 namespace impl
-noncomputable def JHFil {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [hacc: WellFoundedGT ℒ]
-{S : Type} [CompleteLinearOrder S]
+noncomputable def JHFil {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [hacc: WellFoundedGT ℒ]
+{S : Type*} [CompleteLinearOrder S]
 (μ : {p : ℒ × ℒ // p.1 < p.2} → S)
 (hμ : μ ⟨(⊥,⊤),bot_lt_top⟩ ≠ ⊤)
 (hμsl : SlopeLike μ) (hst : Semistable μ)
@@ -32,8 +32,8 @@ noncomputable def JHFil {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrde
       ⊥
 
 
-lemma JHFil_anti_mono {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [hacc: WellFoundedGT ℒ]
-{S : Type} [CompleteLinearOrder S]
+lemma JHFil_anti_mono {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [hacc: WellFoundedGT ℒ]
+{S : Type*} [CompleteLinearOrder S]
 (μ : {p : ℒ × ℒ // p.1 < p.2} → S)
 (hμ : μ ⟨(⊥,⊤),bot_lt_top⟩ ≠ ⊤)
 (hμsl : SlopeLike μ) (hst : Semistable μ)
@@ -48,8 +48,8 @@ lemma JHFil_anti_mono {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder 
     exact hk
 
 
-lemma JHFil_prop₁ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [hacc: WellFoundedGT ℒ]
-{S : Type} [CompleteLinearOrder S]
+lemma JHFil_prop₁ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [hacc: WellFoundedGT ℒ]
+{S : Type*} [CompleteLinearOrder S]
 (μ : {p : ℒ × ℒ // p.1 < p.2} → S)
 (hμ : μ ⟨(⊥,⊤),bot_lt_top⟩ ≠ ⊤)
 (hμsl : SlopeLike μ) (hst : Semistable μ)
@@ -124,8 +124,8 @@ lemma JHFil_prop₁ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
       exact ((Or.resolve_left <| (Or.resolve_left <| (impl.prop4d6 μ).1 hμsl ⊥ (JHFil μ hμ hμsl hst hdc (k + 1)) (JHFil μ hμ hμsl hst hdc k) ⟨hk',this⟩) (fun this_1 ↦ ne_of_lt (lt_trans this_1.left this_1.right) this'')) (fun this_1 ↦ ne_of_lt (gt_trans this_1.1 this_1.2) (Eq.symm this''))).1
 
 
-lemma JHFil_fin_len {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [hacc: WellFoundedGT ℒ]
-{S : Type} [CompleteLinearOrder S]
+lemma JHFil_fin_len {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [hacc: WellFoundedGT ℒ]
+{S : Type*} [CompleteLinearOrder S]
 (μ : {p : ℒ × ℒ // p.1 < p.2} → S)
 (hμ : μ ⟨(⊥,⊤),bot_lt_top⟩ ≠ ⊤)
 (hμsl : SlopeLike μ) (hst : Semistable μ)
@@ -137,8 +137,8 @@ lemma JHFil_fin_len {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
   exact hμ.symm <| hN ▸ JHFil_prop₁ μ hμ hμsl hst hdc N (bot_lt_iff_ne_bot.2 <| hc N)
 
 
-lemma JHFil_prop₂ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [hacc: WellFoundedGT ℒ]
-{S : Type} [CompleteLinearOrder S]
+lemma JHFil_prop₂ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [hacc: WellFoundedGT ℒ]
+{S : Type*} [CompleteLinearOrder S]
 (μ : {p : ℒ × ℒ // p.1 < p.2} → S) [hwdcc' : WeakDescendingChainCondition' μ]
 (hμ : μ ⟨(⊥,⊤),bot_lt_top⟩ ≠ ⊤)
 (hμsl : SlopeLike μ) (hst : Semistable μ)
@@ -207,14 +207,14 @@ lemma JHFil_prop₂ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
     exact (JHFil_prop₁ μ hμ hμsl hst hdc k hk ).symm ▸ lt_trans ((Or.resolve_right <| (Or.resolve_left <| (impl.prop4d6 μ).1 hμsl ⊥ (JHFil μ hμ hμsl hst hdc (k + 1)) z ⟨bot_lt_iff_ne_bot.2 hfp1bot,h'⟩) (not_and_iff_not_or_not.2 <| Or.inl <| not_lt_of_lt <| h'''' ▸ h''')) (not_and_iff_not_or_not.2 <| Or.inl <| ne_of_gt <| h'''' ▸ h''')).2 h'''
 
 
-lemma JH_pos_len {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
-{S : Type} [CompleteLinearOrder S]
+lemma JH_pos_len {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
+{S : Type*} [CompleteLinearOrder S]
 {μ : {p : ℒ × ℒ // p.1 < p.2} → S} : ∀ JH : JordanHolderFiltration μ, Nat.find JH.fin_len ≠ 0 := by
   intro JH h
   simp only [Nat.find_eq_zero, JH.first_eq_top, top_ne_bot] at h
 
 
-noncomputable def function_wrapper {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] (f : ℕ → ℒ) (atf : ∃ k, f k = ⊥) : ℕ → ℒ := fun n ↦
+noncomputable def function_wrapper {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] (f : ℕ → ℒ) (atf : ∃ k, f k = ⊥) : ℕ → ℒ := fun n ↦
   match n with
   | 0 => ⊤
   | t + 1 =>
@@ -224,7 +224,7 @@ noncomputable def function_wrapper {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [
       f <| Nat.find (⟨atf.choose,atf.choose_spec.symm ▸ bot_lt_iff_ne_bot.2 hcond⟩: ∃ k : ℕ, f k < function_wrapper f atf t)
 
 
-lemma function_wrapper_prop0 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] (f : ℕ → ℒ) (atf : ∃ k, f k = ⊥) (hf: Antitone f) (hf0 : f 0 = ⊤): ∀ i : ℕ, ∃ j : ℕ, f i = function_wrapper f atf j := by
+lemma function_wrapper_prop0 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] (f : ℕ → ℒ) (atf : ∃ k, f k = ⊥) (hf: Antitone f) (hf0 : f 0 = ⊤): ∀ i : ℕ, ∃ j : ℕ, f i = function_wrapper f atf j := by
   intro i
   induction' i with i hi
   · exact ⟨0,hf0⟩
@@ -253,7 +253,7 @@ lemma function_wrapper_prop0 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [Bounde
       exact congrArg f this
 
 
-lemma function_wrapper_prop0' {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] (f : ℕ → ℒ) (atf : ∃ k, f k = ⊥) (hf: Antitone f) (hf0 : f 0 = ⊤): ∀ i : ℕ, ∃ j : ℕ, j ≥ i ∧ function_wrapper f atf i = f j:= by
+lemma function_wrapper_prop0' {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] (f : ℕ → ℒ) (atf : ∃ k, f k = ⊥) (hf: Antitone f) (hf0 : f 0 = ⊤): ∀ i : ℕ, ∃ j : ℕ, j ≥ i ∧ function_wrapper f atf i = f j:= by
   intro i
   induction' i with i hi
   · use 0
@@ -283,11 +283,11 @@ lemma function_wrapper_prop0' {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [Bound
       linarith
     simp only [ht]
 
-lemma function_wrapper_prop1 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] (f : ℕ → ℒ) (atf : ∃ k, f k = ⊥) (hf: Antitone f) (hf0 : f 0 = ⊤): ∃ N : ℕ, function_wrapper f atf N = ⊥ := by
+lemma function_wrapper_prop1 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] (f : ℕ → ℒ) (atf : ∃ k, f k = ⊥) (hf: Antitone f) (hf0 : f 0 = ⊤): ∃ N : ℕ, function_wrapper f atf N = ⊥ := by
   rcases (function_wrapper_prop0 f atf hf hf0 atf.choose) with ⟨N,hN⟩
   exact ⟨N, hN ▸ atf.choose_spec⟩
 
-lemma function_wrapper_prop2 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] (f : ℕ → ℒ) (atf : ∃ k, f k = ⊥) : Antitone (function_wrapper f atf) := by
+lemma function_wrapper_prop2 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] (f : ℕ → ℒ) (atf : ∃ k, f k = ⊥) : Antitone (function_wrapper f atf) := by
   intro i j
   apply Nat.le_induction
   · exact le_rfl
@@ -303,7 +303,7 @@ lemma function_wrapper_prop2 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [Bounde
     exact le_of_lt <| Nat.find_spec <| function_wrapper._proof_6 f atf n (of_eq_false (eq_false hcond))
 
 
-lemma function_wrapper_prop3 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] (f : ℕ → ℒ) (hf0 : f 0 = ⊤) (atf : ∃ k, f k = ⊥) (hfat: Antitone f): ∀ k : ℕ, function_wrapper f atf k ≤ f k := by
+lemma function_wrapper_prop3 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] (f : ℕ → ℒ) (hf0 : f 0 = ⊤) (atf : ∃ k, f k = ⊥) (hfat: Antitone f): ∀ k : ℕ, function_wrapper f atf k ≤ f k := by
   intro k
   induction' k with k hk
   · simp only [function_wrapper, hf0, le_refl]
@@ -320,7 +320,7 @@ lemma function_wrapper_prop3 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [Bounde
     exact hjtilde.2 ▸ (hfat <| le_of_lt <| lt_of_le_of_ne hjtilde.1 <| Ne.symm hjt)
 
 
-lemma function_wrapper_prop5 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] (f : ℕ → ℒ) (hf0 : f 0 = ⊤) (atf : ∃ k, f k = ⊥) (hfat: Antitone f) : ∀ (i j : ℕ), i < j → j ≤ Nat.find (function_wrapper_prop1 f atf hfat hf0) → function_wrapper f atf j < function_wrapper f atf i := by
+lemma function_wrapper_prop5 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] (f : ℕ → ℒ) (hf0 : f 0 = ⊤) (atf : ∃ k, f k = ⊥) (hfat: Antitone f) : ∀ (i j : ℕ), i < j → j ≤ Nat.find (function_wrapper_prop1 f atf hfat hf0) → function_wrapper f atf j < function_wrapper f atf i := by
   intro i
   have : ∀ j : ℕ, i+1 ≤ j → j ≤ Nat.find (function_wrapper_prop1 f atf hfat hf0) → function_wrapper f atf j < function_wrapper f atf i := by
     apply Nat.le_induction
@@ -350,7 +350,7 @@ lemma function_wrapper_prop5 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [Bounde
   exact fun j hij hle ↦ this j (by linarith) hle
 
 
-lemma function_wrapper_prop4 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] (f : ℕ → ℒ) (hf0 : f 0 = ⊤) (atf : ∃ k, f k = ⊥) (hfat: Antitone f) (k : ℕ) (hk : f k = ⊥) (htech : ∃ N : ℕ, N + 1 ≤ k ∧ f N = f (N+1)) : (Nat.find <| function_wrapper_prop1 f atf hfat hf0) ≠ k := by
+lemma function_wrapper_prop4 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] (f : ℕ → ℒ) (hf0 : f 0 = ⊤) (atf : ∃ k, f k = ⊥) (hfat: Antitone f) (k : ℕ) (hk : f k = ⊥) (htech : ∃ N : ℕ, N + 1 ≤ k ∧ f N = f (N+1)) : (Nat.find <| function_wrapper_prop1 f atf hfat hf0) ≠ k := by
   let A := Nat.find <| function_wrapper_prop1 f atf hfat hf0
   let 𝒮 := {f t | (t ≤ k)}
   have helper : ∀ t : ℕ, ∃ l : ℕ, l ≤ k ∧ function_wrapper f atf t = f l := by
@@ -383,7 +383,7 @@ lemma function_wrapper_prop4 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [Bounde
   exact ne_of_lt <| Nat.succ_lt_succ_iff.mp <| lt_of_le_of_lt ineq1 ineq2
 
 
-lemma function_wrapper_prop6 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] (f : ℕ → ℒ) (hf0 : f 0 = ⊤) (atf : ∃ k, f k = ⊥) (hfat: Antitone f)
+lemma function_wrapper_prop6 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] (f : ℕ → ℒ) (hf0 : f 0 = ⊤) (atf : ∃ k, f k = ⊥) (hfat: Antitone f)
 (P : {z : ℒ × ℒ // z.1 < z.2} → Prop)
 (ho : ∀ i : ℕ, i < Nat.find atf → (hfi :f (i + 1) < f i) → P ⟨(f (i+1), f i),hfi⟩) : ∀ i : ℕ, (hi : i < Nat.find (function_wrapper_prop1 f atf hfat hf0)) → P ⟨(function_wrapper f atf (i + 1),function_wrapper f atf i), function_wrapper_prop5 f hf0 atf hfat i (i+1) (Nat.lt_succ_self i) (Nat.succ_le.2 hi)⟩ := by
   intro i hi
@@ -432,8 +432,8 @@ lemma function_wrapper_prop6 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [Bounde
   simp only [← heq] at this
   exact this
 
-lemma μA_eq_μmin {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
-{S : Type} [CompleteLinearOrder S]
+lemma μA_eq_μmin {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
+{S : Type*} [CompleteLinearOrder S]
 (μ : {p : ℒ × ℒ // p.1 < p.2} → S)
 [SlopeLike μ] (I : {p : ℒ × ℒ // p.1 < p.2}) :
 μmin μ I = μA μ I := by
@@ -496,8 +496,8 @@ lemma μA_eq_μmin {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ
         rcases hy with ⟨a,ha1,ha2⟩
         use a, ⟨⟨ha1.1.1,a.prop.2⟩,fun hc ↦ ha1.right (Subtype.coe_inj.mp hc)⟩
 
-lemma μ_bot_JH_eq_μ_tot {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
-{S : Type} [CompleteLinearOrder S]
+lemma μ_bot_JH_eq_μ_tot {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
+{S : Type*} [CompleteLinearOrder S]
 {μ : {p : ℒ × ℒ // p.1 < p.2} → S}
 [hsl : SlopeLike μ] (JH : JordanHolderFiltration μ) : ∀ i : ℕ, (hi : i < Nat.find JH.fin_len) → μ ⟨(⊥, JH.filtration i), by
   rw [← Nat.find_spec JH.fin_len]
@@ -540,8 +540,8 @@ lemma μ_bot_JH_eq_μ_tot {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOr
       ,Ne.lt_top' fun a ↦ htop (id (Eq.symm a))⟩
     rw [← (this.2.2.1 hi').2,JH.step_cond₁ i <| Nat.lt_of_succ_lt hi]
 
-lemma res_ss {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
-{S : Type} [CompleteLinearOrder S]
+lemma res_ss {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
+{S : Type*} [CompleteLinearOrder S]
 {μ : {p : ℒ × ℒ // p.1 < p.2} → S}
 [FiniteTotalPayoff μ] [SlopeLike μ] [Semistable μ]
 [WeakDescendingChainCondition' μ] [Affine μ] (JH : JordanHolderFiltration μ) (h : JH.filtration (Nat.find JH.fin_len - 1) < ⊤) : Semistable (Resμ ⟨(JH.filtration (Nat.find JH.fin_len - 1),⊤),h⟩ μ) := by
@@ -573,7 +573,7 @@ lemma res_ss {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [Wel
       ,h⟩).2.2.1 this).2] at this'
     exact this'
 
-instance {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [iml : IsModularLattice ℒ]
+instance {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [iml : IsModularLattice ℒ]
 {I : {p : ℒ × ℒ // p.1 < p.2}} : IsModularLattice (Interval I) where
   sup_inf_le_assoc_of_le := by
     intro x y z hxz
@@ -581,9 +581,9 @@ instance {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [iml : I
     exact hxz
 
 
-lemma looooooooooooooooog_lemma : ∀ n : ℕ, ∀ ℒ : Type, ∀ _: Nontrivial ℒ, ∀ _ : Lattice ℒ, ∀ _ : BoundedOrder ℒ, ∀ _ : WellFoundedGT ℒ,
+lemma looooooooooooooooog_lemma : ∀ n : ℕ, ∀ ℒ : Type*, ∀ _: Nontrivial ℒ, ∀ _ : Lattice ℒ, ∀ _ : BoundedOrder ℒ, ∀ _ : WellFoundedGT ℒ,
 ∀ _ : IsModularLattice ℒ,
-∀ S : Type, ∀ _ : CompleteLinearOrder S, ∀ μ : {p : ℒ × ℒ // p.1 < p.2} → S,
+∀ S : Type*, ∀ _ : CompleteLinearOrder S, ∀ μ : {p : ℒ × ℒ // p.1 < p.2} → S,
 ∀ _ : FiniteTotalPayoff μ, ∀ _ : SlopeLike μ,
 ∀ _ : Semistable μ, ∀ _ : WeakDescendingChainCondition' μ, ∀ _ : Affine μ, (∃ JH : JordanHolderFiltration μ, Nat.find JH.fin_len ≤ n) → (∀ JH' : JordanHolderFiltration μ, Nat.find JH'.fin_len ≤ n) := by
   intro n

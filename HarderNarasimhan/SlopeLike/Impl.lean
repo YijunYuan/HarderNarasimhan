@@ -3,8 +3,8 @@ import HarderNarasimhan.SlopeLike.Defs
 namespace HarderNarasimhan
 
 namespace impl
-lemma prop4d6 {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
-{S : Type} [CompleteLattice S]
+lemma prop4d6 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
+{S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S):
 SlopeLike μ ↔ ∀ (x y z : ℒ), (h : x < y ∧ y < z) → (
   μ ⟨(x, y), h.1⟩ < μ ⟨(x, z), lt_trans h.1 h.2⟩ ∧ μ ⟨(x, z), lt_trans h.1 h.2⟩ < μ ⟨(y, z), h.2⟩
@@ -46,7 +46,7 @@ SlopeLike μ ↔ ∀ (x y z : ℒ), (h : x < y ∧ y < z) → (
       exact imp_iff_or_not.1 fun h' ↦ by cases' (by tauto : μ ⟨(x, y), h.1⟩ > μ ⟨(x, z), lt_trans h.1 h.2⟩ ∧ μ ⟨(x, z), lt_trans h.1 h.2⟩ > μ ⟨(y, z), h.2⟩ ∨ μ ⟨(x, y), h.1⟩ = μ ⟨(x, z), lt_trans h.1 h.2⟩ ∧ μ ⟨(x, z), lt_trans h.1 h.2⟩ = μ ⟨(y, z), h.2⟩) with this this <;> [exact le_of_lt this.1; exact le_of_eq this.1.symm]
 
 
-lemma not_top_of_Nontrivial_TotallyOrderedRealVectorSpace {V : Type} [TotallyOrderedRealVectorSpace V] [hnt: Nontrivial V] : ∀ v : V, OrderTheory.coe' v < (⊤ : OrderTheory.DedekindMacNeilleCompletion V) := by
+lemma not_top_of_Nontrivial_TotallyOrderedRealVectorSpace {V : Type*} [TotallyOrderedRealVectorSpace V] [hnt: Nontrivial V] : ∀ v : V, OrderTheory.coe' v < (⊤ : OrderTheory.DedekindMacNeilleCompletion V) := by
   intro v
   rcases hnt.exists_pair_ne with ⟨v₁, v₂, hne⟩
   let v₀ := if v₁ < v₂ then v₂ - v₁ else v₁ - v₂
@@ -59,16 +59,16 @@ lemma not_top_of_Nontrivial_TotallyOrderedRealVectorSpace {V : Type} [TotallyOrd
   exact not_top_lt <| top_le_iff.1 this ▸ (OrderTheory.coe'.lt_iff_lt.2 <| lt_add_of_pos_right v hpos)
 
 
-lemma μQuotient_helper {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
-{V : Type} [TotallyOrderedRealVectorSpace V]
+lemma μQuotient_helper {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
+{V : Type*} [TotallyOrderedRealVectorSpace V]
 (r : {p :ℒ × ℒ // p.1 < p.2} → NNReal)
 (d : {p :ℒ × ℒ // p.1 < p.2} → V): ∀ z : {p :ℒ × ℒ // p.1 < p.2}, r z > 0 → ∃ (μ : V), (μQuotient r d) z = OrderTheory.coe' μ ∧ (r z) • μ = (d z) :=
   fun z h ↦ ⟨(r z)⁻¹ • d z,⟨by simp only [μQuotient, gt_iff_lt, h, ↓reduceDIte,
     OrderTheory.coe', RelEmbedding.coe_mk, Function.Embedding.coeFn_mk], smul_inv_smul₀ (by aesop) (d z)⟩⟩
 
 
-lemma prop4d8 {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
-{V : Type} [TotallyOrderedRealVectorSpace V] [Nontrivial V]
+lemma prop4d8 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
+{V : Type*} [TotallyOrderedRealVectorSpace V] [Nontrivial V]
 (r : {p :ℒ × ℒ // p.1 < p.2} → NNReal)
 (d : {p :ℒ × ℒ // p.1 < p.2} → V)
 (h₁ : ∀ (x y z : ℒ), (h : x < y ∧ y < z) → d ⟨(x, z), lt_trans h.1 h.2⟩ = d ⟨(x, y), h.1⟩ + d ⟨(y, z), h.2⟩ ∧ r ⟨(x, z), lt_trans h.1 h.2⟩ = r ⟨(x, y), h.1⟩ + r ⟨(y, z), h.2⟩)

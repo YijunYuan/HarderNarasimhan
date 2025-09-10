@@ -7,8 +7,8 @@ namespace impl
 
 section
 
-variable {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-variable {S : Type} [CompleteLattice S]
+variable {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+variable {S : Type*} [CompleteLattice S]
 
 lemma lem2d4₁
   (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
@@ -179,7 +179,7 @@ lemma prop2d6₂I₂
   μA μ ⟨(x, z), lt_trans h.1 h.2⟩ ≤ μA μ ⟨(y, z), h.2⟩ := ⟨(inf_eq_left.2 <| le_of_lt h').symm ▸ prop2d6₁I I μ hμcvx x hxI y hyI z hzI h, prop2d6₀ μ x y z h⟩
 
 
-lemma comparable_iff {L : Type} [PartialOrder L]
+lemma comparable_iff {L : Type*} [PartialOrder L]
 (x : L) (y : L)
 (h : IsComparable x y) :
 x < y ∨ y ≤ x := by
@@ -224,7 +224,7 @@ lemma prop2d6₃I
 
 
 lemma rmk2d7
-  {S : Type} [CompleteLinearOrder S]
+  {S : Type*} [CompleteLinearOrder S]
   (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : ConvexI ⟨(⊥, ⊤), bot_lt_top⟩ μ)
   (x : ℒ) (h : ⊥ < x ∧ x < ⊤)
   (h' : μA μ ⟨(⊥, x), h.1⟩ > μA μ ⟨(⊥, ⊤), bot_lt_top⟩) :

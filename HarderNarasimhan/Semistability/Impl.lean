@@ -7,8 +7,8 @@ namespace HarderNarasimhan
 
 namespace impl
 
-lemma prop3d2 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-{S : Type} [CompleteLattice S]
+lemma prop3d2 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+{S : Type*} [CompleteLattice S]
 (I : {p : ℒ × ℒ // p.1 < p.2})
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : ConvexI I μ)
 (x : ℒ) (hxI : InIntvl I x)
@@ -22,8 +22,8 @@ lemma prop3d2 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   exact h''
 
 
-lemma cor3d3 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-(S : Type) [CompleteLattice S]
+lemma cor3d3 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+(S : Type*) [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : Convex μ)
 (h : ∀ f : ℕ → ℒ, (h : ∀ n : ℕ, f n > f (n + 1)) →  ∃N : ℕ, μA μ ⟨(f <| N + 1, f N),h N⟩ = ⊤)
 : μA_DescendingChainCondition μ := by
@@ -32,16 +32,16 @@ lemma cor3d3 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   exact ⟨N,prop3d2 TotIntvl μ hμcvx (f <| N + 1) (in_TotIntvl <| f <| N + 1) (f N) (in_TotIntvl <| f N) (h₂ N) hN a (in_TotIntvl <| a) (h₁ <| N + 1)⟩
 
 
-def ℒₛ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
-{S : Type} [CompleteLattice S]
+def ℒₛ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
+{S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
 (I : {p : ℒ × ℒ // p.1 < p.2})
 (x : {p : ℒ // InIntvl I p}) (hx : I.val.1 ≠ x) : Set ℒ :=
 {p : ℒ | ∃ h₁ : InIntvl I p, ∃ h₂ : I.val.1 ≠ p ∧ p < x, μA μ ⟨(I.val.1,p),lt_of_le_of_ne h₁.1 h₂.1⟩ > μA μ ⟨(I.val.1 , x.val) , lt_of_le_of_ne x.prop.1 hx⟩}
 
 
-noncomputable def prop3d4₀func {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [h :WellFoundedGT ℒ]
-{S : Type} [CompleteLattice S]
+noncomputable def prop3d4₀func {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [h :WellFoundedGT ℒ]
+{S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
 (I : {p : ℒ × ℒ // p.1 < p.2})
 (k : ℕ) : {p : ℒ // InIntvl I p} :=
@@ -60,8 +60,8 @@ noncomputable def prop3d4₀func {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [Bo
         ⟨I.val.1, ⟨le_rfl,le_of_lt I.prop⟩⟩
 
 
-lemma prop3d4₀func_helper {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
-{S : Type} [CompleteLattice S]
+lemma prop3d4₀func_helper {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
+{S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
 (I : {p : ℒ × ℒ // p.1 < p.2})
 (i : ℕ) (hi : I.val.1 ≠ (prop3d4₀func μ I (i+1)).val ) :
@@ -71,8 +71,8 @@ I.val.1 ≠ (prop3d4₀func μ I i).val := by
   exact hi rfl
 
 
-lemma prop3d4₀func_defprop1 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [inst_3 : WellFoundedGT ℒ]
-{S : Type} [CompleteLattice S]
+lemma prop3d4₀func_defprop1 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [inst_3 : WellFoundedGT ℒ]
+{S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
 (I : {p : ℒ × ℒ // p.1 < p.2})
 (i : ℕ) (hi : I.val.1 ≠ (prop3d4₀func μ I (i+1)).val ) :
@@ -86,8 +86,8 @@ lemma prop3d4₀func_defprop1 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [Bound
   exact (inst_3.wf.has_min (ℒₛ μ I (prop3d4₀func μ I i) <| prop3d4₀func_helper μ I i hi) hne).choose_spec.1.out.choose_spec.choose_spec
 
 
-lemma prop3d4₀func_defprop2 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [inst_3: WellFoundedGT ℒ]
-{S : Type} [CompleteLattice S]
+lemma prop3d4₀func_defprop2 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [inst_3: WellFoundedGT ℒ]
+{S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
 (I : {p : ℒ × ℒ // p.1 < p.2})
 (i : ℕ) (hi : I.val.1 ≠ (prop3d4₀func μ I (i+1)).val ) :
@@ -113,8 +113,8 @@ lemma prop3d4₀func_defprop2 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [Bound
   exact (inst_3.wf.has_min (ℒₛ μ I (prop3d4₀func μ I i) <| prop3d4₀func_helper μ I i hi) hne).choose_spec.2 z h' hz.1
 
 
-lemma prop3d4₀func_strict_decreasing {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [inst_3 : WellFoundedGT ℒ]
-{S : Type} [CompleteLattice S]
+lemma prop3d4₀func_strict_decreasing {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [inst_3 : WellFoundedGT ℒ]
+{S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
 (I : {p : ℒ × ℒ // p.1 < p.2}) :
 ∀ i : ℕ, I.val.1 ≠ (prop3d4₀func μ I i).val →
@@ -136,8 +136,8 @@ lemma prop3d4₀func_strict_decreasing {ℒ : Type} [Nontrivial ℒ] [Lattice �
     exact (inst_3.wf.has_min (ℒₛ μ I (prop3d4₀func μ I i) hi) hne).choose_spec.1.out.choose_spec.choose.2
 
 
-lemma prop3d4₀func_fin_len  {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
-{S : Type} [CompleteLattice S]
+lemma prop3d4₀func_fin_len  {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
+{S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
 (I : {p : ℒ × ℒ // p.1 < p.2})
 (hμDCC : μA_DescendingChainCondition μ) :
@@ -153,8 +153,8 @@ lemma prop3d4₀func_fin_len  {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [Bound
   exact not_le_of_gt (h₂ N) hN
 
 
-noncomputable def prop3d4₀func_len  {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
-{S : Type} [CompleteLattice S]
+noncomputable def prop3d4₀func_len  {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
+{S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
 (I : {p : ℒ × ℒ // p.1 < p.2})
 (hμDCC : μA_DescendingChainCondition μ) : ℕ := by
@@ -162,8 +162,8 @@ noncomputable def prop3d4₀func_len  {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ
   exact Nat.find (prop3d4₀func_fin_len μ I hμDCC)
 
 
-lemma prop3d4₀func_len_nonzero {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
-{S : Type} [CompleteLattice S]
+lemma prop3d4₀func_len_nonzero {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
+{S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
 (I : {p : ℒ × ℒ // p.1 < p.2}) (hμDCC : μA_DescendingChainCondition μ) :
 prop3d4₀func_len μ I hμDCC ≠ 0 := by
@@ -174,8 +174,8 @@ prop3d4₀func_len μ I hμDCC ≠ 0 := by
   exact (lt_self_iff_false I.val.1).1 (h ▸ I.prop)
 
 
-lemma prop3d4₀func_defprop3₀ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
-{S : Type} [CompleteLattice S]
+lemma prop3d4₀func_defprop3₀ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
+{S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
 (I : {p : ℒ × ℒ // p.1 < p.2}) (hμDCC : μA_DescendingChainCondition μ)
 (i : ℕ) (hi : i < (prop3d4₀func_len μ I hμDCC)) :
@@ -184,8 +184,8 @@ I.val.1 < (prop3d4₀func μ I i).val := by
   exact ((Nat.find_min (prop3d4₀func_fin_len μ I hμDCC)) hi).decidable_imp_symm fun hcontra ↦ (eq_of_le_of_not_lt (prop3d4₀func μ I i).prop.1 hcontra).symm
 
 
-lemma prop3d4₀func_defprop3 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [inst_3 : WellFoundedGT ℒ]
-{S : Type} [CompleteLattice S]
+lemma prop3d4₀func_defprop3 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [inst_3 : WellFoundedGT ℒ]
+{S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
 (I : {p : ℒ × ℒ // p.1 < p.2}) (hμDCC : μA_DescendingChainCondition μ)
 (y: ℒ) (hy : I.val.1 < y ∧ y ≤ (prop3d4₀func μ I <| (prop3d4₀func_len μ I hμDCC) - 1).val) :
@@ -209,9 +209,9 @@ lemma prop3d4₀func_defprop3 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [Bound
     exact (lt_self_iff_false <| μA μ ⟨(I.val.1 , (prop3d4₀func μ I <| len - 1).val) , prop3d4₀func_defprop3₀ μ I hμDCC (len - 1) <| Nat.sub_one_lt <| prop3d4₀func_len_nonzero μ I hμDCC⟩).1 hcontra
 
 
-lemma prop3d4 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ] -- The ascending chain condition. Actually we only need this condition on the Interval I, but to make the life easy, we require it on the whole ℒ.
+lemma prop3d4 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ] -- The ascending chain condition. Actually we only need this condition on the Interval I, but to make the life easy, we require it on the whole ℒ.
 -- This actually does `NOT` make the statement any weaker, since if we take I to be (⊥,⊤), then we can "apply" this global version to I itself, which is also a sublattice of ℒ.
-{S : Type} [CompleteLattice S]
+{S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμDCC : μA_DescendingChainCondition μ)
 (I : {p : ℒ × ℒ // p.1 < p.2}) (hμcvx : ConvexI I μ)
 : (StI μ I).Nonempty := by
@@ -272,8 +272,8 @@ lemma prop3d4 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [We
     · exact (func (len - 1)).prop
 
 
-lemma rmk3d5 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
-{S : Type} [CompleteLinearOrder S]
+lemma rmk3d5 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
+{S : Type*} [CompleteLinearOrder S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
 (I : {p : ℒ × ℒ // p.1 < p.2})
 (x : ℒ) (hxSt : x ∈ StI μ I)
@@ -283,8 +283,8 @@ lemma rmk3d5 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [Wel
   exact eq_of_le_of_le (hyS₂ x hxI hx (eq_of_le_of_le (le_of_not_gt <| hxS₁ y hyI hy) (le_of_not_gt <| hyS₁ x hxI hx)).symm) (hxS₂ y hyI hy <| eq_of_le_of_le (le_of_not_gt <| hxS₁ y hyI hy) (le_of_not_gt <| hyS₁ x hxI hx))
 
 
-lemma prop3d7₁ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-{S : Type} [CompleteLattice S]
+lemma prop3d7₁ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+{S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
 (I : {p : ℒ × ℒ // p.1 < p.2})
 (x : ℒ) (hxSt : x ∈ StI μ I) :
@@ -293,8 +293,8 @@ semistableI μ ⟨(I.val.1 , x), lt_of_le_of_ne hxSt.out.choose.1 hxSt.out.choos
   exact ⟨⟨hxI.1,le_rfl⟩, hx', ⟨fun z hzI hz ↦ hx'' z ⟨hzI.1,le_trans hzI.2 hxI.2⟩ hz,fun z hzI hz hz' ↦ hxS₂I z ⟨hzI.1,le_trans hzI.2 hxI.2⟩ hz hz'⟩⟩
 
 
-lemma prop3d7₂ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-{S : Type} [CompleteLattice S]
+lemma prop3d7₂ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+{S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
 (I : {p : ℒ × ℒ // p.1 < p.2}) (hμcvx : ConvexI I μ)
 (x : ℒ) (hxSt : x ∈ StI μ I) :
@@ -304,8 +304,8 @@ lemma prop3d7₂ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   exact (not_le_of_gt hy) (hxSt.out.choose_spec.choose_spec.2 y hyI (ne_of_lt <| lt_of_le_of_lt hxSt.out.choose.1 hy) <|eq_of_ge_of_not_gt ((inf_eq_left.2 hy') ▸ impl.prop2d6₁I I μ hμcvx I.val.1 ⟨le_rfl,le_of_lt I.prop⟩ x hxSt.out.choose y hyI ⟨lt_of_le_of_ne hxSt.out.choose.1 hxSt.out.choose_spec.choose,hy⟩) <| hxSt.out.choose_spec.choose_spec.1 y hyI <| ne_of_lt <| lt_of_le_of_lt hxSt.out.choose.1 hy)
 
 
-lemma prop3d8₁ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
-{S : Type} [CompleteLattice S]
+lemma prop3d8₁ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
+{S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)-- (hμ : μDCC μ)
 (I : {p : ℒ × ℒ // p.1 < p.2}) (hμcvx : ConvexI I μ)
 (h : (IsTotal S (· ≤ ·)) ∨
@@ -330,8 +330,8 @@ IsTotal (StI μ I) (· ≤ ·) := by
   · exact Or.inl (sup_le_iff.1 c2).1
 
 
-lemma prop3d8₁' {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ]  [BoundedOrder ℒ] [inst_3 : WellFoundedGT ℒ]
-{S : Type} [CompleteLattice S]
+lemma prop3d8₁' {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ]  [BoundedOrder ℒ] [inst_3 : WellFoundedGT ℒ]
+{S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : μA_DescendingChainCondition μ)
 (I : {p : ℒ × ℒ // p.1 < p.2}) (hμcvx : ConvexI I μ)
 (h : (IsTotal S (· ≤ ·)) ∨
@@ -345,8 +345,8 @@ lemma prop3d8₁' {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ]  [BoundedOrder ℒ
   · exact le_of_eq <| eq_of_ge_of_not_gt c2 (hM.2 x hx)
 
 
-lemma prop3d8₂ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
-{S : Type} [CompleteLattice S]
+lemma prop3d8₂ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
+{S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)-- (hμ : μDCC μ)
 (I : {p : ℒ × ℒ // p.1 < p.2}) (hμcvx : ConvexI I μ)
 (h : (IsTotal S (· ≤ ·)) ∨
@@ -364,8 +364,8 @@ lemma prop3d8₂ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] 
   · exact False.elim  ((not_lt_of_le <| hxSt.out.choose_spec.choose_spec.2 y hyI  (ne_of_lt <| lt_of_le_of_lt hxSt.out.choose.1 hxy) <| eq_of_ge_of_not_gt c2.1 (hxSt.out.choose_spec.choose_spec.1 y hyI <| ne_of_lt <| lt_of_le_of_lt hxSt.out.choose.1 hxy)) hxy)
 
 
-theorem semistable_iff {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-{S : Type} [CompleteLattice S]
+theorem semistable_iff {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+{S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) :
   Semistable μ ↔ semistableI μ TotIntvl := by
   simp only [semistableI, StI, S₁I, TotIntvl, ne_eq, gt_iff_lt, S₂I, Set.mem_setOf_eq, le_top,
@@ -377,11 +377,11 @@ theorem semistable_iff {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder
   · exact fun h ↦ {semistable := fun y hyI hy ↦ (h.choose_spec y (in_TotIntvl _) (Ne.symm hyI)) hy}
 
 
-lemma stupid_helper {α : Type} {a b c d: α} (h : a = b) (h' : b = c) (h'' : c = d) : a = d := h ▸ h' ▸ h''
+lemma stupid_helper {α : Type*} {a b c d: α} (h : a = b) (h' : b = c) (h'' : c = d) : a = d := h ▸ h' ▸ h''
 
 
-theorem semistableI_iff {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-{S : Type} [CompleteLattice S]
+theorem semistableI_iff {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+{S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
 (I : {p : ℒ × ℒ // p.1 < p.2}) : semistableI μ I ↔ Semistable (Resμ I μ) := by
   rw [semistable_iff]
