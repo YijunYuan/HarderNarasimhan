@@ -12,7 +12,7 @@ import Mathlib.RingTheory.Support
 
 import HarderNarasimhan.Basic
 import HarderNarasimhan.Convexity.Results
-import HarderNarasimhan.DedekindMacNeilleCompletion
+import HarderNarasimhan.OrderTheory.DedekindMacNeilleCompletion
 import HarderNarasimhan.Semistability.Defs
 import HarderNarasimhan.Filtration.Results
 import HarderNarasimhan.CoprimaryFiltration.Lex'Order
@@ -367,7 +367,7 @@ lemma prop3d12 {R : Type} [CommRing R] [IsNoetherianRing R]
   simp only [noname, ne_eq]
   unfold μ
   simp only [ne_eq, Function.Embedding.toFun_eq_coe, RelEmbedding.coe_toEmbedding]
-  have res1 : (coe' {(_μ R M I).toFinset.min' (μ_nonempty I)} : S R) ∈ {x | ∃ a, ∃ (h : InIntvl I a ∧ ¬a = I.val.2), coe' (_μ R M ⟨(a, I.val.2), lt_of_le_of_ne h.1.2 h.2⟩).toFinset = x} := by
+  have res1 : (OrderTheory.coe' {(_μ R M I).toFinset.min' (μ_nonempty I)} : S R) ∈ {x | ∃ a, ∃ (h : InIntvl I a ∧ ¬a = I.val.2), OrderTheory.coe' (_μ R M ⟨(a, I.val.2), lt_of_le_of_ne h.1.2 h.2⟩).toFinset = x} := by
     simp only [exists_prop, Set.mem_setOf_eq, EmbeddingLike.apply_eq_iff_eq]
     use ker_of_quot_comp_localization I
     constructor

@@ -9,7 +9,8 @@ import Mathlib.RingTheory.Ideal.AssociatedPrime.Finiteness
 
 import HarderNarasimhan.Basic
 import HarderNarasimhan.Convexity.Results
-import HarderNarasimhan.DedekindMacNeilleCompletion
+--import HarderNarasimhan.DedekindMacNeilleCompletion
+import HarderNarasimhan.OrderTheory.DedekindMacNeilleCompletion
 import HarderNarasimhan.Semistability.Defs
 import HarderNarasimhan.Filtration.Results
 import HarderNarasimhan.CoprimaryFiltration.Lex'Order
@@ -63,7 +64,7 @@ abbrev S (R : Type) [CommRing R] [IsNoetherianRing R] :
 ------------
 Type
 ------------
-:= @DedekindMacNeilleCompletion (S₀ R) instPartialOrderS₀
+:= @OrderTheory.DedekindMacNeilleCompletion (S₀ R) instPartialOrderS₀
 
 abbrev ℒ (R : Type) [CommRing R] [IsNoetherianRing R]
 (M : Type) [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] :
@@ -94,7 +95,7 @@ noncomputable abbrev μ (R : Type) [CommRing R] [IsNoetherianRing R]
 ------------
 {z: (ℒ R M) × (ℒ R M) // z.1 < z.2} → (S R)
 ------------
-:= fun I ↦ coe'.toFun ((_μ R M) I).toFinset
+:= fun I ↦ OrderTheory.coe'.toFun ((_μ R M) I).toFinset
 
 class Coprimary (R : Type) [CommRing R] [IsNoetherianRing R](M : Type) [AddCommGroup M] [Module R M] : Prop where
   coprimary : ∃! p, p ∈ associatedPrimes R M

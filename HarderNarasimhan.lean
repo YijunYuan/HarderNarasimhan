@@ -15,7 +15,7 @@ import HarderNarasimhan.Filtration.Results
 
 import HarderNarasimhan.FirstMoverAdvantage.Results
 
-import HarderNarasimhan.DedekindMacNeilleCompletion
+import HarderNarasimhan.OrderTheory.DedekindMacNeilleCompletion
 
 import HarderNarasimhan.SlopeLike.Defs
 

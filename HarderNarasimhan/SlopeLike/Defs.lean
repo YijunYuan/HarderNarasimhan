@@ -2,7 +2,7 @@ import HarderNarasimhan.Basic
 import Mathlib.Data.Real.Basic
 import Mathlib.Algebra.Module.Defs
 import Mathlib.Data.NNReal.Basic
-import HarderNarasimhan.DedekindMacNeilleCompletion
+import HarderNarasimhan.OrderTheory.DedekindMacNeilleCompletion
 import HarderNarasimhan.Interval
 
 namespace HarderNarasimhan
@@ -33,8 +33,8 @@ instance {V : Type} [TotallyOrderedRealVectorSpace V] : AddLeftMono V where
 noncomputable def μQuotient {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {V : Type} [TotallyOrderedRealVectorSpace V]
 (r : {p :ℒ × ℒ // p.1 < p.2} → NNReal)
-(d : {p :ℒ × ℒ // p.1 < p.2} → V): {p :ℒ × ℒ // p.1 < p.2} → DedekindMacNeilleCompletion V :=
-  fun z ↦ if _ : r z > 0 then coe' ((r z)⁻¹ • d z) else ⊤
+(d : {p :ℒ × ℒ // p.1 < p.2} → V): {p :ℒ × ℒ // p.1 < p.2} → OrderTheory.DedekindMacNeilleCompletion V :=
+  fun z ↦ if _ : r z > 0 then OrderTheory.coe' ((r z)⁻¹ • d z) else ⊤
 
 
 instance {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]

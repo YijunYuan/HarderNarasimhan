@@ -1,7 +1,7 @@
 import Mathlib.SetTheory.Cardinal.Aleph
 import Mathlib.Order.Closure
 
-namespace HarderNarasimhan
+namespace OrderTheory
 instance {α : Type} [PartialOrder α] (T : ClosureOperator (Set α)): CompleteLattice (ClosureOperator.Closeds T) where
   top :=⟨Set.univ,ClosureOperator.isClosed_iff_closure_le.mpr fun ⦃a⦄ a ↦ trivial⟩
   le_top A := fun ⦃a⦄ a ↦ trivial
@@ -153,4 +153,4 @@ theorem DedekindMacNeilleCompletion_minimality {α : Type} [PartialOrder α] {β
 --TODO: joint-dense, meet-dense
 end DedekindMacNeille
 
-end HarderNarasimhan
+end OrderTheory
