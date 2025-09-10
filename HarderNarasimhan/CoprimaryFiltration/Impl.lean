@@ -15,7 +15,8 @@ import HarderNarasimhan.Convexity.Results
 import HarderNarasimhan.OrderTheory.DedekindMacNeilleCompletion
 import HarderNarasimhan.Semistability.Defs
 import HarderNarasimhan.Filtration.Results
-import HarderNarasimhan.CoprimaryFiltration.Lex'Order
+import HarderNarasimhan.OrderTheory.Lex'Order
+import HarderNarasimhan.CoprimaryFiltration.AdmittedResults
 
 import HarderNarasimhan.CoprimaryFiltration.Defs
 
@@ -191,11 +192,7 @@ lemma support_quotient_mono {R : Type} [CommRing R]
     exact (Submodule.sub_mem_iff_right (N₂.submoduleOf N₃) (h this)).mp this'
   exact hm this
 
--- `https://stacks.math.columbia.edu/tag/02CE`
-lemma min_associated_prime_iff_min_supp {R : Type} [CommRing R] [IsNoetherianRing R]
-{M : Type} [AddCommGroup M] [Module R M] [Module.Finite R M]
-{I : PrimeSpectrum R} :
-Minimal (fun J ↦ J ∈ associatedPrimes R M) I.asIdeal ↔ Minimal (fun J ↦ J ∈ Module.support R M) I := by admit
+
 
 lemma exists_minimal_prime_contained_supp {R : Type} [CommRing R] [IsNoetherianRing R]
 {M : Type} [AddCommGroup M] [Module R M] [Module.Finite R M] :
@@ -215,7 +212,7 @@ lemma prop3d12p1 {R : Type} [CommRing R] [IsNoetherianRing R]
   intro q hq
   have hq' := support_quotient_mono I.val.1 N'' I.val.2 (ha1.1) <| mem_support_of_mem_associatedPrimes hq
   obtain ⟨r,hr,hr'⟩ := exists_minimal_prime_contained_supp {asIdeal := q, isPrime := hq.out.1 } hq'
-  rw [← min_associated_prime_iff_min_supp] at hr
+  rw [← AdmittedResults.min_associated_prime_iff_min_supp] at hr
   have := (((_μ R M) I).toFinset.min'_le) r (by
     simp only [Set.mem_toFinset, Set.mem_setOf_eq]
     use r.asIdeal, hr.1
@@ -318,15 +315,6 @@ lemma koqcl_iso {R : Type} [CommRing R] [IsNoetherianRing R]
   rw [t] at this
   use this
 
-lemma bourbaki_elements_math_alg_comm_chIV_sec1_no2_prop6
-{R : Type} [CommRing R] [IsNoetherianRing R]
-{M : Type} [AddCommGroup M] [Module R M]
-(S : Submonoid R) (N : Submodule R M) :
-  (associatedPrimes R N) = (associatedPrimes R M) \ { p ∈ associatedPrimes R M | p.carrier ∩ S = ∅ } ∧
-  (associatedPrimes R (M⧸N)) = { p ∈ associatedPrimes R M | p.carrier ∩ S = ∅ }
-↔ N = LinearMap.ker (LocalizedModule.mkLinearMap S M)
-:= by admit
-
 lemma associated_primes_quot_koqcl {R : Type} [CommRing R] [IsNoetherianRing R]
 {M : Type} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]
 (I : {z: (ℒ R M) × (ℒ R M) // z.1 < z.2}) :
@@ -334,7 +322,7 @@ associatedPrimes R (I.val.2⧸(ker_of_quot_comp_localization I).submoduleOf I.va
 := by
   rcases koqcl_iso I with ⟨h, _⟩
   rw [LinearEquiv.AssociatedPrimes.eq h]
-  have := bourbaki_elements_math_alg_comm_chIV_sec1_no2_prop6 ((((_μ R M) I).toFinset.min' (μ_nonempty I)).asIdeal.primeCompl) (LinearMap.ker (f1 I))
+  have := AdmittedResults.bourbaki_elements_math_alg_comm_chIV_sec1_no2_prop6 ((((_μ R M) I).toFinset.min' (μ_nonempty I)).asIdeal.primeCompl) (LinearMap.ker (f1 I))
   simp only [iff_true] at this
   rw [this.2]
   ext q

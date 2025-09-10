@@ -13,7 +13,7 @@ import HarderNarasimhan.Convexity.Results
 import HarderNarasimhan.OrderTheory.DedekindMacNeilleCompletion
 import HarderNarasimhan.Semistability.Defs
 import HarderNarasimhan.Filtration.Results
-import HarderNarasimhan.CoprimaryFiltration.Lex'Order
+import HarderNarasimhan.OrderTheory.Lex'Order
 import HarderNarasimhan.Filtration.Results
 
 namespace HarderNarasimhan
