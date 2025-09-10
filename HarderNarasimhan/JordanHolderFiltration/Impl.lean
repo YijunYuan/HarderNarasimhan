@@ -451,8 +451,7 @@ lemma μA_eq_μmin {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ
     · intro hx
       simp only [ne_eq, Set.mem_setOf_eq] at *
       rcases hx with ⟨u,⟨hu1,hu2⟩⟩
-      use u.val
-      use ⟨hu1.1,fun hc ↦ hu1.right (Subtype.coe_inj.mp hc)⟩
+      use u.val, ⟨hu1.1,fun hc ↦ hu1.right (Subtype.coe_inj.mp hc)⟩
       exact hu2
   · unfold μA μAstar μA Resμ
     simp only [ne_eq]
@@ -462,8 +461,7 @@ lemma μA_eq_μmin {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ
     · intro hx
       simp only [Set.mem_setOf_eq] at *
       rcases hx with ⟨u,⟨hu1,hu2⟩⟩
-      use ⟨u,hu1.1⟩
-      use ⟨in_TotIntvl _,fun hc ↦ hu1.right (Subtype.coe_inj.mpr hc)⟩
+      use ⟨u,hu1.1⟩, ⟨in_TotIntvl _,fun hc ↦ hu1.right (Subtype.coe_inj.mpr hc)⟩
       convert hu2
       unfold μmax
       congr
@@ -554,8 +552,7 @@ lemma res_ss {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [Wel
   apply eq_of_le_of_le ?_ ?_
   · apply sInf_le
     simp only [ne_eq, Set.mem_setOf_eq]
-    use JH.filtration (Nat.find JH.fin_len - 1)
-    use ⟨⟨le_rfl,le_top⟩,lt_top_iff_ne_top.1 h⟩
+    use JH.filtration (Nat.find JH.fin_len - 1), ⟨⟨le_rfl,le_top⟩,lt_top_iff_ne_top.1 h⟩
     rfl
   · apply le_sInf
     intro z hz
