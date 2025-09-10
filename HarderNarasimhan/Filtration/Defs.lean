@@ -21,6 +21,6 @@ structure HarderNarasimhanFiltration
   fin_len              : ∃ n : ℕ, filtration n = ⊤
   strict_mono          : ∀ i j : ℕ, i < j → j ≤ Nat.find (fin_len) → filtration i < filtration j
   piecewise_semistable : ∀ i : ℕ, (h: i < Nat.find (fin_len)) → Semistable (Resμ ⟨(filtration i, filtration (i+1)), strict_mono i (i+1) (lt_add_one i) h⟩ μ)
-  μA_pseudo_strict_anti: ∀ i : ℕ, (hi : i + 1 < Nat.find fin_len) → ¬ μA μ ⟨(filtration i, filtration (i+1)), strict_mono i (i+1) (lt_add_one i) <| by omega⟩ ≤ μA μ ⟨(filtration (i+1), filtration (i+2)), strict_mono (i+1) (i+2) (by linarith) (by linarith)⟩
+  μA_pseudo_strict_anti: ∀ i : ℕ, (hi : i + 1 < Nat.find fin_len) → ¬ μA μ ⟨(filtration i, filtration (i+1)), strict_mono i (i+1) (lt_add_one i) <| by omega⟩ ≤ μA μ ⟨(filtration (i+1), filtration (i+2)), strict_mono (i+1) (i+2) (Nat.lt_add_one (i + 1)) hi⟩
 
 end HarderNarasimhan

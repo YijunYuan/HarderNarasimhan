@@ -257,12 +257,12 @@ lemma prop3d4 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [W
           · exact fun k hk hk' ↦  le_of_lt <| lt_of_lt_of_le (prop3d4₀func_defprop1 μ I k <| ne_of_lt <| prop3d4₀func_defprop3₀ μ I hμDCC (k+1) <| Nat.add_lt_of_lt_sub hk) hk'
           · exact le_rfl
         have hh : y < func i := by
-          refine lt_of_le_of_ne (hi' (by linarith)) ?_
+          refine lt_of_le_of_ne (hi' (Nat.le_of_succ_le hi)) ?_
           by_contra!
           have hhh :=  gt_of_ge_of_gt hy' <| gt_of_ge_of_gt (hfinal (i+1) hi) <| prop3d4₀func_defprop1 μ I i (ne_of_lt <| prop3d4₀func_defprop3₀ μ I hμDCC (i+1) <| lt_of_le_of_lt hi <| Nat.sub_one_lt <| ne_of_gt <| Nat.zero_lt_of_ne_zero <| prop3d4₀func_len_nonzero μ I hμDCC)
           simp only [this] at hhh
           exact irrefl _ hhh
-        exact h₃ (i+1) ⟨by linarith,hi⟩ y hyI hy ⟨hh,ge_trans hy' (hfinal (i+1) hi)⟩
+        exact h₃ (i+1) ⟨Nat.le_add_left 1 i,hi⟩ y hyI hy ⟨hh,ge_trans hy' (hfinal (i+1) hi)⟩
     use (func (len - 1)).val
     constructor
     · refine ⟨h₂ (len - 1) le_rfl,⟨?_,fun y hyI hy hy' ↦ (fun y hyI hy h ↦ h₄ y hyI hy h (len - 1) le_rfl) y hyI hy <| ge_of_eq hy'⟩⟩

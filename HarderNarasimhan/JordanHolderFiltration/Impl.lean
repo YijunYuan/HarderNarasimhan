@@ -21,7 +21,7 @@ noncomputable def JHFil {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrd
 (μ : {p : ℒ × ℒ // p.1 < p.2} → S)
 (hμ : μ ⟨(⊥,⊤),bot_lt_top⟩ ≠ ⊤)
 (hμsl : SlopeLike μ) (hst : Semistable μ)
-(hdc: ∀ x : ℕ → ℒ, (sax : StrictAnti x) → ∃ N : ℕ, μ ⟨(x (N +1), x N), sax <| by linarith⟩ = ⊤) (k : ℕ) : ℒ :=
+(hdc: ∀ x : ℕ → ℒ, (sax : StrictAnti x) → ∃ N : ℕ, μ ⟨(x (N +1), x N), sax <| lt_add_one N⟩ = ⊤) (k : ℕ) : ℒ :=
   match k with
   | 0 => ⊤
   | n + 1 =>
@@ -37,7 +37,7 @@ lemma JHFil_anti_mono {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder
 (μ : {p : ℒ × ℒ // p.1 < p.2} → S)
 (hμ : μ ⟨(⊥,⊤),bot_lt_top⟩ ≠ ⊤)
 (hμsl : SlopeLike μ) (hst : Semistable μ)
-(hdc: ∀ x : ℕ → ℒ, (sax : StrictAnti x) → ∃ N : ℕ, μ ⟨(x (N +1), x N), sax <| by linarith⟩ = ⊤) :
+(hdc: ∀ x : ℕ → ℒ, (sax : StrictAnti x) → ∃ N : ℕ, μ ⟨(x (N +1), x N), sax <| lt_add_one N⟩ = ⊤) :
 ∀ k : ℕ, JHFil μ hμ hμsl hst hdc k > ⊥ → JHFil μ hμ hμsl hst hdc k > JHFil μ hμ hμsl hst hdc (k + 1) := by
   intro k hk
   simp only [JHFil]
@@ -53,7 +53,7 @@ lemma JHFil_prop₁ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
 (μ : {p : ℒ × ℒ // p.1 < p.2} → S)
 (hμ : μ ⟨(⊥,⊤),bot_lt_top⟩ ≠ ⊤)
 (hμsl : SlopeLike μ) (hst : Semistable μ)
-(hdc: ∀ x : ℕ → ℒ, (sax : StrictAnti x) → ∃ N : ℕ, μ ⟨(x (N +1), x N), sax <| by linarith⟩ = ⊤) :
+(hdc: ∀ x : ℕ → ℒ, (sax : StrictAnti x) → ∃ N : ℕ, μ ⟨(x (N +1), x N), sax <| lt_add_one N⟩ = ⊤) :
 ∀ k : ℕ,  (hk : JHFil μ hμ hμsl hst hdc k > ⊥) → μ ⟨(JHFil μ hμ hμsl hst hdc (k + 1),JHFil μ hμ hμsl hst hdc k),JHFil_anti_mono μ hμ hμsl hst hdc k hk⟩ = μ ⟨(⊥,⊤),bot_lt_top⟩ := by
   intro k
   induction' k with k hk
@@ -133,7 +133,7 @@ lemma JHFil_fin_len {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
 (μ : {p : ℒ × ℒ // p.1 < p.2} → S)
 (hμ : μ ⟨(⊥,⊤),bot_lt_top⟩ ≠ ⊤)
 (hμsl : SlopeLike μ) (hst : Semistable μ)
-(hdc: ∀ x : ℕ → ℒ, (sax : StrictAnti x) → ∃ N : ℕ, μ ⟨(x (N +1), x N), sax <| by linarith⟩ = ⊤) :
+(hdc: ∀ x : ℕ → ℒ, (sax : StrictAnti x) → ∃ N : ℕ, μ ⟨(x (N +1), x N), sax <| lt_add_one N⟩ = ⊤) :
 ∃ N : ℕ, JHFil μ hμ hμsl hst hdc N = ⊥ := by
   by_contra hc
   simp only [not_exists] at hc
@@ -146,7 +146,7 @@ lemma JHFil_prop₂ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
 (μ : {p : ℒ × ℒ // p.1 < p.2} → S) [hwdcc' : WeakDescendingChainCondition' μ]
 (hμ : μ ⟨(⊥,⊤),bot_lt_top⟩ ≠ ⊤)
 (hμsl : SlopeLike μ) (hst : Semistable μ)
-(hdc: ∀ x : ℕ → ℒ, (sax : StrictAnti x) → ∃ N : ℕ, μ ⟨(x (N +1), x N), sax <| by linarith⟩ = ⊤) :
+(hdc: ∀ x : ℕ → ℒ, (sax : StrictAnti x) → ∃ N : ℕ, μ ⟨(x (N +1), x N), sax <| lt_add_one N⟩ = ⊤) :
 ∀ k : ℕ,  (hk : JHFil μ hμ hμsl hst hdc k > ⊥) → ∀ z : ℒ, (h' : JHFil μ hμ hμsl hst hdc (k + 1) < z) → (h'' : z < JHFil μ hμ hμsl hst hdc k) →
   μ ⟨(JHFil μ hμ hμsl hst hdc (k + 1), z), h'⟩ < μ ⟨(JHFil μ hμ hμsl hst hdc (k + 1), JHFil μ hμ hμsl hst hdc k), JHFil_anti_mono μ hμ hμsl hst hdc k hk⟩ := by
   intro k hk z h' h''
@@ -354,7 +354,7 @@ lemma function_wrapper_prop5 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [Bound
       else
       by_contra!
       exact hcond <| le_bot_iff.1 <| (Nat.find_spec (function_wrapper_prop1 f atf hfat hf0)) ▸ function_wrapper_prop2 f atf (le_of_lt <| lt_of_not_le hcond')
-  exact fun j hij hle ↦ this j (by linarith) hle
+  exact fun j hij hle ↦ this j hij hle
 
 
 lemma function_wrapper_prop4 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] (f : ℕ → ℒ) (hf0 : f 0 = ⊤) (atf : ∃ k, f k = ⊥) (hfat: Antitone f) (k : ℕ) (hk : f k = ⊥) (htech : ∃ N : ℕ, N + 1 ≤ k ∧ f N = f (N+1)) : (Nat.find <| function_wrapper_prop1 f atf hfat hf0) ≠ k := by
@@ -421,11 +421,11 @@ lemma function_wrapper_prop6 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [Bound
       · exact fun _ ↦ rfl
       · intro n hn hn' hn''
         by_contra!
-        have := lt_of_le_of_lt (Nat.find_min' hcondnew <| lt_of_le_of_ne (hfat (by linarith)) this) hn''
+        have := lt_of_le_of_lt (Nat.find_min' hcondnew <| lt_of_le_of_ne (hfat (Nat.le_add_right_of_le hn)) this) hn''
         linarith
     refine Eq.symm <| this (jtilde -1) ?_ (by linarith)
     by_contra!
-    exact (lt_self_iff_false (f j)).mp <| lt_of_le_of_lt (hfat (by linarith)) (Nat.find_spec hcondnew)
+    exact (lt_self_iff_false (f j)).mp <| lt_of_le_of_lt (hfat (Nat.le_of_pred_lt this)) (Nat.find_spec hcondnew)
   conv =>
     arg 1; arg 1; arg 2;
     rw [ha]
@@ -599,7 +599,7 @@ lemma looooooooooooooooog_lemma : ∀ n : ℕ, ∀ ℒ : Type*, ∀ _: Nontrivia
     simp only [nonpos_iff_eq_zero, Nat.find_eq_zero, JH.first_eq_top, top_ne_bot] at hJH
   · intro ℒ ntl l bo wacc hmod S clo μ hftp hsl hst hwdcc' affine ⟨JHy,hJHy⟩ JHx
     if htriv : Nat.find JHx.fin_len = 1 then
-      have := JHx.step_cond₂ 0 (by linarith)
+      have := JHx.step_cond₂ 0 (Nat.lt_of_sub_eq_succ htriv)
       simp only [zero_add,← htriv,Nat.find_spec JHx.fin_len,JHx.first_eq_top] at this
       have : Nat.find JHy.fin_len = 1 := by
         have h : Nat.find JHy.fin_len ≠ 0 := by
@@ -929,9 +929,9 @@ lemma looooooooooooooooog_lemma : ∀ n : ℕ, ∀ ℒ : Type*, ∀ _: Nontrivia
           have : Nat.find JHx.fin_len - 1 ≠ 0 := by
             by_contra t
             rw [t] at hk1
-            linarith
+            exact Nat.not_succ_le_zero k1 hk1
           rw [← JHx.first_eq_top]
-          exact JHx.strict_anti 0 (Nat.find JHx.fin_len - 1) (by linarith) (le_of_lt <| Nat.sub_one_lt <| JH_pos_len JHx)
+          exact JHx.strict_anti 0 (Nat.find JHx.fin_len - 1) (by (expose_names; exact this_1)) (le_of_lt <| Nat.sub_one_lt <| JH_pos_len JHx)
         exact this ▸ (((seesaw_useful μ) inferInstance ⊥ (JHx.filtration (Nat.find JHx.fin_len - 1)) ⊤ ⟨bot_lt_iff_ne_bot.2 <| Nat.find_min JHx.fin_len (Nat.sub_one_lt <| JH_pos_len JHx),ntop⟩).2.2.1 this').2
       · intro i hi z hz hz'
         simp only [Resμ]

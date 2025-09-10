@@ -103,7 +103,7 @@ lemma HNFil_piecewise_semistable {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [B
 lemma HNFil_μA_pseudo_strict_anti {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) [hμ : μA_DescendingChainCondition μ] [hμcvx : Convex μ] [h : μ_Admissible μ] :
-∀ i : ℕ, (hi : i + 1 < Nat.find (HNFil_of_fin_len μ)) → ¬ μA μ ⟨(HNFil μ i, HNFil μ (i+1)), HNFil_is_strict_mono μ i (Nat.find_min (HNFil_of_fin_len μ) (by linarith))⟩ ≤ μA μ ⟨(HNFil μ (i+1), HNFil μ (i+2)), HNFil_is_strict_mono μ (i + 1) (Nat.find_min (HNFil_of_fin_len μ) (by linarith))⟩
+∀ i : ℕ, (hi : i + 1 < Nat.find (HNFil_of_fin_len μ)) → ¬ μA μ ⟨(HNFil μ i, HNFil μ (i+1)), HNFil_is_strict_mono μ i (Nat.find_min (HNFil_of_fin_len μ) (Nat.lt_of_succ_lt hi))⟩ ≤ μA μ ⟨(HNFil μ (i+1), HNFil μ (i+2)), HNFil_is_strict_mono μ (i + 1) (Nat.find_min (HNFil_of_fin_len μ) hi)⟩
 := by
   intro i hj
   refine impl.prop3d7₂ μ ⟨(HNFil μ i,⊤),lt_top_iff_ne_top.2 <| Nat.find_min (HNFil_of_fin_len μ) <| lt_trans (lt_add_one i) hj⟩ (Convex_of_Convex_large TotIntvl ⟨(HNFil μ i,⊤),lt_top_iff_ne_top.2 <| Nat.find_min (HNFil_of_fin_len μ) <| lt_trans (lt_add_one i) hj⟩ ⟨bot_le,le_top⟩ μ hμcvx) (HNFil μ (i + 1)) (HNFil_prop_of_def μ i <| Nat.find_min (HNFil_of_fin_len μ) <| lt_trans (lt_add_one i) hj).1 (HNFil μ (i + 1 + 1)) (?_) ?_

@@ -52,10 +52,10 @@ where
     impl.theorem3d10._proof_6 (HarderNarasimhanFiltration.filtration a) (HarderNarasimhanFiltration.fin_len a) i j hj a_1)⟩ := by
       apply Nat.le_induction
       · exact fun hj ↦ lt_of_not_ge (a.μA_pseudo_strict_anti i hj)
-      · refine fun j hij hind hj ↦ gt_trans (hind (by linarith)) ?_
-        have := a.μA_pseudo_strict_anti j (by linarith)
+      · refine fun j hij hind hj ↦ gt_trans (hind (Nat.lt_of_succ_lt hj)) ?_
+        have := a.μA_pseudo_strict_anti j hj
         aesop
-    exact fun j hij hj ↦ this j (by linarith) hj
+    exact fun j hij hj ↦ this j hij hj
   ) n)
 
 end HarderNarasimhan
