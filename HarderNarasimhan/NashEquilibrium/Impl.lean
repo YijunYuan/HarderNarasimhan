@@ -135,12 +135,10 @@ lemma prop4d12 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
     rw [← hb3]
     by_cases hbot : hb1 = ⊥
     · simp [hbot]
-      exact le_rfl
     refine Or.resolve_left (h hb1 <| ⟨hbot,hb2.2⟩) ?_
     rw [not_not]
     refine h' ▸ (le_sSup ?_)
     use hb1, ⟨in_TotIntvl hb1, Ne.symm hbot⟩
-    rfl
 
 
 lemma rmk4d13 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
@@ -165,12 +163,10 @@ lemma prop4d14 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
     rw [← hb3]
     by_cases htop : hb1 = ⊤
     · simp [htop]
-      exact le_rfl
     refine Or.resolve_right (h hb1 ⟨by tauto,htop⟩) ?_
     rw [not_not]
     refine h' ▸ (sInf_le ?_)
     use hb1, ⟨in_TotIntvl hb1, htop⟩
-    rfl
 
 
 lemma rmk4d15 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]

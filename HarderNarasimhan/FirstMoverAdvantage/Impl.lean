@@ -84,8 +84,6 @@ lemma prop4d1₂ (ℒ : Type) [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   rw [prop4d1₁ ℒ S μ h₁ h₂]
   apply le_sSup
   use ⊤, ⟨⟨bot_le,le_rfl⟩,ne_of_lt bot_lt_top⟩
-  unfold TotIntvl
-  rfl
 
 
 instance {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] : Coe ({p :ℒ × ℒ // p.1 < p.2}) ({p :ℒᵒᵈ × ℒᵒᵈ // p.1 < p.2}) where

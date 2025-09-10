@@ -465,75 +465,6 @@ theorem semistableI_iff {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrde
             rw [← hb2]
             use ⟨b,⟨le_trans ha1.1.1 hb1.1.1,le_trans hb1.1.2 y.prop.2⟩⟩, ⟨hb1.1,Subtype.coe_ne_coe.1 hb1.2⟩
     · simp [S₂I] at *
-      intro y hyI hy h
-      refine h4 y hyI (Subtype.coe_ne_coe.2 hy) <| stupid_helper ?_ h ?_
-      · simp [μA]
-        congr 1; ext
-        constructor
-        . intro h
-          rcases h with ⟨a,⟨ha1,ha2⟩⟩
-          rw [← ha2]
-          use ⟨a,⟨ha1.1.1,le_trans ha1.1.2 y.prop.2⟩⟩, ⟨⟨((in_TotIntvl _).1),ha1.1.2⟩,Subtype.coe_ne_coe.1 ha1.2⟩
-          simp [μmax]
-          congr 1; ext
-          constructor
-          · intro h
-            rcases h with ⟨b,⟨hb1,hb2⟩⟩
-            rw [← hb2]
-            use b.val, ⟨hb1.1,Subtype.coe_ne_coe.2 hb1.2⟩
-          · intro h
-            rcases h with ⟨b,⟨hb1,hb2⟩⟩
-            rw [← hb2]
-            simp
-            use ⟨b,⟨le_trans ha1.1.1 hb1.1.1,le_trans hb1.1.2 y.prop.2⟩⟩, ⟨hb1.1,Subtype.coe_ne_coe.1 hb1.2⟩
-        · intro h
-          rcases h with ⟨a,⟨ha1,ha2⟩⟩
-          rw [← ha2]
-          use a.val, ⟨ha1.1,Subtype.coe_ne_coe.2 ha1.2⟩
-          simp [μmax]
-          congr 1; ext
-          constructor
-          · intro h
-            rcases h with ⟨b,⟨hb1,hb2⟩⟩
-            rw [← hb2]
-            use ⟨b,⟨le_trans ha1.1.1 hb1.1.1,le_trans hb1.1.2 y.prop.2⟩⟩, ⟨hb1.1,Subtype.coe_ne_coe.1 hb1.2⟩
-          · intro h
-            rcases h with ⟨b,⟨hb1,hb2⟩⟩
-            rw [← hb2]
-            use b.val, ⟨hb1.1,Subtype.coe_ne_coe.2 hb1.2⟩
-      · simp [μA]
-        congr 1; ext
-        constructor
-        · intro h
-          rcases h with ⟨a,⟨ha1,ha2⟩⟩
-          rw [← ha2]
-          use a.val, ⟨ha1.1,Subtype.coe_ne_coe.2 ha1.2⟩
-          simp [μmax]
-          congr 1; ext
-          constructor
-          · intro h
-            rcases h with ⟨b,⟨hb1,hb2⟩⟩
-            rw [← hb2]
-            use ⟨b,⟨le_trans ha1.1.1 hb1.1.1,hb1.1.2⟩⟩, ⟨hb1.1,Subtype.coe_ne_coe.1 hb1.2⟩
-          · intro h
-            rcases h with ⟨b,⟨hb1,hb2⟩⟩
-            rw [← hb2]
-            use b.val, ⟨hb1.1,Subtype.coe_ne_coe.2 hb1.2⟩
-        · intro h
-          rcases h with ⟨a,⟨ha1,ha2⟩⟩
-          rw [← ha2]
-          use ⟨a,⟨ha1.1.1,ha1.1.2⟩⟩, ⟨ha1.1,Subtype.coe_ne_coe.1 ha1.2⟩
-          simp [μmax]
-          congr 1; ext
-          constructor
-          · intro h
-            rcases h with ⟨b,⟨hb1,hb2⟩⟩
-            rw [← hb2]
-            use b.val, ⟨hb1.1,Subtype.coe_ne_coe.2 hb1.2⟩
-          · intro h
-            rcases h with ⟨b,⟨hb1,hb2⟩⟩
-            rw [← hb2]
-            use ⟨b,⟨le_trans ha1.1.1 hb1.1.1,hb1.1.2⟩⟩, ⟨hb1.1,Subtype.coe_ne_coe.1 hb1.2⟩
   · rintro ⟨h1,⟨h3,⟨h4,h5⟩⟩⟩
     simp [semistableI,StI]
     use ⟨le_of_lt I.prop,le_rfl⟩, ne_of_lt I.prop
@@ -604,63 +535,7 @@ theorem semistableI_iff {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrde
             use b.val, ⟨hb1.1,Subtype.coe_ne_coe.2 hb1.2⟩
     · simp [S₂I] at *
       intro y hyI hy h
-      refine h5 ⟨y,hyI⟩ (in_TotIntvl _) (Subtype.coe_ne_coe.1 hy) ?_
-      refine stupid_helper ?_ h ?_
-      · simp [μA]
-        congr 1; ext
-        constructor
-        · rintro ⟨a,⟨ha1,ha2⟩⟩
-          rw [← ha2]
-          use a.val, ⟨ha1.1,Subtype.coe_ne_coe.2 ha1.2⟩
-          simp [μmax]
-          congr 1; ext
-          constructor
-          · rintro ⟨b,⟨hb1,hb2⟩⟩
-            rw [← hb2]
-            use ⟨b,⟨le_trans a.prop.1 hb1.1.1,le_trans hb1.1.2 hyI.2⟩⟩, ⟨hb1.1,Subtype.coe_ne_coe.1 hb1.2⟩
-          · rintro ⟨b,⟨hb1,hb2⟩⟩
-            rw [← hb2]
-            use b.val, ⟨hb1.1,Subtype.coe_ne_coe.2 hb1.2⟩
-        · intro h
-          rcases h with ⟨a,⟨ha1,ha2⟩⟩
-          rw [← ha2]
-          use ⟨a,⟨ha1.1.1,le_trans ha1.1.2 hyI.2⟩⟩, ⟨ha1.1,Subtype.coe_ne_coe.1 ha1.2⟩
-          simp [μmax]
-          congr 1; ext
-          constructor
-          · rintro ⟨b,⟨hb1,hb2⟩⟩
-            rw [← hb2]
-            use b.val, ⟨hb1.1,Subtype.coe_ne_coe.2 hb1.2⟩
-          · rintro ⟨b,⟨hb1,hb2⟩⟩
-            rw [← hb2]
-            use ⟨b,⟨le_trans ha1.1.1 hb1.1.1,le_trans hb1.1.2 hyI.2⟩⟩, ⟨hb1.1,Subtype.coe_ne_coe.1 hb1.2⟩
-      · simp [μA]
-        congr 1; ext
-        constructor
-        · rintro ⟨a,⟨ha1,ha2⟩⟩
-          rw [← ha2]
-          use ⟨a,ha1.1⟩, ⟨ha1.1,Subtype.coe_ne_coe.1 ha1.2⟩
-          simp [μmax]
-          congr 1; ext
-          constructor
-          · rintro ⟨b,⟨hb1,hb2⟩⟩
-            rw [← hb2]
-            use b.val, ⟨hb1.1,Subtype.coe_ne_coe.2 hb1.2⟩
-          · rintro ⟨b,⟨hb1,hb2⟩⟩
-            rw [← hb2]
-            use ⟨b,⟨le_trans ha1.1.1 hb1.1.1,hb1.1.2⟩⟩, ⟨hb1.1,Subtype.coe_ne_coe.1 hb1.2⟩
-        · rintro ⟨a,⟨ha1,ha2⟩⟩
-          rw [← ha2]
-          use a.val, ⟨ha1.1,Subtype.coe_ne_coe.2 ha1.2⟩
-          simp [μmax]
-          congr 1; ext
-          constructor
-          · rintro ⟨b,⟨hb1,hb2⟩⟩
-            rw [← hb2]
-            use ⟨b,⟨le_trans ha1.1.1 hb1.1.1,hb1.1.2⟩⟩, ⟨hb1.1,Subtype.coe_ne_coe.1 hb1.2⟩
-          · rintro ⟨b,⟨hb1,hb2⟩⟩
-            rw [← hb2]
-            use b.val, ⟨hb1.1,Subtype.coe_ne_coe.2 hb1.2⟩
+      exact hyI.2
 
 
 end impl

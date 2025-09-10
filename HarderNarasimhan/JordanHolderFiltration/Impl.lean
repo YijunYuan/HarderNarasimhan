@@ -549,7 +549,6 @@ lemma res_ss {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [Wel
 [WeakDescendingChainCondition' μ] [Affine μ] (JH : JordanHolderFiltration μ) (h : JH.filtration (Nat.find JH.fin_len - 1) < ⊤) : Semistable (Resμ ⟨(JH.filtration (Nat.find JH.fin_len - 1),⊤),h⟩ μ) := by
   apply (thm4d21 (Resμ ⟨(JH.filtration (Nat.find JH.fin_len - 1),⊤),h⟩ μ) inferInstance inferInstance inferInstance).2.2 (fun _ _ ↦ inferInstance)
   apply (List.TFAE.out (thm4d21 (Resμ ⟨(JH.filtration (Nat.find JH.fin_len - 1),⊤),h⟩ μ) inferInstance inferInstance inferInstance).1 1 3).1
-  unfold TotIntvl
   rw [μmin_res_intvl, μ_res_intvl]
   simp only [μmin]
   apply eq_of_le_of_le ?_ ?_
@@ -563,8 +562,20 @@ lemma res_ss {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [Wel
     simp only [ne_eq, Set.mem_setOf_eq] at hz
     rcases hz with ⟨u,⟨hu1,hu2⟩⟩
     rw [← hu2]
-
-    sorry
+    have := (thm4d21 μ inferInstance inferInstance inferInstance).2.1 inferInstance
+    have := (List.TFAE.out (thm4d21 μ inferInstance inferInstance inferInstance).1 1 3).2 this
+    unfold TotIntvl at this
+    have this' : μ ⟨(u,⊤),lt_top_iff_ne_top.2 hu1.2⟩ ≥ μ ⟨(⊥,⊤),bot_lt_top⟩ := by
+      rw [← this]
+      apply sInf_le
+      use u, ⟨in_TotIntvl _,hu1.2⟩
+    have := μ_bot_JH_eq_μ_tot JH (Nat.find JH.fin_len - 1) (Nat.sub_one_lt <| JH_pos_len JH)
+    rw [((seesaw_useful μ inferInstance ⊥ (JH.filtration (Nat.find JH.fin_len - 1)) ⊤ ⟨by
+      by_contra hc
+      simp only [not_bot_lt_iff] at hc
+      exact (Nat.find_min JH.fin_len <| Nat.sub_one_lt <| JH_pos_len JH) hc
+      ,h⟩).2.2.1 this).2] at this'
+    exact this'
 
 
 lemma looooooooooooooooog_lemma : ∀ n : ℕ, ∀ ℒ : Type, ∀ ntl: Nontrivial ℒ, ∀ l : Lattice ℒ, ∀ bo : BoundedOrder ℒ, ∀ wacc : WellFoundedGT ℒ,
@@ -686,7 +697,6 @@ lemma looooooooooooooooog_lemma : ∀ n : ℕ, ∀ ℒ : Type, ∀ ntl: Nontrivi
                 apply le_sSup
                 simp only [ne_eq, Set.mem_setOf_eq]
                 use u, ⟨in_TotIntvl _,Ne.symm hubot⟩
-                rfl
               rw [this] at this'
               unfold TotIntvl at this'
               exact (not_le_of_lt hc this').elim
@@ -728,7 +738,6 @@ lemma looooooooooooooooog_lemma : ∀ n : ℕ, ∀ ℒ : Type, ∀ ntl: Nontrivi
                 apply le_sSup
                 simp only [ne_eq, Set.mem_setOf_eq]
                 use u, ⟨in_TotIntvl _,Ne.symm hubot⟩
-                rfl
               rw [this] at this'
               unfold TotIntvl at this'
               exact (not_le_of_lt hc this').elim

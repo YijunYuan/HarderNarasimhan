@@ -9,7 +9,7 @@ def InIntvl {ℒ: Type} [PartialOrder ℒ]
   I.val.1 ≤ x ∧ x ≤ I.val.2
 
 
-def TotIntvl {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]: {p : ℒ × ℒ // p.1 < p.2} := ⟨(⊥,⊤),bot_lt_top⟩
+abbrev TotIntvl {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]: {p : ℒ × ℒ // p.1 < p.2} := ⟨(⊥,⊤),bot_lt_top⟩
 
 
 lemma in_TotIntvl {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] (x : ℒ) : InIntvl TotIntvl x := ⟨bot_le,le_top⟩
