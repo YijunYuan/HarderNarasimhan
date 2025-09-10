@@ -10,7 +10,7 @@ import HarderNarasimhan.SlopeLike.Result
 import HarderNarasimhan.FirstMoverAdvantage.Results
 import HarderNarasimhan.Convexity.Results
 import Mathlib.Data.Finite.Card
-
+import Mathlib.Order.ModularLattice
 open Classical
 
 namespace HarderNarasimhan
@@ -577,16 +577,24 @@ lemma res_ss {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [Wel
       ,h⟩).2.2.1 this).2] at this'
     exact this'
 
+instance {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [iml : IsModularLattice ℒ]
+{I : {p : ℒ × ℒ // p.1 < p.2}} : IsModularLattice (Interval I) where
+  sup_inf_le_assoc_of_le := by
+    intro x y z hxz
+    apply iml.sup_inf_le_assoc_of_le
+    exact hxz
 
-lemma looooooooooooooooog_lemma : ∀ n : ℕ, ∀ ℒ : Type, ∀ ntl: Nontrivial ℒ, ∀ l : Lattice ℒ, ∀ bo : BoundedOrder ℒ, ∀ wacc : WellFoundedGT ℒ,
-∀ S : Type, ∀ clo : CompleteLinearOrder S, ∀ μ : {p : ℒ × ℒ // p.1 < p.2} → S,
-∀ hftp : FiniteTotalPayoff μ, ∀ hsl : SlopeLike μ,
-∀ hst : Semistable μ, ∀ hwdcc' : WeakDescendingChainCondition' μ, ∀ affine : Affine μ, (∃ JH : JordanHolderFiltration μ, Nat.find JH.fin_len ≤ n) → (∀ JH' : JordanHolderFiltration μ, Nat.find JH'.fin_len ≤ n) := by
+
+lemma looooooooooooooooog_lemma : ∀ n : ℕ, ∀ ℒ : Type, ∀ _: Nontrivial ℒ, ∀ _ : Lattice ℒ, ∀ _ : BoundedOrder ℒ, ∀ _ : WellFoundedGT ℒ,
+∀ _ : IsModularLattice ℒ,
+∀ S : Type, ∀ _ : CompleteLinearOrder S, ∀ μ : {p : ℒ × ℒ // p.1 < p.2} → S,
+∀ _ : FiniteTotalPayoff μ, ∀ _ : SlopeLike μ,
+∀ _ : Semistable μ, ∀ _ : WeakDescendingChainCondition' μ, ∀ _ : Affine μ, (∃ JH : JordanHolderFiltration μ, Nat.find JH.fin_len ≤ n) → (∀ JH' : JordanHolderFiltration μ, Nat.find JH'.fin_len ≤ n) := by
   intro n
   induction' n with n hn
-  · intro ℒ ntl l bo wacc S clo μ hftp hsl hst hwdcc' affine ⟨JH,hJH⟩ JH'
+  · intro ℒ ntl l bo wacc hmod S clo μ hftp hsl hst hwdcc' affine ⟨JH,hJH⟩ JH'
     simp only [nonpos_iff_eq_zero, Nat.find_eq_zero, JH.first_eq_top, top_ne_bot] at hJH
-  · intro ℒ ntl l bo wacc S clo μ hftp hsl hst hwdcc' affine ⟨JHy,hJHy⟩ JHx
+  · intro ℒ ntl l bo wacc hmod S clo μ hftp hsl hst hwdcc' affine ⟨JHy,hJHy⟩ JHx
     if htriv : Nat.find JHx.fin_len = 1 then
       have := JHx.step_cond₂ 0 (by linarith)
       simp only [zero_add,← htriv,Nat.find_spec JHx.fin_len,JHx.first_eq_top] at this
@@ -760,7 +768,17 @@ lemma looooooooooooooooog_lemma : ∀ n : ℕ, ∀ ℒ : Type, ∀ ntl: Nontrivi
         simp only [Nat.sub_one_add_one <| JH_pos_len JHx,Nat.find_spec JHx.fin_len] at this'
         have this' := ((seesaw_useful μ hsl ⊥ (JHx.filtration (Nat.find JHx.fin_len - 1)) ⊤ ⟨bot_lt_iff_ne_bot.2 <| Nat.find_min JHx.fin_len <| Nat.sub_one_lt <| JH_pos_len JHx,nt⟩).2.2.1 this').2
         rw [this]
-        have hproblem : JHy.filtration (j + 1) ≠ JHy.filtration j ⊓ ↑w := sorry
+        have hproblem : JHy.filtration (j + 1) ≠ JHy.filtration j ⊓ ↑w := by
+          by_contra hc
+          simp only [JH_raw] at hw1
+          have hw1 := lt_iff_le_not_le.mpr hw1
+          simp only [JH_raw] at hw2
+          have hw2 := lt_iff_le_not_le.mpr hw2
+          have := @hmod.sup_inf_le_assoc_of_le (JHx.filtration (Nat.find JHx.fin_len - 1)) (JHy.filtration j) w.val (by
+            apply le_of_lt <| lt_of_le_of_lt le_sup_left hw1
+            )
+          rw [← hc, inf_eq_right.2 <| le_of_lt hw2] at this
+          exact (not_le_of_lt hw1) this
         have hnle : ¬ (JHy.filtration j ≤ w) := by
           by_contra hc
           simp only [JH_raw] at hw2
@@ -929,7 +947,7 @@ lemma looooooooooooooooog_lemma : ∀ n : ℕ, ∀ ℒ : Type, ∀ ntl: Nontrivi
         simp only [JHfun]; simp only [Eq.mpr (id (congrArg (fun _a ↦ i + 1 ≤ _a) hhard.symm)) hi,
           ↓reduceDIte, le_of_lt <| hhard ▸ hi, gt_iff_lt, JHfun]
         exact JHx.step_cond₂ i (Nat.lt_of_lt_pred <| hhard ▸ hi) z htemp htemp2
-    exact Nat.le_add_of_sub_le <| hhard ▸ hn (Interval Ires) inferInstance inferInstance inferInstance inferInstance S clo (Resμ Ires μ) ftpLres inferInstance (res_ss _ _) inferInstance inferInstance ⟨JH_FINAL,Nat.le_of_lt_succ <| Nat.lt_of_lt_of_le ha hJHy⟩ JHres
+    exact Nat.le_add_of_sub_le <| hhard ▸ hn (Interval Ires) inferInstance inferInstance inferInstance inferInstance inferInstance S clo (Resμ Ires μ) ftpLres inferInstance (res_ss _ _) inferInstance inferInstance ⟨JH_FINAL,Nat.le_of_lt_succ <| Nat.lt_of_lt_of_le ha hJHy⟩ JHres
 
 
 end impl
