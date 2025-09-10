@@ -81,7 +81,7 @@ lemma prop3d4₀func_defprop1 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [Boun
   have hne : (ℒₛ μ I (prop3d4₀func μ I i) <| prop3d4₀func_helper μ I i hi).Nonempty := by
     by_contra hcontra
     simp only [prop3d4₀func, prop3d4₀func_helper μ I i hi, hcontra] at hi
-    simp at hi
+    simp only [↓reduceDIte, ne_eq, not_true_eq_false] at hi
   simp only [hne]
   exact (inst_3.wf.has_min (ℒₛ μ I (prop3d4₀func μ I i) <| prop3d4₀func_helper μ I i hi) hne).choose_spec.1.out.choose_spec.choose_spec
 
@@ -98,7 +98,7 @@ lemma prop3d4₀func_defprop2 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [Boun
   have hne : (ℒₛ μ I (prop3d4₀func μ I i) <| prop3d4₀func_helper μ I i hi).Nonempty := by
     by_contra hcontra
     simp only [prop3d4₀func, prop3d4₀func_helper μ I i hi, hcontra] at hi
-    simp at hi
+    simp only [↓reduceDIte, ne_eq, not_true_eq_false] at hi
   simp only [hne]
   by_contra hcontra
   have h' : z ∈ (ℒₛ μ I (prop3d4₀func μ I i) <| prop3d4₀func_helper μ I i hi) := by
@@ -131,7 +131,7 @@ lemma prop3d4₀func_strict_decreasing {ℒ : Type*} [Nontrivial ℒ] [Lattice �
     have hne : (ℒₛ μ I (prop3d4₀func μ I i) <| prop3d4₀func_helper μ I i h).Nonempty := by
       by_contra hcontra
       simp only [prop3d4₀func, prop3d4₀func_helper μ I i h, hcontra] at h
-      simp at h
+      simp only [↓reduceDIte, not_true_eq_false] at h
     simp only [hne]
     exact (inst_3.wf.has_min (ℒₛ μ I (prop3d4₀func μ I i) hi) hne).choose_spec.1.out.choose_spec.choose.2
 

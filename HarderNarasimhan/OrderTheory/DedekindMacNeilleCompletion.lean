@@ -8,7 +8,7 @@ instance {α : Type*} [PartialOrder α] (T : ClosureOperator (Set α)): Complete
   bot := ⟨T ∅, ClosureOperator.isClosed_closure T ∅⟩
   bot_le A := by
     intro a ha
-    simp at *
+    simp only at *
     exact (ClosureOperator.IsClosed.closure_eq A.property) ▸ (T.monotone <| Set.empty_subset A.val) ha
   inf A B := ⟨A.val ∩ B.val,ClosureOperator.isClosed_iff_closure_le.mpr fun x hx ↦ (ClosureOperator.IsClosed.closure_eq A.property) ▸ (ClosureOperator.IsClosed.closure_eq B.property) ▸ ⟨(T.monotone <| Set.inter_subset_left) hx,(T.monotone <| Set.inter_subset_right) hx⟩⟩
   le_inf A B C h1 h2 := fun a ha ↦ ⟨h1 ha,h2 ha⟩
@@ -17,7 +17,7 @@ instance {α : Type*} [PartialOrder α] (T : ClosureOperator (Set α)): Complete
   sup A B := ⟨T (A.val ∪ B.val), ClosureOperator.isClosed_closure T (A.val ∪ B.val)⟩
   sup_le A B C h1 h2 := by
     intro a ha
-    simp at *
+    simp only at *
     exact (ClosureOperator.IsClosed.closure_eq C.property) ▸ (T.monotone <| Set.union_subset h1 h2) ha
   le_sup_left := by
     intro A B
@@ -29,17 +29,17 @@ instance {α : Type*} [PartialOrder α] (T : ClosureOperator (Set α)): Complete
     exact ClosureOperator.monotone T Set.subset_union_right
   sInf 𝒮 := by
     refine ⟨⋂ a ∈ 𝒮, a.val,ClosureOperator.isClosed_iff_closure_le.mpr fun x hx ↦ ?_⟩
-    simp at *
+    simp only [Set.mem_iInter, Subtype.forall] at *
     refine fun S hS hSb ↦ (ClosureOperator.IsClosed.closure_eq hS) ▸ T.monotone (fun x hx ↦ ?_) hx
-    simp at hx
+    simp only [Set.mem_iInter, Subtype.forall] at hx
     exact hx S hS hSb
   le_sInf 𝒮 A hA := by
     intro x h
-    simp at *
+    simp only [Subtype.forall, Set.mem_iInter] at *
     exact fun S hS hSb ↦ hA S hS hSb h
   sInf_le 𝒮 A:= by
     intro hA x hx
-    simp at *
+    simp only [Set.mem_iInter, Subtype.forall] at *
     exact hx A.val A.prop hA
   sSup 𝒮 := ⟨T (⋃ a ∈ 𝒮, a.val),ClosureOperator.isClosed_closure T (⋃ a ∈ 𝒮, a.val)⟩
   le_sSup 𝒮 A hA:= fun x hx ↦ ClosureOperator.monotone T (Set.subset_biUnion_of_mem hA) <| (ClosureOperator.IsClosed.closure_eq A.property).symm ▸ hx
@@ -47,7 +47,7 @@ instance {α : Type*} [PartialOrder α] (T : ClosureOperator (Set α)): Complete
     intro x hx
     simp
     refine (ClosureOperator.IsClosed.closure_eq A.property) ▸ ClosureOperator.monotone T (fun y hy ↦ ?_) hx
-    simp at hy
+    simp only [Set.mem_iUnion, exists_prop, Subtype.exists, exists_and_right] at hy
     exact Exists.casesOn hy fun S h ↦ And.casesOn h fun left hSb ↦ Exists.casesOn left fun hS hP ↦ hA ⟨S, hS⟩ hP hSb
 
 
@@ -115,7 +115,7 @@ def coe' {α : Type*} [PartialOrder α] : α ↪o DedekindMacNeilleCompletion α
     imp_self, implies_true]),fun hy x_1 ha ↦ ha hy⟩
   have : Function.Injective fun x ↦ (⟨Set.Iic x,inj x⟩ : DedekindMacNeilleCompletion α) := by
     intro a b hab
-    simp at hab
+    simp only [Subtype.mk.injEq] at hab
     exact le_antisymm (hab ▸ Set.right_mem_Iic).out (hab.symm ▸ Set.right_mem_Iic).out
   use ⟨fun x ↦ ⟨Set.Iic x, inj x⟩,this⟩
   simp

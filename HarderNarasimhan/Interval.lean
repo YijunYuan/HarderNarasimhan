@@ -60,7 +60,7 @@ instance {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ] [h
     refine { wf := WellFounded.wellFounded_iff_has_min.mpr fun S hS ↦ ?_ }
     rcases hw.wf.has_min (Subtype.val '' S) ( Set.Nonempty.image Subtype.val hS) with ⟨a,ha⟩
     have := ha.1
-    simp at this
+    simp only [Set.mem_image, Subtype.exists, exists_and_right, exists_eq_right] at this
     rcases this with ⟨x, hx⟩
     exact Exists.intro ⟨a, x⟩ ⟨hx, fun y hy h ↦ ha.right y.val (Set.mem_image_of_mem Subtype.val hy) (lt_iff_le_not_le.2 h)⟩
 

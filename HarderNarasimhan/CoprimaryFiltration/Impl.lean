@@ -430,7 +430,7 @@ instance prop3d13₂ {R : Type*} [CommRing R] [IsNoetherianRing R]
   μ_dcc := by
     intro N x hx1 hx2
     by_contra hc
-    simp at hc
+    simp only [not_exists, not_le] at hc
     simp only [prop3d12, Function.Embedding.toFun_eq_coe, RelEmbedding.coe_toEmbedding,
       OrderEmbedding.le_iff_le, not_le] at hc
     have hc := fun w ↦ S₀_order'.mpr (by
@@ -546,7 +546,8 @@ lemma rmk4d14₂ {R : Type*} [CommRing R] [IsNoetherianRing R]
         exact Ideal.IsPrime.ne_top (ht ▸ hJ).1 rfl
       have h:= h N hN
       rw [prop3d12 ⟨(⊥, N), hN⟩] at h
-      simp at h
+      simp only [Function.Embedding.toFun_eq_coe, RelEmbedding.coe_toEmbedding,
+        EmbeddingLike.apply_eq_iff_eq, Finset.singleton_inj] at h
       rw [← h] at hc
       have : (_μ R M ⟨(⊥, N), hN⟩) = {⟨J,hJ.1⟩} := by
         unfold _μ
@@ -595,7 +596,7 @@ lemma rmk4d14₂ {R : Type*} [CommRing R] [IsNoetherianRing R]
               have s'_ne0 : s' ≠ 0 := by
                 by_contra hc
                 unfold s' at hc
-                simp at hc
+                simp only [Submodule.subtype_apply, ZeroMemClass.coe_eq_zero] at hc
                 have : s = 0 := by
                   have := hc ▸ Quotient.out_eq s
                   exact id (Eq.symm this)

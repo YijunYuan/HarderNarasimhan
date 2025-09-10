@@ -140,7 +140,7 @@ theorem theorem3d10  {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder 
         have h₅ := Nat.find_min h₂ (Nat.sub_one_lt <| ne_of_gt <| lt_of_lt_of_le (Nat.add_one_pos n) h₁₅ )
         apply not_and_or.1 at h₅
         cases' h₅ with h₅ h₅
-        · simp at h₅
+        · simp only [ge_iff_le, not_le] at h₅
           nth_rw 1 [← hn, ← eq_of_le_of_le (Nat.le_of_lt_add_one h₅) (Nat.sub_le_sub_right h₁₅ 1)] at h₃
           exact not_le_of_lt h₃
         · exact h₅

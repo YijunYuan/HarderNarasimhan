@@ -23,7 +23,7 @@ noncomputable def prop4d1₁_seq {ℒ : Type*} [Nontrivial ℒ] [PartialOrder �
       by_contra! hcon
       simp only [Set.mem_setOf_eq, not_lt_top_iff.mp hcon, le_refl, not_true_eq_false] at h'''
     by_contra!
-    simp at this
+    simp only [Set.mem_setOf_eq, not_exists, not_forall, Classical.not_imp, not_not] at this
     rcases this h' with ⟨xA,⟨hxA,hh⟩⟩
     have hhh : ∀ (xB : ℒ) (x_1 : xA < xB), μ ⟨(xA, xB), x_1⟩ ≤ μ ⟨(prop4d1₁_seq μ h₁ h₂ h₃ k, ⊤), (prop4d1₁_seq μ h₁ h₂ h₃ k).prop.choose⟩ := fun xB hAB ↦ le_trans (hh xB hAB) <| Or.resolve_left (h₂ ⟨(prop4d1₁_seq μ h₁ h₂ h₃ k, prop4d1₁_seqkp1.choose), prop4d1₁_seqkp1.choose_spec.choose⟩ h') h'''
     rcases (prop4d1₁_seq μ h₁ h₂ h₃ k).prop.out.choose_spec xA hxA with ⟨xB,⟨hAB,con⟩⟩
@@ -106,7 +106,7 @@ lemma h₁_dual_of_h₁ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [Bound
   intro xd smf
   rcases (h₁ (fun n ↦ (xd n).ofDual) fun _ _ hab ↦ smf hab) with ⟨N, hN⟩
   have := fuck μ ⟨(xd N, ⊤), lt_of_lt_of_le (smf (Nat.lt_add_one N)) le_top⟩
-  simp at this
+  simp only [OrderDual.ofDual_top] at this
   rw [this,fuck μ ⟨(xd N, xd (N + 1)), smf (Nat.lt_add_one N)⟩] at hN
   use N, OrderDual.ofDual_le_ofDual.1 hN
 
