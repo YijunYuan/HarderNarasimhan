@@ -123,7 +123,7 @@ theorem theorem3d10  {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder 
 --(hfsi : ∀ i : ℕ, i < Nat.find hffin → f i < f (i + 1))
 (ffst : ∀ i : ℕ, i ≥ Nat.find hffin → f i = ⊤)
 (hss : ∀ j : ℕ, (hj : j < Nat.find hffin) → Semistable (Resμ ⟨(f j, f (j+1)), hfsi j (j+1) (lt_add_one j) hj⟩ μ))
-(hmua: ∀ i : ℕ, ∀ j : ℕ, (hij : i < j) → (hj : j < Nat.find hffin) → μA μ ⟨(f i, f (i+1)), hfsi i (i+1) (lt_add_one i) <| (by omega)⟩ > μA μ ⟨(f j, f (j+1)), hfsi j (j+1) (lt_add_one j) <| (by omega)⟩)
+(hmua: ∀ i : ℕ, ∀ j : ℕ, (hij : i < j) → (hj : j < Nat.find hffin) → μA μ ⟨(f i, f (i+1)), hfsi i (i+1) (lt_add_one i) <| (by omega)⟩ > μA μ ⟨(f j, f (j+1)), hfsi j (j+1) (lt_add_one j) <| hj⟩)
 : f = HNFil μ := by
   have hss := fun j hj ↦ (semistableI_iff μ ⟨(f j, f (j+1)), hfsi j (j+1) (lt_add_one j) hj⟩).2 <| hss j hj
   let HNFilt := HNFil μ
@@ -147,7 +147,7 @@ theorem theorem3d10  {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder 
       have h₁₃ : HNFilt n ≤ f (i - 1) := by
         simp only [HNFilt]
         rw [← hn]
-        have h₁₄ : n ≤ i - 1 := by omega
+        have h₁₄ : n ≤ i - 1 := Nat.le_sub_one_of_lt h₁₅
         rw [le_iff_eq_or_lt] at h₁₄
         cases' h₁₄ with h₁₄ h₁₄
         · rw [h₁₄]
@@ -159,14 +159,14 @@ theorem theorem3d10  {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder 
             · simp only [Nat.find_spec hffin, le_top, not_true_eq_false] at c₂
           exact hfsi n (i-1) h₁₄ (by omega)
       have h₆ := impl.lem2d4₃I TotIntvl μ hμcvx (HNFilt (n + 1)) (in_TotIntvl (HNFilt (n + 1))) (f (i - 1)) (in_TotIntvl (f (i - 1))) h₄ (HNFilt n) <| le_inf (le_of_lt h₃) h₁₃
-      have h₉ : i > 0 := by omega
+      have h₉ : i > 0 := Nat.zero_lt_of_lt h₁₅
       have h₈ : i - 1 < Nat.find hffin := by
         apply Nat.sub_one_lt_of_le h₉
         by_contra!
         cases' not_and_or.1 <| Nat.find_min h₂ this with c₁ c₂
         · exact c₁ h₁
         · simp only [Nat.find_spec hffin, le_top, not_true_eq_false] at c₂
-      have h₇ : f (i-1) < f i := (congrArg (fun _a ↦ f (i - 1) < f _a) (Nat.sub_add_cancel h₉)) ▸ (hfsi (i - 1) i (by omega) (by omega))
+      have h₇ : f (i-1) < f i := (congrArg (fun _a ↦ f (i - 1) < f _a) (Nat.sub_add_cancel h₉)) ▸ (hfsi (i - 1) i (Nat.sub_one_lt_of_lt h₁₅) (Nat.le_of_pred_lt h₈))
       have h₁₀ : μA μ ⟨(HNFilt n, HNFilt (n+1)), h₃⟩ ≤ μA μ ⟨(f (i-1),f i), h₇⟩ := by
         have h₁₁ := hss (i-1) h₈
         simp only [Nat.sub_one_add_one <| ne_of_gt h₉] at h₁₁
@@ -176,9 +176,9 @@ theorem theorem3d10  {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder 
         by_contra!
         have : HNFilt n < f (n+1):= by
           simp only [HNFilt, ← hn]
-          apply hfsi n (n+1) (by omega) (by omega)
-        have h₁₂ : μA μ ⟨(HNFilt n, HNFilt (n + 1)), h₃⟩ < μA μ ⟨(HNFilt n, f (n+1)),by omega⟩ := by
-          have h₁₃ := hmua n (i-1) (by omega) (by omega)
+          apply hfsi n (n+1) (lt_add_one n) h₁
+        have h₁₂ : μA μ ⟨(HNFilt n, HNFilt (n + 1)), h₃⟩ < μA μ ⟨(HNFilt n, f (n+1)),this⟩ := by
+          have h₁₃ := hmua n (i-1) (by (expose_names; exact Nat.lt_sub_of_add_lt this_1)) h₈
           simp only [hn, Nat.sub_one_add_one <| ne_of_gt h₉, gt_iff_lt] at h₁₃
           exact lt_of_le_of_lt h₁₀ h₁₃
         exact ((HNFil_prop_of_def μ n <| ne_of_lt <| lt_of_lt_of_le this le_top).1.out.choose_spec.choose_spec.1 (f (n+1)) ⟨le_of_lt this,le_top⟩ <| ne_of_lt this) h₁₂
@@ -190,12 +190,12 @@ theorem theorem3d10  {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder 
           exact h₇
       have h₁₆ : f n < HNFilt (n + 1):= Eq.mpr (hn ▸ rfl)
         (HNFil_is_strict_mono μ n (ne_of_lt (lt_of_lt_of_le h₃ le_top)))
-      have h₁₇ := le_of_not_gt <| (hss n (by omega)).out.choose_spec.choose_spec.1 (HNFilt (n+1)) ⟨le_of_lt h₁₆,h₁₄⟩ <| ne_of_lt h₁₆
+      have h₁₇ := le_of_not_gt <| (hss n h₁).out.choose_spec.choose_spec.1 (HNFilt (n+1)) ⟨le_of_lt h₁₆,h₁₄⟩ <| ne_of_lt h₁₆
       simp only [hn] at h₁₇
       exact eq_of_le_of_le ((HNFil_prop_of_def μ n <| ne_of_lt <| lt_of_lt_of_le h₃ le_top).1.out.choose_spec.choose_spec.2 (f (n+1)) ⟨le_of_lt h₁₉,le_top⟩ (ne_of_lt h₁₉) (eq_of_le_of_not_lt h₁₇ <| (HNFil_prop_of_def μ n <| ne_of_lt <| lt_of_lt_of_le h₃ le_top).1.out.choose_spec.choose_spec.1 (f (n+1)) ⟨le_of_lt h₁₉,le_top⟩ <| ne_of_lt h₁₉).symm) h₁₄
     · apply Nat.gt_of_not_le at h₁
-      rw [ffst (n+1) (by omega),eq_comm]
-      rw [ffst n (by omega)] at hn
+      rw [ffst (n+1) (Nat.le_of_succ_le h₁),eq_comm]
+      rw [ffst n (Nat.le_of_lt_succ h₁)] at hn
       exact not_ne_iff.1 <| (HNFil_ne_top_iff_lt_len μ (n+1)).not.2 (not_lt_of_ge <| le_of_lt <| Nat.lt_add_one_iff.2 <| le_of_not_lt <| (HNFil_ne_top_iff_lt_len μ n).not.1 (not_ne_iff.2 hn.symm))
 
 

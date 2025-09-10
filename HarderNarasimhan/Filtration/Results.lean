@@ -48,8 +48,7 @@ where
     impl.theorem3d10._proof_5 (HarderNarasimhanFiltration.filtration a) (HarderNarasimhanFiltration.fin_len a) i j hij hj
       a_1)⟩ >
     μA μ ⟨(HarderNarasimhanFiltration.filtration a j, HarderNarasimhanFiltration.filtration a (j + 1)), HarderNarasimhanFiltration.strict_mono a j (j + 1) (lt_add_one j)
-  (Decidable.byContradiction fun a_1 ↦
-    impl.theorem3d10._proof_6 (HarderNarasimhanFiltration.filtration a) (HarderNarasimhanFiltration.fin_len a) i j hj a_1)⟩ := by
+  hj⟩ := by
       apply Nat.le_induction
       · exact fun hj ↦ lt_of_not_ge (a.μA_pseudo_strict_anti i hj)
       · refine fun j hij hind hj ↦ gt_trans (hind (Nat.lt_of_succ_lt hj)) ?_

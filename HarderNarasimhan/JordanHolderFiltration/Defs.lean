@@ -30,7 +30,7 @@ where
   step_cond₁ : ∀ k : ℕ,  (hk : k < Nat.find (fin_len)) → μ ⟨(filtration (k + 1),filtration k),strict_anti k (k+1) (lt_add_one k) hk⟩ = μ ⟨(⊥,⊤),bot_lt_top⟩
   step_cond₂ : ∀ i : ℕ, (hi : i < Nat.find fin_len) →
     ∀ z : ℒ, (h' : filtration (i+1) < z) → (h'' : z < filtration i) →
-    μ ⟨(filtration (i+1), z), h'⟩ < μ ⟨(filtration (i+1), filtration i), strict_anti i (i+1) (by omega) hi⟩
+    μ ⟨(filtration (i+1), z), h'⟩ < μ ⟨(filtration (i+1), filtration i), strict_anti i (i+1) (lt_add_one i) hi⟩
 
 
 instance {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]

@@ -44,7 +44,7 @@ lemma lem2d4₂I
       simp only [hh, ge_iff_le]
       have hbnlew : ¬ b ≤ w := inf_lt_left.mp
         ((congrArg (fun _a ↦ _a < b) (hh.symm)) ▸ hb.1)
-      have hfinal : μ ⟨(w, b ⊔ w), by aesop⟩ ≤ μmax μ ⟨(w, t), gt_of_ge_of_gt hxwt (right_lt_sup.2 hxw)⟩ := by
+      have hfinal : μ ⟨(w, b ⊔ w), right_lt_sup.mpr hbnlew⟩ ≤ μmax μ ⟨(w, t), gt_of_ge_of_gt hxwt (right_lt_sup.2 hxw)⟩ := by
         apply le_sSup
         use b ⊔ w, ⟨⟨le_sup_right, le_trans (sup_le_sup_right hb.2 w) hxwt⟩, (mt right_eq_sup.1) <| inf_lt_left.1 <| hh.symm ▸ hb.1⟩
       apply le_trans (hμcvx.convex b w ⟨le_of_lt (lt_of_le_of_lt (le_inf hxI.1 hwI.1) hb.1), le_trans hb.2 hxI.2⟩ hwI hbnlew) hfinal

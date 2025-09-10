@@ -33,7 +33,7 @@ lemma rmk4d10₁ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder
     unfold μB at h
     apply sSup_le_iff.1 at h
     simp only [ne_eq, Set.mem_setOf_eq, le_sInf_iff, forall_exists_index] at h
-    refine (((fun (x : ℒ) (hx : ¬ ⊥ = x) ↦ h (μmin μ ⟨(⊥, x), bot_lt_iff_ne_bot.2 (by tauto)⟩) <| x) y <| ne_of_lt hy) ⟨in_TotIntvl y,by aesop⟩ <| rfl) (μmax μ ⟨(x, ⊤), lt_top_iff_ne_top.2 hx⟩) x ⟨in_TotIntvl x, hx⟩ rfl
+    refine (((fun (x : ℒ) (hx : ¬ ⊥ = x) ↦ h (μmin μ ⟨(⊥, x), bot_lt_iff_ne_bot.2 (by tauto)⟩) <| x) y <| ne_of_lt hy) ⟨in_TotIntvl y,ne_of_lt hy⟩ <| rfl) (μmax μ ⟨(x, ⊤), lt_top_iff_ne_top.2 hx⟩) x ⟨in_TotIntvl x, hx⟩ rfl
   · refine fun h ↦ sSup_le_iff.2 ?_
     simp
     refine fun b x hx h' ↦ h' ▸ le_sInf_iff.2 ?_
@@ -221,7 +221,7 @@ lemma prop4d18₁ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ
     apply sSup_le
     rintro b ⟨hb1,⟨hb2,hb3⟩⟩
     have := hb3 ▸ hμ.out.choose_spec.choose_spec.1 hb1 (in_TotIntvl hb1) (Ne.symm <| bot_lt_iff_ne_bot.1 hb2)
-    aesop
+    exact le_of_not_lt this
   refine le_trans (sSup_le_sSup_of_forall_exists_le ?_) this
   rintro x ⟨hx1,⟨hx2,hx3⟩⟩
   use μA μ ⟨(⊥,hx1),bot_lt_iff_ne_bot.2 <| Ne.symm hx2.2⟩

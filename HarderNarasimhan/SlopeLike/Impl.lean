@@ -64,7 +64,7 @@ lemma μQuotient_helper {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [Bound
 (r : {p :ℒ × ℒ // p.1 < p.2} → NNReal)
 (d : {p :ℒ × ℒ // p.1 < p.2} → V): ∀ z : {p :ℒ × ℒ // p.1 < p.2}, r z > 0 → ∃ (μ : V), (μQuotient r d) z = OrderTheory.coe' μ ∧ (r z) • μ = (d z) :=
   fun z h ↦ ⟨(r z)⁻¹ • d z,⟨by simp only [μQuotient, gt_iff_lt, h, ↓reduceDIte,
-    OrderTheory.coe', RelEmbedding.coe_mk, Function.Embedding.coeFn_mk], smul_inv_smul₀ (by aesop) (d z)⟩⟩
+    OrderTheory.coe', RelEmbedding.coe_mk, Function.Embedding.coeFn_mk], smul_inv_smul₀ (Ne.symm (ne_of_lt h)) (d z)⟩⟩
 
 
 lemma prop4d8 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
