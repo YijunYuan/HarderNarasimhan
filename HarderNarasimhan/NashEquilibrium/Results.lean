@@ -2,7 +2,7 @@ import HarderNarasimhan.NashEquilibrium.Impl
 
 namespace HarderNarasimhan
 
-lemma μmin_lt_μ_lt_μmax {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+lemma μmin_lt_μ_lt_μmax {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p : ℒ × ℒ // p.1 < p.2} → S) :
 ------------
@@ -11,7 +11,7 @@ lemma μmin_lt_μ_lt_μmax {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedO
 := impl.rmk4d10₀ μ
 
 
-lemma remark_4_10 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+lemma remark_4_10 {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) :
 ------------
@@ -33,7 +33,7 @@ lemma remark_4_10 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 := ⟨impl.rmk4d10₁ μ,⟨impl.rmk4d10₂ μ,impl.rmk4d10₃ μ⟩⟩
 
 
-lemma proposition_4_11 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+lemma proposition_4_11 {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) :
 ------------
@@ -48,7 +48,7 @@ lemma proposition_4_11 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder
 := ⟨impl.prop4d11₁ μ,impl.prop4d11₂ μ⟩
 
 
-lemma proposition_4_12 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+lemma proposition_4_12 {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
 (h : ∀ x : ℒ, (hx : x ≠ ⊥ ∧ x ≠ ⊤) → ¬ μ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx.1⟩ ≤ μ TotIntvl ∨ μ TotIntvl ≤ μ ⟨(x,⊤),lt_top_iff_ne_top.2 hx.2⟩) :
@@ -58,7 +58,7 @@ lemma proposition_4_12 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder
 := impl.prop4d12 μ h
 
 
-lemma remark_4_13 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+lemma remark_4_13 {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : SlopeLike μ):
 ------------
@@ -68,7 +68,7 @@ lemma remark_4_13 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 := impl.rmk4d13 μ hμ
 
 
-lemma proposition_4_14 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+lemma proposition_4_14 {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
 (h : ∀ x : ℒ, (hx : x ≠ ⊥ ∧ x ≠ ⊤) → μ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx.1⟩ ≤ μ TotIntvl ∨ ¬ μ TotIntvl ≤ μ ⟨(x,⊤),lt_top_iff_ne_top.2 hx.2⟩) :
@@ -78,7 +78,7 @@ lemma proposition_4_14 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder
 := impl.prop4d14 μ h
 
 
-lemma remark_4_15 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+lemma remark_4_15 {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : SlopeLike μ) :
 ------------
@@ -89,7 +89,7 @@ lemma remark_4_15 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 := impl.rmk4d15 μ hμ
 
 
-lemma proposition_4_16 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+lemma proposition_4_16 {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : SlopeLike μ):
 ------------

@@ -3,7 +3,7 @@ import HarderNarasimhan.SlopeLike.Defs
 namespace HarderNarasimhan
 
 namespace impl
-lemma prop4d6 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+lemma prop4d6 {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S):
 SlopeLike μ ↔ ∀ (x y z : ℒ), (h : x < y ∧ y < z) → (
@@ -59,14 +59,14 @@ lemma not_top_of_Nontrivial_TotallyOrderedRealVectorSpace {V : Type} [TotallyOrd
   exact not_top_lt <| top_le_iff.1 this ▸ (OrderTheory.coe'.lt_iff_lt.2 <| lt_add_of_pos_right v hpos)
 
 
-lemma μQuotient_helper {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+lemma μQuotient_helper {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {V : Type} [TotallyOrderedRealVectorSpace V]
 (r : {p :ℒ × ℒ // p.1 < p.2} → NNReal)
 (d : {p :ℒ × ℒ // p.1 < p.2} → V): ∀ z : {p :ℒ × ℒ // p.1 < p.2}, r z > 0 → ∃ (μ : V), (μQuotient r d) z = OrderTheory.coe' μ ∧ (r z) • μ = (d z) :=
   fun z h ↦ ⟨(r z)⁻¹ • d z,⟨by simp [μQuotient, OrderTheory.coe', h], smul_inv_smul₀ (by aesop) (d z)⟩⟩
 
 
-lemma prop4d8 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+lemma prop4d8 {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {V : Type} [TotallyOrderedRealVectorSpace V] [Nontrivial V]
 (r : {p :ℒ × ℒ // p.1 < p.2} → NNReal)
 (d : {p :ℒ × ℒ // p.1 < p.2} → V)

@@ -7,7 +7,7 @@ import HarderNarasimhan.Interval
 
 namespace HarderNarasimhan
 
-class SlopeLike {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+class SlopeLike {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) : Prop where
   slopelike : ∀ (x y z : ℒ), (h : x < y ∧ y < z) →
@@ -30,14 +30,14 @@ instance {V : Type} [TotallyOrderedRealVectorSpace V] : AddLeftMono V where
   elim := fun x _ _ h ↦ TotallyOrderedRealVectorSpace.elim_AddLeftMono x h
 
 
-noncomputable def μQuotient {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+noncomputable def μQuotient {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {V : Type} [TotallyOrderedRealVectorSpace V]
 (r : {p :ℒ × ℒ // p.1 < p.2} → NNReal)
 (d : {p :ℒ × ℒ // p.1 < p.2} → V): {p :ℒ × ℒ // p.1 < p.2} → OrderTheory.DedekindMacNeilleCompletion V :=
   fun z ↦ if _ : r z > 0 then OrderTheory.coe' ((r z)⁻¹ • d z) else ⊤
 
 
-instance {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+instance {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S]
 {μ : {p : ℒ × ℒ // p.1 < p.2} → S} [hsl : SlopeLike μ]
 {z : {p : ℒ × ℒ // p.1 < p.2}} : SlopeLike (Resμ z μ)

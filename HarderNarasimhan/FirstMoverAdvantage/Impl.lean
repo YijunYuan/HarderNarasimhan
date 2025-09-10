@@ -5,7 +5,7 @@ namespace HarderNarasimhan
 
 namespace impl
 
-noncomputable def prop4d1₁_seq {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+noncomputable def prop4d1₁_seq {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
 (h₁ : ∀ x : ℕ → ℒ, (smf : StrictMono x) → ∃ N : ℕ, μ ⟨(x N, x (N+1)), smf <| Nat.lt_add_one N⟩ ≤ μ ⟨(x N,⊤), lt_of_lt_of_le (smf <| Nat.lt_add_one N) le_top⟩)
@@ -30,7 +30,7 @@ noncomputable def prop4d1₁_seq {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [Bo
     exact con (hhh xB hAB)
 
 
-lemma prop4d1_helper {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+lemma prop4d1_helper {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) : sInf {x | ∃ x_1, ∃ (hx : x_1 < ⊤), μ ⟨(x_1, ⊤), hx⟩ = x} = μmin μ TotIntvl := by
     unfold TotIntvl
@@ -42,7 +42,7 @@ lemma prop4d1_helper {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
       use w, lt_top_iff_ne_top.2 hw.2
 
 
-lemma prop4d1₁ (ℒ : Type) [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+lemma prop4d1₁ (ℒ : Type) [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 (S : Type) [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
 (h₁ : ∀ x : ℕ → ℒ, (smf : StrictMono x) → ∃ N : ℕ, μ ⟨(x N, x (N+1)), smf <| Nat.lt_add_one N⟩ ≤ μ ⟨(x N,⊤), lt_of_lt_of_le (smf <| Nat.lt_add_one N) le_top⟩)
@@ -75,7 +75,7 @@ lemma prop4d1₁ (ℒ : Type) [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
     use ⊤, ⟨⟨le_top,le_top⟩,hx.2⟩
 
 
-lemma prop4d1₂ (ℒ : Type) [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+lemma prop4d1₂ (ℒ : Type) [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 (S : Type) [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
 (h₁ : ∀ x : ℕ → ℒ, (smf : StrictMono x) → ∃ N : ℕ, μ ⟨(x N, x (N+1)), smf <| Nat.lt_add_one N⟩ ≤ μ ⟨(x N,⊤), lt_of_lt_of_le (smf <| Nat.lt_add_one N) le_top⟩)
@@ -86,23 +86,23 @@ lemma prop4d1₂ (ℒ : Type) [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   use ⊤, ⟨⟨bot_le,le_rfl⟩,ne_of_lt bot_lt_top⟩
 
 
-instance {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] : Coe ({p :ℒ × ℒ // p.1 < p.2}) ({p :ℒᵒᵈ × ℒᵒᵈ // p.1 < p.2}) where
+instance {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ] : Coe ({p :ℒ × ℒ // p.1 < p.2}) ({p :ℒᵒᵈ × ℒᵒᵈ // p.1 < p.2}) where
   coe p := ⟨(p.val.2, p.val.1), p.prop⟩
 
 
-instance {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] : Coe ({p :ℒᵒᵈ × ℒᵒᵈ // p.1 < p.2}) ({p :ℒ × ℒ // p.1 < p.2}) where
+instance {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ] : Coe ({p :ℒᵒᵈ × ℒᵒᵈ // p.1 < p.2}) ({p :ℒ × ℒ // p.1 < p.2}) where
   coe p := ⟨(p.val.2, p.val.1), p.prop⟩
 
 
-instance {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+instance {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S] : Coe ({p :ℒ × ℒ // p.1 < p.2} → S) ({p :ℒᵒᵈ × ℒᵒᵈ // p.1 < p.2} → Sᵒᵈ) where
   coe f := fun p ↦ f p
 
 
-lemma fuck {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] {S : Type} [CompleteLattice S] (μ : {p :ℒ × ℒ // p.1 < p.2} → S) : ∀ I : {p :ℒᵒᵈ × ℒᵒᵈ // p.1 < p.2}, μ ⟨(I.val.2.ofDual,I.val.1.ofDual),I.prop⟩ = OrderDual.ofDual ((↑μ : {p :ℒᵒᵈ × ℒᵒᵈ // p.1 < p.2} → Sᵒᵈ) I) := fun _ ↦ rfl
+lemma fuck {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ] {S : Type} [CompleteLattice S] (μ : {p :ℒ × ℒ // p.1 < p.2} → S) : ∀ I : {p :ℒᵒᵈ × ℒᵒᵈ // p.1 < p.2}, μ ⟨(I.val.2.ofDual,I.val.1.ofDual),I.prop⟩ = OrderDual.ofDual ((↑μ : {p :ℒᵒᵈ × ℒᵒᵈ // p.1 < p.2} → Sᵒᵈ) I) := fun _ ↦ rfl
 
 
-lemma h₁_dual_of_h₁ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] {S : Type} [CompleteLattice S] {μ : {p :ℒ × ℒ // p.1 < p.2} → S} (h₁ : ∀ x : ℕ → ℒ, (saf : StrictAnti x) → ∃ N : ℕ, μ ⟨(⊥ , x N), lt_of_le_of_lt bot_le <| saf <| Nat.lt_add_one N⟩ ≤ μ ⟨(x (N+1), x N), saf <| Nat.lt_add_one N⟩) :
+lemma h₁_dual_of_h₁ {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ] {S : Type} [CompleteLattice S] {μ : {p :ℒ × ℒ // p.1 < p.2} → S} (h₁ : ∀ x : ℕ → ℒ, (saf : StrictAnti x) → ∃ N : ℕ, μ ⟨(⊥ , x N), lt_of_le_of_lt bot_le <| saf <| Nat.lt_add_one N⟩ ≤ μ ⟨(x (N+1), x N), saf <| Nat.lt_add_one N⟩) :
 (∀ x : ℕ → ℒᵒᵈ, (smf : StrictMono x) → ∃ N : ℕ, @LE.le Sᵒᵈ (OrderDual.instLE S) ((↑μ : {p :ℒᵒᵈ × ℒᵒᵈ // p.1 < p.2} → Sᵒᵈ) ⟨(x N, x (N+1)), smf <| Nat.lt_add_one N⟩)  ((↑μ : {p :ℒᵒᵈ × ℒᵒᵈ // p.1 < p.2} → Sᵒᵈ) ⟨(x N,⊤), lt_of_lt_of_le (smf <| Nat.lt_add_one N) le_top⟩)) := by
   intro xd smf
   rcases (h₁ (fun n ↦ (xd n).ofDual) fun _ _ hab ↦ smf hab) with ⟨N, hN⟩
@@ -112,14 +112,14 @@ lemma h₁_dual_of_h₁ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrde
   use N, OrderDual.ofDual_le_ofDual.1 hN
 
 
-lemma h₂_dual_of_h₂ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] {S : Type} [CompleteLattice S] {μ : {p :ℒ × ℒ // p.1 < p.2} → S}
+lemma h₂_dual_of_h₂ {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ] {S : Type} [CompleteLattice S] {μ : {p :ℒ × ℒ // p.1 < p.2} → S}
 (h₂ : ∀ z : {p :ℒ × ℒ // p.1 < p.2}, (hz : ⊥ < z.val.1) → μ ⟨(⊥,z.val.2),lt_trans hz z.prop⟩ ≤ μ z ∨ μ ⟨(⊥,z.val.2),lt_trans hz z.prop⟩ ≤ μ ⟨(⊥,z.val.1),hz⟩) :
 ∀ z : {p :ℒᵒᵈ × ℒᵒᵈ // p.1 < p.2}, (hz :z.val.2 < ⊤) → @LE.le Sᵒᵈ (OrderDual.instLE S) ((↑μ : {p :ℒᵒᵈ × ℒᵒᵈ // p.1 < p.2} → Sᵒᵈ) z) ((↑μ : {p :ℒᵒᵈ × ℒᵒᵈ // p.1 < p.2} → Sᵒᵈ) ⟨(z.val.1,⊤),lt_trans z.prop hz⟩) ∨ @LE.le Sᵒᵈ (OrderDual.instLE S) ((↑μ : {p :ℒᵒᵈ × ℒᵒᵈ // p.1 < p.2} → Sᵒᵈ) ⟨(z.val.2,⊤),hz⟩) ((↑μ : {p :ℒᵒᵈ × ℒᵒᵈ // p.1 < p.2} → Sᵒᵈ) ⟨(z.val.1,⊤),lt_trans z.prop hz⟩) := by
   intro z hz
   exact h₂ z hz
 
 
-lemma dualμAstar_eq_μBstar {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+lemma dualμAstar_eq_μBstar {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) :
 OrderDual.ofDual <| μAstar (fun (p : {p : ℒᵒᵈ × ℒᵒᵈ // p.1 < p.2}) ↦ OrderDual.toDual <| μ ⟨(p.val.2, p.val.1), p.prop⟩) = μBstar μ
@@ -145,7 +145,7 @@ OrderDual.ofDual <| μAstar (fun (p : {p : ℒᵒᵈ × ℒᵒᵈ // p.1 < p.2})
       exact ⟨b, ⟨⟨hb.1.2,hb.1.1⟩,Ne.symm hb.2⟩, hb'.symm ▸ rfl⟩
 
 
-lemma dualμBstar_eq_μAstar {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+lemma dualμBstar_eq_μAstar {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) :
 OrderDual.ofDual <| μBstar (fun (p : {p : ℒᵒᵈ × ℒᵒᵈ // p.1 < p.2}) ↦ OrderDual.toDual <| μ ⟨(p.val.2, p.val.1), p.prop⟩) = μAstar μ
@@ -171,7 +171,7 @@ OrderDual.ofDual <| μBstar (fun (p : {p : ℒᵒᵈ × ℒᵒᵈ // p.1 < p.2})
       exact ⟨b, ⟨⟨hb.1.2,hb.1.1⟩,Ne.symm hb.2⟩, hb'.symm ▸ rfl⟩
 
 
-lemma prop4d3_helper {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+lemma prop4d3_helper {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) : sSup {μ ⟨(⊥, y),hy⟩ | (y : ℒ) (hy : ⊥ < y) } = μmax μ TotIntvl := by
     unfold TotIntvl
@@ -183,7 +183,7 @@ lemma prop4d3_helper {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
       use w, bot_lt_iff_ne_bot.2 <| Ne.symm hw.2
 
 
-lemma prop4d3₁ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+lemma prop4d3₁ {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
 (h₁ : ∀ x : ℕ → ℒ, (saf : StrictAnti x) → ∃ N : ℕ, μ ⟨(⊥ , x N), lt_of_le_of_lt bot_le <| saf <| Nat.lt_add_one N⟩ ≤ μ ⟨(x (N+1), x N), saf <| Nat.lt_add_one N⟩)
@@ -202,7 +202,7 @@ lemma prop4d3₁ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
     use a, ha, ha'
 
 
-lemma prop4d3₂ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+lemma prop4d3₂ {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
 (h₁ : ∀ x : ℕ → ℒ, (saf : StrictAnti x) → ∃ N : ℕ, μ ⟨(⊥ , x N), lt_of_le_of_lt bot_le <| saf <| Nat.lt_add_one N⟩ ≤ μ ⟨(x (N+1), x N), saf <| Nat.lt_add_one N⟩)
@@ -210,7 +210,7 @@ lemma prop4d3₂ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 μAstar μ ≤ μBstar μ := (dualμAstar_eq_μBstar μ) ▸ (dualμBstar_eq_μAstar μ) ▸ prop4d1₂ ℒᵒᵈ Sᵒᵈ (↑μ : {p :ℒᵒᵈ × ℒᵒᵈ // p.1 < p.2} → Sᵒᵈ) (h₁_dual_of_h₁ h₁) (h₂_dual_of_h₂ h₂)
 
 
-lemma rmk4d4 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+lemma rmk4d4 {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
 (r : ℒ → ℝ) (hr₁ : Monotone r) (hr₂ : IsWellOrder (Set.range r) (· < ·))

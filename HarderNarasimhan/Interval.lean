@@ -5,55 +5,58 @@ import Mathlib.Order.Sublattice
 import HarderNarasimhan.Basic
 
 namespace HarderNarasimhan
-def Interval {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+def Interval {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 (z : {p : ℒ × ℒ // p.1 < p.2}) : Type :=
 {p : ℒ // z.val.1 ≤ p ∧ p ≤ z.val.2}
 
 
-instance {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] {z : {p : ℒ × ℒ // p.1 < p.2}} : Nontrivial (Interval z) where
+instance {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ] {z : {p : ℒ × ℒ // p.1 < p.2}} : Nontrivial (Interval z) where
     exists_pair_ne := by
         rcases z with ⟨⟨x, y⟩, hxy⟩
         use ⟨x,⟨le_rfl,le_of_lt hxy⟩⟩, ⟨y,⟨le_of_lt hxy,le_rfl⟩⟩
         exact Subtype.coe_ne_coe.mp <| ne_of_lt hxy
 
 
+instance {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ] {z : {p : ℒ × ℒ // p.1 < p.2}} : PartialOrder (Interval z) where
+  le := fun a b => a.val ≤ b.val
+  le_refl := by (expose_names; exact fun a ↦ Preorder.le_refl a.val)
+  le_trans := by  (expose_names; exact fun a b c a_1 a_2 ↦ Preorder.le_trans a.val b.val c.val a_1 a_2)
+  le_antisymm := fun a b h1 h2 ↦ Subtype.ext <| le_antisymm h1 h2
+
+
 instance {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] {z : {p : ℒ × ℒ // p.1 < p.2}} : Lattice (Interval z) where
-    le := fun a b => a.val ≤ b.val
-    le_refl := by (expose_names; exact fun a ↦ Preorder.le_refl a.val)
-    le_trans := by  (expose_names; exact fun a b c a_1 a_2 ↦ Preorder.le_trans a.val b.val c.val a_1 a_2)
-    le_antisymm := fun a b h1 h2 ↦ Subtype.ext <| le_antisymm h1 h2
     sup := fun a b => ⟨a.val ⊔ b.val, ⟨le_trans a.prop.1 le_sup_left,sup_le a.prop.2 b.prop.2⟩⟩
-    sup_le := fun a b c h1 h2 ↦ sup_le h1 h2
-    le_sup_left := fun a b ↦ le_sup_left
-    le_sup_right := fun a b ↦ le_sup_right
+    sup_le := fun _ _ _ h1 h2 ↦ sup_le h1 h2
+    le_sup_left := fun _ _ ↦ le_sup_left
+    le_sup_right := fun _ _ ↦ le_sup_right
     inf := fun a b => ⟨a.val ⊓ b.val,⟨le_inf a.prop.1 b.prop.1, le_trans inf_le_right b.prop.2⟩⟩
-    le_inf := fun a b c h1 h2 ↦ le_inf h1 h2
-    inf_le_left := fun a b ↦ inf_le_left
-    inf_le_right := fun a b ↦ inf_le_right
+    le_inf := fun _ _ _ h1 h2 ↦ le_inf h1 h2
+    inf_le_left := fun _ _ ↦ inf_le_left
+    inf_le_right := fun _ _ ↦ inf_le_right
 
 
-instance {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] {z : {p : ℒ × ℒ // p.1 < p.2}} : BoundedOrder (Interval z) where
+instance {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ] {z : {p : ℒ × ℒ // p.1 < p.2}} : BoundedOrder (Interval z) where
     bot := ⟨z.val.1,⟨le_rfl,le_of_lt z.prop⟩⟩
     bot_le := fun a ↦ a.prop.1
     top := ⟨z.val.2,⟨le_of_lt z.prop,le_rfl⟩⟩
     le_top := fun a ↦ a.prop.2
 
 
-instance {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] {z : {p : ℒ × ℒ // p.1 < p.2}} : CoeOut (Interval z) ℒ where
+instance {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ] {z : {p : ℒ × ℒ // p.1 < p.2}} : CoeOut (Interval z) ℒ where
     coe := fun a ↦ a.val
 
 
-instance {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] : Coe ℒ (Interval (⟨(⊥,⊤),bot_lt_top⟩ : {p : ℒ × ℒ // p.1 < p.2})) where
+instance {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ] : Coe ℒ (Interval (⟨(⊥,⊤),bot_lt_top⟩ : {p : ℒ × ℒ // p.1 < p.2})) where
     coe := fun a ↦ ⟨a,⟨bot_le,le_top⟩⟩
 
 
-def Resμ {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] (z : {p : ℒ × ℒ // p.1 < p.2}) {S : Type} [CompleteLattice S] (μ : {p :ℒ × ℒ // p.1 < p.2} → S): {p :(Interval z) × (Interval z) // p.1 < p.2} → S := fun p ↦ μ ⟨(p.val.1.val,p.val.2.val),Subtype.GCongr.coe_lt_coe <| Subtype.mk_lt_mk.2 (lt_iff_le_not_le.mpr p.prop)⟩
+def Resμ {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ] (z : {p : ℒ × ℒ // p.1 < p.2}) {S : Type} [CompleteLattice S] (μ : {p :ℒ × ℒ // p.1 < p.2} → S): {p :(Interval z) × (Interval z) // p.1 < p.2} → S := fun p ↦ μ ⟨(p.val.1.val,p.val.2.val),Subtype.GCongr.coe_lt_coe <| Subtype.mk_lt_mk.2 (lt_iff_le_not_le.mpr p.prop)⟩
 
 
-instance {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] {z : {p : ℒ × ℒ // p.1 < p.2}} {S : Type} [CompleteLattice S] : Coe ({p :ℒ × ℒ // p.1 < p.2} → S) ({p :(Interval z) × (Interval z) // p.1 < p.2} → S) where
+instance {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ] {z : {p : ℒ × ℒ // p.1 < p.2}} {S : Type} [CompleteLattice S] : Coe ({p :ℒ × ℒ // p.1 < p.2} → S) ({p :(Interval z) × (Interval z) // p.1 < p.2} → S) where
     coe := Resμ z
 
-instance {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [hw : WellFoundedGT ℒ] {z : {p : ℒ × ℒ // p.1 < p.2}} : WellFoundedGT (Interval z) := by
+instance {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ] [hw : WellFoundedGT ℒ] {z : {p : ℒ × ℒ // p.1 < p.2}} : WellFoundedGT (Interval z) := by
     refine { wf := WellFounded.wellFounded_iff_has_min.mpr fun S hS ↦ ?_ }
     rcases hw.wf.has_min (Subtype.val '' S) ( Set.Nonempty.image Subtype.val hS) with ⟨a,ha⟩
     have := ha.1
@@ -61,7 +64,7 @@ instance {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [hw : We
     rcases this with ⟨x, hx⟩
     exact Exists.intro ⟨a, x⟩ ⟨hx, fun y hy h ↦ ha.right y.val (Set.mem_image_of_mem Subtype.val hy) (lt_iff_le_not_le.2 h)⟩
 
-lemma μ_res_intvl {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+lemma μ_res_intvl {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {I : {p : ℒ × ℒ // p.1 < p.2}}
 {S : Type} [CompleteLattice S]
 {μ : {p :ℒ × ℒ // p.1 < p.2} → S}
@@ -71,7 +74,7 @@ lemma μ_res_intvl {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ
 ------------
 := rfl
 
-lemma μmax_res_intvl {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+lemma μmax_res_intvl {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {I : {p : ℒ × ℒ // p.1 < p.2}}
 {S : Type} [CompleteLattice S]
 {μ : {p :ℒ × ℒ // p.1 < p.2} → S}
@@ -99,7 +102,7 @@ lemma μmax_res_intvl {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder 
     simp only [exists_prop, and_true]
     exact ⟨hu1.1,fun hc ↦ hu1.right (Subtype.coe_inj.2 hc)⟩
 
-lemma μmin_res_intvl {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+lemma μmin_res_intvl {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {I : {p : ℒ × ℒ // p.1 < p.2}}
 {S : Type} [CompleteLattice S]
 {μ : {p :ℒ × ℒ // p.1 < p.2} → S}
@@ -127,7 +130,7 @@ lemma μmin_res_intvl {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder 
     simp only [exists_prop, and_true]
     exact ⟨hu1.1,fun hc ↦ hu1.right (Subtype.coe_inj.2 hc)⟩
 
-lemma μA_res_intvl {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+lemma μA_res_intvl {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {I : {p : ℒ × ℒ // p.1 < p.2}}
 {S : Type} [CompleteLattice S]
 {μ : {p :ℒ × ℒ // p.1 < p.2} → S}
@@ -155,7 +158,7 @@ lemma μA_res_intvl {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
     simp only [exists_prop, and_true]
     exact ⟨hu1.1,fun hc ↦ hu1.right (Subtype.coe_inj.2 hc)⟩
 
-lemma μB_res_intvl {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+lemma μB_res_intvl {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {I : {p : ℒ × ℒ // p.1 < p.2}}
 {S : Type} [CompleteLattice S]
 {μ : {p :ℒ × ℒ // p.1 < p.2} → S}

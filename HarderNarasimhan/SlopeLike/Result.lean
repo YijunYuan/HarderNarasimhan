@@ -2,7 +2,7 @@ import HarderNarasimhan.SlopeLike.Impl
 
 namespace HarderNarasimhan
 
-lemma proposition_4_6 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+lemma proposition_4_6 {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S):
 ------------
@@ -18,7 +18,7 @@ SlopeLike μ ↔
 := impl.prop4d6 μ
 
 
-lemma proposition_4_8 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+lemma proposition_4_8 {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {V : Type} [TotallyOrderedRealVectorSpace V] [Nontrivial V]
 (r : {p :ℒ × ℒ // p.1 < p.2} → NNReal)
 (d : {p :ℒ × ℒ // p.1 < p.2} → V)
@@ -30,7 +30,7 @@ lemma proposition_4_8 {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder 
 := impl.prop4d8 r d h₁ h₂
 
 
-lemma seesaw_useful {ℒ : Type} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+lemma seesaw_useful {ℒ : Type} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S):
 ------------
