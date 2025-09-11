@@ -78,7 +78,12 @@ lemma prop4d8 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder �
   refine (prop4d6 μ).2 fun x y z h ↦ ?_
   cases' eq_zero_or_pos (r ⟨(x, z), lt_trans h.1 h.2⟩) with h' h'
   · have : r ⟨(x, y), h.1⟩ = 0 ∧ r ⟨(y, z), h.2⟩ = 0 := add_eq_zero.1 <| (h₁ x y z h).2 ▸ h'
-    have : ¬ r ⟨(y, z), h.2⟩ > 0 ∧ ¬ r ⟨(x,y), h.1⟩ > 0 := by aesop
+    have : ¬ r ⟨(y, z), h.2⟩ > 0 ∧ ¬ r ⟨(x,y), h.1⟩ > 0 := by
+      constructor
+      · rw [this.2]
+        exact not_lt_zero'
+      · rw [this.1]
+        exact not_lt_zero'
     have : μ ⟨(x, z), lt_trans h.1 h.2⟩ = ⊤ ∧ μ ⟨(x, y), h.1⟩ = ⊤ ∧ μ ⟨(y, z), h.2⟩ = ⊤ := by
       refine ⟨?_,⟨?_,?_⟩⟩
       · simp only [μQuotient, h', gt_iff_lt, lt_self_iff_false, ↓reduceDIte, μ]

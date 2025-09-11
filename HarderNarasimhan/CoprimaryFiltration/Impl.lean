@@ -97,7 +97,8 @@ _μ R M ⟨(N₁, u), h₁⟩ ⊆ _μ R M ⟨(N₁, N₃), lt_of_lt_of_le h₁ h
   simp only [Set.mem_setOf_eq] at hp1
   rcases hp1.2 with ⟨m,hm⟩
   refine assp p m hm <| (Submodule.Quotient.mk_eq_zero N₃).mp ?_
-  aesop
+  rw [Submodule.Quotient.mk_eq_zero]
+  exact h₂ m.out.prop
 
 
 lemma noname {R : Type*} [CommRing R] [IsNoetherianRing R]
@@ -292,7 +293,9 @@ lemma koqcl_iso {R : Type*} [CommRing R] [IsNoetherianRing R]
         have hy2 : y ∈ Submodule.map (Submodule.subtype I.val.2) (LinearMap.ker (f1 I ∘ₗ f2 I)) := hy2
         simp only [Submodule.mem_map, LinearMap.mem_ker] at hy2
         rcases hy2 with ⟨w,hw1,hw2⟩
-        have : Submodule.Quotient.mk ⟨y, hy1⟩ = (f2 I) w := by aesop
+        have : Submodule.Quotient.mk ⟨y, hy1⟩ = (f2 I) w := by
+          simp only [← hw2, Submodule.subtype_apply, Subtype.coe_eta, LinearMap.coe_mk,
+            Submodule.mkQ_apply, AddHom.coe_mk]
         rw [← hy3, this]
         exact hw1
       · intro hz

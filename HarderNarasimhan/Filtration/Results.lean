@@ -52,8 +52,7 @@ where
       apply Nat.le_induction
       · exact fun hj ↦ lt_of_not_ge (a.μA_pseudo_strict_anti i hj)
       · refine fun j hij hind hj ↦ gt_trans (hind (Nat.lt_of_succ_lt hj)) ?_
-        have := a.μA_pseudo_strict_anti j hj
-        aesop
+        exact lt_of_not_ge <| a.μA_pseudo_strict_anti j hj
     exact fun j hij hj ↦ this j hij hj
   ) n)
 
