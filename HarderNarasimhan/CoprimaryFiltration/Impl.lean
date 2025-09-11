@@ -436,7 +436,9 @@ instance prop3d13₂ {R : Type*} [CommRing R] [IsNoetherianRing R]
     simp only [not_exists, not_le] at hc
     simp only [prop3d12, Function.Embedding.toFun_eq_coe, RelEmbedding.coe_toEmbedding,
       OrderEmbedding.le_iff_le, not_le] at hc
+    simp only [OrderEmbedding.lt_iff_lt, not_lt, not_le] at hc
     have hc := fun w ↦ S₀_order'.mpr (by
+
       simpa only [OrderEmbedding.lt_iff_lt] using (hc w)
       )
     have s1 : ∀ i, ((_μ R M ⟨(N, x i), hx1 i⟩).toFinset.min' <| μ_nonempty ⟨(N, x i), hx1 i⟩).asIdeal ∈ associatedPrimes R ((x i)⧸(Submodule.submoduleOf N (x i))) := by
@@ -453,9 +455,13 @@ instance prop3d13₂ {R : Type*} [CommRing R] [IsNoetherianRing R]
       unfold IsAssociatedPrime at *
       refine ⟨hw'.1,?_⟩
       rcases hw'.2 with ⟨m,hm⟩
-      have : ↑(Quotient.out m) ∈ x 0 :=
-        (if hi : i = 0 then hi ▸ le_rfl
-        else le_of_lt (strictAnti_nat_of_succ_lt hx2 <| Nat.zero_lt_of_ne_zero hi)) <| Submodule.coe_mem (Quotient.out m)
+      have : ↑(Quotient.out m) ∈ x 0 := by
+        if hi : i = 0 then
+          rw [← hi]
+          exact Submodule.coe_mem m.out
+        else
+        have hx2 := subset_of_ssubset <| (hx2 (Nat.zero_lt_of_ne_zero hi)).ssubset
+        exact hx2 <| Submodule.coe_mem m.out
       exact assp w m hm this
     have : (associatedPrimes R (↥(x 0) ⧸ Submodule.submoduleOf N (x 0))).Infinite := by
       refine Set.infinite_of_injective_forall_mem ?_ <| fun i ↦ s2 i (s1 i)

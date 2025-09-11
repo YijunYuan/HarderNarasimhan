@@ -158,7 +158,7 @@ lemma JHFil_fin_len {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
 
 lemma JHFil_prop₂ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [hacc: WellFoundedGT ℒ]
 {S : Type*} [CompleteLinearOrder S]
-(μ : {p : ℒ × ℒ // p.1 < p.2} → S) [hwdcc' : WeakDescendingChainCondition' μ]
+(μ : {p : ℒ × ℒ // p.1 < p.2} → S) [hwdcc' : StrongDescendingChainCondition' μ]
 (hμ : μ ⟨(⊥,⊤),bot_lt_top⟩ ≠ ⊤)
 (hμsl : SlopeLike μ) (hst : Semistable μ)
 (hdc: ∀ x : ℕ → ℒ, (sax : StrictAnti x) → ∃ N : ℕ, μ ⟨(x (N +1), x N), sax <| lt_add_one N⟩ = ⊤) :
@@ -569,7 +569,7 @@ lemma res_ss {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [We
 {S : Type*} [CompleteLinearOrder S]
 {μ : {p : ℒ × ℒ // p.1 < p.2} → S}
 [FiniteTotalPayoff μ] [SlopeLike μ] [Semistable μ]
-[WeakDescendingChainCondition' μ] [Affine μ] (JH : JordanHolderFiltration μ) (h : JH.filtration (Nat.find JH.fin_len - 1) < ⊤) : Semistable (Resμ ⟨(JH.filtration (Nat.find JH.fin_len - 1),⊤),h⟩ μ) := by
+[StrongDescendingChainCondition' μ] [Affine μ] (JH : JordanHolderFiltration μ) (h : JH.filtration (Nat.find JH.fin_len - 1) < ⊤) : Semistable (Resμ ⟨(JH.filtration (Nat.find JH.fin_len - 1),⊤),h⟩ μ) := by
   apply (thm4d21 (Resμ ⟨(JH.filtration (Nat.find JH.fin_len - 1),⊤),h⟩ μ) inferInstance inferInstance inferInstance).2.2 (fun _ _ ↦ inferInstance)
   apply (List.TFAE.out (thm4d21 (Resμ ⟨(JH.filtration (Nat.find JH.fin_len - 1),⊤),h⟩ μ) inferInstance inferInstance inferInstance).1 1 3).1
   rw [μmin_res_intvl, μ_res_intvl]
@@ -610,7 +610,7 @@ lemma looooooooooooooooog_lemma : ∀ n : ℕ, ∀ ℒ : Type*, ∀ _: Nontrivia
 ∀ _ : IsModularLattice ℒ,
 ∀ S : Type*, ∀ _ : CompleteLinearOrder S, ∀ μ : {p : ℒ × ℒ // p.1 < p.2} → S,
 ∀ _ : FiniteTotalPayoff μ, ∀ _ : SlopeLike μ,
-∀ _ : Semistable μ, ∀ _ : WeakDescendingChainCondition' μ, ∀ _ : Affine μ, (∃ JH : JordanHolderFiltration μ, Nat.find JH.fin_len ≤ n) → (∀ JH' : JordanHolderFiltration μ, Nat.find JH'.fin_len ≤ n) := by
+∀ _ : Semistable μ, ∀ _ : StrongDescendingChainCondition' μ, ∀ _ : Affine μ, (∃ JH : JordanHolderFiltration μ, Nat.find JH.fin_len ≤ n) → (∀ JH' : JordanHolderFiltration μ, Nat.find JH'.fin_len ≤ n) := by
   intro n
   induction' n with n hn
   · intro ℒ ntl l bo wacc hmod S clo μ hftp hsl hst hwdcc' affine ⟨JH,hJH⟩ JH'

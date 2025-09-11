@@ -37,7 +37,7 @@ OrderDual.ofDual <| μBstar (fun (p : {p : ℒᵒᵈ × ℒᵒᵈ // p.1 < p.2})
 lemma proposition_4_3 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
-(h₁ : WeakDescendingChainCondition μ) (h₂ : WeakSlopeLike₂ μ) :
+(h₁ : StrongDescendingChainCondition μ) (h₂ : WeakSlopeLike₂ μ) :
 ------------
 (
   μBstar μ = μmax μ TotIntvl
@@ -54,7 +54,7 @@ lemma remark_4_4 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder
 (r : ℒ → ℝ) (hr₁ : Monotone r) (hr₂ : IsWellOrder (Set.range r) (· < ·))
 (h : ∀ z : {p :ℒ × ℒ // p.1 < p.2}, r z.val.1 = r z.val.2 → μ z = ⊤) :
 ------------
-WeakDescendingChainCondition μ
+StrongDescendingChainCondition μ
 ------------
 := {wdcc := impl.rmk4d4 μ r hr₁ hr₂ h}
 

@@ -25,11 +25,13 @@ lemma prop3d2 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 lemma cor3d3 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 (S : Type*) [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : _Convex μ)
-(h : ∀ f : ℕ → ℒ, (h : ∀ n : ℕ, f n > f (n + 1)) →  ∃N : ℕ, μA μ ⟨(f <| N + 1, f N),h N⟩ = ⊤)
+(h : ∀ f : ℕ → ℒ, (h : StrictAnti f) →  ∃N : ℕ, μA μ ⟨(f <| N + 1, f N),h (lt_add_one N)⟩ = ⊤)
 : μA_DescendingChainCondition μ := by
   refine { μ_dcc := fun a f h₁ h₂ ↦ ?_ }
   rcases (h f h₂) with ⟨N, hN⟩
-  exact ⟨N,prop3d2 TotIntvl μ hμcvx (f <| N + 1) (in_TotIntvl <| f <| N + 1) (f N) (in_TotIntvl <| f N) (h₂ N) hN a (in_TotIntvl <| a) (h₁ <| N + 1)⟩
+  use N
+  have := prop3d2 TotIntvl μ hμcvx (f <| N + 1) (in_TotIntvl <| f <| N + 1) (f N) (in_TotIntvl <| f N) (h₂ (lt_add_one N)) hN a (in_TotIntvl <| a) (h₁ <| N + 1)
+  exact not_lt_of_ge this
 
 
 def ℒₛ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
@@ -149,8 +151,9 @@ lemma prop3d4₀func_fin_len  {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [Boun
     rw [gt_iff_lt]
     exact Ne.lt_of_le (this i).symm  (prop3d4₀func μ I i).prop.1
   have h₂ := fun t ↦ prop3d4₀func_defprop1 μ I t (this (t + 1)).symm
-  rcases (hμDCC.μ_dcc I.val.1 func h₀ fun t ↦ prop3d4₀func_strict_decreasing μ I t (this t).symm) with ⟨N, hN⟩
-  exact not_le_of_gt (h₂ N) hN
+  have ttt := fun t ↦ prop3d4₀func_strict_decreasing μ I t (this t).symm
+  rcases (hμDCC.μ_dcc I.val.1 func h₀ (strictAnti_nat_of_succ_lt ttt)) with ⟨N, hN⟩
+  exact hN (h₂ N)
 
 
 noncomputable def prop3d4₀func_len  {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]

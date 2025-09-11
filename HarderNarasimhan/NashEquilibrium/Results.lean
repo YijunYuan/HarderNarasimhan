@@ -24,7 +24,7 @@ lemma remark_4_10 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrde
     NashEquilibrium μ ↔ ∀ y : ℒ, (hy : y ≠ ⊥) → μmin μ ⟨(⊥,y),bot_lt_iff_ne_bot.2 hy⟩ ≤ μmin μ TotIntvl
   )
 ) ∧ (
-  WeakDescendingChainCondition μ → WeakSlopeLike₂ μ →
+  StrongDescendingChainCondition μ → WeakSlopeLike₂ μ →
   (
     NashEquilibrium μ ↔ ∀ y : ℒ, (hy : y ≠ ⊤) → μmax μ TotIntvl ≤ μmax μ ⟨(y,⊤),lt_top_iff_ne_top.2 hy⟩
   )
@@ -41,7 +41,7 @@ lemma proposition_4_11 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [Bounde
   μmin μ TotIntvl = μmax μ TotIntvl → μBstar μ ≤ μAstar μ
 ) ∧ (
   WeakAscendingChainCondition μ → WeakSlopeLike₁ μ →
-  WeakDescendingChainCondition μ → WeakSlopeLike₂ μ →
+  StrongDescendingChainCondition μ → WeakSlopeLike₂ μ →
   μBstar μ ≤ μAstar μ → μmin μ TotIntvl = μmax μ TotIntvl
 )
 ------------
@@ -100,7 +100,7 @@ lemma proposition_4_16 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [Bounde
   μmin μ TotIntvl = μmax μ TotIntvl
   ]
 ) ∧ (
-  WeakAscendingChainCondition μ → WeakDescendingChainCondition μ →
+  WeakAscendingChainCondition μ → StrongDescendingChainCondition μ →
   List.TFAE [
   μmax μ TotIntvl = μ TotIntvl,
   μmin μ TotIntvl = μ TotIntvl,
@@ -124,7 +124,7 @@ lemma proposition_4_18 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrde
 (
   μBstar μ ≤ μAstar μ
 ) ∧ (
-  (WeakAscendingChainCondition μ ∧ WeakSlopeLike₁ μ) ∨ (WeakDescendingChainCondition μ ∧ WeakSlopeLike₂ μ) →
+  (WeakAscendingChainCondition μ ∧ WeakSlopeLike₁ μ) ∨ (StrongDescendingChainCondition μ ∧ WeakSlopeLike₂ μ) →
     NashEquilibrium μ
 )
 ------------
@@ -147,7 +147,7 @@ NashEquilibrium μ → Semistable μ
 theorem theorem_4_21 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLinearOrder S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : SlopeLike μ)
-(h₁ : WeakAscendingChainCondition μ) (h₂ : WeakDescendingChainCondition μ) :
+(h₁ : WeakAscendingChainCondition μ) (h₂ : StrongDescendingChainCondition μ) :
 ------------
 List.TFAE [
   μmax μ TotIntvl = μ TotIntvl,

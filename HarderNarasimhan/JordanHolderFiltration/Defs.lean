@@ -10,7 +10,7 @@ class FiniteTotalPayoff {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrd
   fin_tot_payoff : μ ⟨(⊥,⊤),bot_lt_top⟩ ≠ ⊤
 
 
-class WeakDescendingChainCondition' {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+class StrongDescendingChainCondition' {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : {p : ℒ × ℒ // p.1 < p.2} → S) : Prop where
   wdcc' : ∀ x : ℕ → ℒ, (sax : StrictAnti x) → ∃ N : ℕ, μ ⟨(x (N +1), x N), sax <| lt_add_one N⟩ = ⊤
@@ -20,7 +20,7 @@ class WeakDescendingChainCondition' {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ]
 structure JordanHolderFiltration {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLinearOrder S]
 (μ : {p : ℒ × ℒ // p.1 < p.2} → S)
---[FiniteTotalPayoff μ] [SlopeLike μ] [Semistable μ] [WeakDescendingChainCondition' μ]
+--[FiniteTotalPayoff μ] [SlopeLike μ] [Semistable μ] [StrongDescendingChainCondition' μ]
 where
   filtration : ℕ → ℒ
   antitone : Antitone filtration
@@ -35,8 +35,8 @@ where
 
 instance {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-{μ : {p : ℒ × ℒ // p.1 < p.2} → S} [h : WeakDescendingChainCondition' μ] :
-WeakDescendingChainCondition μ where
+{μ : {p : ℒ × ℒ // p.1 < p.2} → S} [h : StrongDescendingChainCondition' μ] :
+StrongDescendingChainCondition μ where
   wdcc := by
     intro f saf
     rcases h.wdcc' f saf with ⟨N, hN⟩
@@ -46,7 +46,7 @@ WeakDescendingChainCondition μ where
 
 instance {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-{μ : {p : ℒ × ℒ // p.1 < p.2} → S} [h : WeakDescendingChainCondition' μ] {I : {p : ℒ × ℒ // p.1 < p.2}} : WeakDescendingChainCondition' (Resμ I μ) where
+{μ : {p : ℒ × ℒ // p.1 < p.2} → S} [h : StrongDescendingChainCondition' μ] {I : {p : ℒ × ℒ // p.1 < p.2}} : StrongDescendingChainCondition' (Resμ I μ) where
   wdcc' := fun f saf ↦ h.wdcc' (fun n ↦ (f n).val) fun ⦃_ _⦄ hn ↦ lt_iff_le_not_le.mpr (saf hn)
 
 
@@ -72,7 +72,7 @@ instance {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 instance {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLinearOrder S]
 {μ : {p : ℒ × ℒ // p.1 < p.2} → S}
-[hftp : FiniteTotalPayoff μ] [hsl : SlopeLike μ] [hst : Semistable μ] [hwdcc' : WeakDescendingChainCondition' μ] {x : ℒ} {hx : ⊥ < x}: FiniteTotalPayoff (Resμ ⟨(⊥, x), hx⟩ μ) := by
+[hftp : FiniteTotalPayoff μ] [hsl : SlopeLike μ] [hst : Semistable μ] [hwdcc' : StrongDescendingChainCondition' μ] {x : ℒ} {hx : ⊥ < x}: FiniteTotalPayoff (Resμ ⟨(⊥, x), hx⟩ μ) := by
   refine { fin_tot_payoff := ?_ }
   simp only [Resμ]
   by_contra h

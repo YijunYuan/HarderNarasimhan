@@ -70,7 +70,7 @@ NashEquilibrium μ ↔ ∀ y : ℒ, (hy : y ≠ ⊥) → μmin μ ⟨(⊥,y),bot
 lemma rmk4d10₃ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
-(h₁ : WeakDescendingChainCondition μ) (h₂ : WeakSlopeLike₂ μ):
+(h₁ : StrongDescendingChainCondition μ) (h₂ : WeakSlopeLike₂ μ):
 NashEquilibrium μ ↔ ∀ y : ℒ, (hy : y ≠ ⊤) → μmax μ TotIntvl ≤ μmax μ ⟨(y,⊤),lt_top_iff_ne_top.2 hy⟩ := by
   constructor
   · intro h y hy
@@ -116,7 +116,7 @@ lemma prop4d11₂ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrde
 {S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
 (h₁ : WeakAscendingChainCondition μ) (h₂ : WeakSlopeLike₁ μ)
-(h₁' : WeakDescendingChainCondition μ) (h₂' : WeakSlopeLike₂ μ):
+(h₁' : StrongDescendingChainCondition μ) (h₂' : WeakSlopeLike₂ μ):
 μBstar μ ≤ μAstar μ → μmin μ TotIntvl = μmax μ TotIntvl := fun h ↦ eq_of_le_of_le (le_trans (rmk4d10₀ μ TotIntvl).1 (rmk4d10₀ μ ⟨(⊥,⊤),bot_lt_top⟩).2) <| (impl.prop4d3₁ μ h₁'.wdcc h₂'.wsl₂) ▸ (impl.prop4d1₁ ℒ S μ h₁.wacc h₂.wsl₁) ▸ h
 
 
@@ -200,7 +200,7 @@ List.TFAE [
 lemma prop4d16₂ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : SlopeLike μ)
-(h₁ : WeakAscendingChainCondition μ) (h₂ : WeakDescendingChainCondition μ) :
+(h₁ : WeakAscendingChainCondition μ) (h₂ : StrongDescendingChainCondition μ) :
 μmin μ TotIntvl = μmax μ TotIntvl ↔ NashEquilibrium μ := by
   have : ∀ (z : { p : ℒ × ℒ // p.1 < p.2 }) (hz : z.val.2 < ⊤), μ z ≤ μ ⟨(z.val.1, ⊤), lt_trans z.prop hz⟩ ∨ μ ⟨(z.val.2, ⊤), hz⟩ ≤ μ ⟨(z.val.1, ⊤), lt_trans z.prop hz⟩ := by
     intro z hz
@@ -239,7 +239,7 @@ lemma prop4d18₁ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ
 lemma prop4d18₂ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLinearOrder S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : Semistable μ)
-(h : (WeakAscendingChainCondition μ ∧ WeakSlopeLike₁ μ) ∨ (WeakDescendingChainCondition μ ∧ WeakSlopeLike₂ μ)) :
+(h : (WeakAscendingChainCondition μ ∧ WeakSlopeLike₁ μ) ∨ (StrongDescendingChainCondition μ ∧ WeakSlopeLike₂ μ)) :
 NashEquilibrium μ := by
   refine {nash_eq := eq_of_le_of_le ?_ (prop4d18₁ μ hμ)}
   cases' h with h h
@@ -386,7 +386,7 @@ WeakSlopeLike₂ μ := by
 theorem thm4d21 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLinearOrder S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : SlopeLike μ)
-(h₁ : WeakAscendingChainCondition μ) (h₂ : WeakDescendingChainCondition μ) :
+(h₁ : WeakAscendingChainCondition μ) (h₂ : StrongDescendingChainCondition μ) :
 List.TFAE [
   μmax μ TotIntvl = μ TotIntvl,
   μmin μ TotIntvl = μ TotIntvl,

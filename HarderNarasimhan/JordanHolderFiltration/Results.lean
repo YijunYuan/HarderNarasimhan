@@ -8,14 +8,14 @@ namespace HarderNarasimhan
 instance {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLinearOrder S]
 {μ : {p : ℒ × ℒ // p.1 < p.2} → S}
-[hftp : FiniteTotalPayoff μ] [hsl : SlopeLike μ] [hst : Semistable μ] [hwdcc' : WeakDescendingChainCondition' μ] :
+[hftp : FiniteTotalPayoff μ] [hsl : SlopeLike μ] [hst : Semistable μ] [hwdcc' : StrongDescendingChainCondition' μ] :
 ------------
 Nonempty (JordanHolderFiltration μ)
 ------------
 := Nonempty.intro {
   filtration := impl.JHFil μ hftp.fin_tot_payoff hsl hst hwdcc'.wdcc',
   antitone := fun x y hxy ↦
-    if hy : y ≤ Nat.find (impl.JHFil_fin_len μ FiniteTotalPayoff.fin_tot_payoff hsl hst WeakDescendingChainCondition'.wdcc') then
+    if hy : y ≤ Nat.find (impl.JHFil_fin_len μ FiniteTotalPayoff.fin_tot_payoff hsl hst StrongDescendingChainCondition'.wdcc') then
       (Nat.le_induction
         (fun a ↦ le_rfl)
         (fun n hn hind hn' ↦
@@ -68,7 +68,7 @@ theorem remark_4_26 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
 {S : Type*} [CompleteLinearOrder S]
 {μ : {p : ℒ × ℒ // p.1 < p.2} → S}
 [FiniteTotalPayoff μ] [SlopeLike μ] [Semistable μ]
-[WeakDescendingChainCondition' μ] [Affine μ] :
+[StrongDescendingChainCondition' μ] [Affine μ] :
 ------------
 ∀ JH1 JH2 : JordanHolderFiltration μ, Nat.find JH1.fin_len = Nat.find JH2.fin_len
 ------------
