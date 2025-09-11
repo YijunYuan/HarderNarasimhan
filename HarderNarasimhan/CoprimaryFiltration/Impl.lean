@@ -1335,7 +1335,7 @@ noncomputable instance {R : Type*} [CommRing R] [IsNoetherianRing R]
 Unique (CoprimaryFiltration R M) where
   uniq := by
     intro a
-    have t2 := CP_HN' (@default (CoprimaryFiltration R M) instInhabitedCoprimaryFiltration)
+    have t2 := CP_HN' (@default (CoprimaryFiltration R M) inferInstance)
     rw [← CP_HN' a] at t2
     ext
     rw [t2]

@@ -83,7 +83,7 @@ private def Lex'LinearOrder {α : Type*} [LinearOrder α] : LinearOrder (Finset 
     unfold DecidableLE LE.le LexLE DecidableRel
     intro A B
     simp only [not_lt]
-    exact instDecidableOr
+    exact inferInstance
   min := fun A B ↦ if A ≤ B then A else B
   min_def := by
     intro A B
