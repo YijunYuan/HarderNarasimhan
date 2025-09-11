@@ -124,7 +124,7 @@ lemma noname {R : Type*} [CommRing R] [IsNoetherianRing R]
 
 
 instance prop3d11 {R : Type*} [CommRing R] [IsNoetherianRing R]
-{M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] : Convex (μ R M) := by
+{M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] : _Convex (μ R M) := by
   refine { convex := fun x y _ _ hxy ↦ ?_ }
   unfold μ
   simp only [Function.Embedding.toFun_eq_coe, RelEmbedding.coe_toEmbedding,

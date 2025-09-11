@@ -22,7 +22,10 @@ instance proposition_3_11 {R : Type*} [CommRing R] [IsNoetherianRing R]
 ------------
 Convex (μ R M)
 ------------
-:= inferInstance
+:= by
+  apply (impl.Convex_iff _).1
+  infer_instance
+
 
 lemma proposition_3_12 {R : Type*} [CommRing R] [IsNoetherianRing R]
 {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] :

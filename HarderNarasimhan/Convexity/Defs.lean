@@ -3,33 +3,16 @@ import HarderNarasimhan.Interval
 
 namespace HarderNarasimhan
 
+class Convex {ℒ : Type*} [Lattice ℒ]
+{S : Type*} [CompleteLattice S]
+(μ : {p :ℒ × ℒ // p.1 < p.2} → S) : Prop where
+  convex : ∀ x y : ℒ, (h : ¬ x ≤ y) → μ ⟨(x ⊓ y, x), inf_lt_left.2 h⟩ ≤ μ ⟨(y, x ⊔ y), right_lt_sup.2 h⟩
+
 class ConvexI {ℒ : Type*} [Lattice ℒ]
 {S : Type*} [CompleteLattice S]
 (I : {p : ℒ × ℒ // p.1 < p.2})
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) : Prop where
-  convex : ∀ x : ℒ, ∀ y : ℒ, InIntvl I x → InIntvl I y → (h : ¬ x ≤ y) → μ ⟨(x ⊓ y, x), inf_lt_left.2 h⟩ ≤ μ ⟨(y, x ⊔ y), right_lt_sup.2 h⟩
-
-abbrev Convex {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-{S : Type*} [CompleteLattice S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S) := ConvexI TotIntvl μ
-
-theorem Convex_iff {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-{S : Type*} [CompleteLattice S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S) : Convex μ ↔
-∀ x : ℒ, ∀ y : ℒ, (h : ¬ x ≤ y) → μ ⟨(x ⊓ y, x), inf_lt_left.2 h⟩ ≤ μ ⟨(y, x ⊔ y), right_lt_sup.2 h⟩ := by
-  constructor
-  · intro h
-    exact fun x y hxy ↦ h.convex x y (in_TotIntvl _) (in_TotIntvl _) hxy
-  · intro h
-    exact { convex := fun x y hx hy hxy ↦ h x y hxy }
-
-theorem ConvexI_iff_Convex_res {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-{S : Type*} [CompleteLattice S]
-(I : {p : ℒ × ℒ // p.1 < p.2}) (μ : {p :ℒ × ℒ // p.1 < p.2} → S) :
-ConvexI I μ ↔ Convex (Resμ I μ) := by
-  constructor
-  · exact fun h ↦ { convex := fun x y hx hy hxy ↦ h.convex x y x.prop y.prop hxy }
-  · exact fun h ↦ { convex := fun x y hx hy hxy ↦ h.convex ⟨x,hx⟩ ⟨y,hy⟩ (in_TotIntvl _) (in_TotIntvl _) hxy }
+  convex : ∀ x y : ℒ, InIntvl I x → InIntvl I y → (h : ¬ x ≤ y) → μ ⟨(x ⊓ y, x), inf_lt_left.2 h⟩ ≤ μ ⟨(y, x ⊔ y), right_lt_sup.2 h⟩
 
 lemma Convex_of_Convex_large {ℒ : Type*} [Lattice ℒ]
 {S : Type*} [CompleteLattice S]

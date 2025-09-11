@@ -4,6 +4,35 @@ import HarderNarasimhan.Convexity.Defs
 namespace HarderNarasimhan
 
 namespace impl
+abbrev _Convex {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+{S : Type*} [CompleteLattice S]
+(μ : {p :ℒ × ℒ // p.1 < p.2} → S) := ConvexI TotIntvl μ
+
+@[simp]
+lemma Convex_iff {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+{S : Type*} [CompleteLattice S]
+(μ : {p :ℒ × ℒ // p.1 < p.2} → S) : _Convex μ ↔
+Convex μ := by
+  constructor
+  · intro h
+    refine {convex := ?_ }
+    exact fun x y hxy ↦ h.convex x y (in_TotIntvl _) (in_TotIntvl _) hxy
+  · intro h
+    refine { convex := ?_ }
+    exact fun x y a a h_4 ↦ Convex.convex x y h_4
+
+instance {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+{S : Type*} [CompleteLattice S] {μ : {p :ℒ × ℒ // p.1 < p.2} → S} [Convex μ]:
+_Convex μ := by
+  simp only [Convex_iff]
+  infer_instance
+
+instance {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+{S : Type*} [CompleteLattice S] {μ : {p :ℒ × ℒ // p.1 < p.2} → S} [_Convex μ]:
+Convex μ := by
+  simp only [← Convex_iff]
+  infer_instance
+
 
 section
 
