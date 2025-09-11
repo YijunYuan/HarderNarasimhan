@@ -35,9 +35,9 @@ lemma rmk4d10₁ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder
     simp only [ne_eq, Set.mem_setOf_eq, le_sInf_iff, forall_exists_index] at h
     refine (((fun (x : ℒ) (hx : ¬ ⊥ = x) ↦ h (μmin μ ⟨(⊥, x), bot_lt_iff_ne_bot.2 (by tauto)⟩) <| x) y <| ne_of_lt hy) ⟨in_TotIntvl y,ne_of_lt hy⟩ <| rfl) (μmax μ ⟨(x, ⊤), lt_top_iff_ne_top.2 hx⟩) x ⟨in_TotIntvl x, hx⟩ rfl
   · refine fun h ↦ sSup_le_iff.2 ?_
-    simp
+    simp only [ne_eq, Set.mem_setOf_eq, forall_exists_index]
     refine fun b x hx h' ↦ h' ▸ le_sInf_iff.2 ?_
-    simp
+    simp only [ne_eq, Set.mem_setOf_eq, forall_exists_index]
     exact fun _ x' _ h'' ↦ h'' ▸ h x' (by tauto) x _
 
 
@@ -259,7 +259,7 @@ NashEquilibrium μ → Semistable μ := by
     unfold μBstar μB
     congr 1; ext
     constructor
-    · simp
+    · simp only [ne_eq, Set.mem_setOf_eq, forall_exists_index]
       intro x hx hx'
       rw [← hx']
       use x, ⟨in_TotIntvl _,Ne.symm hx⟩
@@ -306,7 +306,7 @@ NashEquilibrium μ → Semistable μ := by
             use ⟨hb1,⟨bot_le,hb2.1.2⟩⟩, ⟨hb2.1,Subtype.coe_ne_coe.1 hb2.2⟩
             rw [← hb3]
             congr 1
-    · simp
+    · simp only [ne_eq, Set.mem_setOf_eq, forall_exists_index]
       intro x hx hx'
       rw [← hx']
       use x, Ne.symm hx.2

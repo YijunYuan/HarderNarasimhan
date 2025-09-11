@@ -45,7 +45,7 @@ instance {α : Type*} [PartialOrder α] (T : ClosureOperator (Set α)): Complete
   le_sSup 𝒮 A hA:= fun x hx ↦ ClosureOperator.monotone T (Set.subset_biUnion_of_mem hA) <| (ClosureOperator.IsClosed.closure_eq A.property).symm ▸ hx
   sSup_le 𝒮 A hA := by
     intro x hx
-    simp
+    simp only
     refine (ClosureOperator.IsClosed.closure_eq A.property) ▸ ClosureOperator.monotone T (fun y hy ↦ ?_) hx
     simp only [Set.mem_iUnion, exists_prop, Subtype.exists, exists_and_right] at hy
     exact Exists.casesOn hy fun S h ↦ And.casesOn h fun left hSb ↦ Exists.casesOn left fun hS hP ↦ hA ⟨S, hS⟩ hP hSb
@@ -118,7 +118,8 @@ def coe' {α : Type*} [PartialOrder α] : α ↪o DedekindMacNeilleCompletion α
     simp only [Subtype.mk.injEq] at hab
     exact le_antisymm (hab ▸ Set.right_mem_Iic).out (hab.symm ▸ Set.right_mem_Iic).out
   use ⟨fun x ↦ ⟨Set.Iic x, inj x⟩,this⟩
-  simp
+  simp only [Function.Embedding.coeFn_mk, Subtype.mk_le_mk, Set.le_eq_subset, Set.Iic_subset_Iic,
+    implies_true]
 
 
 instance {α : Type*} [PartialOrder α]: Coe α (DedekindMacNeilleCompletion α) := ⟨coe'.toFun⟩
@@ -147,7 +148,7 @@ theorem DedekindMacNeilleCompletion_minimality {α : Type*} [PartialOrder α] {�
         sSup_le_iff, g]
       exact fun y hy ↦ hy.out fun w hw ↦ le_sSup fun ⦃a⦄ a ↦ a w (h hw)
   refine ⟨⟨⟨g,fun x y h ↦ le_antisymm ((this x y).1 <| (le_antisymm_iff.1 h).1) ((this y x).1 <| (le_antisymm_iff.1 h).2)⟩,?_⟩,?_⟩
-  · simp
+  · simp only [Function.Embedding.coeFn_mk, Subtype.forall, Subtype.mk_le_mk, Set.le_eq_subset, g]
     exact fun x hx y hy ↦ this ⟨x, hx⟩ ⟨y, hy⟩
   · refine funext fun x ↦ ?_
     simp only [RelEmbedding.coe_mk, Function.Embedding.coeFn_mk, coe', Function.comp_apply, g]

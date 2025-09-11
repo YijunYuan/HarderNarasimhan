@@ -513,7 +513,6 @@ lemma rmk4d14₂ {R : Type*} [CommRing R] [IsNoetherianRing R]
       simp only [Set.mem_toFinset, Set.mem_setOf_eq] at this
       rcases this with ⟨p,⟨hp1,hp2⟩⟩
       rw [← hp2]
-      simp
       convert hp1
       refine LinearEquiv.AssociatedPrimes.eq <| LinearEquiv.symm ?_
       have t1 := Submodule.quotEquivOfEqBot (Submodule.submoduleOf (⊥: Submodule R M) (⊤: Submodule R M)) (id
@@ -725,7 +724,7 @@ N₁ ≤ lift_quot N₁ N₂ x ∧ lift_quot N₁ N₂ x ≤ N₂ := by
       Subtype.exists, exists_and_right, exists_eq_right]
     use hN hx
     convert Submodule.zero_mem x
-    simp
+    simp only [Submodule.Quotient.mk_eq_zero]
     exact hx
   · unfold lift_quot
     intro x' hx
@@ -745,7 +744,8 @@ lemma lift_quot_not_bot {R : Type*} [CommRing R] [IsNoetherianRing R]
   rcases (Quotient.exists_rep r) with ⟨rtilde,hrtilde⟩
   have : N₂.subtype rtilde ∈ N₁ := by
     rw [← hc]
-    simp
+    simp only [Submodule.subtype_apply, Submodule.mem_map, Submodule.mem_comap, Submodule.mkQ_apply,
+      SetLike.coe_eq_coe, exists_eq_right]
     convert hr
   rw [← hrtilde]
   apply (Submodule.Quotient.mk_eq_zero (N₁.submoduleOf N₂)).2

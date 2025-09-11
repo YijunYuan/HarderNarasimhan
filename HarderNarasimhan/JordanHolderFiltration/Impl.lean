@@ -63,7 +63,7 @@ lemma JHFil_prop₁ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
     · simp only [this]
       have this' := (hacc.wf.has_min _ this).choose_spec.1.2.2
       exact ((Or.resolve_left <| (Or.resolve_left <| (impl.prop4d6 μ).1 hμsl ⊥ (hacc.wf.has_min _ this).choose ⊤ ⟨(hacc.wf.has_min _ this).choose_spec.1.choose,(hacc.wf.has_min _ this).choose_spec.1.out.choose_spec.1⟩) (by aesop)) (by aesop)).2.symm
-    · simp only [this]; simp
+    · simp only [this, ↓reduceDIte]
   · intro hk'
     have jh_kp1_ntop : {p : ℒ | ∃ h : ⊥ < p, p < JHFil μ hμ hμsl hst hdc k ∧ μ ⟨(⊥,p),h⟩ = μ ⟨(⊥,⊤),bot_lt_top⟩}.Nonempty := by
       by_contra!
@@ -78,30 +78,41 @@ lemma JHFil_prop₁ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
     · have stupid : μ ⟨(⊥, (hacc.wf.has_min _ jh_kp2_ntop).choose), (hacc.wf.has_min _ jh_kp2_ntop).choose_spec.1.out.1⟩ = μ ⟨(⊥, JHFil μ hμ hμsl hst hdc (k + 1)), hk'⟩ := by
         rw [(hacc.wf.has_min _ jh_kp2_ntop).choose_spec.1.out.choose_spec.2,← bot_jh_kp1_eq_ans]
         simp only [JHFil,jh_kp1_ntop ]
-        simp
+        simp only [exists_and_left, Set.mem_setOf_eq, gt_iff_lt, and_imp, forall_exists_index,
+          ↓reduceDIte]
       have hfinal : μ ⟨(⊥, JHFil μ hμ hμsl hst hdc (k + 1)), hk'⟩ = μ ⟨((hacc.wf.has_min _ jh_kp2_ntop).choose, JHFil μ hμ hμsl hst hdc (k + 1)), (hacc.wf.has_min _ jh_kp2_ntop).choose_spec.1.out.choose_spec.1⟩ := by
         refine (Or.resolve_left ((Or.resolve_left <| (impl.prop4d6 μ).1 hμsl ⊥ (hacc.wf.has_min _ jh_kp2_ntop).choose (JHFil μ hμ hμsl hst hdc (k + 1)) ⟨(hacc.wf.has_min _ jh_kp2_ntop).choose_spec.1.out.choose,(hacc.wf.has_min _ jh_kp2_ntop).choose_spec.1.out.choose_spec.1⟩) (?_)) (?_)).2
         · apply not_and_iff_not_or_not.2
           refine Or.inl ?_
-          simp only [stupid]; simp only [JHFil,jh_kp1_ntop]; simp
+          simp only [stupid]; simp only [JHFil,jh_kp1_ntop]
+          simp only [↓reduceDIte,
+            exists_and_left, Set.mem_setOf_eq, gt_iff_lt, and_imp, forall_exists_index,
+            lt_self_iff_false, not_false_eq_true]
         · apply not_and_iff_not_or_not.2
           refine Or.inl ?_
-          simp only [stupid]; simp only [JHFil,jh_kp1_ntop]; simp
+          simp only [stupid]; simp only [JHFil,jh_kp1_ntop]
+          simp only [↓reduceDIte, exists_and_left, Set.mem_setOf_eq, gt_iff_lt, and_imp,
+            forall_exists_index, lt_self_iff_false, not_false_eq_true]
       conv_lhs =>
         arg 1; arg 1; arg 1
         unfold JHFil
-        simp only [jh_kp2_ntop]; simp
+        simp only [jh_kp2_ntop]
+        simp only [↓reduceDIte, exists_and_left, Set.mem_setOf_eq, gt_iff_lt, and_imp,
+          forall_exists_index]
       simp only [exists_and_left, Set.mem_setOf_eq, gt_iff_lt, and_imp,
         forall_exists_index] at hfinal
       rw [← hfinal]
-      simp only [JHFil,jh_kp1_ntop]; simp
+      simp only [JHFil,jh_kp1_ntop]
+      simp only [↓reduceDIte, exists_and_left, Set.mem_setOf_eq, gt_iff_lt, and_imp,
+        forall_exists_index]
       simp only [exists_and_left, Set.mem_setOf_eq, gt_iff_lt, and_imp,
         forall_exists_index] at bot_jh_kp1_eq_ans
       exact bot_jh_kp1_eq_ans
     · conv_lhs =>
         arg 1; arg 1; arg 1
         unfold JHFil
-        simp only [jh_kp2_ntop]; simp
+        simp only [jh_kp2_ntop]
+        simp only [↓reduceDIte]
       have this': μ ⟨(⊥, JHFil μ hμ hμsl hst hdc k), jh_kp1_ntop'⟩ = μ ⟨(⊥,⊤),bot_lt_top⟩ := by
         by_cases hh : k = 0
         · simp only [hh,JHFil]
@@ -113,7 +124,9 @@ lemma JHFil_prop₁ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
             rw [this] at jh_kp1_ntop'
             simp only [JHFil,hthis] at jh_kp1_ntop'; simp only [↓reduceDIte, gt_iff_lt,
               lt_self_iff_false] at jh_kp1_ntop'
-          simp only [JHFil,this]; simp
+          simp only [JHFil,this]
+          simp only [↓reduceDIte, exists_and_left, Set.mem_setOf_eq, gt_iff_lt, and_imp,
+            forall_exists_index]
           have := (hacc.wf.has_min _ this).choose_spec.1.out.choose_spec.2
           simp only [exists_and_left, Set.mem_setOf_eq, gt_iff_lt, and_imp,
             forall_exists_index] at this
@@ -124,7 +137,9 @@ lemma JHFil_prop₁ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
         exact (hacc.wf.has_min _ jh_kp1_ntop).choose_spec.1.out.choose_spec.1
       have this'' :  μ ⟨(⊥, JHFil μ hμ hμsl hst hdc (k + 1)), hk'⟩ = μ ⟨(JHFil μ hμ hμsl hst hdc (k + 1), JHFil μ hμ hμsl hst hdc k), this⟩ := by
         rw [hk jh_kp1_ntop',← bot_jh_kp1_eq_ans]
-        simp only [JHFil,jh_kp1_ntop]; simp
+        simp only [JHFil,jh_kp1_ntop]
+        simp only [↓reduceDIte, exists_and_left, Set.mem_setOf_eq, gt_iff_lt, and_imp,
+          forall_exists_index]
       exact ((Or.resolve_left <| (Or.resolve_left <| (impl.prop4d6 μ).1 hμsl ⊥ (JHFil μ hμ hμsl hst hdc (k + 1)) (JHFil μ hμ hμsl hst hdc k) ⟨hk',this⟩) (fun this_1 ↦ ne_of_lt (lt_trans this_1.left this_1.right) this'')) (fun this_1 ↦ ne_of_lt (gt_trans this_1.1 this_1.2) (Eq.symm this''))).1
 
 
@@ -188,7 +203,9 @@ lemma JHFil_prop₂ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
         simp only [this',JHFil,this] at hk
         simp only [Set.not_nonempty_empty, ↓reduceDIte, gt_iff_lt, lt_self_iff_false] at hk
       rw [← (hacc.wf.has_min _ hne).choose_spec.1.out.2.2] at this
-      simp only [JHFil,hne]; simp
+      simp only [JHFil,hne]
+      simp only [↓reduceDIte, exists_and_left, Set.mem_setOf_eq, gt_iff_lt, and_imp,
+        forall_exists_index]
       simp only [exists_and_left, Set.mem_setOf_eq, gt_iff_lt, and_imp, forall_exists_index] at this
       exact this
   · have h''' : μ ⟨(⊥, z), lt_of_le_of_lt bot_le h'⟩ < μ ⟨(⊥, ⊤), bot_lt_top⟩ := by
@@ -245,7 +262,8 @@ lemma function_wrapper_prop0 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [Bound
       exact ⟨j,h' ▸ hj⟩
     else
       use j+1
-      simp only [function_wrapper,hj ▸ h]; simp
+      simp only [function_wrapper,hj ▸ h]
+      simp only [↓reduceDIte]
       have hq := function_wrapper._proof_6 f atf j (Eq.mpr_not (eq_false (hj ▸ h)) (of_eq_false (Eq.refl False)))
       have : i + 1 = Nat.find hq := by
         apply eq_of_le_of_le
@@ -889,14 +907,15 @@ lemma looooooooooooooooog_lemma : ∀ n : ℕ, ∀ ℒ : Type*, ∀ _: Nontrivia
     have JHfun_antitone : Antitone JHfun := by
         intro n1 n2 hn
         by_cases h3 : n2 ≤ Nat.find JHx.fin_len - 1
-        · simp only [JHfun,le_trans hn h3,h3]; simp
+        · simp only [JHfun,le_trans hn h3,h3]
+          simp only [↓reduceDIte, JHfun]
           exact JHx.antitone hn
         · simp only [h3, ↓reduceDIte, bot_le, JHfun]
     have hhard : Nat.find JHfun_fin_len = Nat.find JHx.fin_len - 1 := by
       have hgreat : Nat.find JHfun_fin_len ≤ Nat.find JHx.fin_len - 1 := by
         refine Nat.find_min' JHfun_fin_len ?_
         unfold JHfun
-        simp
+        simp only [le_refl, ↓reduceDIte, JHfun]
         rfl
       refine eq_of_le_of_not_lt hgreat fun hv ↦ ?_
       have hweired : JHx.filtration (Nat.find JHfun_fin_len) = JHx.filtration (Nat.find JHx.fin_len - 1)  := by
@@ -920,7 +939,8 @@ lemma looooooooooooooooog_lemma : ∀ n : ℕ, ∀ ℒ : Type*, ∀ _: Nontrivia
         simp only [Resμ, JHfun]
         have hk1 := hhard ▸ hk1
         have hk1' : k1 + 1 ≤ Nat.find JHx.fin_len - 1 := hk1
-        simp only [hk1',le_of_lt hk1]; simp
+        simp only [hk1',le_of_lt hk1]
+        simp only [↓reduceDIte, JHfun]
         have := JHx.step_cond₁ k1 <| Nat.lt_of_lt_pred hk1
         simp only [JHfun] at this
         have this' := JHx.step_cond₁ (Nat.find JHx.fin_len - 1) (Nat.sub_one_lt <| JH_pos_len JHx)

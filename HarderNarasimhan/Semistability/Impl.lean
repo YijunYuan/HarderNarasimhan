@@ -452,7 +452,7 @@ theorem semistableI_iff {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrd
             use ⟨b,⟨le_trans ha1.1.1 hb1.1.1,le_trans hb1.1.2 y.prop.2⟩⟩, ⟨hb1.1,Subtype.coe_ne_coe.1 hb1.2⟩
           · rintro ⟨b,⟨hb1,hb2⟩⟩
             rw [← hb2]
-            simp
+            simp only [Set.mem_setOf_eq]
             use b.val, ⟨hb1.1,Subtype.coe_ne_coe.2 hb1.2⟩
         · rintro ⟨a,⟨ha1,ha2⟩⟩
           rw [← ha2]
