@@ -377,7 +377,7 @@ theorem semistable_iff {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrde
   · exact fun h ↦ {semistable := fun y hyI hy ↦ (h.choose_spec y (in_TotIntvl _) (Ne.symm hyI)) hy}
 
 
-lemma stupid_helper {α : Type*} {a b c d: α} (h : a = b) (h' : b = c) (h'' : c = d) : a = d := h ▸ h' ▸ h''
+lemma smart_helper {α : Type*} {a b c d: α} (h : a = b) (h' : b = c) (h'' : c = d) : a = d := h ▸ h' ▸ h''
 
 
 theorem semistableI_iff {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
@@ -399,9 +399,9 @@ theorem semistableI_iff {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrd
     · simp only [S₁I, ne_eq, Prod.mk.eta, Subtype.coe_eta, gt_iff_lt] at *
       intro y hyI hy
       have := h3 y hyI (Subtype.coe_ne_coe.2 hy)
-      by_contra fuck
+      by_contra fine
       refine this ?_
-      refine lt_of_eq_of_lt ?_ (lt_of_lt_of_eq fuck ?_)
+      refine lt_of_eq_of_lt ?_ (lt_of_lt_of_eq fine ?_)
       · simp only [μA, ne_eq]
         congr 1
         ext

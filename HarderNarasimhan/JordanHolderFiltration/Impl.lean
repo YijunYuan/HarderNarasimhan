@@ -75,7 +75,7 @@ lemma JHFil_prop₁ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
       exact (hacc.wf.has_min _ jh_kp1_ntop).choose_spec.1.out.choose_spec.1
     have bot_jh_kp1_eq_ans := (hacc.wf.has_min _ jh_kp1_ntop).choose_spec.1.2.2
     by_cases jh_kp2_ntop : {p : ℒ | ∃ h : ⊥ < p, p < JHFil μ hμ hμsl hst hdc (k + 1) ∧ μ ⟨(⊥,p),h⟩ = μ ⟨(⊥,⊤),bot_lt_top⟩}.Nonempty
-    · have stupid : μ ⟨(⊥, (hacc.wf.has_min _ jh_kp2_ntop).choose), (hacc.wf.has_min _ jh_kp2_ntop).choose_spec.1.out.1⟩ = μ ⟨(⊥, JHFil μ hμ hμsl hst hdc (k + 1)), hk'⟩ := by
+    · have smart : μ ⟨(⊥, (hacc.wf.has_min _ jh_kp2_ntop).choose), (hacc.wf.has_min _ jh_kp2_ntop).choose_spec.1.out.1⟩ = μ ⟨(⊥, JHFil μ hμ hμsl hst hdc (k + 1)), hk'⟩ := by
         rw [(hacc.wf.has_min _ jh_kp2_ntop).choose_spec.1.out.choose_spec.2,← bot_jh_kp1_eq_ans]
         simp only [JHFil,jh_kp1_ntop ]
         simp only [exists_and_left, Set.mem_setOf_eq, gt_iff_lt, and_imp, forall_exists_index,
@@ -84,13 +84,13 @@ lemma JHFil_prop₁ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
         refine (Or.resolve_left ((Or.resolve_left <| (impl.prop4d6 μ).1 hμsl ⊥ (hacc.wf.has_min _ jh_kp2_ntop).choose (JHFil μ hμ hμsl hst hdc (k + 1)) ⟨(hacc.wf.has_min _ jh_kp2_ntop).choose_spec.1.out.choose,(hacc.wf.has_min _ jh_kp2_ntop).choose_spec.1.out.choose_spec.1⟩) (?_)) (?_)).2
         · apply not_and_iff_not_or_not.2
           refine Or.inl ?_
-          simp only [stupid]; simp only [JHFil,jh_kp1_ntop]
+          simp only [smart]; simp only [JHFil,jh_kp1_ntop]
           simp only [↓reduceDIte,
             exists_and_left, Set.mem_setOf_eq, gt_iff_lt, and_imp, forall_exists_index,
             lt_self_iff_false, not_false_eq_true]
         · apply not_and_iff_not_or_not.2
           refine Or.inl ?_
-          simp only [stupid]; simp only [JHFil,jh_kp1_ntop]
+          simp only [smart]; simp only [JHFil,jh_kp1_ntop]
           simp only [↓reduceDIte, exists_and_left, Set.mem_setOf_eq, gt_iff_lt, and_imp,
             forall_exists_index, lt_self_iff_false, not_false_eq_true]
       conv_lhs =>

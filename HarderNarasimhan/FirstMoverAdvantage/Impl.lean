@@ -98,16 +98,16 @@ instance {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
   coe f := fun p ↦ f p
 
 
-lemma fuck {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ] {S : Type*} [CompleteLattice S] (μ : {p :ℒ × ℒ // p.1 < p.2} → S) : ∀ I : {p :ℒᵒᵈ × ℒᵒᵈ // p.1 < p.2}, μ ⟨(I.val.2.ofDual,I.val.1.ofDual),I.prop⟩ = OrderDual.ofDual ((↑μ : {p :ℒᵒᵈ × ℒᵒᵈ // p.1 < p.2} → Sᵒᵈ) I) := fun _ ↦ rfl
+lemma fine {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ] {S : Type*} [CompleteLattice S] (μ : {p :ℒ × ℒ // p.1 < p.2} → S) : ∀ I : {p :ℒᵒᵈ × ℒᵒᵈ // p.1 < p.2}, μ ⟨(I.val.2.ofDual,I.val.1.ofDual),I.prop⟩ = OrderDual.ofDual ((↑μ : {p :ℒᵒᵈ × ℒᵒᵈ // p.1 < p.2} → Sᵒᵈ) I) := fun _ ↦ rfl
 
 
 lemma h₁_dual_of_h₁ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ] {S : Type*} [CompleteLattice S] {μ : {p :ℒ × ℒ // p.1 < p.2} → S} (h₁ : ∀ x : ℕ → ℒ, (saf : StrictAnti x) → ∃ N : ℕ, μ ⟨(⊥ , x N), lt_of_le_of_lt bot_le <| saf <| Nat.lt_add_one N⟩ ≤ μ ⟨(x (N+1), x N), saf <| Nat.lt_add_one N⟩) :
 (∀ x : ℕ → ℒᵒᵈ, (smf : StrictMono x) → ∃ N : ℕ, @LE.le Sᵒᵈ (OrderDual.instLE S) ((↑μ : {p :ℒᵒᵈ × ℒᵒᵈ // p.1 < p.2} → Sᵒᵈ) ⟨(x N, x (N+1)), smf <| Nat.lt_add_one N⟩)  ((↑μ : {p :ℒᵒᵈ × ℒᵒᵈ // p.1 < p.2} → Sᵒᵈ) ⟨(x N,⊤), lt_of_lt_of_le (smf <| Nat.lt_add_one N) le_top⟩)) := by
   intro xd smf
   rcases (h₁ (fun n ↦ (xd n).ofDual) fun _ _ hab ↦ smf hab) with ⟨N, hN⟩
-  have := fuck μ ⟨(xd N, ⊤), lt_of_lt_of_le (smf (Nat.lt_add_one N)) le_top⟩
+  have := fine μ ⟨(xd N, ⊤), lt_of_lt_of_le (smf (Nat.lt_add_one N)) le_top⟩
   simp only [OrderDual.ofDual_top] at this
-  rw [this,fuck μ ⟨(xd N, xd (N + 1)), smf (Nat.lt_add_one N)⟩] at hN
+  rw [this,fine μ ⟨(xd N, xd (N + 1)), smf (Nat.lt_add_one N)⟩] at hN
   use N, OrderDual.ofDual_le_ofDual.1 hN
 
 

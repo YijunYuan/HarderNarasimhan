@@ -263,7 +263,7 @@ NashEquilibrium μ → Semistable μ := by
       intro x hx hx'
       rw [← hx']
       use x, ⟨in_TotIntvl _,Ne.symm hx⟩
-      refine impl.stupid_helper ?_ (Eq.symm <| impl.prop4d1₁ (Interval ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx⟩) S (Resμ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx⟩ μ) (h₁ x hx).wacc (h₂ x hx).wsl₁) ?_
+      refine impl.smart_helper ?_ (Eq.symm <| impl.prop4d1₁ (Interval ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx⟩) S (Resμ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx⟩ μ) (h₁ x hx).wacc (h₂ x hx).wsl₁) ?_
       · simp only [μmin, ne_eq]
         congr 1; ext
         constructor
@@ -310,7 +310,7 @@ NashEquilibrium μ → Semistable μ := by
       intro x hx hx'
       rw [← hx']
       use x, Ne.symm hx.2
-      refine impl.stupid_helper ?_ (impl.prop4d1₁ (Interval ⟨(⊥,x),bot_lt_iff_ne_bot.2 <| Ne.symm hx.2⟩) S (Resμ ⟨(⊥,x),bot_lt_iff_ne_bot.2 <| Ne.symm hx.2⟩ μ) (h₁ x <| Ne.symm hx.2).wacc (h₂ x <| Ne.symm hx.2).wsl₁) ?_
+      refine impl.smart_helper ?_ (impl.prop4d1₁ (Interval ⟨(⊥,x),bot_lt_iff_ne_bot.2 <| Ne.symm hx.2⟩) S (Resμ ⟨(⊥,x),bot_lt_iff_ne_bot.2 <| Ne.symm hx.2⟩ μ) (h₁ x <| Ne.symm hx.2).wacc (h₂ x <| Ne.symm hx.2).wsl₁) ?_
       · simp only [μA, ne_eq, μAstar]
         congr 1; ext
         constructor
