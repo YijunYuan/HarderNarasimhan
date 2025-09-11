@@ -71,7 +71,7 @@ instance {α : Type*} [LinearOrder α] : IsTotal (DedekindMacNeilleCompletion α
   simp only [Subtype.mk_le_mk, Set.le_eq_subset]
   apply or_iff_not_imp_left.2
   intro h1
-  rcases Set.not_subset_iff_exists_mem_not_mem.1 h1 with ⟨a₀,ha₀⟩
+  rcases Set.not_subset_iff_exists_mem_notMem.1 h1 with ⟨a₀,ha₀⟩
   intro b hb
   rw [← hB] at hb
   simp only [GaloisConnection.lowerAdjoint_toFun, OrderDual.ofDual_toDual] at hb

@@ -184,7 +184,7 @@ lemma JHFil_prop₂ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
       simp only [exists_and_left, Set.mem_setOf_eq, gt_iff_lt, and_imp, forall_exists_index] at this
       exact (ne_of_lt this) hfp1bot.symm
     apply Set.not_nonempty_iff_eq_empty.1 at this
-    apply Set.eq_empty_iff_forall_not_mem.1 at this
+    apply Set.eq_empty_iff_forall_notMem.1 at this
     have := this z
     simp only [exists_and_left, Set.mem_setOf_eq, not_and, not_exists] at this
     have := lt_of_le_of_ne this_q <| this h'' (lt_of_le_of_lt bot_le h')
