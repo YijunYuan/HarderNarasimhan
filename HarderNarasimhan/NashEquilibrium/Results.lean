@@ -144,17 +144,16 @@ NashEquilibrium μ → Semistable μ
 := impl.prop4d20 μ h₁ h₂
 
 
-theorem theorem_4_21 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+theorem NashEquil_equiv {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLinearOrder S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : SlopeLike μ)
-(h₁ : WeakAscendingChainCondition μ) (h₂ : StrongDescendingChainCondition μ) :
+(μ : {p :ℒ × ℒ // p.1 < p.2} → S) [hμ : SlopeLike μ]
+[h₁ : WeakAscendingChainCondition μ] [h₂ : StrongDescendingChainCondition μ] :
 ------------
 List.TFAE [
   μmax μ TotIntvl = μ TotIntvl,
   μmin μ TotIntvl = μ TotIntvl,
   μmin μ TotIntvl = μmax μ TotIntvl,
-  NashEquilibrium μ--,
-  --Semistable μ
+  NashEquilibrium μ
   ]
 ∧ (
   Semistable μ → NashEquilibrium μ
