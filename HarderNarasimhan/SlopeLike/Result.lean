@@ -18,7 +18,7 @@ SlopeLike μ ↔
 := impl.prop4d6 μ
 
 
-lemma proposition_4_8 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
+theorem SlopeLike_of_μQuotient {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {V : Type*} [TotallyOrderedRealVectorSpace V] [Nontrivial V]
 (r : {p :ℒ × ℒ // p.1 < p.2} → NNReal)
 (d : {p :ℒ × ℒ // p.1 < p.2} → V)

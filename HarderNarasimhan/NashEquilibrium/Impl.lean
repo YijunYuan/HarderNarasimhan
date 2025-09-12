@@ -363,26 +363,6 @@ NashEquilibrium μ → Semistable μ := by
   exact {semistable := fun x hx ↦ LE.le.not_lt <| this x hx}
 
 
-instance {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
-{S : Type*} [CompleteLinearOrder S]
-{μ : {p :ℒ × ℒ // p.1 < p.2} → S} [hμ : SlopeLike μ]:
-WeakSlopeLike₁ μ := by
-  refine { wsl₁ := fun z hz ↦ ?_ }
-  cases' (hμ.slopelike z.val.1 z.val.2 ⊤ ⟨z.prop,hz⟩).1 with this this
-  · exact Or.inl this
-  · exact Or.inr <| le_of_lt this
-
-
-instance {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
-{S : Type*} [CompleteLinearOrder S]
-{μ : {p :ℒ × ℒ // p.1 < p.2} → S} [hμ : SlopeLike μ]:
-WeakSlopeLike₂ μ := by
-  refine { wsl₂ := fun z hz ↦ ?_ }
-  cases' (hμ.slopelike ⊥ z.val.1 z.val.2 ⟨hz,z.prop⟩).2.2.1 with this this
-  · exact Or.inr <| le_of_lt this
-  · exact Or.inl this
-
-
 theorem thm4d21 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLinearOrder S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : SlopeLike μ)
