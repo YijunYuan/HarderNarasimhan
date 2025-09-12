@@ -14,7 +14,7 @@ class μ_Admissible {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
 structure HarderNarasimhanFiltration
 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S) [hμ : μA_DescendingChainCondition μ] [hμcvx : Convex μ] [h : μ_Admissible μ] where
+(μ : {p :ℒ × ℒ // p.1 < p.2} → S) where
   filtration           : ℕ → ℒ
   monotone             : Monotone filtration
   first_eq_bot         : filtration 0 = ⊥
