@@ -99,7 +99,7 @@ open Classical
 @[ext]
 structure CoprimaryFiltration (R : Type*) [CommRing R] [IsNoetherianRing R]
 (M : Type*) [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] where
-  filtration          : ℕ → (ℒ R M)
+  filtration          : ℕ → Submodule R M
   monotone            : Monotone filtration
   first_eq_bot        : filtration 0 = ⊥
   fin_len             : ∃ n : ℕ, filtration n = ⊤
@@ -116,12 +116,11 @@ structure CoprimaryFiltration (R : Type*) [CommRing R] [IsNoetherianRing R]
         ({
           asIdeal := (piecewise_coprimary (n+1) hn).coprimary.exists.choose,
           isPrime := (piecewise_coprimary (n+1) hn).coprimary.exists.choose_spec.out.1
-          } : LinearExtension (PrimeSpectrum R))
-        --<
+          })
         ({
           asIdeal := (piecewise_coprimary n (Nat.lt_of_succ_lt hn)).coprimary.exists.choose,
           isPrime := (piecewise_coprimary n (Nat.lt_of_succ_lt hn)).coprimary.exists.choose_spec.out.1
-          } : LinearExtension (PrimeSpectrum R))
+          })
 
 
 end HarderNarasimhan

@@ -6,26 +6,27 @@ open Classical
 
 namespace HarderNarasimhan
 
-noncomputable instance {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
+noncomputable instance instInhabitedHarderNarasimhanFiltration
+{ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLattice S]
 {μ : {p :ℒ × ℒ // p.1 < p.2} → S} [hμ : μA_DescendingChainCondition μ] [hμcvx : Convex μ] [h : μ_Admissible μ] :
 ------------
-Inhabited (HarderNarasimhanFiltration μ)
+Inhabited (HarderNarasimhanFiltration μ) where
 ------------
-:= { default :=
-    { filtration           := impl.HNFil μ,
-      first_eq_bot         := of_eq_true (eq_self ⊥),
-      fin_len              := impl.HNFil_of_fin_len μ,
-      strict_mono          := impl.HNFil_is_strict_mono' μ,
-      piecewise_semistable := impl.HNFil_piecewise_semistable μ,
-      μA_pseudo_strict_anti:= impl.HNFil_μA_pseudo_strict_anti μ,
-      monotone             := by
-        have : ∀ n : ℕ, impl.HNlen μ ≤ n → impl.HNFil μ n = ⊤ := Nat.le_induction (Nat.find_spec (impl.HNFil_of_fin_len μ)) (fun n hn hn' ↦ (by simp only [impl.HNFil,hn']; simp))
-        exact fun i j hij ↦ if h : i = j then (by rw [h]) else (if h' : j ≤ impl.HNlen μ then (le_of_lt <| impl.HNFil_is_strict_mono' μ i j (lt_of_le_of_ne hij h) h') else ((this) j <| le_of_lt <| lt_of_not_le h') ▸ le_top)
-         } }
+default :=
+  { filtration           := impl.HNFil μ,
+    first_eq_bot         := of_eq_true (eq_self ⊥),
+    fin_len              := impl.HNFil_of_fin_len μ,
+    strict_mono          := impl.HNFil_is_strict_mono' μ,
+    piecewise_semistable := impl.HNFil_piecewise_semistable μ,
+    μA_pseudo_strict_anti:= impl.HNFil_μA_pseudo_strict_anti μ,
+    monotone             := by
+      have : ∀ n : ℕ, impl.HNlen μ ≤ n → impl.HNFil μ n = ⊤ := Nat.le_induction (Nat.find_spec (impl.HNFil_of_fin_len μ)) (fun n hn hn' ↦ (by simp only [impl.HNFil,hn']; simp))
+      exact fun i j hij ↦ if h : i = j then (by rw [h]) else (if h' : j ≤ impl.HNlen μ then (le_of_lt <| impl.HNFil_is_strict_mono' μ i j (lt_of_le_of_ne hij h) h') else ((this) j <| le_of_lt <| lt_of_not_le h') ▸ le_top)
+  }
 
 
-instance {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
+instance instNonemptyHarderNarasimhanFiltration {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLattice S]
 {μ : {p :ℒ × ℒ // p.1 < p.2} → S} [hμ : μA_DescendingChainCondition μ] [hμcvx : Convex μ] [h : μ_Admissible μ] :
 ------------
