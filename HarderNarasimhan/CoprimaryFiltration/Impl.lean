@@ -224,20 +224,20 @@ lemma prop3d12p2 {R : Type*} [CommRing R] [IsNoetherianRing R]
 {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]
 (I : {z: (ℒ R M) × (ℒ R M) // z.1 < z.2})
 (N'' : ℒ R M) (ha1 : InIntvl I N'') (ha2 : N'' ≠ I.val.2) : @LE.le (S₀ R) Preorder.toLE {(_μ R M I).toFinset.min' <| μ_nonempty I} (_μ R M ⟨(N'', I.val.2), lt_of_le_of_ne ha1.2 ha2⟩).toFinset   := by
-  have : @LE.le (S₀ R) Preorder.toLE {(_μ R M I).toFinset.min' <| μ_nonempty I} {(_μ R M ⟨(N'', I.val.2), lt_of_le_of_ne ha1.2 ha2⟩).toFinset.min' <| μ_nonempty ⟨(N'', I.val.2), lt_of_le_of_ne ha1.2 ha2⟩} := by
+  have : @LE.le (S₀ R) Preorder.toLE {(_μ R M I).toFinset.min' <| μ_nonempty I} {(_μ R M ⟨(N'', I.val.2), lt_of_le_of_ne ha1.2 ha2⟩).toFinset.min' <| μ_nonempty _} := by
     rw [← S₀_order.2]
-    have this' : ((_μ R M ⟨(N'', I.val.2), lt_of_le_of_ne ha1.2 ha2⟩).toFinset.min' <| μ_nonempty ⟨(N'', I.val.2), lt_of_le_of_ne ha1.2 ha2⟩).asIdeal ∈ associatedPrimes R (↥I.val.2 ⧸ Submodule.submoduleOf N'' I.val.2) := by
+    have this' : ((_μ R M ⟨(N'', I.val.2), lt_of_le_of_ne ha1.2 ha2⟩).toFinset.min' <| μ_nonempty _).asIdeal ∈ associatedPrimes R (↥I.val.2 ⧸ Submodule.submoduleOf N'' I.val.2) := by
       simp only [Set.mem_setOf_eq]
-      have := ((_μ R M ⟨(N'', I.val.2), lt_of_le_of_ne ha1.2 ha2⟩).toFinset.min'_mem <| μ_nonempty ⟨(N'', I.val.2), lt_of_le_of_ne ha1.2 ha2⟩).out
+      have := ((_μ R M ⟨(N'', I.val.2), lt_of_le_of_ne ha1.2 ha2⟩).toFinset.min'_mem <| μ_nonempty _).out
       simp only [Finset.mem_val, Set.mem_toFinset, Set.mem_setOf_eq] at this
       rcases this with ⟨p,⟨hp1,hp2⟩⟩
       rw [← hp2]
       exact hp1
-    exact prop3d12p1 I N'' ha1 (((_μ R M ⟨(N'', I.val.2), lt_of_le_of_ne ha1.2 ha2⟩).toFinset.min' <| μ_nonempty ⟨(N'', I.val.2), lt_of_le_of_ne ha1.2 ha2⟩).asIdeal) this'
+    exact prop3d12p1 I N'' ha1 (((_μ R M ⟨(N'', I.val.2), lt_of_le_of_ne ha1.2 ha2⟩).toFinset.min' <| μ_nonempty _).asIdeal) this'
   refine le_trans this ?_
   apply S₀_order.1
   simp only [Set.subset_toFinset, Finset.coe_singleton, Set.singleton_subset_iff]
-  exact Set.mem_toFinset.mp <| (_μ R M ⟨(N'', I.val.2), lt_of_le_of_ne ha1.2 ha2⟩).toFinset.min'_mem <| μ_nonempty ⟨(N'', I.val.2), lt_of_le_of_ne ha1.2 ha2⟩
+  exact Set.mem_toFinset.mp <| (_μ R M ⟨(N'', I.val.2), lt_of_le_of_ne ha1.2 ha2⟩).toFinset.min'_mem <| μ_nonempty _
 
 noncomputable abbrev f1 {R : Type*} [CommRing R] [IsNoetherianRing R]
 {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]
@@ -441,9 +441,9 @@ instance prop3d13₂ {R : Type*} [CommRing R] [IsNoetherianRing R]
 
       simpa only [OrderEmbedding.lt_iff_lt] using (hc w)
       )
-    have s1 : ∀ i, ((_μ R M ⟨(N, x i), hx1 i⟩).toFinset.min' <| μ_nonempty ⟨(N, x i), hx1 i⟩).asIdeal ∈ associatedPrimes R ((x i)⧸(Submodule.submoduleOf N (x i))) := by
+    have s1 : ∀ i, ((_μ R M ⟨(N, x i), hx1 i⟩).toFinset.min' <| μ_nonempty _).asIdeal ∈ associatedPrimes R ((x i)⧸(Submodule.submoduleOf N (x i))) := by
       intro i
-      have := (_μ R M ⟨(N, x i), hx1 i⟩).toFinset.min'_mem (μ_nonempty ⟨(N, x i), hx1 i⟩)
+      have := (_μ R M ⟨(N, x i), hx1 i⟩).toFinset.min'_mem (μ_nonempty _)
       simp only [Set.mem_toFinset, Set.mem_setOf_eq] at this
       rcases this with ⟨p,⟨hp1,hp2⟩⟩
       rw [← hp2]
@@ -471,15 +471,15 @@ instance prop3d13₂ {R : Type*} [CommRing R] [IsNoetherianRing R]
             fun A B h ↦ id (PrimeSpectrum.ext (Ideal.ext fun t ↦ Eq.to_iff (congrFun (congrArg Membership.mem h) t)))
       cases' ne_iff_lt_or_gt.1 this with this this
       · have := strictMono_nat_of_lt_succ hc this
-        rw [help ((_μ R M ⟨(N, x a), hx1 a⟩).toFinset.min' (μ_nonempty ⟨(N, x a), hx1 a⟩)) ((_μ R M ⟨(N, x b), hx1 b⟩).toFinset.min' (μ_nonempty ⟨(N, x b), hx1 b⟩)) hab] at this
+        rw [help ((_μ R M ⟨(N, x a), hx1 a⟩).toFinset.min' (μ_nonempty _)) ((_μ R M ⟨(N, x b), hx1 b⟩).toFinset.min' (μ_nonempty _)) hab] at this
         exact (lt_self_iff_false _).1 this
       · have := strictMono_nat_of_lt_succ hc this
-        rw [help ((_μ R M ⟨(N, x a), hx1 a⟩).toFinset.min' (μ_nonempty ⟨(N, x a), hx1 a⟩)) ((_μ R M ⟨(N, x b), hx1 b⟩).toFinset.min' (μ_nonempty ⟨(N, x b), hx1 b⟩)) hab] at this
+        rw [help ((_μ R M ⟨(N, x a), hx1 a⟩).toFinset.min' (μ_nonempty _)) ((_μ R M ⟨(N, x b), hx1 b⟩).toFinset.min' (μ_nonempty _)) hab] at this
         exact (lt_self_iff_false _).1 this
     exact this <| associatedPrimes.finite R ((↥(x 0) ⧸ Submodule.submoduleOf N (x 0)))
 
 lemma rmk4d14₁ {R : Type*} [CommRing R] [IsNoetherianRing R]
-{M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] : Semistable (μ R M) ↔ ∀ N : (ℒ R M), (hN : ⊥ < N) → μA (μ R M) ⟨(⊥,N),hN⟩ = ({(((_μ R M) ⟨(⊥,⊤),bot_lt_top⟩).toFinset.min' (μ_nonempty ⟨(⊥,⊤),bot_lt_top⟩))} : S₀ R) := by
+{M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] : Semistable (μ R M) ↔ ∀ N : (ℒ R M), (hN : ⊥ < N) → μA (μ R M) ⟨(⊥,N),hN⟩ = ({(((_μ R M) ⟨(⊥,⊤),bot_lt_top⟩).toFinset.min' (μ_nonempty _))} : S₀ R) := by
   constructor
   · intro hst
     intro N hN
@@ -492,7 +492,7 @@ lemma rmk4d14₁ {R : Type*} [CommRing R] [IsNoetherianRing R]
     simp only [Function.Embedding.toFun_eq_coe, RelEmbedding.coe_toEmbedding, gt_iff_lt,
       OrderEmbedding.lt_iff_lt, not_lt] at hst
     apply (S₀_order.2 _ _).2 at hst
-    exact eq_of_le_of_le hst <| Finset.min'_subset (μ_nonempty ⟨(⊥, N), hN⟩) <| Set.toFinset_subset_toFinset.mpr <| assinc hN fun ⦃x⦄ a ↦ by trivial
+    exact eq_of_le_of_le hst <| Finset.min'_subset (μ_nonempty _) <| Set.toFinset_subset_toFinset.mpr <| assinc hN fun ⦃x⦄ a ↦ by trivial
   · intro h
     refine { semistable := ?_ }
     intro N hN
@@ -515,10 +515,10 @@ lemma rmk4d14₂ {R : Type*} [CommRing R] [IsNoetherianRing R]
   constructor
   · intro h
     have := prop3d12 (⟨((⊥ : ℒ R M), ⊤), bot_lt_top⟩)
-    use ((_μ R M ⟨(⊥, ⊤), bot_lt_top⟩).toFinset.min' <| μ_nonempty ⟨(⊥, ⊤), bot_lt_top⟩).asIdeal
+    use ((_μ R M ⟨(⊥, ⊤), bot_lt_top⟩).toFinset.min' <| μ_nonempty _).asIdeal
     constructor
     · simp only
-      have := (_μ R M ⟨(⊥, ⊤), bot_lt_top⟩).toFinset.min'_mem <| μ_nonempty ⟨(⊥, ⊤), bot_lt_top⟩
+      have := (_μ R M ⟨(⊥, ⊤), bot_lt_top⟩).toFinset.min'_mem <| μ_nonempty _
       simp only [Set.mem_toFinset, Set.mem_setOf_eq] at this
       rcases this with ⟨p,⟨hp1,hp2⟩⟩
       rw [← hp2]
@@ -676,10 +676,10 @@ lemma rmk4d14₂ {R : Type*} [CommRing R] [IsNoetherianRing R]
     simp only [Function.Embedding.toFun_eq_coe, RelEmbedding.coe_toEmbedding,
       EmbeddingLike.apply_eq_iff_eq, Finset.singleton_inj]
     have := assinc hN le_top
-    have : (_μ R M ⟨(⊥, N), hN⟩).toFinset.min' (μ_nonempty ⟨(⊥, N), hN⟩) ∈ _μ R M ⟨(⊥, ⊤), bot_lt_top⟩ := by
+    have : (_μ R M ⟨(⊥, N), hN⟩).toFinset.min' (μ_nonempty _) ∈ _μ R M ⟨(⊥, ⊤), bot_lt_top⟩ := by
       refine this ?_
       simp only [Set.mem_setOf_eq]
-      have := (_μ R M ⟨(⊥, N), hN⟩).toFinset.min'_mem (μ_nonempty ⟨(⊥, N), hN⟩)
+      have := (_μ R M ⟨(⊥, N), hN⟩).toFinset.min'_mem (μ_nonempty _)
       simp only [Set.mem_toFinset, Set.mem_setOf_eq] at this
       rcases this with ⟨t1,_⟩
       use t1
@@ -692,8 +692,8 @@ lemma rmk4d14₂ {R : Type*} [CommRing R] [IsNoetherianRing R]
         (of_eq_true (Eq.trans (congrArg (fun x ↦ x = ⊥) (Submodule.ker_subtype ⊤)) (eq_self ⊥)))
         )
       exact LinearEquiv.trans t1 Submodule.topEquiv
-    have hp1' : ((_μ R M ⟨(⊥, ⊤), bot_lt_top⟩).toFinset.min' (μ_nonempty ⟨(⊥, ⊤), bot_lt_top⟩)).asIdeal ∈ associatedPrimes R M := by
-      have := (_μ R M ⟨(⊥, ⊤), bot_lt_top⟩).toFinset.min'_mem (μ_nonempty ⟨(⊥, ⊤), bot_lt_top⟩)
+    have hp1' : ((_μ R M ⟨(⊥, ⊤), bot_lt_top⟩).toFinset.min' (μ_nonempty _)).asIdeal ∈ associatedPrimes R M := by
+      have := (_μ R M ⟨(⊥, ⊤), bot_lt_top⟩).toFinset.min'_mem (μ_nonempty _)
       simp only [Set.mem_toFinset, Set.mem_setOf_eq] at this
       rcases this with ⟨p,⟨hp1,hp2⟩⟩
       rw [← hp2]
@@ -1263,21 +1263,14 @@ Inhabited (CoprimaryFiltration R M) := by
   apply S₀_order'.2 at this
   have pcn := (piecewise_coprimary HNFil n <| Nat.lt_of_succ_lt hn).coprimary
   have pcnp1 := (piecewise_coprimary HNFil (n+1) hn).coprimary
-  have t' : (_μ R M ⟨(HNFil.filtration (n + 1), HNFil.filtration (n + 2)), HNFil.strict_mono (n+1) (n+2) (Nat.lt_add_one (n + 1)) hn⟩).toFinset.min' (μ_nonempty
-      ⟨(HNFil.filtration (n + 1), HNFil.filtration (n + 2)),
-        HNFil.strict_mono (n + 1) (n + 2) (Nat.lt_add_one (n + 1)) hn⟩) = {asIdeal := pcnp1.exists.choose, isPrime := pcnp1.exists.choose_spec.out.1} := by
-    have := ((_μ R M ⟨(HNFil.filtration (n + 1), HNFil.filtration (n + 2)), HNFil.strict_mono (n+1) (n+2) (Nat.lt_add_one (n + 1)) hn⟩).toFinset.min'_mem (μ_nonempty
-      ⟨(HNFil.filtration (n + 1), HNFil.filtration (n + 2)),
-        HNFil.strict_mono (n + 1) (n + 2) (Nat.lt_add_one (n + 1)) hn⟩)).out
+  have t' : (_μ R M ⟨(HNFil.filtration (n + 1), HNFil.filtration (n + 2)), HNFil.strict_mono (n+1) (n+2) (Nat.lt_add_one (n + 1)) hn⟩).toFinset.min' (μ_nonempty _) = {asIdeal := pcnp1.exists.choose, isPrime := pcnp1.exists.choose_spec.out.1} := by
+    have := ((_μ R M ⟨(HNFil.filtration (n + 1), HNFil.filtration (n + 2)), HNFil.strict_mono (n+1) (n+2) (Nat.lt_add_one (n + 1)) hn⟩).toFinset.min'_mem (μ_nonempty _)).out
     apply Set.mem_toFinset.mp at this
     rcases this.out with ⟨p,hp1,hp2⟩
     rw [← hp2]
     simp only [pcnp1.unique pcnp1.exists.choose_spec hp1]
-  have t'' : (_μ R M ⟨(HNFil.filtration n, HNFil.filtration (n + 1)), HNFil.strict_mono n (n+1) (Nat.lt_add_one n) (Nat.le_of_succ_le hn)⟩).toFinset.min' (μ_nonempty ⟨(HNFil.filtration n, HNFil.filtration (n + 1)),
-        HNFil.strict_mono n (n + 1) (Nat.lt_add_one n) (Nat.le_of_succ_le hn)⟩) = {asIdeal := pcn.exists.choose, isPrime := pcn.exists.choose_spec.out.1} := by
-    have := ((_μ R M ⟨(HNFil.filtration n, HNFil.filtration (n + 1)), HNFil.strict_mono n (n+1) (Nat.lt_add_one n) <| le_of_lt hn⟩).toFinset.min'_mem (μ_nonempty
-      ⟨(HNFil.filtration n, HNFil.filtration (n + 1)),
-        HNFil.strict_mono n (n + 1) (Nat.lt_add_one n) <| le_of_lt hn⟩)).out
+  have t'' : (_μ R M ⟨(HNFil.filtration n, HNFil.filtration (n + 1)), HNFil.strict_mono n (n+1) (Nat.lt_add_one n) (Nat.le_of_succ_le hn)⟩).toFinset.min' (μ_nonempty _) = {asIdeal := pcn.exists.choose, isPrime := pcn.exists.choose_spec.out.1} := by
+    have := ((_μ R M ⟨(HNFil.filtration n, HNFil.filtration (n + 1)), HNFil.strict_mono n (n+1) (Nat.lt_add_one n) <| le_of_lt hn⟩).toFinset.min'_mem (μ_nonempty _)).out
     apply Set.mem_toFinset.mp at this
     rcases this.out with ⟨p,hp1,hp2⟩
     rw [← hp2]
@@ -1317,12 +1310,12 @@ lemma CP_HN {R : Type*} [CommRing R] [IsNoetherianRing R]
         apply S₀_order'.1
         have := a.strict_mono_associated_prime i hi
         convert this
-        · have := (_μ R M ⟨(a.filtration (i + 1), a.filtration (i + 2)), a.strict_mono (i+1) (i+2) (Nat.lt_add_one (i + 1)) hi⟩).toFinset.min'_mem (μ_nonempty ⟨(a.filtration (i + 1), a.filtration (i + 2)), a.strict_mono (i+1) (i+2) (Nat.lt_add_one (i + 1)) hi⟩)
+        · have := (_μ R M ⟨(a.filtration (i + 1), a.filtration (i + 2)), a.strict_mono (i+1) (i+2) (Nat.lt_add_one (i + 1)) hi⟩).toFinset.min'_mem (μ_nonempty _)
           apply Set.mem_toFinset.mp at this
           rcases this.out with ⟨p,hp1,hp2⟩
           rw [← hp2]
           simp only [(a.piecewise_coprimary (i+1) hi).coprimary.unique ((a.piecewise_coprimary (i+1) hi).coprimary.exists.choose_spec) hp1]
-        · have := (_μ R M ⟨(a.filtration i, a.filtration (i + 1)), a.strict_mono i (i+1) (Nat.lt_add_one i) (Nat.le_of_succ_le hi)⟩).toFinset.min'_mem (μ_nonempty ⟨(a.filtration i, a.filtration (i + 1)), a.strict_mono i (i+1) (Nat.lt_add_one i) (Nat.le_of_succ_le hi)⟩)
+        · have := (_μ R M ⟨(a.filtration i, a.filtration (i + 1)), a.strict_mono i (i+1) (Nat.lt_add_one i) (Nat.le_of_succ_le hi)⟩).toFinset.min'_mem (μ_nonempty _)
           apply Set.mem_toFinset.mp at this
           rcases this.out with ⟨p,hp1,hp2⟩
           rw [← hp2]

@@ -49,7 +49,7 @@ lemma remark_3_14 {R : Type*} [CommRing R] [IsNoetherianRing R]
 List.TFAE [
 Semistable (μ R M),
 ∀ N : (ℒ R M), (hN : ⊥ < N) →
-  μA (μ R M) ⟨(⊥,N),hN⟩ = ({(((_μ R M) ⟨(⊥,⊤),bot_lt_top⟩).toFinset.min' (μ_nonempty ⟨(⊥,⊤),bot_lt_top⟩))} : S₀ R),
+  μA (μ R M) ⟨(⊥,N),hN⟩ = ({(((_μ R M) ⟨(⊥,⊤),bot_lt_top⟩).toFinset.min' (μ_nonempty _))} : S₀ R),
 ∃! p, p ∈ associatedPrimes R M
 ]
 ------------

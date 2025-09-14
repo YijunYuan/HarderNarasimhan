@@ -6,7 +6,8 @@ import Mathlib.RingTheory.Support
 namespace HarderNarasimhan
 namespace AdmittedResults
 
--- `https://stacks.math.columbia.edu/tag/02CE`
+
+@[stacks 02CE]
 lemma min_associated_prime_iff_min_supp {R : Type*} [CommRing R] [IsNoetherianRing R]
 {M : Type*} [AddCommGroup M] [Module R M] [Module.Finite R M]
 {I : PrimeSpectrum R} :
