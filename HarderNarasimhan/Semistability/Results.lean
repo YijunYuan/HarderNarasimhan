@@ -13,7 +13,7 @@ lemma proposition_3_2 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder
   μA μ ⟨(a , x) , hax⟩ ≤ μA μ ⟨(a , z) , lt_trans hax h⟩
 ------------
   := by
-    rw [← impl.Convex_iff] at hμcvx
+    rw [← impl.ConvexI_TotIntvl_iff_Convex] at hμcvx
     exact impl.prop3d2 TotIntvl μ hμcvx x (in_TotIntvl x) z (in_TotIntvl z) h h' a (in_TotIntvl a) hax
 
 
@@ -28,7 +28,7 @@ lemma proposition_3_4 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder
   (St μ).Nonempty
 ------------
   := by
-    rw [← impl.Convex_iff] at hμcvx
+    rw [← impl.ConvexI_TotIntvl_iff_Convex] at hμcvx
     exact impl.prop3d4 μ hμDCC TotIntvl hμcvx
 
 
@@ -55,7 +55,7 @@ lemma proposition_3_7 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder
   ∀ y : ℒ, (hy : y > x) → ¬ μA μ ⟨(⊥ , x) , lt_of_le_of_ne hxSt.out.choose.1 hxSt.out.choose_spec.choose⟩ ≤ μA μ ⟨(x, y), hy⟩
 ------------
   := by
-    rw [← impl.Convex_iff] at hμcvx
+    rw [← impl.ConvexI_TotIntvl_iff_Convex] at hμcvx
     constructor
     · apply (semistableI_iff μ ⟨(⊥, x), lt_of_le_of_ne bot_le hxSt.out.choose_spec.choose⟩).1 <| impl.prop3d7₁ μ TotIntvl x hxSt
     · exact fun y hy ↦ impl.prop3d7₂ μ TotIntvl hμcvx x hxSt y (in_TotIntvl y) hy
@@ -76,7 +76,7 @@ lemma proposition_3_8 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder
   (∀ y : ℒ, (hxy : y > x) → μA μ ⟨(⊥ , y), lt_of_le_of_lt hxSt.out.choose.1 hxy⟩ = μA μ ⟨(x , y), hxy⟩)
 ------------
  := by
-  rw [← impl.Convex_iff] at hμcvx
+  rw [← impl.ConvexI_TotIntvl_iff_Convex] at hμcvx
   constructor
   · constructor
     · cases' h with c1 c2

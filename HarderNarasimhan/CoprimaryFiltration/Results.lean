@@ -23,7 +23,7 @@ instance proposition_3_11 {R : Type*} [CommRing R] [IsNoetherianRing R]
 Convex (μ R M)
 ------------
 := by
-  apply (impl.Convex_iff _).1
+  apply (impl.ConvexI_TotIntvl_iff_Convex _).1
   infer_instance
 
 

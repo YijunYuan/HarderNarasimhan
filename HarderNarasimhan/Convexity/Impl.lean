@@ -4,14 +4,11 @@ import HarderNarasimhan.Convexity.Defs
 namespace HarderNarasimhan
 
 namespace impl
-abbrev _Convex {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-{S : Type*} [CompleteLattice S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S) := ConvexI TotIntvl μ
 
 @[simp]
-lemma Convex_iff {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+lemma ConvexI_TotIntvl_iff_Convex {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S) : _Convex μ ↔
+(μ : {p :ℒ × ℒ // p.1 < p.2} → S) : ConvexI TotIntvl μ ↔
 Convex μ := by
   constructor
   · intro h
@@ -21,16 +18,32 @@ Convex μ := by
     refine { convex := ?_ }
     exact fun x y a a h_4 ↦ Convex.convex x y h_4
 
+lemma ConvexI_iff_Convex_Res {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+{S : Type*} [CompleteLattice S]
+(I : {p :ℒ × ℒ // p.1 < p.2})
+(μ : {p :ℒ × ℒ // p.1 < p.2} → S) : ConvexI I μ ↔ Convex (Resμ I μ) := by
+  constructor
+  · intro h
+    refine {convex := ?_ }
+    intro x y hxy
+    unfold Resμ
+    simp only
+    exact h.convex x.val y.val x.prop y.prop hxy
+  · intro h
+    refine {convex := ?_ }
+    intro x y hxI hyI hxy
+    exact h.convex ⟨x,hxI⟩ ⟨y,hyI⟩ hxy
+
 instance {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S] {μ : {p :ℒ × ℒ // p.1 < p.2} → S} [Convex μ]:
-_Convex μ := by
-  simp only [Convex_iff]
+ConvexI TotIntvl μ := by
+  simp only [ConvexI_TotIntvl_iff_Convex]
   infer_instance
 
 instance {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-{S : Type*} [CompleteLattice S] {μ : {p :ℒ × ℒ // p.1 < p.2} → S} [_Convex μ]:
+{S : Type*} [CompleteLattice S] {μ : {p :ℒ × ℒ // p.1 < p.2} → S} [ConvexI TotIntvl μ]:
 Convex μ := by
-  simp only [← Convex_iff]
+  simp only [← ConvexI_TotIntvl_iff_Convex]
   infer_instance
 
 

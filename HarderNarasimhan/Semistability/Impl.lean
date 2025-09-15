@@ -24,7 +24,7 @@ lemma prop3d2 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 
 lemma cor3d3 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 (S : Type*) [CompleteLattice S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : _Convex μ)
+(μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : ConvexI TotIntvl μ)
 (h : ∀ f : ℕ → ℒ, (h : StrictAnti f) →  ∃N : ℕ, μA μ ⟨(f <| N + 1, f N),h (lt_add_one N)⟩ = ⊤)
 : μA_DescendingChainCondition μ := by
   refine { μ_dcc := fun a f h₁ h₂ ↦ ?_ }

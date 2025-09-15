@@ -43,7 +43,7 @@ Unique (HarderNarasimhanFiltration μ)
 ------------
 where
   uniq := by
-    rw [← impl.Convex_iff] at hμcvx
+    rw [← impl.ConvexI_TotIntvl_iff_Convex] at hμcvx
     exact fun a ↦ HarderNarasimhanFiltration.ext (funext fun n ↦ congrFun (impl.theorem3d10 μ hμ hμcvx a.filtration a.first_eq_bot a.fin_len a.strict_mono (Nat.le_induction (Nat.find_spec a.fin_len) fun n _ hn' ↦ eq_top_iff.2 <| hn' ▸ a.monotone (Nat.le_succ n)) a.piecewise_semistable fun i  ↦ by
     have : ∀ (j : ℕ) (hij : i + 1 ≤ j) (hj : j < Nat.find a.fin_len),
   μA μ ⟨(HarderNarasimhanFiltration.filtration a i, HarderNarasimhanFiltration.filtration a (i + 1)), HarderNarasimhanFiltration.strict_mono a i (i + 1) (lt_add_one i)
