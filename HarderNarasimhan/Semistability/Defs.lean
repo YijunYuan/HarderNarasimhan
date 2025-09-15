@@ -49,6 +49,6 @@ class Semistable {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 class Stable {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) extends Semistable μ where
-  stable : ∀x : ℒ, (hx : x ≠ ⊥) → μA μ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx⟩ ≠ μA μ ⟨(⊥,⊤),bot_lt_top⟩
+  stable : ∀x : ℒ, (hx : x ≠ ⊥) → x ≠ ⊤ → μA μ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx⟩ ≠ μA μ ⟨(⊥,⊤),bot_lt_top⟩
 
 end HarderNarasimhan
