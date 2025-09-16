@@ -669,7 +669,7 @@ instance {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [iml : 
     exact hxz
 
 
-lemma looooooooooooooooog_lemma : ∀ n : ℕ, ∀ ℒ : Type*, ∀ _: Nontrivial ℒ, ∀ _ : Lattice ℒ, ∀ _ : BoundedOrder ℒ, ∀ _ : WellFoundedGT ℒ,
+lemma induction_on_length_of_JordanHolderFiltration : ∀ n : ℕ, ∀ ℒ : Type*, ∀ _: Nontrivial ℒ, ∀ _ : Lattice ℒ, ∀ _ : BoundedOrder ℒ, ∀ _ : WellFoundedGT ℒ,
 ∀ _ : IsModularLattice ℒ,
 ∀ S : Type*, ∀ _ : CompleteLinearOrder S, ∀ μ : {p : ℒ × ℒ // p.1 < p.2} → S,
 ∀ _ : FiniteTotalPayoff μ, ∀ _ : SlopeLike μ,
