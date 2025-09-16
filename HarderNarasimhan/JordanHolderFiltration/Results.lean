@@ -64,7 +64,17 @@ Nonempty (JordanHolderFiltration μ)
 }
 
 
-theorem remark_4_26 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ] [IsModularLattice ℒ]
+theorem piecewise_stable_of_JordanHolderFiltration
+{ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
+{S : Type*} [CompleteLinearOrder S]
+{μ : {p : ℒ × ℒ // p.1 < p.2} → S}
+[SlopeLike μ] [sdc : StrongDescendingChainCondition' μ]
+(JH : JordanHolderFiltration μ) :
+∀ i : ℕ, (hi : i < Nat.find JH.fin_len) → Stable (Resμ ⟨(JH.filtration (i+1), JH.filtration i), JH.strict_anti i (i+1) (lt_add_one i) hi⟩ μ) := by
+  exact impl.stable_of_step_cond₂ μ JH.filtration JH.fin_len JH.strict_anti JH.step_cond₂
+
+
+theorem length_eq_of_JordanHolderFiltration {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ] [IsModularLattice ℒ]
 {S : Type*} [CompleteLinearOrder S]
 {μ : {p : ℒ × ℒ // p.1 < p.2} → S}
 [FiniteTotalPayoff μ] [SlopeLike μ] [Semistable μ]
@@ -72,7 +82,7 @@ theorem remark_4_26 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
 ------------
 ∀ JH1 JH2 : JordanHolderFiltration μ, Nat.find JH1.fin_len = Nat.find JH2.fin_len
 ------------
-:= fun JH1 JH2 ↦ eq_of_le_of_le (impl.looooooooooooooooog_lemma (Nat.find JH2.fin_len) ℒ _ _ _ _ inferInstance _ _ μ inferInstance inferInstance inferInstance inferInstance inferInstance ⟨JH2,rfl.le⟩ JH1) <| impl.looooooooooooooooog_lemma (Nat.find JH1.fin_len) ℒ _ _ _ _ inferInstance _ _ _ inferInstance inferInstance inferInstance inferInstance inferInstance ⟨JH1,rfl.le⟩ JH2
+:= fun JH1 JH2 ↦ eq_of_le_of_le (impl.looooooooooooooooog_lemma (Nat.find JH2.fin_len) ℒ _ _ _ inferInstance inferInstance _ _ μ inferInstance inferInstance inferInstance inferInstance inferInstance ⟨JH2,rfl.le⟩ JH1) <| impl.looooooooooooooooog_lemma (Nat.find JH1.fin_len) ℒ _ _ _ inferInstance inferInstance _ _ _ inferInstance inferInstance inferInstance inferInstance inferInstance ⟨JH1,rfl.le⟩ JH2
 
 
 end HarderNarasimhan

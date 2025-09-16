@@ -463,63 +463,11 @@ lemma μA_eq_μmin {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
 [SlopeLike μ] (I : {p : ℒ × ℒ // p.1 < p.2}) :
 μmin μ I = μA μ I := by
   convert Eq.symm <| (proposition_4_1 (Resμ I μ) inferInstance inferInstance).1
-  · unfold μmin
-    congr
-    ext x
-    constructor
-    · intro hx
-      simp only [ne_eq, Set.mem_setOf_eq] at *
-      rcases hx with ⟨u,⟨hu1,hu2⟩⟩
-      use ⟨u,hu1.1⟩
-      use ⟨in_TotIntvl _,fun hc ↦ hu1.right (Subtype.coe_inj.mpr hc)⟩
-      exact hu2
-    · intro hx
-      simp only [ne_eq, Set.mem_setOf_eq] at *
-      rcases hx with ⟨u,⟨hu1,hu2⟩⟩
-      use u.val, ⟨hu1.1,fun hc ↦ hu1.right (Subtype.coe_inj.mp hc)⟩
-      exact hu2
-  · unfold μA μAstar μA Resμ
-    simp only [ne_eq]
-    congr
-    ext x
-    constructor
-    · intro hx
-      simp only [Set.mem_setOf_eq] at *
-      rcases hx with ⟨u,⟨hu1,hu2⟩⟩
-      use ⟨u,hu1.1⟩, ⟨in_TotIntvl _,fun hc ↦ hu1.right (Subtype.coe_inj.mpr hc)⟩
-      convert hu2
-      unfold μmax
-      congr
-      ext y
-      constructor
-      · intro hy
-        simp only [ne_eq, Set.mem_setOf_eq] at *
-        rcases hy with ⟨a,ha1,ha2⟩
-        use a
-        use ⟨⟨ha1.1.1,a.prop.2⟩,fun hc ↦ ha1.right (Subtype.coe_inj.mp hc)⟩
-      · intro hy
-        simp only [ne_eq, Set.mem_setOf_eq] at *
-        rcases hy with ⟨a,ha1,ha2⟩
-        use ⟨a,⟨le_trans hu1.1.1 ha1.1.1,ha1.1.2⟩⟩
-        use ⟨⟨ha1.1.1,le_top⟩,fun hc ↦ ha1.right (Subtype.coe_inj.mpr hc)⟩
-    · intro hx
-      simp only [Set.mem_setOf_eq] at *
-      rcases hx with ⟨u,⟨hu1,hu2⟩⟩
-      use u, ⟨hu1.1,fun hc ↦ hu1.right (Subtype.coe_inj.mp hc)⟩
-      rw [← hu2]
-      unfold μmax
-      congr
-      ext y
-      constructor
-      · intro hy
-        simp only [ne_eq, Set.mem_setOf_eq] at *
-        rcases hy with ⟨a,ha1,ha2⟩
-        use ⟨a,⟨le_trans hu1.1.1 ha1.1.1,ha1.1.2⟩⟩
-        use ⟨⟨ha1.1.1,le_top⟩,fun hc ↦ ha1.right (Subtype.coe_inj.mpr hc)⟩
-      · intro hy
-        simp only [ne_eq, Set.mem_setOf_eq] at *
-        rcases hy with ⟨a,ha1,ha2⟩
-        use a, ⟨⟨ha1.1.1,a.prop.2⟩,fun hc ↦ ha1.right (Subtype.coe_inj.mp hc)⟩
+  · simp only [μmin_res_intvl]
+    rfl
+  · unfold μAstar
+    simp only [μA_res_intvl]
+    rfl
 
 lemma μ_bot_JH_eq_μ_tot {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLinearOrder S]
@@ -564,6 +512,121 @@ lemma μ_bot_JH_eq_μ_tot {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedO
       · exact le_rfl
       ,Ne.lt_top' fun a ↦ htop (id (Eq.symm a))⟩
     rw [← (this.2.2.1 hi').2,JH.step_cond₁ i <| Nat.lt_of_succ_lt hi]
+
+lemma semistable_of_step_cond₂ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
+{S : Type*} [CompleteLinearOrder S]
+(μ : {p : ℒ × ℒ // p.1 < p.2} → S) [SlopeLike μ] [sdc : StrongDescendingChainCondition' μ]
+(filtration : ℕ → ℒ) (fin_len : ∃ N : ℕ, filtration N =⊥)
+(strict_anti : ∀ i j : ℕ, i < j → j ≤ Nat.find (fin_len) → filtration j < filtration i) :
+(∀ i : ℕ, (hi : i < Nat.find fin_len) →
+    ∀ z : ℒ, (h' : filtration (i+1) < z) → (h'' : z < filtration i) →
+    μ ⟨(filtration (i+1), z), h'⟩ < μ ⟨(filtration (i+1), filtration i), strict_anti i (i+1) (lt_add_one i) hi⟩)
+→ (
+∀ i : ℕ, (hi : i < Nat.find fin_len) → Semistable (Resμ ⟨(filtration (i+1), filtration i), strict_anti i (i+1) (lt_add_one i) hi⟩ μ)
+) := by
+  intro h
+  intro i hi
+  have h := h i hi
+  apply (impl.thm4d21 (Resμ ⟨(filtration (i+1), filtration i), strict_anti i (i+1) (lt_add_one i) hi⟩ μ) inferInstance inferInstance inferInstance).2.2 (fun _ _ ↦ inferInstance)
+  apply (List.TFAE.out (impl.thm4d21 (Resμ ⟨(filtration (i+1), filtration i), strict_anti i (i+1) (lt_add_one i) hi⟩ μ) inferInstance inferInstance inferInstance).1 1 3).1
+  apply eq_of_le_of_le ?_ ?_
+  · apply sInf_le
+    simp only [ne_eq, Set.mem_setOf_eq]
+    use ⊥
+    simp only [bot_ne_top, not_false_eq_true, and_true, exists_prop,in_TotIntvl]
+  · apply le_sInf
+    intro b hb
+    simp only [ne_eq, Set.mem_setOf_eq] at hb
+    rcases hb with ⟨u,hu1,hu2⟩
+    rw [← hu2]
+    simp only [μ_res_intvl]
+    if hu : u = ⊥ then
+      simp only [hu, le_refl]
+    else
+    have h := h u.val (lt_of_le_of_ne u.prop.1 (by
+      by_contra hc
+      refine hu ?_
+      apply Subtype.coe_inj.1
+      exact id (Eq.symm hc)
+          )) (lt_of_le_of_ne u.prop.2 (by
+            by_contra hc
+            refine hu1.2 ?_
+            apply Subtype.coe_inj.1
+            exact hc
+            ))
+    have := ((seesaw_useful μ inferInstance (filtration (i + 1)) u.val (filtration i) ⟨(lt_of_le_of_ne u.prop.1 (by
+      by_contra hc
+      refine hu ?_
+      apply Subtype.coe_inj.1
+      exact id (Eq.symm hc)
+          )),(lt_of_le_of_ne u.prop.2 (by
+            by_contra hc
+            refine hu1.2 ?_
+            apply Subtype.coe_inj.1
+            exact hc
+            ))⟩).1.1 h).2
+    apply le_of_lt this
+
+lemma stable_of_step_cond₂ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
+{S : Type*} [CompleteLinearOrder S]
+(μ : {p : ℒ × ℒ // p.1 < p.2} → S) [SlopeLike μ] [sdc : StrongDescendingChainCondition' μ]
+(filtration : ℕ → ℒ) (fin_len : ∃ N : ℕ, filtration N =⊥)
+(strict_anti : ∀ i j : ℕ, i < j → j ≤ Nat.find (fin_len) → filtration j < filtration i):
+(∀ i : ℕ, (hi : i < Nat.find fin_len) →
+    ∀ z : ℒ, (h' : filtration (i+1) < z) → (h'' : z < filtration i) →
+    μ ⟨(filtration (i+1), z), h'⟩ < μ ⟨(filtration (i+1), filtration i), strict_anti i (i+1) (lt_add_one i) hi⟩)
+→ (
+∀ i : ℕ, (hi : i < Nat.find fin_len) → Stable (Resμ ⟨(filtration (i+1), filtration i), strict_anti i (i+1) (lt_add_one i) hi⟩ μ)
+) := by
+    intro h
+    intro i hi
+    refine { toSemistable := semistable_of_step_cond₂ μ filtration fin_len strict_anti h i hi, stable := ?_ }
+    · intro x hx hx'
+      have := (proposition_4_1 (Resμ ⟨(filtration (i+1), filtration i), strict_anti i (i+1) (lt_add_one i) hi⟩ μ) inferInstance inferInstance).1
+      have this' := (proposition_4_1 (Resμ ⟨(filtration (i+1), x.val), (lt_of_le_of_ne x.prop.1 (by
+          by_contra hc
+          exact hx <| Subtype.coe_inj.1 <| id (Eq.symm hc)
+          ))⟩ μ) inferInstance inferInstance).1
+      unfold μAstar at this
+      unfold μAstar at this'
+      simp only [μA_res_intvl,μmin_res_intvl] at *
+      rw [this]
+      have t1: @Bot.bot (Interval ⟨(filtration (i + 1), filtration i), strict_anti i (i + 1) (lt_add_one i) hi⟩) OrderBot.toBot = filtration (i + 1) := by rfl
+      have t2 : @Top.top (Interval ⟨(filtration (i + 1), ↑x), lt_of_le_of_ne (Subtype.prop x).left fun hc ↦ hx (Subtype.coe_inj.mp (id (Eq.symm hc)))⟩) OrderTop.toTop = x.val := by rfl
+      have t3 : (@Bot.bot (Interval ⟨(filtration (i + 1), ↑x), lt_of_le_of_ne (Subtype.prop x).left fun hc ↦ hx (Subtype.coe_inj.mp (id (Eq.symm hc)))⟩) OrderBot.toBot).val = filtration (i + 1) := by rfl
+      simp only [t1,t2,t3] at *
+      rw [this']
+      have hss := semistable_of_step_cond₂ μ filtration fin_len strict_anti h i hi
+      have := (impl.thm4d21 (Resμ ⟨(filtration (i + 1), filtration i), strict_anti i (i + 1) (lt_add_one i) hi⟩ μ) inferInstance inferInstance inferInstance).2.1 hss
+      have := (List.TFAE.out (impl.thm4d21 (Resμ ⟨(filtration (i + 1), filtration i), strict_anti i (i + 1) (lt_add_one i) hi⟩ μ) inferInstance inferInstance inferInstance).1 1 3).2 this
+      simp only [μmin_res_intvl,μ_res_intvl] at this
+      have t4 : @Bot.bot (Interval ⟨(filtration (i + 1), filtration i), strict_anti i (i + 1) (lt_add_one i) hi⟩) OrderBot.toBot = filtration (i+1) := by rfl
+      have t5 : @Top.top (Interval ⟨(filtration (i + 1), filtration i), strict_anti i (i + 1) (lt_add_one i) hi⟩) OrderTop.toTop = filtration i := by rfl
+      simp only [t4, t5] at *
+      rw [this]
+      apply ne_of_lt
+      have : μmin μ ⟨(filtration (i + 1), ↑x), (lt_of_le_of_ne x.prop.1 (by
+          by_contra hc
+          exact hx <| Subtype.coe_inj.1 <| id (Eq.symm hc)
+          ))⟩ ≤ μ ⟨(filtration (i + 1), ↑x), (lt_of_le_of_ne x.prop.1 (by
+          by_contra hc
+          exact hx <| Subtype.coe_inj.1 <| id (Eq.symm hc)
+          ))⟩ := by
+        apply sInf_le
+        simp only [ne_eq, id_eq, Set.mem_setOf_eq]
+        use filtration (i + 1)
+        simp only [exists_prop, and_true]
+        refine ⟨⟨le_rfl,x.prop.1⟩, ?_⟩
+        by_contra hc
+        refine hx ?_
+        apply Subtype.coe_inj.1
+        rw [← hc]
+        rfl
+      refine lt_of_le_of_lt this ?_
+      exact (h i hi) x.val (lt_of_le_of_ne x.prop.1 (by
+          by_contra hc
+          exact hx <| Subtype.coe_inj.1 <| id (Eq.symm hc)
+          )) <| lt_iff_le_not_le.mpr (lt_top_iff_ne_top.2 hx')
 
 lemma res_ss {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLinearOrder S]
