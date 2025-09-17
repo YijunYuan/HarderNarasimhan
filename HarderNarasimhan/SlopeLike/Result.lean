@@ -2,7 +2,7 @@ import HarderNarasimhan.SlopeLike.Impl
 
 namespace HarderNarasimhan
 
-lemma proposition_4_6 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
+lemma seesaw {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S):
 ------------
@@ -30,7 +30,7 @@ theorem SlopeLike_of_μQuotient {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ
 := impl.prop4d8 r d h₁ h₂
 
 
-lemma seesaw_useful {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
+lemma seesaw' {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S):
 ------------
@@ -70,7 +70,7 @@ SlopeLike μ → ∀ (x y z : ℒ), (h : x < y ∧ y < z) →
   )
 ) := by
   intro hsl x y z h
-  have h1 := (proposition_4_6 μ).1 hsl x y z h
+  have h1 := (seesaw μ).1 hsl x y z h
   refine ⟨?_,⟨?_,⟨fun _ ↦ by aesop,⟨fun h' ↦ (Or.resolve_left <| Or.resolve_left h1 <| fun t ↦ (lt_self_iff_false _).1 <| h' ▸ lt_trans t.1 t.2) fun t ↦ (lt_self_iff_false _).1 <| h' ▸ gt_trans t.1 t.2,fun _ ↦ by aesop⟩⟩⟩⟩
   · rw [← or_assoc] at h1
     refine ⟨fun h' ↦ ?_,⟨fun h' ↦ (Or.resolve_right <| Or.resolve_right h1 <| fun t ↦ (lt_self_iff_false _).1 <| t.1 ▸ t.2 ▸ h') fun t ↦ (not_lt_of_gt <| gt_trans t.1 t.2) h',fun h' ↦ ?_⟩⟩

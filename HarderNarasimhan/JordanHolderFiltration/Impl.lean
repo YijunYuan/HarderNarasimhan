@@ -481,7 +481,7 @@ lemma μ_bot_JH_eq_μ_tot {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedO
   intro i hi
   induction' i with i hi'
   · simp only [JH.first_eq_top]
-  · have := seesaw_useful μ hsl ⊥ (JH.filtration (i + 1)) ⊤ ⟨by
+  · have := seesaw' μ hsl ⊥ (JH.filtration (i + 1)) ⊤ ⟨by
       rw [← Nat.find_spec JH.fin_len]
       apply JH.strict_anti
       exact hi
@@ -497,7 +497,7 @@ lemma μ_bot_JH_eq_μ_tot {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedO
     if htop : JH.filtration i = ⊤ then
       simp only [htop]
     else
-    have := seesaw_useful μ hsl (JH.filtration (i + 1)) (JH.filtration i) ⊤ ⟨by
+    have := seesaw' μ hsl (JH.filtration (i + 1)) (JH.filtration i) ⊤ ⟨by
       apply JH.strict_anti
       exact lt_add_one i
       exact Nat.le_of_succ_le hi
@@ -505,7 +505,7 @@ lemma μ_bot_JH_eq_μ_tot {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedO
       ⟩
     refine (this.2.2.2.1 ?_).1
     have hi' := hi' (Nat.lt_of_succ_lt hi)
-    have := seesaw_useful μ hsl ⊥ (JH.filtration i) ⊤ ⟨by
+    have := seesaw' μ hsl ⊥ (JH.filtration i) ⊤ ⟨by
       rw [← Nat.find_spec JH.fin_len]
       apply JH.strict_anti
       · exact Nat.lt_of_succ_lt hi
@@ -554,7 +554,7 @@ lemma semistable_of_step_cond₂ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [B
             apply Subtype.coe_inj.1
             exact hc
             ))
-    have := ((seesaw_useful μ inferInstance (filtration (i + 1)) u.val (filtration i) ⟨(lt_of_le_of_ne u.prop.1 (by
+    have := ((seesaw' μ inferInstance (filtration (i + 1)) u.val (filtration i) ⟨(lt_of_le_of_ne u.prop.1 (by
       by_contra hc
       refine hu ?_
       apply Subtype.coe_inj.1
@@ -654,7 +654,7 @@ lemma res_ss {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [We
       apply sInf_le
       use u, ⟨in_TotIntvl _,hu1.2⟩
     have := μ_bot_JH_eq_μ_tot JH (Nat.find JH.fin_len - 1) (Nat.sub_one_lt <| JH_pos_len JH)
-    rw [((seesaw_useful μ inferInstance ⊥ (JH.filtration (Nat.find JH.fin_len - 1)) ⊤ ⟨by
+    rw [((seesaw' μ inferInstance ⊥ (JH.filtration (Nat.find JH.fin_len - 1)) ⊤ ⟨by
       by_contra hc
       simp only [not_bot_lt_iff] at hc
       exact (Nat.find_min JH.fin_len <| Nat.sub_one_lt <| JH_pos_len JH) hc
@@ -695,7 +695,7 @@ lemma induction_on_length_of_JordanHolderFiltration : ∀ n : ℕ, ∀ ℒ : Typ
       simp only [Resμ]
       have := JHx.step_cond₁ (Nat.find JHx.fin_len - 1) (by omega)
       simp only [Nat.sub_one_add_one <| JH_pos_len JHx,Nat.find_spec JHx.fin_len] at this
-      exact ((seesaw_useful μ hsl ⊥ (JHx.filtration <| Nat.find JHx.fin_len - 1) ⊤ ⟨bot_lt_iff_ne_bot.2 <| Nat.find_min JHx.fin_len <| Nat.sub_one_lt <| JH_pos_len JHx,nt⟩).2.2.1 this).2 ▸ hftp.fin_tot_payoff
+      exact ((seesaw' μ hsl ⊥ (JHx.filtration <| Nat.find JHx.fin_len - 1) ⊤ ⟨bot_lt_iff_ne_bot.2 <| Nat.find_min JHx.fin_len <| Nat.sub_one_lt <| JH_pos_len JHx,nt⟩).2.2.1 this).2 ▸ hftp.fin_tot_payoff
     let JH_raw : ℕ → (Interval Ires) := fun n ↦ ⟨(JHx.filtration (Nat.find JHx.fin_len - 1)) ⊔ JHy.filtration n,⟨le_sup_left,le_top⟩⟩
     have JH_raw_antitone : Antitone JH_raw := by
       intro n1 n2 hn
@@ -715,7 +715,7 @@ lemma induction_on_length_of_JordanHolderFiltration : ∀ n : ℕ, ∀ ℒ : Typ
       have htrans : μ ⟨(JHx.filtration (Nat.find JHx.fin_len - 1),⊤),(JHx.first_eq_top) ▸ JHx.strict_anti 0 (Nat.find JHx.fin_len - 1) this (Nat.sub_le (Nat.find JHx.fin_len) 1)⟩ = μ ⟨(⊥,⊤),bot_lt_top⟩ := by
         have := JHx.step_cond₁ (Nat.find JHx.fin_len - 1) (by omega)
         simp only [Nat.sub_one_add_one <| JH_pos_len JHx,Nat.find_spec JHx.fin_len] at this
-        exact ((seesaw_useful μ hsl ⊥ (JHx.filtration <| Nat.find JHx.fin_len - 1) ⊤ ⟨bot_lt_iff_ne_bot.2 <| Nat.find_min JHx.fin_len <| Nat.sub_one_lt <| JH_pos_len JHx,nt⟩).2.2.1 this).2.symm
+        exact ((seesaw' μ hsl ⊥ (JHx.filtration <| Nat.find JHx.fin_len - 1) ⊤ ⟨bot_lt_iff_ne_bot.2 <| Nat.find_min JHx.fin_len <| Nat.sub_one_lt <| JH_pos_len JHx,nt⟩).2.2.1 this).2.symm
       have hj': ∀ j: ℕ, j ≤ Nat.find JHy.fin_len → μ ⟨(⊥,JHx.filtration (Nat.find JHx.fin_len -1) ⊔ JHy.filtration j), lt_of_lt_of_le (bot_lt_iff_ne_bot.2 <| Nat.find_min JHx.fin_len <| Nat.sub_one_lt <| JH_pos_len JHx) le_sup_left⟩ = μ ⟨(⊥,⊤),bot_lt_top⟩ := by
         refine fun j hj ↦ eq_of_le_of_le ?_ ?_
         · have : Semistable μ → μmax μ TotIntvl = μ TotIntvl := by
@@ -748,7 +748,7 @@ lemma induction_on_length_of_JordanHolderFiltration : ∀ n : ℕ, ∀ ℒ : Typ
             else
               apply bot_lt_iff_ne_bot.2 at ubot
               have := this ubot (lt_of_le_of_ne hu1.1.2 hu1.2)
-              exact le_of_lt <| ((seesaw_useful μ hsl ⊥ u (JHx.filtration (Nat.find JHx.fin_len - 1)) ⟨ubot,lt_of_le_of_ne hu1.1.2 hu1.2⟩).1.1 this).2
+              exact le_of_lt <| ((seesaw' μ hsl ⊥ u (JHx.filtration (Nat.find JHx.fin_len - 1)) ⟨ubot,lt_of_le_of_ne hu1.1.2 hu1.2⟩).1.1 this).2
           else
           have := (proposition_2_8 μ inferInstance (JHx.filtration (Nat.find JHx.fin_len - 1)) (JHy.filtration j) ⊥ ⟨bot_lt_iff_ne_bot.mpr (Nat.find_min JHx.fin_len (Nat.sub_one_lt (JH_pos_len JHx))),bot_lt_iff_ne_bot.2 fun a ↦ hjbot (id (Eq.symm a))⟩).1
           convert this.le
@@ -768,7 +768,7 @@ lemma induction_on_length_of_JordanHolderFiltration : ∀ n : ℕ, ∀ ℒ : Typ
               else
               by_contra hc
               simp only [not_le] at hc
-              have := seesaw_useful μ hsl ⊥ u (JHx.filtration (Nat.find JHx.fin_len - 1)) ⟨bot_lt_iff_ne_bot.2 hubot,lt_of_le_of_ne hu1.1.2 hu1.2⟩
+              have := seesaw' μ hsl ⊥ u (JHx.filtration (Nat.find JHx.fin_len - 1)) ⟨bot_lt_iff_ne_bot.2 hubot,lt_of_le_of_ne hu1.1.2 hu1.2⟩
               have hc := (this.2.1.2.2 hc).1
               rw [hess] at hc
               have := (List.TFAE.out (impl.thm4d21 μ hsl inferInstance inferInstance).1 0 3).2 ((impl.thm4d21 μ hsl inferInstance inferInstance).2.1 hst)
@@ -807,7 +807,7 @@ lemma induction_on_length_of_JordanHolderFiltration : ∀ n : ℕ, ∀ ℒ : Typ
               else
               by_contra hc
               simp only [not_le] at hc
-              have := seesaw_useful μ hsl ⊥ u (JHy.filtration j) ⟨bot_lt_iff_ne_bot.2 hubot,lt_of_le_of_ne hu1.1.2 hu1.2⟩
+              have := seesaw' μ hsl ⊥ u (JHy.filtration j) ⟨bot_lt_iff_ne_bot.2 hubot,lt_of_le_of_ne hu1.1.2 hu1.2⟩
               have hc := (this.2.1.2.2 hc).1
               rw [hess] at hc
               have := (List.TFAE.out (impl.thm4d21 μ hsl inferInstance inferInstance).1 0 3).2 ((impl.thm4d21 μ hsl inferInstance inferInstance).2.1 hst)
@@ -825,16 +825,16 @@ lemma induction_on_length_of_JordanHolderFiltration : ∀ n : ℕ, ∀ ℒ : Typ
           rw [← t1,← t2]
           exact Eq.symm (min_self (μ TotIntvl))
       have tj1 := hj' j (le_of_lt <| lt_of_lt_of_le hj <| Nat.find_min' ((⟨Nat.find JHy.fin_len,JH_raw_fin_len⟩) : ∃ k, JH_raw k = ⊥) JH_raw_fin_len)
-      have := tj1 ▸ ((seesaw_useful μ hsl ⊥ (JHx.filtration (Nat.find JHx.fin_len -1) ⊔ JHy.filtration (j+1)) (JHx.filtration (Nat.find JHx.fin_len -1) ⊔ JHy.filtration j) ⟨lt_of_lt_of_le (bot_lt_iff_ne_bot.2 <| Nat.find_min JHx.fin_len <| Nat.sub_one_lt <| JH_pos_len JHx) le_sup_left,lt_iff_le_not_le.mpr hfj⟩).2.2.1 <| tj1 ▸ hj' (j+1) (lt_of_lt_of_le hj <| Nat.find_min' ((⟨Nat.find JHy.fin_len,JH_raw_fin_len⟩) : ∃ k, JH_raw k = ⊥) JH_raw_fin_len)).2
+      have := tj1 ▸ ((seesaw' μ hsl ⊥ (JHx.filtration (Nat.find JHx.fin_len -1) ⊔ JHy.filtration (j+1)) (JHx.filtration (Nat.find JHx.fin_len -1) ⊔ JHy.filtration j) ⟨lt_of_lt_of_le (bot_lt_iff_ne_bot.2 <| Nat.find_min JHx.fin_len <| Nat.sub_one_lt <| JH_pos_len JHx) le_sup_left,lt_iff_le_not_le.mpr hfj⟩).2.2.1 <| tj1 ▸ hj' (j+1) (lt_of_lt_of_le hj <| Nat.find_min' ((⟨Nat.find JHy.fin_len,JH_raw_fin_len⟩) : ∃ k, JH_raw k = ⊥) JH_raw_fin_len)).2
       rw [← this]
       exact id (Eq.symm htrans)
     let JH_FINAL : JordanHolderFiltration (Resμ Ires μ) := by
       refine { filtration := JHfinal, antitone := subseq_prop2 JH_raw (⟨Nat.find JHy.fin_len,JH_raw_fin_len⟩), fin_len := subseq_prop1 JH_raw (⟨Nat.find JHy.fin_len,JH_raw_fin_len⟩) JH_raw_antitone JH_raw_first_top, strict_anti := fun i j hij hj ↦ subseq_prop5 JH_raw JH_raw_first_top (⟨Nat.find JHy.fin_len,JH_raw_fin_len⟩) JH_raw_antitone i j hij hj, first_eq_top := by simp only [JHfinal_first_top], step_cond₁ := fun k1 hk1 ↦ subseq_prop6 JH_raw JH_raw_first_top (⟨Nat.find JHy.fin_len,JH_raw_fin_len⟩) JH_raw_antitone (fun z ↦ (Resμ Ires μ) z = (Resμ Ires μ) ⟨(⊥,⊤),bot_lt_top⟩) hcond1 k1 hk1, step_cond₂ := ?_ }
-      · refine fun i hi ↦ subseq_prop6 JH_raw JH_raw_first_top (⟨Nat.find JHy.fin_len,JH_raw_fin_len⟩) JH_raw_antitone (fun w ↦ ∀ z : (Interval Ires), (hw : w.val.1 < z) → z < w.val.2 → (Resμ Ires μ) ⟨(w.val.1,z),hw⟩ < (Resμ Ires μ) w ) (fun j hj hfj w hw1 hw2 ↦ ((seesaw_useful μ hsl ↑(JH_raw (j + 1)) w ↑(JH_raw j) ⟨lt_iff_le_not_le.mpr hw1,lt_iff_le_not_le.mpr hw2⟩).1.2.2 ?_).1) i hi
+      · refine fun i hi ↦ subseq_prop6 JH_raw JH_raw_first_top (⟨Nat.find JHy.fin_len,JH_raw_fin_len⟩) JH_raw_antitone (fun w ↦ ∀ z : (Interval Ires), (hw : w.val.1 < z) → z < w.val.2 → (Resμ Ires μ) ⟨(w.val.1,z),hw⟩ < (Resμ Ires μ) w ) (fun j hj hfj w hw1 hw2 ↦ ((seesaw' μ hsl ↑(JH_raw (j + 1)) w ↑(JH_raw j) ⟨lt_iff_le_not_le.mpr hw1,lt_iff_le_not_le.mpr hw2⟩).1.2.2 ?_).1) i hi
         have := hcond1 j hj hfj; simp only [Resμ] at this
         have this' := JHx.step_cond₁ (Nat.find JHx.fin_len - 1) (by omega)
         simp only [Nat.sub_one_add_one <| JH_pos_len JHx,Nat.find_spec JHx.fin_len] at this'
-        have this' := ((seesaw_useful μ hsl ⊥ (JHx.filtration (Nat.find JHx.fin_len - 1)) ⊤ ⟨bot_lt_iff_ne_bot.2 <| Nat.find_min JHx.fin_len <| Nat.sub_one_lt <| JH_pos_len JHx,nt⟩).2.2.1 this').2
+        have this' := ((seesaw' μ hsl ⊥ (JHx.filtration (Nat.find JHx.fin_len - 1)) ⊤ ⟨bot_lt_iff_ne_bot.2 <| Nat.find_min JHx.fin_len <| Nat.sub_one_lt <| JH_pos_len JHx,nt⟩).2.2.1 this').2
         rw [this]
         have hproblem : JHy.filtration (j + 1) ≠ JHy.filtration j ⊓ ↑w := by
           by_contra hc
@@ -883,7 +883,7 @@ lemma induction_on_length_of_JordanHolderFiltration : ∀ n : ℕ, ∀ ℒ : Typ
           refine lt_of_le_of_ne (le_inf (JHy.antitone <| Nat.le_add_right j 1) ?_) hproblem
           simp only [sup_comm, JH_raw] at hw1
           exact le_of_lt <| lt_of_le_of_lt (le_sup_left) <| lt_iff_le_not_le.mpr hw1
-        refine ((seesaw_useful μ hsl (JHy.filtration (j+1)) (JHy.filtration j ⊓ w) (JHy.filtration j) ⟨hlt,inf_lt_left.2 hnle⟩).1.1 ?_).2
+        refine ((seesaw' μ hsl (JHy.filtration (j+1)) (JHy.filtration j ⊓ w) (JHy.filtration j) ⟨hlt,inf_lt_left.2 hnle⟩).1.1 ?_).2
         exact JHy.step_cond₂ j (by
           have this' := Nat.find_min (Exists.intro (Nat.find JHy.fin_len) JH_raw_fin_len : ∃ k, JH_raw k = ⊥) hj
           unfold JH_raw at this'
@@ -946,7 +946,7 @@ lemma induction_on_length_of_JordanHolderFiltration : ∀ n : ℕ, ∀ ℒ : Typ
                 exact Ne.bot_lt' hif
               have := le_of_lt <| JHx.step_cond₂ (Nat.find JHx.fin_len -1) (Nat.sub_one_lt <| JH_pos_len JHx) (JHx.filtration (Nat.find JHx.fin_len -1) ⊓ JHy.filtration (i0 + 1)) ((Nat.sub_one_add_one <| JH_pos_len JHx) ▸ hh) <| inf_lt_left.mpr himp
               simp only [Nat.sub_one_add_one <| JH_pos_len JHx] at this
-              exact byContradiction fun hcc ↦  (lt_iff_not_le.1 <| ((seesaw_useful μ hsl (JHx.filtration (Nat.find JHx.fin_len)) (JHx.filtration (Nat.find JHx.fin_len -1) ⊓ JHy.filtration (i0 + 1)) (JHx.filtration (Nat.find JHx.fin_len -1)) ⟨hh,inf_lt_left.mpr himp⟩).2.1.2.2 <| lt_of_not_le hcc).1) this
+              exact byContradiction fun hcc ↦  (lt_iff_not_le.1 <| ((seesaw' μ hsl (JHx.filtration (Nat.find JHx.fin_len)) (JHx.filtration (Nat.find JHx.fin_len -1) ⊓ JHy.filtration (i0 + 1)) (JHx.filtration (Nat.find JHx.fin_len -1)) ⟨hh,inf_lt_left.mpr himp⟩).2.1.2.2 <| lt_of_not_le hcc).1) this
           exact Subtype.coe_inj.1 <| h1 ▸ (sup_eq_right.2 this)
     let JHfun : ℕ → Interval Ires := fun n ↦
       if hn : n ≤ Nat.find JHx.fin_len - 1 then
@@ -1005,7 +1005,7 @@ lemma induction_on_length_of_JordanHolderFiltration : ∀ n : ℕ, ∀ ℒ : Typ
             exact Nat.not_succ_le_zero k1 hk1
           rw [← JHx.first_eq_top]
           exact JHx.strict_anti 0 (Nat.find JHx.fin_len - 1) (by (expose_names; exact this_1)) (le_of_lt <| Nat.sub_one_lt <| JH_pos_len JHx)
-        exact this ▸ (((seesaw_useful μ) inferInstance ⊥ (JHx.filtration (Nat.find JHx.fin_len - 1)) ⊤ ⟨bot_lt_iff_ne_bot.2 <| Nat.find_min JHx.fin_len (Nat.sub_one_lt <| JH_pos_len JHx),ntop⟩).2.2.1 this').2
+        exact this ▸ (((seesaw' μ) inferInstance ⊥ (JHx.filtration (Nat.find JHx.fin_len - 1)) ⊤ ⟨bot_lt_iff_ne_bot.2 <| Nat.find_min JHx.fin_len (Nat.sub_one_lt <| JH_pos_len JHx),ntop⟩).2.2.1 this').2
       · intro i hi z hz hz'
         simp only [Resμ]
         have htemp : JHx.filtration (i + 1) < z.val := by
