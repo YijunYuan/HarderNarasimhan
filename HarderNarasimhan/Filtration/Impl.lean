@@ -225,6 +225,159 @@ lemma balabala2 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   · simp only [Fin.val_natCast, Nat.mod_succ_eq_iff_lt, Nat.succ_eq_add_one]
     exact Nat.succ_lt_succ hi
 
+lemma hHFil_of_hNSeries {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
+{S : Type*} [CompleteLinearOrder S]
+(μ : {p :ℒ × ℒ // p.1 < p.2} → S)
+(F1 : RelSeries (IsIntervalSemistable μ))
+(h1 : F1.head = ⊥ ∧ F1.last = ⊤ ∧
+  ∀ i : ℕ, (hi : i + 1 < F1.length) →
+    ¬   μA μ ⟨(F1.toFun i, F1.toFun ↑(i+1)), by simp [*]⟩
+      ≤ μA μ ⟨(F1.toFun ↑(i+1), F1.toFun ↑(i+2)), by simp [*]⟩):
+∃ HN1 : HarderNarasimhanFiltration μ, HN1.filtration = (fun n ↦ if n ≤ F1.length then F1.toFun n else ⊤) ∧ (Nat.find HN1.fin_len = F1.length) := by
+  let filtration1 := fun n ↦ if n ≤ F1.length then F1.toFun n else ⊤
+  have hstrange : ∃ n, (if n ≤ F1.length then F1.toFun ↑n else ⊤) = ⊤ := by
+    use F1.length
+    simp only [le_refl, Fin.natCast_eq_last]
+    exact h1.2.1
+  have Fmono : ∀ i j : ℕ, i < j → j ≤ F1.length → F1.toFun ↑i < F1.toFun ↑j := by
+    intro i
+    simp [Iff.symm Nat.add_one_le_iff]
+    apply Nat.le_induction
+    · intro h
+      have := (F1.step ⟨i,h⟩).choose
+      convert this
+      · refine Fin.eq_mk_iff_val_eq.mpr ?_
+        refine Fin.val_cast_of_lt ?_
+        exact Nat.lt_add_right 1 h
+      · refine Fin.eq_mk_iff_val_eq.mpr ?_
+        refine Fin.val_cast_of_lt ?_
+        exact Nat.add_lt_add_right h 1
+    · intro n hn hind h
+      refine lt_trans (hind (Nat.le_of_succ_le h)) ?_
+      have := (F1.step ⟨n , h⟩).choose
+      simp at this
+      convert this
+      · refine Fin.val_cast_of_lt ?_
+        exact Nat.lt_add_right 1 h
+      · refine Fin.val_cast_of_lt ?_
+        exact Nat.add_lt_add_right h 1
+  have hslen : Nat.find hstrange  = F1.length := by
+      have := Nat.find_min' hstrange ((by
+        unfold filtration1
+        simp only [le_refl, ↓reduceIte, Fin.natCast_eq_last, filtration1]
+        exact h1.2.1
+        ) : filtration1 F1.length = ⊤)
+      refine le_antisymm this ?_
+      by_contra hc
+      apply lt_of_not_le at hc
+      have t := Nat.find_spec hstrange
+      simp only [if_pos this] at t
+      have := t ▸ Fmono (Nat.find hstrange) F1.length hc le_rfl
+      simp_all only [not_le, ite_eq_right_iff, Nat.find_le_iff, Nat.find_lt_iff, Fin.natCast_eq_last, not_top_lt]
+  let HN1 : HarderNarasimhanFiltration μ := {
+      filtration := filtration1,
+      monotone := by
+        refine monotone_nat_of_le_succ ?_
+        intro n
+        if hn : n ≤ F1.length then
+          simp only [filtration1,hn, ↓reduceIte]
+          if hn' : n + 1 ≤ F1.length then
+            simp only [hn', ↓reduceIte]
+            have := le_of_lt (F1.step ⟨n,hn'⟩).choose
+            convert this
+            · simp only [Fin.castSucc_mk]
+              refine Fin.eq_mk_iff_val_eq.mpr ?_
+              refine Fin.val_cast_of_lt ?_
+              exact Nat.lt_add_right 1 hn'
+            · simp only [Fin.succ_mk, filtration1]
+              refine Fin.eq_mk_iff_val_eq.mpr ?_
+              refine Fin.val_cast_of_lt ?_
+              exact Nat.add_lt_add_right hn' 1
+          else
+          simp only [hn', ↓reduceIte, le_top]
+        else
+        simp only [filtration1,hn, ↓reduceIte, top_le_iff, ite_eq_right_iff]
+        intro hn'
+        exfalso
+        linarith,
+      first_eq_bot := by
+        simp only [filtration1,zero_le, ↓reduceIte]
+        exact h1.1,
+      fin_len := by
+        use F1.length
+        simp only [filtration1,le_refl, ↓reduceIte, Fin.natCast_eq_last]
+        exact h1.2.1,
+      strict_mono := by
+        intro i j hij hj
+        rw [hslen] at hj
+        simp only [le_of_lt <| lt_of_lt_of_le hij hj, ↓reduceIte, hj, filtration1]
+        exact Fmono i j hij hj,
+      piecewise_semistable := by
+        intro i hi
+        have := (F1.step ⟨i,hslen ▸ hi⟩).choose_spec
+        unfold filtration1
+        simp only [eq_mp_eq_cast, id_eq, eq_mpr_eq_cast, filtration1]
+        rw [hslen] at hi
+        convert this
+        · simp only [le_of_lt hi, ↓reduceIte, Fin.castSucc_mk, filtration1]
+          congr
+          refine Fin.eq_mk_iff_val_eq.mpr ?_
+          refine Fin.val_cast_of_lt ?_
+          exact Nat.lt_add_right 1 hi
+        · have this': i + 1 ≤ F1.length := by linarith
+          simp only [this', ↓reduceIte, Fin.succ_mk, filtration1]
+          congr
+          refine Fin.eq_mk_iff_val_eq.mpr ?_
+          refine Fin.val_cast_of_lt ?_
+          exact Nat.add_lt_add_right hi 1
+        · simp only [le_of_lt hi, ↓reduceIte, Fin.castSucc_mk, filtration1]
+          congr
+          refine Fin.eq_mk_iff_val_eq.mpr ?_
+          refine Fin.val_cast_of_lt ?_
+          exact Nat.lt_add_right 1 hi
+        · have this' : i + 1 ≤ F1.length := by linarith
+          simp only [this', ↓reduceIte, Fin.succ_mk, filtration1]
+          congr
+          refine Fin.eq_mk_iff_val_eq.mpr ?_
+          refine Fin.val_cast_of_lt ?_
+          exact Nat.add_lt_add_right hi 1
+        · simp only [le_of_lt hi, ↓reduceIte, Fin.castSucc_mk, filtration1]
+          congr
+          refine Fin.eq_mk_iff_val_eq.mpr ?_
+          refine Fin.val_cast_of_lt ?_
+          exact Nat.lt_add_right 1 hi
+        · have this' : i + 1 ≤ F1.length := by linarith
+          simp only [this', ↓reduceIte, Fin.succ_mk, filtration1]
+          congr
+          refine Fin.eq_mk_iff_val_eq.mpr ?_
+          refine Fin.val_cast_of_lt ?_
+          exact Nat.add_lt_add_right hi 1
+        · simp only [le_of_lt hi, ↓reduceIte, Fin.castSucc_mk, filtration1]
+          congr
+          refine Fin.eq_mk_iff_val_eq.mpr ?_
+          refine Fin.val_cast_of_lt ?_
+          exact Nat.lt_add_right 1 hi
+        · have this' : i + 1 ≤ F1.length := by linarith
+          simp only [this', ↓reduceIte, Fin.succ_mk, filtration1]
+          congr
+          refine Fin.eq_mk_iff_val_eq.mpr ?_
+          refine Fin.val_cast_of_lt ?_
+          exact Nat.add_lt_add_right hi 1,
+      μA_pseudo_strict_anti := by
+        intro i hi
+        have := h1.2.2 i (hslen ▸ hi)
+        unfold filtration1
+        rw [hslen] at hi
+        convert this
+        · have this' : i ≤ F1.length := by linarith
+          simp only [this', ↓reduceIte, filtration1]
+        · simp only [le_of_lt hi, ↓reduceIte, filtration1]
+        · simp only [le_of_lt hi, ↓reduceIte, filtration1]
+        · have : i + 2 ≤ F1.length := hi
+          simp only [this, ↓reduceIte]
+    }
+  use HN1
+
 end impl
 
 end HarderNarasimhan
