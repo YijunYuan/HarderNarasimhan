@@ -198,6 +198,32 @@ theorem theorem3d10  {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder 
       rw [ffst n (Nat.le_of_lt_succ h₁)] at hn
       exact not_ne_iff.1 <| (HNFil_ne_top_iff_lt_len μ (n+1)).not.2 (not_lt_of_ge <| le_of_lt <| Nat.lt_add_one_iff.2 <| le_of_not_lt <| (HNFil_ne_top_iff_lt_len μ n).not.1 (not_ne_iff.2 hn.symm))
 
+@[simp]
+lemma balabala1 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+{S : Type*} [CompleteLattice S]
+{μ : {p :ℒ × ℒ // p.1 < p.2} → S}
+(s : RelSeries (IsIntervalSemistable μ))
+{i : ℕ} (hi : i + 1 < s.length)
+ : s.toFun ↑i < s.toFun ↑(i + 1) := by
+  have := (s.step ⟨i,Nat.lt_of_succ_lt hi⟩).choose
+  simp only [Fin.castSucc_mk, Fin.succ_mk] at this
+  convert this
+  · exact Fin.val_cast_of_lt <| lt_trans (Nat.lt_add_one _) <| lt_trans hi <| Nat.lt_add_one _
+  · exact Fin.val_cast_of_lt <| lt_trans hi <| Nat.lt_add_one _
+
+@[simp]
+lemma balabala2 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+{S : Type*} [CompleteLattice S]
+{μ : {p :ℒ × ℒ // p.1 < p.2} → S}
+(s : RelSeries (IsIntervalSemistable μ))
+{i : ℕ} (hi : i + 1 < s.length)
+ : s.toFun ↑(i + 1) < s.toFun ↑(i + 2) := by
+  have := (s.step ⟨i+1, hi⟩).choose
+  simp only [Fin.castSucc_mk, Fin.succ_mk] at this
+  convert this
+  · exact Fin.val_cast_of_lt <| Nat.lt_add_right 1 hi
+  · simp only [Fin.val_natCast, Nat.mod_succ_eq_iff_lt, Nat.succ_eq_add_one]
+    exact Nat.succ_lt_succ hi
 
 end impl
 

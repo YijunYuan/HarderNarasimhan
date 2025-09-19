@@ -1,5 +1,5 @@
 import HarderNarasimhan.Semistability.Results
-
+import Mathlib.Order.RelSeries
 open Classical
 
 namespace HarderNarasimhan
@@ -27,5 +27,11 @@ structure HarderNarasimhanFiltration
   strict_mono          : ∀ i j : ℕ, i < j → j ≤ Nat.find (fin_len) → filtration i < filtration j
   piecewise_semistable : ∀ i : ℕ, (h: i < Nat.find (fin_len)) → Semistable (Resμ ⟨(filtration i, filtration (i+1)), strict_mono i (i+1) (lt_add_one i) h⟩ μ)
   μA_pseudo_strict_anti: ∀ i : ℕ, (hi : i + 1 < Nat.find fin_len) → ¬ μA μ ⟨(filtration i, filtration (i+1)), strict_mono i (i+1) (lt_add_one i) <| le_of_lt hi⟩ ≤ μA μ ⟨(filtration (i+1), filtration (i+2)), strict_mono (i+1) (i+2) (Nat.lt_add_one (i + 1)) hi⟩
+
+def IsIntervalSemistable {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+{S : Type*} [CompleteLattice S]
+(μ : {p :ℒ × ℒ // p.1 < p.2} → S)
+(x y : ℒ) : Prop :=
+  ∃ h : x < y, Semistable (Resμ ⟨(x, y), h⟩ μ)
 
 end HarderNarasimhan

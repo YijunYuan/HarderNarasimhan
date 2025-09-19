@@ -50,7 +50,12 @@ instance {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ] : 
     coe := fun a ↦ ⟨a,⟨bot_le,le_top⟩⟩
 
 
-def Resμ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ] (z : {p : ℒ × ℒ // p.1 < p.2}) {S : Type*} [CompleteLattice S] (μ : {p :ℒ × ℒ // p.1 < p.2} → S): {p :(Interval z) × (Interval z) // p.1 < p.2} → S := fun p ↦ μ ⟨(p.val.1.val,p.val.2.val),Subtype.GCongr.coe_lt_coe <| Subtype.mk_lt_mk.2 (lt_iff_le_not_le.mpr p.prop)⟩
+lemma lt_lt {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ] {z : {p : ℒ × ℒ // p.1 < p.2}} {p : {p :(Interval z) × (Interval z) // p.1 < p.2}} : (p.val.1.val, p.val.2.val).1 < (p.val.1.val, p.val.2.val).2 := by
+  refine Subtype.coe_lt_coe.mpr ?_
+  refine Subtype.mk_lt_mk.2 (lt_iff_le_not_le.mpr p.prop)
+
+
+def Resμ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ] (z : {p : ℒ × ℒ // p.1 < p.2}) {S : Type*} [CompleteLattice S] (μ : {p :ℒ × ℒ // p.1 < p.2} → S): {p :(Interval z) × (Interval z) // p.1 < p.2} → S := fun p ↦ μ ⟨(p.val.1.val,p.val.2.val), lt_lt⟩
 
 
 instance {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ] {z : {p : ℒ × ℒ // p.1 < p.2}} {S : Type*} [CompleteLattice S] : Coe ({p :ℒ × ℒ // p.1 < p.2} → S) ({p :(Interval z) × (Interval z) // p.1 < p.2} → S) where
@@ -70,7 +75,7 @@ lemma μ_res_intvl {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrd
 {μ : {p :ℒ × ℒ // p.1 < p.2} → S}
 {J : {p :(Interval I) × (Interval I) // p.1 < p.2}} :
 ------------
-(Resμ I μ) J = μ ⟨(J.val.1.val,J.val.2.val),Subtype.GCongr.coe_lt_coe <| Subtype.mk_lt_mk.2 (lt_iff_le_not_le.mpr J.prop)⟩
+(Resμ I μ) J = μ ⟨(J.val.1.val,J.val.2.val),lt_lt⟩
 ------------
 := rfl
 
@@ -80,7 +85,7 @@ lemma μmax_res_intvl {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [Bounded
 {μ : {p :ℒ × ℒ // p.1 < p.2} → S}
 {J : {p :(Interval I) × (Interval I) // p.1 < p.2}} :
 ------------
-μmax (Resμ I μ) J = μmax μ ⟨(J.val.1.val,J.val.2.val),Subtype.GCongr.coe_lt_coe <| Subtype.mk_lt_mk.2 (lt_iff_le_not_le.mpr J.prop)⟩
+μmax (Resμ I μ) J = μmax μ ⟨(J.val.1.val,J.val.2.val),lt_lt⟩
 ------------
 := by
   unfold μmax
@@ -108,7 +113,7 @@ lemma μmin_res_intvl {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [Bounded
 {μ : {p :ℒ × ℒ // p.1 < p.2} → S}
 {J : {p :(Interval I) × (Interval I) // p.1 < p.2}} :
 ------------
-μmin (Resμ I μ) J = μmin μ ⟨(J.val.1.val,J.val.2.val),Subtype.GCongr.coe_lt_coe <| Subtype.mk_lt_mk.2 (lt_iff_le_not_le.mpr J.prop)⟩
+μmin (Resμ I μ) J = μmin μ ⟨(J.val.1.val,J.val.2.val),lt_lt⟩
 ------------
 := by
   unfold μmin
@@ -136,7 +141,7 @@ lemma μA_res_intvl {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOr
 {μ : {p :ℒ × ℒ // p.1 < p.2} → S}
 {J : {p :(Interval I) × (Interval I) // p.1 < p.2}} :
 ------------
-μA (Resμ I μ) J = μA μ ⟨(J.val.1.val,J.val.2.val),Subtype.GCongr.coe_lt_coe <| Subtype.mk_lt_mk.2 (lt_iff_le_not_le.mpr J.prop)⟩
+μA (Resμ I μ) J = μA μ ⟨(J.val.1.val,J.val.2.val),lt_lt⟩
 ------------
 := by
   unfold μA
@@ -164,7 +169,7 @@ lemma μB_res_intvl {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOr
 {μ : {p :ℒ × ℒ // p.1 < p.2} → S}
 {J : {p :(Interval I) × (Interval I) // p.1 < p.2}} :
 ------------
-μB (Resμ I μ) J = μB μ ⟨(J.val.1.val,J.val.2.val),Subtype.GCongr.coe_lt_coe <| Subtype.mk_lt_mk.2 (lt_iff_le_not_le.mpr J.prop)⟩
+μB (Resμ I μ) J = μB μ ⟨(J.val.1.val,J.val.2.val),lt_lt⟩
 ------------
 := by
   unfold μB
