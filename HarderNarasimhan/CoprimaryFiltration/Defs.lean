@@ -9,12 +9,10 @@ import Mathlib.RingTheory.Ideal.AssociatedPrime.Finiteness
 
 import HarderNarasimhan.Basic
 import HarderNarasimhan.Convexity.Results
---import HarderNarasimhan.DedekindMacNeilleCompletion
 import HarderNarasimhan.OrderTheory.DedekindMacNeilleCompletion
 import HarderNarasimhan.Semistability.Defs
 import HarderNarasimhan.Filtration.Results
 import HarderNarasimhan.OrderTheory.Lex'Order
-import HarderNarasimhan.Filtration.Results
 
 namespace HarderNarasimhan
 
