@@ -64,6 +64,26 @@ Nonempty (JordanHolderFiltration μ)
 }
 
 
+theorem exists_JordanHolderSeries {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
+{S : Type*} [CompleteLinearOrder S]
+{μ : {p : ℒ × ℒ // p.1 < p.2} → S}
+[hftp : FiniteTotalPayoff μ] [hsl : SlopeLike μ] [hst : Semistable μ] [hwdcc' : StrongDescendingChainCondition' μ] :
+------------
+∃ s : RelSeries (JordanHolderRel μ), s.head = ⊤ ∧ s.last = ⊥
+------------
+:= by
+  have := (inferInstance : Nonempty (JordanHolderFiltration μ)).some
+  let JH : RelSeries (JordanHolderRel μ) := {
+    length := Nat.find this.fin_len,
+    toFun := fun n ↦ this.filtration n.toNat,
+    step := by
+      intro n
+      use this.strict_anti n n.succ (Nat.lt_add_one ↑n) (Fin.is_le n.succ)
+      exact ⟨this.step_cond₁ n n.isLt,this.step_cond₂ n n.isLt⟩
+  }
+  exact ⟨JH, ⟨this.first_eq_top, Nat.find_spec this.fin_len⟩⟩
+
+
 theorem piecewise_stable_of_JordanHolderFiltration
 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLinearOrder S]

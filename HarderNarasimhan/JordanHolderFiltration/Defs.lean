@@ -22,7 +22,6 @@ class StrongDescendingChainCondition' {ℒ : Type*} [Nontrivial ℒ] [Lattice �
 structure JordanHolderFiltration {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : {p : ℒ × ℒ // p.1 < p.2} → S)
---[FiniteTotalPayoff μ] [SlopeLike μ] [Semistable μ] [StrongDescendingChainCondition' μ]
 where
   filtration : ℕ → ℒ
   antitone : Antitone filtration
@@ -34,7 +33,14 @@ where
     ∀ z : ℒ, (h' : filtration (i+1) < z) → (h'' : z < filtration i) →
     μ ⟨(filtration (i+1), z), h'⟩ < μ ⟨(filtration (i+1), filtration i), strict_anti i (i+1) (lt_add_one i) hi⟩
 
-
+def JordanHolderRel {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+{S : Type*} [CompleteLattice S]
+(μ : {p : ℒ × ℒ // p.1 < p.2} → S) : SetRel ℒ ℒ :=
+{(x, y) | ∃ h : y < x,
+    μ ⟨(y, x), h⟩ = μ ⟨(⊥,⊤),bot_lt_top⟩
+  ∧ ∀ z : ℒ, (h' : y < z) → (h'' : z < x) →
+    μ ⟨(y, z), h'⟩ < μ ⟨(y , x), h⟩
+}
 
 instance {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
