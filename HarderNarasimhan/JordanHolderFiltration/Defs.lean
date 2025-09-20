@@ -50,7 +50,7 @@ StrongDescendingChainCondition μ where
 instance {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 {μ : {p : ℒ × ℒ // p.1 < p.2} → S} [h : StrongDescendingChainCondition' μ] {I : {p : ℒ × ℒ // p.1 < p.2}} : StrongDescendingChainCondition' (Resμ I μ) where
-  wdcc' := fun f saf ↦ h.wdcc' (fun n ↦ (f n).val) fun ⦃_ _⦄ hn ↦ lt_iff_le_not_le.mpr (saf hn)
+  wdcc' := fun f saf ↦ h.wdcc' (fun n ↦ (f n).val) fun ⦃_ _⦄ hn ↦ lt_iff_le_not_ge.mpr (saf hn)
 
 
 class Affine {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
@@ -87,7 +87,7 @@ instance {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFo
     rw [← this]
     apply le_sSup
     use x, ⟨in_TotIntvl x, Ne.symm <| bot_lt_iff_ne_bot.1 hx⟩
-  exact (not_le_of_lt <| h ▸ lt_top_iff_ne_top.2 hftp.fin_tot_payoff) this_q
+  exact (not_le_of_gt <| h ▸ lt_top_iff_ne_top.2 hftp.fin_tot_payoff) this_q
 
 
 end HarderNarasimhan

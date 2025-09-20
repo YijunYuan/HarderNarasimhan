@@ -228,7 +228,7 @@ lemma JHFil_prop₂ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
         exact this.symm
       · simp only [JHFil,hne] at hfp1bot
         simp only [↓reduceDIte, not_true_eq_false] at hfp1bot
-    exact (JHFil_prop₁ μ hμ hμsl hst hdc k hk ).symm ▸ lt_trans ((Or.resolve_right <| (Or.resolve_left <| (impl.prop4d6 μ).1 hμsl ⊥ (JHFil μ hμ hμsl hst hdc (k + 1)) z ⟨bot_lt_iff_ne_bot.2 hfp1bot,h'⟩) (not_and_iff_not_or_not.2 <| Or.inl <| not_lt_of_lt <| h'''' ▸ h''')) (not_and_iff_not_or_not.2 <| Or.inl <| ne_of_gt <| h'''' ▸ h''')).2 h'''
+    exact (JHFil_prop₁ μ hμ hμsl hst hdc k hk ).symm ▸ lt_trans ((Or.resolve_right <| (Or.resolve_left <| (impl.prop4d6 μ).1 hμsl ⊥ (JHFil μ hμ hμsl hst hdc (k + 1)) z ⟨bot_lt_iff_ne_bot.2 hfp1bot,h'⟩) (not_and_iff_not_or_not.2 <| Or.inl <| not_lt_of_gt <| h'''' ▸ h''')) (not_and_iff_not_or_not.2 <| Or.inl <| ne_of_gt <| h'''' ▸ h''')).2 h'''
 
 
 lemma JH_pos_len {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
@@ -264,7 +264,7 @@ lemma subseq_prop0 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
       use j+1
       simp only [subseq,hj ▸ h]
       simp only [↓reduceDIte]
-      have hq := subseq._proof_6 f atf j (Eq.mpr_not (eq_false (hj ▸ h)) (of_eq_false (Eq.refl False)))
+      have hq := subseq._proof_2 f atf j (Eq.mpr_not (eq_false (hj ▸ h)) (of_eq_false (Eq.refl False)))
       have : i + 1 = Nat.find hq := by
         apply eq_of_le_of_le
         · have : Nat.find hq > i := by
@@ -293,14 +293,14 @@ lemma subseq_prop0' {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
       exact ht.2 ▸ (Eq.symm <| le_bot_iff.1 <| ht.2 ▸ hf (Nat.le_succ t))
     else
     simp only [ge_iff_le, hcond, ↓reduceDIte]
-    have hq := subseq._proof_6 f atf i (of_eq_false (eq_false hcond))
+    have hq := subseq._proof_2 f atf i (of_eq_false (eq_false hcond))
     rcases hi with ⟨t,ht⟩
     rw [ht.2] at hq
     use Nat.find hq
     constructor
     · have : Nat.find hq > t := by
         by_contra d
-        apply le_of_not_lt at d
+        apply le_of_not_gt at d
         if hy: Nat.find hq = t then
           exact (lt_self_iff_false (f t)).mp (Eq.mp (congrArg (fun _a ↦ f _a < f t) hy) <| Nat.find_spec hq)
         else
@@ -325,7 +325,7 @@ lemma subseq_prop2 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
       simp only [hcond, ↓reduceDIte, le_refl]
     else
     simp only [hcond, ↓reduceDIte]
-    exact le_of_lt <| Nat.find_spec <| subseq._proof_6 f atf n (of_eq_false (eq_false hcond))
+    exact le_of_lt <| Nat.find_spec <| subseq._proof_2 f atf n (of_eq_false (eq_false hcond))
 
 
 lemma subseq_prop3 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] (f : ℕ → ℒ) (hf0 : f 0 = ⊤) (atf : ∃ k, f k = ⊥) (hfat: Antitone f): ∀ k : ℕ, subseq f atf k ≤ f k := by
@@ -356,7 +356,7 @@ lemma subseq_prop5 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
         exact (Nat.find_min (subseq_prop1 f atf hfat hf0) (Nat.lt_of_add_one_le h)) hcond
       else
       simp only [hcond, ↓reduceDIte]
-      exact Nat.find_spec (subseq._proof_6 f atf i (of_eq_false (eq_false hcond)))
+      exact Nat.find_spec (subseq._proof_2 f atf i (of_eq_false (eq_false hcond)))
     · intro j hij hind hj
       simp only [subseq]
       if hcond : subseq f atf j = ⊥ then
@@ -368,10 +368,10 @@ lemma subseq_prop5 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
       else
       simp only [hcond, ↓reduceDIte]
       if hcond' : j ≤ Nat.find (subseq_prop1 f atf hfat hf0) then
-        exact lt_trans (Nat.find_spec (subseq._proof_6 f atf j (of_eq_false (eq_false hcond)))) <| hind hcond'
+        exact lt_trans (Nat.find_spec (subseq._proof_2 f atf j (of_eq_false (eq_false hcond)))) <| hind hcond'
       else
       by_contra!
-      exact hcond <| le_bot_iff.1 <| (Nat.find_spec (subseq_prop1 f atf hfat hf0)) ▸ subseq_prop2 f atf (le_of_lt <| lt_of_not_le hcond')
+      exact hcond <| le_bot_iff.1 <| (Nat.find_spec (subseq_prop1 f atf hfat hf0)) ▸ subseq_prop2 f atf (le_of_lt <| lt_of_not_ge hcond')
   exact fun j hij hle ↦ this j hij hle
 
 
@@ -396,7 +396,7 @@ lemma subseq_prop4 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
       if hd' : d2 < d1 then
         exact False.elim <| (lt_self_iff_false (subseq f atf ↑d2)).mp <| this ▸ subseq_prop5 f hf0 atf hfat d2 d1 hd' (Fin.is_le d1)
       else
-      exact Fin.le_antisymm (le_of_not_lt hd') (le_of_not_lt hd)
+      exact Fin.le_antisymm (le_of_not_gt hd') (le_of_not_gt hd)
   let fS : Fin (k+1) → 𝒮 := fun n ↦ ⟨f n,Set.mem_setOf.mpr ⟨n,⟨Fin.is_le n,rfl⟩⟩⟩
   have fSsuj : Function.Surjective fS := by
     intro y
@@ -428,11 +428,11 @@ lemma subseq_prop6 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
     (expose_names; exact Ne.bot_lt' (id (Ne.symm hcond_1)))
   let jtilde := Nat.find hcondnew
   expose_names
-  have heq : Nat.find ((funext fun k ↦ congrArg (LT.lt (f k)) hj) ▸ subseq._proof_6 f atf i (of_eq_false (eq_false hcond_1))) = (jtilde -1) +1:= by
+  have heq : Nat.find ((funext fun k ↦ congrArg (LT.lt (f k)) hj) ▸ subseq._proof_2 f atf i (of_eq_false (eq_false hcond_1))) = (jtilde -1) +1:= by
     refine (Nat.sub_eq_iff_eq_add ?_).mp rfl
     by_contra!
     simp only [Nat.lt_one_iff, Nat.find_eq_zero] at this
-    exact (not_lt_of_le le_top) <| hf0 ▸ this
+    exact (not_lt_of_ge le_top) <| hf0 ▸ this
   have ha : f j = f (jtilde -1) := by
     have : ∀ j' : ℕ, j ≤ j' → j' < jtilde → f j' = f j := by
       apply Nat.le_induction
@@ -453,7 +453,7 @@ lemma subseq_prop6 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
       arg 1;
       apply Nat.sub_one_add_one <| fun this ↦ (lt_self_iff_false ⊤).mp <| hf0 ▸ lt_of_lt_of_le (this ▸ yah) le_top
     exact yah
-  have := ho (jtilde -1) (byContradiction fun this' ↦ not_le_of_gt (lt_of_le_of_lt bot_le yah) (Nat.find_spec atf ▸ hfat (le_of_not_lt this'))) this
+  have := ho (jtilde -1) (byContradiction fun this' ↦ not_le_of_gt (lt_of_le_of_lt bot_le yah) (Nat.find_spec atf ▸ hfat (le_of_not_gt this'))) this
   simp only [← heq] at this
   exact this
 
@@ -626,7 +626,7 @@ lemma stable_of_step_cond₂ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [Bound
       exact (h i hi) x.val (lt_of_le_of_ne x.prop.1 (by
           by_contra hc
           exact hx <| Subtype.coe_inj.1 <| id (Eq.symm hc)
-          )) <| lt_iff_le_not_le.mpr (lt_top_iff_ne_top.2 hx')
+          )) <| lt_iff_le_not_ge.mpr (lt_top_iff_ne_top.2 hx')
 
 lemma res_ss {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLinearOrder S]
@@ -777,7 +777,7 @@ lemma induction_on_length_of_JordanHolderFiltration : ∀ n : ℕ, ∀ ℒ : Typ
                 simp only [ne_eq, Set.mem_setOf_eq]
                 use u, ⟨in_TotIntvl _,Ne.symm hubot⟩
               rw [this] at this'
-              exact (not_le_of_lt hc this').elim
+              exact (not_le_of_gt hc this').elim
             · apply sInf_le
               simp only [ne_eq, id_eq, Set.mem_setOf_eq]
               use ⊥
@@ -816,7 +816,7 @@ lemma induction_on_length_of_JordanHolderFiltration : ∀ n : ℕ, ∀ ℒ : Typ
                 simp only [ne_eq, Set.mem_setOf_eq]
                 use u, ⟨in_TotIntvl _,Ne.symm hubot⟩
               rw [this] at this'
-              exact (not_le_of_lt hc this').elim
+              exact (not_le_of_gt hc this').elim
             · apply sInf_le
               simp only [ne_eq, id_eq, Set.mem_setOf_eq]
               use ⊥
@@ -825,12 +825,12 @@ lemma induction_on_length_of_JordanHolderFiltration : ∀ n : ℕ, ∀ ℒ : Typ
           rw [← t1,← t2]
           exact Eq.symm (min_self (μ TotIntvl))
       have tj1 := hj' j (le_of_lt <| lt_of_lt_of_le hj <| Nat.find_min' ((⟨Nat.find JHy.fin_len,JH_raw_fin_len⟩) : ∃ k, JH_raw k = ⊥) JH_raw_fin_len)
-      have := tj1 ▸ ((seesaw' μ hsl ⊥ (JHx.filtration (Nat.find JHx.fin_len -1) ⊔ JHy.filtration (j+1)) (JHx.filtration (Nat.find JHx.fin_len -1) ⊔ JHy.filtration j) ⟨lt_of_lt_of_le (bot_lt_iff_ne_bot.2 <| Nat.find_min JHx.fin_len <| Nat.sub_one_lt <| JH_pos_len JHx) le_sup_left,lt_iff_le_not_le.mpr hfj⟩).2.2.1 <| tj1 ▸ hj' (j+1) (lt_of_lt_of_le hj <| Nat.find_min' ((⟨Nat.find JHy.fin_len,JH_raw_fin_len⟩) : ∃ k, JH_raw k = ⊥) JH_raw_fin_len)).2
+      have := tj1 ▸ ((seesaw' μ hsl ⊥ (JHx.filtration (Nat.find JHx.fin_len -1) ⊔ JHy.filtration (j+1)) (JHx.filtration (Nat.find JHx.fin_len -1) ⊔ JHy.filtration j) ⟨lt_of_lt_of_le (bot_lt_iff_ne_bot.2 <| Nat.find_min JHx.fin_len <| Nat.sub_one_lt <| JH_pos_len JHx) le_sup_left,lt_iff_le_not_ge.mpr hfj⟩).2.2.1 <| tj1 ▸ hj' (j+1) (lt_of_lt_of_le hj <| Nat.find_min' ((⟨Nat.find JHy.fin_len,JH_raw_fin_len⟩) : ∃ k, JH_raw k = ⊥) JH_raw_fin_len)).2
       rw [← this]
       exact id (Eq.symm htrans)
     let JH_FINAL : JordanHolderFiltration (Resμ Ires μ) := by
       refine { filtration := JHfinal, antitone := subseq_prop2 JH_raw (⟨Nat.find JHy.fin_len,JH_raw_fin_len⟩), fin_len := subseq_prop1 JH_raw (⟨Nat.find JHy.fin_len,JH_raw_fin_len⟩) JH_raw_antitone JH_raw_first_top, strict_anti := fun i j hij hj ↦ subseq_prop5 JH_raw JH_raw_first_top (⟨Nat.find JHy.fin_len,JH_raw_fin_len⟩) JH_raw_antitone i j hij hj, first_eq_top := by simp only [JHfinal_first_top], step_cond₁ := fun k1 hk1 ↦ subseq_prop6 JH_raw JH_raw_first_top (⟨Nat.find JHy.fin_len,JH_raw_fin_len⟩) JH_raw_antitone (fun z ↦ (Resμ Ires μ) z = (Resμ Ires μ) ⟨(⊥,⊤),bot_lt_top⟩) hcond1 k1 hk1, step_cond₂ := ?_ }
-      · refine fun i hi ↦ subseq_prop6 JH_raw JH_raw_first_top (⟨Nat.find JHy.fin_len,JH_raw_fin_len⟩) JH_raw_antitone (fun w ↦ ∀ z : (Interval Ires), (hw : w.val.1 < z) → z < w.val.2 → (Resμ Ires μ) ⟨(w.val.1,z),hw⟩ < (Resμ Ires μ) w ) (fun j hj hfj w hw1 hw2 ↦ ((seesaw' μ hsl ↑(JH_raw (j + 1)) w ↑(JH_raw j) ⟨lt_iff_le_not_le.mpr hw1,lt_iff_le_not_le.mpr hw2⟩).1.2.2 ?_).1) i hi
+      · refine fun i hi ↦ subseq_prop6 JH_raw JH_raw_first_top (⟨Nat.find JHy.fin_len,JH_raw_fin_len⟩) JH_raw_antitone (fun w ↦ ∀ z : (Interval Ires), (hw : w.val.1 < z) → z < w.val.2 → (Resμ Ires μ) ⟨(w.val.1,z),hw⟩ < (Resμ Ires μ) w ) (fun j hj hfj w hw1 hw2 ↦ ((seesaw' μ hsl ↑(JH_raw (j + 1)) w ↑(JH_raw j) ⟨lt_iff_le_not_ge.mpr hw1,lt_iff_le_not_ge.mpr hw2⟩).1.2.2 ?_).1) i hi
         have := hcond1 j hj hfj; simp only [Resμ] at this
         have this' := JHx.step_cond₁ (Nat.find JHx.fin_len - 1) (by omega)
         simp only [Nat.sub_one_add_one <| JH_pos_len JHx,Nat.find_spec JHx.fin_len] at this'
@@ -839,31 +839,31 @@ lemma induction_on_length_of_JordanHolderFiltration : ∀ n : ℕ, ∀ ℒ : Typ
         have hproblem : JHy.filtration (j + 1) ≠ JHy.filtration j ⊓ ↑w := by
           by_contra hc
           simp only [JH_raw] at hw1
-          have hw1 := lt_iff_le_not_le.mpr hw1
+          have hw1 := lt_iff_le_not_ge.mpr hw1
           simp only [JH_raw] at hw2
-          have hw2 := lt_iff_le_not_le.mpr hw2
+          have hw2 := lt_iff_le_not_ge.mpr hw2
           have := @hmod.sup_inf_le_assoc_of_le (JHx.filtration (Nat.find JHx.fin_len - 1)) (JHy.filtration j) w.val (by
             apply le_of_lt <| lt_of_le_of_lt le_sup_left hw1
             )
           rw [← hc, inf_eq_right.2 <| le_of_lt hw2] at this
-          exact (not_le_of_lt hw1) this
+          exact (not_le_of_gt hw1) this
         have hnle : ¬ (JHy.filtration j ≤ w) := by
           by_contra hc
           simp only [JH_raw] at hw2
-          refine (not_le_of_lt hw2) ?_
+          refine (not_le_of_gt hw2) ?_
           apply sup_le_iff.2
           refine ⟨?_,hc⟩
           simp only [JH_raw] at hw1
           have hw1 : JHx.filtration (Nat.find JHx.fin_len - 1) ⊔ JHy.filtration (j + 1) < w.val := by
-            exact lt_iff_le_not_le.mpr hw1
+            exact lt_iff_le_not_ge.mpr hw1
           apply le_of_lt <| lt_of_le_of_lt le_sup_left hw1
-        have heqs : μ ⟨(↑w, ↑(JH_raw j)), lt_iff_le_not_le.mpr hw2⟩ = μ ⟨(JHy.filtration j ⊓ w,JHy.filtration j),inf_lt_left.2 hnle⟩ := by
+        have heqs : μ ⟨(↑w, ↑(JH_raw j)), lt_iff_le_not_ge.mpr hw2⟩ = μ ⟨(JHy.filtration j ⊓ w,JHy.filtration j),inf_lt_left.2 hnle⟩ := by
           rw [affine.affine (JHy.filtration j) w.val hnle]
           have : ↑(JH_raw j) = JHy.filtration j ⊔ w.val := by
             simp only [JH_raw]
             apply eq_of_le_of_le ?_ ?_
             · simp only [JH_raw] at hw1
-              have hw1 := lt_iff_le_not_le.mpr hw1
+              have hw1 := lt_iff_le_not_ge.mpr hw1
               have hw1 := sup_le_sup_right (le_of_lt hw1) (JHy.filtration j)
               have := left_eq_sup.2 <| JHy.antitone (Nat.le_add_right j 1)
               rw [sup_comm] at this
@@ -871,7 +871,7 @@ lemma induction_on_length_of_JordanHolderFiltration : ∀ n : ℕ, ∀ ℒ : Typ
               nth_rw 2 [sup_comm] at hw1
               exact hw1
             · simp only [JH_raw] at hw2
-              have hw2 := lt_iff_le_not_le.mpr hw2
+              have hw2 := lt_iff_le_not_ge.mpr hw2
               have hw2 := sup_le_sup_right (le_of_lt hw2) (JHy.filtration j)
               nth_rw 1 [sup_assoc,sup_comm] at hw2
               simp only [Nat.find_le_iff, forall_exists_index, and_imp, Nat.lt_find_iff, ne_eq,
@@ -882,7 +882,7 @@ lemma induction_on_length_of_JordanHolderFiltration : ∀ n : ℕ, ∀ ℒ : Typ
         have hlt : JHy.filtration (j+1) < JHy.filtration j ⊓ w := by
           refine lt_of_le_of_ne (le_inf (JHy.antitone <| Nat.le_add_right j 1) ?_) hproblem
           simp only [sup_comm, JH_raw] at hw1
-          exact le_of_lt <| lt_of_le_of_lt (le_sup_left) <| lt_iff_le_not_le.mpr hw1
+          exact le_of_lt <| lt_of_le_of_lt (le_sup_left) <| lt_iff_le_not_ge.mpr hw1
         refine ((seesaw' μ hsl (JHy.filtration (j+1)) (JHy.filtration j ⊓ w) (JHy.filtration j) ⟨hlt,inf_lt_left.2 hnle⟩).1.1 ?_).2
         exact JHy.step_cond₂ j (by
           have this' := Nat.find_min (Exists.intro (Nat.find JHy.fin_len) JH_raw_fin_len : ∃ k, JH_raw k = ⊥) hj
@@ -924,7 +924,7 @@ lemma induction_on_length_of_JordanHolderFiltration : ∀ n : ℕ, ∀ ℒ : Typ
                   exact Nat.find_min JHx.fin_len (Nat.sub_one_lt <| JH_pos_len JHx) this'
             have otherwise := JHy.step_cond₂ i0 ((Nat.le_sub_one_iff_lt <| zero_lt_iff.2 <| JH_pos_len JHy).1 this) ↑(JH_raw (i0 + 1)) hsmall hc
             rw [JHy.step_cond₁ i0 <| lt_of_le_of_lt this <| Nat.sub_one_lt <| JH_pos_len JHy ] at otherwise
-            refine (lt_iff_not_le.1 otherwise) ?_
+            refine (lt_iff_not_ge.1 otherwise) ?_
             rw [← JHx.step_cond₁ (Nat.find JHx.fin_len - 1) (by omega)]
             simp only [Nat.sub_one_add_one <| JH_pos_len JHx]
             have himp : ¬ JHx.filtration (Nat.find JHx.fin_len - 1) ≤ JHy.filtration (i0+1) := by
@@ -946,7 +946,7 @@ lemma induction_on_length_of_JordanHolderFiltration : ∀ n : ℕ, ∀ ℒ : Typ
                 exact Ne.bot_lt' hif
               have := le_of_lt <| JHx.step_cond₂ (Nat.find JHx.fin_len -1) (Nat.sub_one_lt <| JH_pos_len JHx) (JHx.filtration (Nat.find JHx.fin_len -1) ⊓ JHy.filtration (i0 + 1)) ((Nat.sub_one_add_one <| JH_pos_len JHx) ▸ hh) <| inf_lt_left.mpr himp
               simp only [Nat.sub_one_add_one <| JH_pos_len JHx] at this
-              exact byContradiction fun hcc ↦  (lt_iff_not_le.1 <| ((seesaw' μ hsl (JHx.filtration (Nat.find JHx.fin_len)) (JHx.filtration (Nat.find JHx.fin_len -1) ⊓ JHy.filtration (i0 + 1)) (JHx.filtration (Nat.find JHx.fin_len -1)) ⟨hh,inf_lt_left.mpr himp⟩).2.1.2.2 <| lt_of_not_le hcc).1) this
+              exact byContradiction fun hcc ↦  (lt_iff_not_ge.1 <| ((seesaw' μ hsl (JHx.filtration (Nat.find JHx.fin_len)) (JHx.filtration (Nat.find JHx.fin_len -1) ⊓ JHy.filtration (i0 + 1)) (JHx.filtration (Nat.find JHx.fin_len -1)) ⟨hh,inf_lt_left.mpr himp⟩).2.1.2.2 <| lt_of_not_ge hcc).1) this
           exact Subtype.coe_inj.1 <| h1 ▸ (sup_eq_right.2 this)
     let JHfun : ℕ → Interval Ires := fun n ↦
       if hn : n ≤ Nat.find JHx.fin_len - 1 then
@@ -956,7 +956,7 @@ lemma induction_on_length_of_JordanHolderFiltration : ∀ n : ℕ, ∀ ℒ : Typ
     have JHfun_fin_len : ∃ N : ℕ, JHfun N = ⊥ := by
         simp only [JHfun]
         use Nat.find JHx.fin_len
-        simp only [lt_iff_not_le.1 <| Nat.sub_one_lt <| JH_pos_len JHx, ↓reduceDIte, JHfun]
+        simp only [lt_iff_not_ge.1 <| Nat.sub_one_lt <| JH_pos_len JHx, ↓reduceDIte, JHfun]
     have JHfun_antitone : Antitone JHfun := by
         intro n1 n2 hn
         by_cases h3 : n2 ≤ Nat.find JHx.fin_len - 1
@@ -1010,10 +1010,10 @@ lemma induction_on_length_of_JordanHolderFiltration : ∀ n : ℕ, ∀ ℒ : Typ
         simp only [Resμ]
         have htemp : JHx.filtration (i + 1) < z.val := by
           simp only [JHfun,Eq.mpr (id (congrArg (fun _a ↦ i + 1 ≤ _a) hhard.symm)) hi] at hz
-          exact lt_iff_le_not_le.mpr hz
+          exact lt_iff_le_not_ge.mpr hz
         have htemp2 : z < JHx.filtration i := by
           simp only [JHfun,le_of_lt <| hhard ▸ hi] at hz'; simp only [↓reduceDIte, JHfun] at hz'
-          exact lt_iff_le_not_le.mpr hz'
+          exact lt_iff_le_not_ge.mpr hz'
         simp only [JHfun]; simp only [Eq.mpr (id (congrArg (fun _a ↦ i + 1 ≤ _a) hhard.symm)) hi,
           ↓reduceDIte, le_of_lt <| hhard ▸ hi, gt_iff_lt, JHfun]
         exact JHx.step_cond₂ i (Nat.lt_of_lt_pred <| hhard ▸ hi) z htemp htemp2

@@ -35,7 +35,7 @@ Nonempty (JordanHolderFiltration μ)
           exists_false, Set.setOf_false, Set.not_nonempty_empty, ↓reduceDIte]
         : ∀ n : ℕ, Nat.find (impl.JHFil_fin_len μ hftp.fin_tot_payoff hsl hst hwdcc'.wdcc') ≤ n →
           impl.JHFil μ hftp.fin_tot_payoff hsl hst hwdcc'.wdcc' n = ⊥)
-      y (le_of_lt <| lt_of_not_le hy) ▸ bot_le,
+      y (le_of_lt <| lt_of_not_ge hy) ▸ bot_le,
   fin_len := impl.JHFil_fin_len μ hftp.fin_tot_payoff hsl hst hwdcc'.wdcc',
   strict_anti := fun x y hxy hx' ↦
     (Nat.le_induction

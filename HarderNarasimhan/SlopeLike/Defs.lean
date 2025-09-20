@@ -41,6 +41,6 @@ instance {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 {μ : {p : ℒ × ℒ // p.1 < p.2} → S} [hsl : SlopeLike μ]
 {z : {p : ℒ × ℒ // p.1 < p.2}} : SlopeLike (Resμ z μ)
-:= { slopelike := fun x y z h ↦ hsl.slopelike x.val y.val z.val ⟨lt_iff_le_not_le.2 h.1,lt_iff_le_not_le.2 h.2⟩ }
+:= { slopelike := fun x y z h ↦ hsl.slopelike x.val y.val z.val ⟨lt_iff_le_not_ge.2 h.1,lt_iff_le_not_ge.2 h.2⟩ }
 
 end HarderNarasimhan

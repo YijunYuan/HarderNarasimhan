@@ -76,7 +76,7 @@ SlopeLike μ → ∀ (x y z : ℒ), (h : x < y ∧ y < z) →
     refine ⟨fun h' ↦ ?_,⟨fun h' ↦ (Or.resolve_right <| Or.resolve_right h1 <| fun t ↦ (lt_self_iff_false _).1 <| t.1 ▸ t.2 ▸ h') fun t ↦ (not_lt_of_gt <| gt_trans t.1 t.2) h',fun h' ↦ ?_⟩⟩
     · have := (Or.resolve_right <| Or.resolve_right h1 <| fun t ↦ (lt_self_iff_false _).1 <| t.1 ▸ h') fun t ↦ (not_lt_of_gt t.1) h'
       exact ⟨lt_trans this.1 this.2, this.2⟩
-    · have := (Or.resolve_right <| Or.resolve_right h1 <| fun t ↦ (lt_self_iff_false _).1 <| t.2 ▸ h') fun t ↦ (not_lt_of_lt h') t.2
+    · have := (Or.resolve_right <| Or.resolve_right h1 <| fun t ↦ (lt_self_iff_false _).1 <| t.2 ▸ h') fun t ↦ (not_lt_of_gt h') t.2
       exact ⟨this.1,lt_trans this.1 this.2⟩
   · refine ⟨fun h' ↦ ?_,⟨fun h' ↦  (Or.resolve_right <| Or.resolve_left h1 <| fun t ↦ not_lt_of_gt h' (lt_trans t.1 t.2)) fun t ↦ (lt_self_iff_false _).1 <| t.1 ▸ t.2 ▸ h',fun h' ↦ ?_⟩⟩
     · have := (Or.resolve_right <| Or.resolve_left h1 (fun t ↦ not_lt_of_gt h' t.left)) (fun t ↦ (lt_self_iff_false (μ ⟨(x, z), lt_trans h.1 h.2⟩)).1 (t.1 ▸ h'))

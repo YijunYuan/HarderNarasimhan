@@ -142,7 +142,7 @@ theorem theorem3d10  {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder 
         cases' h₅ with h₅ h₅
         · simp only [ge_iff_le, not_le] at h₅
           nth_rw 1 [← hn, ← eq_of_le_of_le (Nat.le_of_lt_add_one h₅) (Nat.sub_le_sub_right h₁₅ 1)] at h₃
-          exact not_le_of_lt h₃
+          exact not_le_of_gt h₃
         · exact h₅
       have h₁₃ : HNFilt n ≤ f (i - 1) := by
         simp only [HNFilt]
@@ -196,8 +196,10 @@ theorem theorem3d10  {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder 
     · apply Nat.gt_of_not_le at h₁
       rw [ffst (n+1) (Nat.le_of_succ_le h₁),eq_comm]
       rw [ffst n (Nat.le_of_lt_succ h₁)] at hn
-      exact not_ne_iff.1 <| (HNFil_ne_top_iff_lt_len μ (n+1)).not.2 (not_lt_of_ge <| le_of_lt <| Nat.lt_add_one_iff.2 <| le_of_not_lt <| (HNFil_ne_top_iff_lt_len μ n).not.1 (not_ne_iff.2 hn.symm))
+      exact not_ne_iff.1 <| (HNFil_ne_top_iff_lt_len μ (n+1)).not.2 (not_lt_of_ge <| le_of_lt <| Nat.lt_add_one_iff.2 <| le_of_not_gt <| (HNFil_ne_top_iff_lt_len μ n).not.1 (not_ne_iff.2 hn.symm))
 
+section Fil_to_RelSeries
+open Fin.NatCast
 @[simp]
 lemma balabala1 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
@@ -269,7 +271,7 @@ lemma hHFil_of_hNSeries {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrd
         ) : filtration1 F1.length = ⊤)
       refine le_antisymm this ?_
       by_contra hc
-      apply lt_of_not_le at hc
+      apply lt_of_not_ge at hc
       have t := Nat.find_spec hstrange
       simp only [if_pos this] at t
       have := t ▸ Fmono (Nat.find hstrange) F1.length hc le_rfl
@@ -316,7 +318,6 @@ lemma hHFil_of_hNSeries {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrd
         intro i hi
         have := (F1.step ⟨i,hslen ▸ hi⟩).choose_spec
         unfold filtration1
-        simp only [eq_mp_eq_cast, id_eq, eq_mpr_eq_cast, filtration1]
         rw [hslen] at hi
         convert this
         · simp only [le_of_lt hi, ↓reduceIte, Fin.castSucc_mk, filtration1]
@@ -377,6 +378,8 @@ lemma hHFil_of_hNSeries {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrd
           simp only [this, ↓reduceIte]
     }
   use HN1
+
+end Fil_to_RelSeries
 
 end impl
 

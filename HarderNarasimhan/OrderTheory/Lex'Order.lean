@@ -68,7 +68,7 @@ private def Lex'LinearOrder {α : Type*} [LinearOrder α] : LinearOrder (Finset 
         constructor
         · linarith
         · exact le_trans h1.2.2 h2.2.2
-  lt_iff_le_not_le := by
+  lt_iff_le_not_ge := by
     intro A B
     constructor
     · intro h
@@ -105,7 +105,7 @@ private def Lex'LinearOrder {α : Type*} [LinearOrder α] : LinearOrder (Finset 
     simp only
     cases' helper.1 h2 with h2 h2
     · left
-      apply le_of_not_lt at h1
+      apply le_of_not_gt at h1
       apply lt_of_le_of_ne h1 <| Ne.symm h2
     · right
       simp only [Decidable.not_not, not_le] at h2

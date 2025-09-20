@@ -227,7 +227,6 @@ lemma prop3d12p2 {R : Type*} [CommRing R] [IsNoetherianRing R]
   have : @LE.le (S₀ R) Preorder.toLE {(_μ R M I).toFinset.min' <| μ_nonempty I} {(_μ R M ⟨(N'', I.val.2), lt_of_le_of_ne ha1.2 ha2⟩).toFinset.min' <| μ_nonempty _} := by
     rw [← S₀_order.2]
     have this' : ((_μ R M ⟨(N'', I.val.2), lt_of_le_of_ne ha1.2 ha2⟩).toFinset.min' <| μ_nonempty _).asIdeal ∈ associatedPrimes R (↥I.val.2 ⧸ Submodule.submoduleOf N'' I.val.2) := by
-      simp only [Set.mem_setOf_eq]
       have := ((_μ R M ⟨(N'', I.val.2), lt_of_le_of_ne ha1.2 ha2⟩).toFinset.min'_mem <| μ_nonempty _).out
       simp only [Finset.mem_val, Set.mem_toFinset, Set.mem_setOf_eq] at this
       rcases this with ⟨p,⟨hp1,hp2⟩⟩
@@ -769,7 +768,7 @@ lemma quot_ntl {R : Type*} [CommRing R] [IsNoetherianRing R] {M : Type*} [Nontri
     have : ⟨x,hx⟩ ∈ Submodule.submoduleOf N₁ N₂ := hc ▸ Submodule.mem_top
     simp only [Submodule.submoduleOf, Submodule.mem_comap, Submodule.subtype_apply] at this
     exact this
-  exact (not_lt_of_le h') <| hN
+  exact (not_lt_of_ge h') <| hN
 
 lemma quot_ntl' {R : Type*} [CommRing R] [IsNoetherianRing R] {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] {N₁ N₂ : ℒ R M} (hN : N₁ < N₂) : Nontrivial (@ℒ R _ _ (↥N₂ ⧸ Submodule.submoduleOf N₁ N₂) (@quot_ntl R _ _ M _ _ _ _ N₁ N₂ hN) _ _ _) :=
 (Submodule.nontrivial_iff R).mpr <| (@quot_ntl R _ _ M _ _ _ _ N₁ N₂ hN)
@@ -1241,7 +1240,7 @@ lemma piecewise_coprimary {R : Type*} [CommRing R] [IsNoetherianRing R]
       have : ⟨x,hx⟩ ∈ Submodule.submoduleOf (HNFil.filtration n) (HNFil.filtration (n + 1)) := hc ▸ Submodule.mem_top
       simp only [Submodule.submoduleOf, Submodule.mem_comap, Submodule.subtype_apply] at this
       exact this
-    exact (not_lt_of_le h') <| HNFil.strict_mono n (n+1) (lt_add_one n) hn
+    exact (not_lt_of_ge h') <| HNFil.strict_mono n (n+1) (lt_add_one n) hn
   have ttt : Semistable (μ R (↥(HNFil.filtration (n + 1)) ⧸ Submodule.submoduleOf (HNFil.filtration n) (HNFil.filtration (n + 1)))) := by
     rw [← ss_iff']
     exact this
@@ -1254,7 +1253,7 @@ Inhabited (CoprimaryFiltration R M) := by
   have HNFil := (inferInstance : Inhabited (HarderNarasimhanFiltration (μ R M))).default
   refine { default := { filtration := HNFil.filtration, monotone := HNFil.monotone, first_eq_bot := HNFil.first_eq_bot, fin_len := HNFil.fin_len, strict_mono := HNFil.strict_mono, piecewise_coprimary := fun n hn ↦ piecewise_coprimary HNFil n hn, strict_mono_associated_prime := ?_ } }
   intro n hn
-  have := lt_of_not_le <| HNFil.μA_pseudo_strict_anti n hn
+  have := lt_of_not_ge <| HNFil.μA_pseudo_strict_anti n hn
   repeat rw [prop3d12] at this
   simp only [Int.reduceNeg, Int.rawCast.eq_1, Int.cast_eq, Nat.rawCast.eq_1, Int.cast_ofNat_Int,
     Int.reduceAdd, Int.ofNat_eq_coe, Nat.cast_ofNat, Nat.cast_id, Int.natCast_add, eq_mp_eq_cast,
@@ -1296,7 +1295,7 @@ lemma CP_HN {R : Type*} [CommRing R] [IsNoetherianRing R]
             have : ⟨x,hx⟩ ∈ Submodule.submoduleOf (a.filtration i) (a.filtration (i + 1)) := hc ▸ Submodule.mem_top
             simp only [Submodule.submoduleOf, Submodule.mem_comap, Submodule.subtype_apply] at this
             exact this
-          exact (not_lt_of_le h') <| a.strict_mono i (i+1) (lt_add_one i) hi
+          exact (not_lt_of_ge h') <| a.strict_mono i (i+1) (lt_add_one i) hi
         have this := this.coprimary
         rw [← rmk4d14₂,← ss_iff'] at this
         exact this

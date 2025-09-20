@@ -52,7 +52,7 @@ instance {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ] : 
 
 lemma lt_lt {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ] {z : {p : ℒ × ℒ // p.1 < p.2}} {p : {p :(Interval z) × (Interval z) // p.1 < p.2}} : (p.val.1.val, p.val.2.val).1 < (p.val.1.val, p.val.2.val).2 := by
   refine Subtype.coe_lt_coe.mpr ?_
-  refine Subtype.mk_lt_mk.2 (lt_iff_le_not_le.mpr p.prop)
+  refine Subtype.mk_lt_mk.2 (lt_iff_le_not_ge.mpr p.prop)
 
 
 def Resμ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ] (z : {p : ℒ × ℒ // p.1 < p.2}) {S : Type*} [CompleteLattice S] (μ : {p :ℒ × ℒ // p.1 < p.2} → S): {p :(Interval z) × (Interval z) // p.1 < p.2} → S := fun p ↦ μ ⟨(p.val.1.val,p.val.2.val), lt_lt⟩
@@ -67,7 +67,7 @@ instance {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ] [h
     have := ha.1
     simp only [Set.mem_image, Subtype.exists, exists_and_right, exists_eq_right] at this
     rcases this with ⟨x, hx⟩
-    exact Exists.intro ⟨a, x⟩ ⟨hx, fun y hy h ↦ ha.right y.val (Set.mem_image_of_mem Subtype.val hy) (lt_iff_le_not_le.2 h)⟩
+    exact Exists.intro ⟨a, x⟩ ⟨hx, fun y hy h ↦ ha.right y.val (Set.mem_image_of_mem Subtype.val hy) (lt_iff_le_not_ge.2 h)⟩
 
 lemma μ_res_intvl {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {I : {p : ℒ × ℒ // p.1 < p.2}}

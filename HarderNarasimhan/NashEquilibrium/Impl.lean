@@ -144,7 +144,7 @@ lemma rmk4d13 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder �
   intro x hx
   have := (hμ.slopelike ⊥ x ⊤ ⟨bot_lt_iff_ne_bot.2 hx.1,lt_top_iff_ne_top.2 hx.2⟩).2.2.1
   cases' this with this this
-  · exact Or.inl <| not_le_of_lt this
+  · exact Or.inl <| not_le_of_gt this
   · exact Or.inr this
 
 
@@ -173,7 +173,7 @@ lemma rmk4d15 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder �
   have := (hμ.slopelike ⊥ x ⊤ ⟨bot_lt_iff_ne_bot.2 hx.1,lt_top_iff_ne_top.2 hx.2⟩).1
   cases' this with this this
   · exact Or.inl this
-  · exact Or.inr <| not_le_of_lt this
+  · exact Or.inr <| not_le_of_gt this
 
 
 lemma prop4d16₁ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
@@ -221,7 +221,7 @@ lemma prop4d18₁ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ
     apply sSup_le
     rintro b ⟨hb1,⟨hb2,hb3⟩⟩
     have := hb3 ▸ hμ.out.choose_spec.choose_spec.1 hb1 (in_TotIntvl hb1) (Ne.symm <| bot_lt_iff_ne_bot.1 hb2)
-    exact le_of_not_lt this
+    exact le_of_not_gt this
   refine le_trans (sSup_le_sSup_of_forall_exists_le ?_) this
   rintro x ⟨hx1,⟨hx2,hx3⟩⟩
   use μA μ ⟨(⊥,hx1),bot_lt_iff_ne_bot.2 <| Ne.symm hx2.2⟩
@@ -360,7 +360,7 @@ NashEquilibrium μ → Semistable μ := by
     rw [← this]
     apply le_sSup
     use x, hx
-  exact {semistable := fun x hx ↦ LE.le.not_lt <| this x hx}
+  exact {semistable := fun x hx ↦ LE.le.not_gt <| this x hx}
 
 
 theorem thm4d21 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
@@ -395,10 +395,9 @@ List.TFAE [
   intro h₁
   refine prop4d20 μ h₁ ?_
   intro x hx
-  simp only [ne_eq]
   refine {wsl₁ := ?_}
   intro a b
-  cases' (hμ.slopelike a.val.1 a.val.2 x ⟨lt_iff_le_not_le.2 (by aesop),lt_iff_le_not_le.2 (by aesop)⟩).1 with this this
+  cases' (hμ.slopelike a.val.1 a.val.2 x ⟨lt_iff_le_not_ge.2 (by aesop),lt_iff_le_not_ge.2 (by aesop)⟩).1 with this this
   · exact Or.inl this
   · exact Or.inr <| le_of_lt this
 

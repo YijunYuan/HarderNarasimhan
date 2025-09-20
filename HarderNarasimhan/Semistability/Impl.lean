@@ -109,8 +109,8 @@ lemma prop3d4₀func_defprop2 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [Boun
       apply lt_of_le_of_ne hz.2
       by_contra hcontra'
       simp only [hcontra', ↓reduceDIte, gt_iff_lt, ge_iff_le] at hcontra
-      exact (inst_3.wf.has_min (ℒₛ μ I (prop3d4₀func μ I i) <| prop3d4₀func_helper μ I i hi) hne).choose_spec.1.out.choose_spec.choose_spec.not_le hcontra
-    use ⟨ne_of_lt <| lt_of_le_of_lt (prop3d4₀func μ I (i+1)).prop.1 hz.1,h''⟩, gt_of_ge_of_gt hcontra.ge (inst_3.wf.has_min (ℒₛ μ I (prop3d4₀func μ I i) <| prop3d4₀func_helper μ I i hi) hne).choose_spec.1.out.choose_spec.choose_spec
+      exact (inst_3.wf.has_min (ℒₛ μ I (prop3d4₀func μ I i) <| prop3d4₀func_helper μ I i hi) hne).choose_spec.1.out.choose_spec.choose_spec.not_ge hcontra
+    use ⟨ne_of_lt <| lt_of_le_of_lt (prop3d4₀func μ I (i+1)).prop.1 hz.1,h''⟩, lt_of_le_of_lt' hcontra.ge (inst_3.wf.has_min (ℒₛ μ I (prop3d4₀func μ I i) <| prop3d4₀func_helper μ I i hi) hne).choose_spec.1.out.choose_spec.choose_spec
   simp only [prop3d4₀func, prop3d4₀func_helper μ I i hi, hne] at hz
   exact (inst_3.wf.has_min (ℒₛ μ I (prop3d4₀func μ I i) <| prop3d4₀func_helper μ I i hi) hne).choose_spec.2 z h' hz.1
 
@@ -262,7 +262,7 @@ lemma prop3d4 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [W
         have hh : y < func i := by
           refine lt_of_le_of_ne (hi' (Nat.le_of_succ_le hi)) ?_
           by_contra!
-          have hhh :=  gt_of_ge_of_gt hy' <| gt_of_ge_of_gt (hfinal (i+1) hi) <| prop3d4₀func_defprop1 μ I i (ne_of_lt <| prop3d4₀func_defprop3₀ μ I hμDCC (i+1) <| lt_of_le_of_lt hi <| Nat.sub_one_lt <| ne_of_gt <| Nat.zero_lt_of_ne_zero <| prop3d4₀func_len_nonzero μ I hμDCC)
+          have hhh :=  lt_of_le_of_lt' hy' <| lt_of_le_of_lt' (hfinal (i+1) hi) <| prop3d4₀func_defprop1 μ I i (ne_of_lt <| prop3d4₀func_defprop3₀ μ I hμDCC (i+1) <| lt_of_le_of_lt hi <| Nat.sub_one_lt <| ne_of_gt <| Nat.zero_lt_of_ne_zero <| prop3d4₀func_len_nonzero μ I hμDCC)
           simp only [this] at hhh
           exact irrefl _ hhh
         exact h₃ (i+1) ⟨Nat.le_add_left 1 i,hi⟩ y hyI hy ⟨hh,ge_trans hy' (hfinal (i+1) hi)⟩
@@ -364,7 +364,7 @@ lemma prop3d8₂ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
     · exact Or.inr <| hattained y hyI (ne_of_lt <| lt_of_le_of_lt hxSt.out.choose.1 hxy)
   cases' (impl.prop2d6₃I I μ hμcvx I.val.1 ⟨le_rfl,le_of_lt I.prop⟩ x hxSt.out.choose y hyI ⟨lt_of_le_of_ne hxSt.out.choose.1 hxSt.out.choose_spec.choose,hxy⟩ h) with c1 c2
   · exact c1.symm
-  · exact False.elim  ((not_lt_of_le <| hxSt.out.choose_spec.choose_spec.2 y hyI  (ne_of_lt <| lt_of_le_of_lt hxSt.out.choose.1 hxy) <| eq_of_ge_of_not_gt c2.1 (hxSt.out.choose_spec.choose_spec.1 y hyI <| ne_of_lt <| lt_of_le_of_lt hxSt.out.choose.1 hxy)) hxy)
+  · exact False.elim  ((not_lt_of_ge <| hxSt.out.choose_spec.choose_spec.2 y hyI  (ne_of_lt <| lt_of_le_of_lt hxSt.out.choose.1 hxy) <| eq_of_ge_of_not_gt c2.1 (hxSt.out.choose_spec.choose_spec.1 y hyI <| ne_of_lt <| lt_of_le_of_lt hxSt.out.choose.1 hxy)) hxy)
 
 
 theorem semistable_iff {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
@@ -394,8 +394,6 @@ theorem semistableI_iff {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrd
     simp only [semistableI]
     simp only [semistableI] at h
     rcases h.out with ⟨h1,h2,h3,h4⟩
-    apply Set.mem_def.2
-    refine Set.setOf_app_iff.mpr ?_
     use in_TotIntvl (TotIntvl.val).2
     use ne_of_lt (TotIntvl.prop)
     constructor

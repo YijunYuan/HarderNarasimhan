@@ -75,9 +75,9 @@ lemma lem2d4₂I
   (hxw : ¬ x ≤ w)
   (t : ℒ)
   (hxwt : x ⊔ w ≤ t) :
-  μmax μ ⟨(x ⊓ w, x), inf_lt_left.2 hxw⟩ ≤ μmax μ ⟨(w, t), gt_of_ge_of_gt hxwt <| right_lt_sup.2 hxw⟩ := by
+  μmax μ ⟨(x ⊓ w, x), inf_lt_left.2 hxw⟩ ≤ μmax μ ⟨(w, t), lt_of_le_of_lt' hxwt <| right_lt_sup.2 hxw⟩ := by
     have h : ∀ b : ℒ, (h' : x ⊓ w < b ∧ b ≤ x) →
-        μ ⟨(x ⊓ w, b), h'.1⟩ ≤ μmax μ ⟨(w, t), gt_of_ge_of_gt hxwt <| right_lt_sup.2 hxw⟩ := by
+        μ ⟨(x ⊓ w, b), h'.1⟩ ≤ μmax μ ⟨(w, t), lt_of_le_of_lt' hxwt <| right_lt_sup.2 hxw⟩ := by
       intro b hb
       have hh : x ⊓ w = b ⊓ w := by
         refine le_antisymm ?_ <| inf_le_inf_right w hb.2
@@ -86,7 +86,7 @@ lemma lem2d4₂I
       simp only [hh, ge_iff_le]
       have hbnlew : ¬ b ≤ w := inf_lt_left.mp
         ((congrArg (fun _a ↦ _a < b) (hh.symm)) ▸ hb.1)
-      have hfinal : μ ⟨(w, b ⊔ w), right_lt_sup.mpr hbnlew⟩ ≤ μmax μ ⟨(w, t), gt_of_ge_of_gt hxwt (right_lt_sup.2 hxw)⟩ := by
+      have hfinal : μ ⟨(w, b ⊔ w), right_lt_sup.mpr hbnlew⟩ ≤ μmax μ ⟨(w, t), lt_of_le_of_lt' hxwt (right_lt_sup.2 hxw)⟩ := by
         apply le_sSup
         use b ⊔ w, ⟨⟨le_sup_right, le_trans (sup_le_sup_right hb.2 w) hxwt⟩, (mt right_eq_sup.1) <| inf_lt_left.1 <| hh.symm ▸ hb.1⟩
       apply le_trans (hμcvx.convex b w ⟨le_of_lt (lt_of_le_of_lt (le_inf hxI.1 hwI.1) hb.1), le_trans hb.2 hxI.2⟩ hwI hbnlew) hfinal
@@ -125,7 +125,7 @@ lemma lem2d4I
   (huxw : u ≤ x ⊓ w)
   (hxwt : x ⊔ w ≤ t) :
   μA μ ⟨(u, x), lt_of_le_of_lt huxw <|inf_lt_left.2 hxw⟩ ≤ μmax μ ⟨(x ⊓ w, x), inf_lt_left.2 hxw⟩ ∧
-  μmax μ ⟨(x ⊓ w, x), inf_lt_left.2 hxw⟩ ≤ μmax μ ⟨(w, t), gt_of_ge_of_gt hxwt <| right_lt_sup.2 hxw⟩ ∧
+  μmax μ ⟨(x ⊓ w, x), inf_lt_left.2 hxw⟩ ≤ μmax μ ⟨(w, t), lt_of_le_of_lt' hxwt <| right_lt_sup.2 hxw⟩ ∧
   μA μ ⟨(u, x), lt_of_le_of_lt huxw <| inf_lt_left.2 hxw⟩ ≤ μA μ ⟨(w, x ⊔ w), right_lt_sup.2 hxw⟩ :=
   ⟨lem2d4₁ μ x w hxw u huxw, ⟨lem2d4₂I I μ hμcvx x hxI w hwI hxw t hxwt, lem2d4₃I I μ hμcvx x hxI w hwI hxw u huxw⟩⟩
 
@@ -147,7 +147,7 @@ lemma rmk2d5₂
     simp only [ne_eq, Set.mem_setOf_eq, forall_exists_index]
     intro b v hv res
     rw [← res]
-    have h : μmax μ ⟨(v ⊓ I.val.1, v), inf_lt_left.2 (not_le_of_gt (lt_of_le_of_ne hv.1.1 hv.2))⟩ ≤ μmax μ ⟨(I.val.1, I.val.2), gt_of_ge_of_gt ((sup_eq_left.2 hv.1.1).symm ▸ hv.1.2) <| right_lt_sup.2 <| not_le_of_gt <| lt_of_le_of_ne hv.1.1 hv.2⟩ :=
+    have h : μmax μ ⟨(v ⊓ I.val.1, v), inf_lt_left.2 (not_le_of_gt (lt_of_le_of_ne hv.1.1 hv.2))⟩ ≤ μmax μ ⟨(I.val.1, I.val.2), lt_of_le_of_lt' ((sup_eq_left.2 hv.1.1).symm ▸ hv.1.2) <| right_lt_sup.2 <| not_le_of_gt <| lt_of_le_of_ne hv.1.1 hv.2⟩ :=
       lem2d4₂I I μ hμcvx v hv.1 I.val.1 ⟨le_rfl, le_of_lt I.prop⟩ (not_le_of_gt <| lt_of_le_of_ne hv.1.1 hv.2) I.val.2 <| (sup_eq_left.2 hv.1.1).symm ▸ hv.1.2
     simp only [inf_eq_right.2 hv.1.1] at h
     exact h
@@ -276,7 +276,7 @@ lemma rmk2d7
       exact Or.inl <| le_total (μA μ ⟨(⊥, x), h.1⟩) (μA μ ⟨(x, ⊤), h.2⟩)
     cases' h₁ with h₂ h₃
     · exact h₂
-    · exact Classical.byContradiction fun x_1 ↦ not_le_of_lt h' h₃.left
+    · exact Classical.byContradiction fun x_1 ↦ not_le_of_gt h' h₃.left
 
 
 lemma prop2d8₀I
@@ -292,7 +292,7 @@ lemma prop2d8₀I
   have h' : ¬ x ≤ w ∨ ¬ y ≤ w := by
     apply not_and_or.1
     rw [← sup_le_iff]
-    apply not_le_of_lt hw.2
+    apply not_le_of_gt hw.2
   cases' h' with h₁ h₂
   · exact Or.inl <| le_trans (lem2d4₁ μ x w h₁ u <| le_inf (le_of_lt h.1) hw.1) <| lem2d4₂I I μ hμcvx x hxI w hwI h₁ (x ⊔ y) <| sup_le le_sup_left <| le_of_lt hw.2
   · exact Or.inr <| le_trans (lem2d4₁ μ y w h₂ u <| le_inf (le_of_lt h.2) hw.1) <| lem2d4₂I I μ hμcvx y hyI w hwI h₂ (x ⊔ y) <| sup_le le_sup_right <| le_of_lt hw.2

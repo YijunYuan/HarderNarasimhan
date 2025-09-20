@@ -17,9 +17,9 @@ SlopeLike μ ↔ ∀ (x y z : ℒ), (h : x < y ∧ y < z) → (
   · intro sl x y z h
     have sl := sl.slopelike x y z h
     by_cases h' : μ ⟨(x, y), h.1⟩ < μ ⟨(x, z), lt_trans h.1 h.2⟩
-    · exact Or.inl ⟨h', Or.resolve_left sl.2.2.2 (not_le_of_lt h')⟩
+    · exact Or.inl ⟨h', Or.resolve_left sl.2.2.2 (not_le_of_gt h')⟩
     · by_cases h'' : μ ⟨(x, z), lt_trans h.1 h.2⟩ < μ ⟨(x, y), h.1⟩
-      · have := not_le_of_lt h''
+      · have := not_le_of_gt h''
         tauto
       · have h₁ := not_lt_of_ge <| Or.resolve_left sl.2.1 h'
         exact Or.inr <| Or.inr ⟨Eq.symm <| eq_of_le_of_not_lt (Or.resolve_right sl.2.2.2 h₁) h'', eq_of_le_of_not_lt (by tauto) h₁⟩
@@ -54,7 +54,7 @@ lemma not_top_of_Nontrivial_TotallyOrderedRealVectorSpace {V : Type*} [TotallyOr
     by_cases h : v₁ < v₂
     · simp only [h, ↓reduceIte, gt_iff_lt, sub_pos, v₀]
     · simp only [h, ↓reduceIte, gt_iff_lt, sub_pos, v₀]
-      exact (eq_or_lt_of_not_lt h).resolve_left hne
+      exact (eq_or_lt_of_not_gt h).resolve_left hne
   by_contra!
   exact not_top_lt <| top_le_iff.1 this ▸ (OrderTheory.coe'.lt_iff_lt.2 <| lt_add_of_pos_right v hpos)
 
@@ -103,7 +103,7 @@ lemma prop4d8 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder �
         · refine Or.inr <| Or.inr <| ⟨hs',?_⟩
           simp only [hs', add_right_inj, μ] at this
           exact smul_right_injective V (ne_of_lt h''.2).symm this
-        · have hs' : μxz < μxy := lt_of_not_le (Eq.mpr (id (congrArg (fun _a ↦ ¬_a) (propext le_iff_eq_or_lt))) (not_or.mpr ⟨hs', hs⟩))
+        · have hs' : μxz < μxy := lt_of_not_ge (Eq.mpr (id (congrArg (fun _a ↦ ¬_a) (propext le_iff_eq_or_lt))) (not_or.mpr ⟨hs', hs⟩))
           exact Or.inr <| Or.inl <| ⟨hs',(smul_lt_smul_iff_of_pos_left h''.2).1 <| (add_lt_add_iff_left <| r ⟨(x, y), h.1⟩ • μxy).1 <| sub_lt_iff_lt_add.1 <| (eq_sub_of_add_eq this) ▸ (smul_lt_smul_iff_of_pos_left h''.1).2 hs'⟩
     · by_cases h''' : r ⟨(x, y), h.1⟩ = 0 ∧ r ⟨(y, z), h.2⟩ > 0
       · have h2 : μ ⟨(x, y), h.1⟩ = ⊤ := by simp only [μQuotient, h'''.1, gt_iff_lt,
