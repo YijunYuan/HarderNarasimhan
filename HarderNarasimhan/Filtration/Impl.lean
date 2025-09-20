@@ -141,7 +141,7 @@ theorem theorem3d10  {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder 
         apply not_and_or.1 at h₅
         cases' h₅ with h₅ h₅
         · simp only [ge_iff_le, not_le] at h₅
-          nth_rw 1 [← hn, ← eq_of_le_of_le (Nat.le_of_lt_add_one h₅) (Nat.sub_le_sub_right h₁₅ 1)] at h₃
+          nth_rw 1 [← hn, ← eq_of_le_of_ge (Nat.le_of_lt_add_one h₅) (Nat.sub_le_sub_right h₁₅ 1)] at h₃
           exact not_le_of_gt h₃
         · exact h₅
       have h₁₃ : HNFilt n ≤ f (i - 1) := by
@@ -172,7 +172,7 @@ theorem theorem3d10  {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder 
         simp only [Nat.sub_one_add_one <| ne_of_gt h₉] at h₁₁
         exact le_trans h₆ <| le_of_not_gt (h₁₁.out.choose_spec.2.1 (HNFilt (n + 1) ⊔ f (i - 1)) ⟨le_sup_right,sup_le_iff.2 ⟨(Nat.find_spec h₂).2,le_of_lt h₇⟩⟩ <| ne_of_lt <|right_lt_sup.2 h₄)
       have h₁₂ : i = n + 1 := by
-        refine eq_of_ge_of_not_gt h₁₅ ?_
+        refine eq_of_le_of_not_lt' h₁₅ ?_
         by_contra!
         have : HNFilt n < f (n+1):= by
           simp only [HNFilt, ← hn]
@@ -192,7 +192,7 @@ theorem theorem3d10  {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder 
         (HNFil_is_strict_mono μ n (ne_of_lt (lt_of_lt_of_le h₃ le_top)))
       have h₁₇ := le_of_not_gt <| (hss n h₁).out.choose_spec.choose_spec.1 (HNFilt (n+1)) ⟨le_of_lt h₁₆,h₁₄⟩ <| ne_of_lt h₁₆
       simp only [hn] at h₁₇
-      exact eq_of_le_of_le ((HNFil_prop_of_def μ n <| ne_of_lt <| lt_of_lt_of_le h₃ le_top).1.out.choose_spec.choose_spec.2 (f (n+1)) ⟨le_of_lt h₁₉,le_top⟩ (ne_of_lt h₁₉) (eq_of_le_of_not_lt h₁₇ <| (HNFil_prop_of_def μ n <| ne_of_lt <| lt_of_lt_of_le h₃ le_top).1.out.choose_spec.choose_spec.1 (f (n+1)) ⟨le_of_lt h₁₉,le_top⟩ <| ne_of_lt h₁₉).symm) h₁₄
+      exact eq_of_le_of_ge ((HNFil_prop_of_def μ n <| ne_of_lt <| lt_of_lt_of_le h₃ le_top).1.out.choose_spec.choose_spec.2 (f (n+1)) ⟨le_of_lt h₁₉,le_top⟩ (ne_of_lt h₁₉) (eq_of_le_of_not_lt h₁₇ <| (HNFil_prop_of_def μ n <| ne_of_lt <| lt_of_lt_of_le h₃ le_top).1.out.choose_spec.choose_spec.1 (f (n+1)) ⟨le_of_lt h₁₉,le_top⟩ <| ne_of_lt h₁₉).symm) h₁₄
     · apply Nat.gt_of_not_le at h₁
       rw [ffst (n+1) (Nat.le_of_succ_le h₁),eq_comm]
       rw [ffst n (Nat.le_of_lt_succ h₁)] at hn
@@ -204,7 +204,7 @@ open Fin.NatCast
 lemma balabala1 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 {μ : {p :ℒ × ℒ // p.1 < p.2} → S}
-(s : RelSeries (IsIntervalSemistable μ))
+(s : RelSeries (IntervalSemistableRel μ))
 {i : ℕ} (hi : i + 1 < s.length)
  : s.toFun ↑i < s.toFun ↑(i + 1) := by
   have := (s.step ⟨i,Nat.lt_of_succ_lt hi⟩).choose
@@ -217,7 +217,7 @@ lemma balabala1 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 lemma balabala2 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 {μ : {p :ℒ × ℒ // p.1 < p.2} → S}
-(s : RelSeries (IsIntervalSemistable μ))
+(s : RelSeries (IntervalSemistableRel μ))
 {i : ℕ} (hi : i + 1 < s.length)
  : s.toFun ↑(i + 1) < s.toFun ↑(i + 2) := by
   have := (s.step ⟨i+1, hi⟩).choose
@@ -230,7 +230,7 @@ lemma balabala2 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 lemma hHFil_of_hNSeries {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLinearOrder S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
-(F1 : RelSeries (IsIntervalSemistable μ))
+(F1 : RelSeries (IntervalSemistableRel μ))
 (h1 : F1.head = ⊥ ∧ F1.last = ⊤ ∧
   ∀ i : ℕ, (hi : i + 1 < F1.length) →
     ¬   μA μ ⟨(F1.toFun i, F1.toFun ↑(i+1)), by simp [*]⟩
@@ -266,7 +266,7 @@ lemma hHFil_of_hNSeries {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrd
   have hslen : Nat.find hstrange  = F1.length := by
       have := Nat.find_min' hstrange ((by
         unfold filtration1
-        simp only [le_refl, ↓reduceIte, Fin.natCast_eq_last, filtration1]
+        simp only [le_refl, ↓reduceIte, Fin.natCast_eq_last]
         exact h1.2.1
         ) : filtration1 F1.length = ⊤)
       refine le_antisymm this ?_
@@ -291,7 +291,7 @@ lemma hHFil_of_hNSeries {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrd
               refine Fin.eq_mk_iff_val_eq.mpr ?_
               refine Fin.val_cast_of_lt ?_
               exact Nat.lt_add_right 1 hn'
-            · simp only [Fin.succ_mk, filtration1]
+            · simp only [Fin.succ_mk]
               refine Fin.eq_mk_iff_val_eq.mpr ?_
               refine Fin.val_cast_of_lt ?_
               exact Nat.add_lt_add_right hn' 1
@@ -320,46 +320,46 @@ lemma hHFil_of_hNSeries {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrd
         unfold filtration1
         rw [hslen] at hi
         convert this
-        · simp only [le_of_lt hi, ↓reduceIte, Fin.castSucc_mk, filtration1]
+        · simp only [le_of_lt hi, ↓reduceIte, Fin.castSucc_mk]
           congr
           refine Fin.eq_mk_iff_val_eq.mpr ?_
           refine Fin.val_cast_of_lt ?_
           exact Nat.lt_add_right 1 hi
         · have this': i + 1 ≤ F1.length := by linarith
-          simp only [this', ↓reduceIte, Fin.succ_mk, filtration1]
+          simp only [this', ↓reduceIte, Fin.succ_mk]
           congr
           refine Fin.eq_mk_iff_val_eq.mpr ?_
           refine Fin.val_cast_of_lt ?_
           exact Nat.add_lt_add_right hi 1
-        · simp only [le_of_lt hi, ↓reduceIte, Fin.castSucc_mk, filtration1]
+        · simp only [le_of_lt hi, ↓reduceIte, Fin.castSucc_mk]
           congr
           refine Fin.eq_mk_iff_val_eq.mpr ?_
           refine Fin.val_cast_of_lt ?_
           exact Nat.lt_add_right 1 hi
         · have this' : i + 1 ≤ F1.length := by linarith
-          simp only [this', ↓reduceIte, Fin.succ_mk, filtration1]
+          simp only [this', ↓reduceIte, Fin.succ_mk]
           congr
           refine Fin.eq_mk_iff_val_eq.mpr ?_
           refine Fin.val_cast_of_lt ?_
           exact Nat.add_lt_add_right hi 1
-        · simp only [le_of_lt hi, ↓reduceIte, Fin.castSucc_mk, filtration1]
+        · simp only [le_of_lt hi, ↓reduceIte, Fin.castSucc_mk]
           congr
           refine Fin.eq_mk_iff_val_eq.mpr ?_
           refine Fin.val_cast_of_lt ?_
           exact Nat.lt_add_right 1 hi
         · have this' : i + 1 ≤ F1.length := by linarith
-          simp only [this', ↓reduceIte, Fin.succ_mk, filtration1]
+          simp only [this', ↓reduceIte, Fin.succ_mk]
           congr
           refine Fin.eq_mk_iff_val_eq.mpr ?_
           refine Fin.val_cast_of_lt ?_
           exact Nat.add_lt_add_right hi 1
-        · simp only [le_of_lt hi, ↓reduceIte, Fin.castSucc_mk, filtration1]
+        · simp only [le_of_lt hi, ↓reduceIte, Fin.castSucc_mk]
           congr
           refine Fin.eq_mk_iff_val_eq.mpr ?_
           refine Fin.val_cast_of_lt ?_
           exact Nat.lt_add_right 1 hi
         · have this' : i + 1 ≤ F1.length := by linarith
-          simp only [this', ↓reduceIte, Fin.succ_mk, filtration1]
+          simp only [this', ↓reduceIte, Fin.succ_mk]
           congr
           refine Fin.eq_mk_iff_val_eq.mpr ?_
           refine Fin.val_cast_of_lt ?_
@@ -371,9 +371,9 @@ lemma hHFil_of_hNSeries {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrd
         rw [hslen] at hi
         convert this
         · have this' : i ≤ F1.length := by linarith
-          simp only [this', ↓reduceIte, filtration1]
-        · simp only [le_of_lt hi, ↓reduceIte, filtration1]
-        · simp only [le_of_lt hi, ↓reduceIte, filtration1]
+          simp only [this', ↓reduceIte]
+        · simp only [le_of_lt hi, ↓reduceIte]
+        · simp only [le_of_lt hi, ↓reduceIte]
         · have : i + 2 ≤ F1.length := hi
           simp only [this, ↓reduceIte]
     }

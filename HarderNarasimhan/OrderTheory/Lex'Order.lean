@@ -30,7 +30,7 @@ private lemma le_antisymm {α : Type*} [LinearOrder α] : ∀ (a b : Finset α),
     · linarith
   · cases' h2 with h2 h2
     · linarith
-    · exact inj_sort _ <| eq_of_le_of_le h1.2 h2.2
+    · exact inj_sort _ <| eq_of_le_of_ge h1.2 h2.2
 
 private lemma le_card {α : Type*} [LinearOrder α] (A B : Finset α) : A ≤ B → A.card ≤ B.card := by
   intro h
@@ -46,7 +46,7 @@ private def Lex'LinearOrder {α : Type*} [LinearOrder α] : LinearOrder (Finset 
   le_refl := by
     intro A
     unfold LE.le LexLE
-    simp only [lt_self_iff_false, le_refl, or_true]
+    simp only [lt_self_iff_false, le_refl]
     tauto
   le_trans := by
     intro A B C hAB hBC
@@ -81,17 +81,16 @@ private def Lex'LinearOrder {α : Type*} [LinearOrder α] : LinearOrder (Finset 
       exact ⟨h.1,fun this ↦ (and_not_self_iff (B ≤ B)).mp <| this ▸ h⟩
   toDecidableLE := by
     unfold DecidableLE LE.le LexLE DecidableRel
-    intro A B
-    simp only [not_lt]
+    intro A BaseIO
     exact inferInstance
   min := fun A B ↦ if A ≤ B then A else B
   min_def := by
     intro A B
-    simp only [ite_eq_ite]
+    simp only
   max := fun A B ↦ if A ≤ B then B else A
   max_def := by
     intro A B
-    simp only [ite_eq_ite]
+    simp only
   le_total := by
     intro A B
     refine Decidable.or_iff_not_imp_left.mpr ?_

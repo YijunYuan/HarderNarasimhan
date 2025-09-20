@@ -79,7 +79,7 @@ instance {α : Type*} [LinearOrder α] : IsTotal (DedekindMacNeilleCompletion α
   rw [← hA] at hc
   simp only [GaloisConnection.lowerAdjoint_toFun, OrderDual.ofDual_toDual] at hc
   unfold lowerBounds at hc
-  simp only [Set.mem_setOf_eq, not_forall, Classical.not_imp, not_le] at hc
+  simp only [Set.mem_setOf_eq, not_forall,  not_le] at hc
   rcases hc with ⟨a',ha'1,ha'2⟩
   have hhb : b ∈ upperBounds A := upperBounds_mono (fun ⦃a⦄ a ↦ a) (le_of_lt ha'2) ha'1
   have hB : B = lowerBounds (upperBounds B) := by
@@ -106,7 +106,7 @@ noncomputable instance {α : Type*} [LinearOrder α] : LinearOrder (DedekindMacN
   }
 
 noncomputable instance {α : Type*} [LinearOrder α] : CompleteLinearOrder (DedekindMacNeilleCompletion α) :=
-  {instLinearOrderDedekindMacNeilleCompletion , LinearOrder.toBiheytingAlgebra, instCompleteLatticeDedekindMacNeilleCompletion with}
+  {instLinearOrderDedekindMacNeilleCompletion, LinearOrder.toBiheytingAlgebra (DedekindMacNeilleCompletion α), instCompleteLatticeDedekindMacNeilleCompletion with}
 
 
 def coe' {α : Type*} [PartialOrder α] : α ↪o DedekindMacNeilleCompletion α := by
@@ -154,8 +154,7 @@ theorem univ_prop_DedekindMacNeilleCompletion {α : Type*} [PartialOrder α] {β
     simp only [RelEmbedding.coe_mk, Function.Embedding.coeFn_mk, coe', Function.comp_apply, g]
     refine le_antisymm (le_sSup fun a ha ↦ ha.out <| Set.mem_image_of_mem f Set.right_mem_Iic) <| sSup_le fun _ hb ↦ hb ?_
     simp only [upperBounds, Set.mem_image, Set.mem_Iic, forall_exists_index, and_imp,
-      forall_apply_eq_imp_iff₂, Set.mem_setOf_eq, OrderEmbedding.le_iff_le, imp_self, implies_true,
-      g]
+      forall_apply_eq_imp_iff₂, Set.mem_setOf_eq, OrderEmbedding.le_iff_le, imp_self, implies_true]
 
 --TODO: joint-dense, meet-dense
 end DedekindMacNeille

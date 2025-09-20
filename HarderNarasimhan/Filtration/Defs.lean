@@ -34,4 +34,9 @@ def IsIntervalSemistable {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOr
 (x y : ℒ) : Prop :=
   ∃ h : x < y, Semistable (Resμ ⟨(x, y), h⟩ μ)
 
+def IntervalSemistableRel {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+{S : Type*} [CompleteLattice S]
+(μ : {p :ℒ × ℒ // p.1 < p.2} → S)
+: SetRel ℒ ℒ :=
+{(x, y) | ∃ h : x < y, Semistable (Resμ ⟨(x, y), h⟩ μ)}
 end HarderNarasimhan

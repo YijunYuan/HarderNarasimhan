@@ -54,7 +54,7 @@ lemma not_top_of_Nontrivial_TotallyOrderedRealVectorSpace {V : Type*} [TotallyOr
     by_cases h : v₁ < v₂
     · simp only [h, ↓reduceIte, gt_iff_lt, sub_pos, v₀]
     · simp only [h, ↓reduceIte, gt_iff_lt, sub_pos, v₀]
-      exact (eq_or_lt_of_not_gt h).resolve_left hne
+      exact (eq_or_gt_of_not_lt h).resolve_left hne
   by_contra!
   exact not_top_lt <| top_le_iff.1 this ▸ (OrderTheory.coe'.lt_iff_lt.2 <| lt_add_of_pos_right v hpos)
 
@@ -101,7 +101,7 @@ lemma prop4d8 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder �
       · exact Or.inl ⟨hs,(smul_lt_smul_iff_of_pos_left h''.2).1 <| (add_lt_add_iff_left <| r ⟨(x, y), h.1⟩ • μxy).1 <| lt_sub_iff_add_lt.1 <| (eq_sub_of_add_eq this) ▸ (smul_lt_smul_iff_of_pos_left h''.1).2 hs⟩
       · by_cases hs' : μxy = μxz
         · refine Or.inr <| Or.inr <| ⟨hs',?_⟩
-          simp only [hs', add_right_inj, μ] at this
+          simp only [hs', add_right_inj] at this
           exact smul_right_injective V (ne_of_lt h''.2).symm this
         · have hs' : μxz < μxy := lt_of_not_ge (Eq.mpr (id (congrArg (fun _a ↦ ¬_a) (propext le_iff_eq_or_lt))) (not_or.mpr ⟨hs', hs⟩))
           exact Or.inr <| Or.inl <| ⟨hs',(smul_lt_smul_iff_of_pos_left h''.2).1 <| (add_lt_add_iff_left <| r ⟨(x, y), h.1⟩ • μxy).1 <| sub_lt_iff_lt_add.1 <| (eq_sub_of_add_eq this) ▸ (smul_lt_smul_iff_of_pos_left h''.1).2 hs'⟩
@@ -119,7 +119,7 @@ lemma prop4d8 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder �
           exact h4 ▸ ((smul_lt_smul_iff_of_pos_left <| Right.inv_pos.mpr h').2 <| (h₁ x y z h).1 ▸ lt_add_of_pos_left (d ⟨(y, z), h.right⟩) <| h₂ x y h.1 h'''.1)
       · apply not_and_or.1 at h''
         apply not_and_or.1 at h'''
-        simp only [pos_iff_ne_zero.symm, gt_iff_lt, not_lt, nonpos_iff_eq_zero, μ] at h'''
+        simp only [pos_iff_ne_zero.symm, gt_iff_lt, not_lt, nonpos_iff_eq_zero] at h'''
         have : r ⟨(y, z), h.2⟩ = 0 := by aesop
         have this' := (add_zero <| r ⟨(x, y), h.1⟩) ▸ (this ▸ (h₁ x y z h).2) ▸ h'
         have h2 : μ ⟨(y, z), h.2⟩ = ⊤ := by simp only [μQuotient, this, gt_iff_lt,

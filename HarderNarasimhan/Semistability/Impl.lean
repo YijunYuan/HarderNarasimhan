@@ -283,7 +283,7 @@ lemma rmk3d5 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [We
 (y : ℒ) (hySt : y ∈ StI μ I) : x = y := by
   rcases hxSt with ⟨hxI,⟨hx,⟨hxS₁,hxS₂⟩⟩⟩
   rcases hySt with ⟨hyI,⟨hy,⟨hyS₁,hyS₂⟩⟩⟩
-  exact eq_of_le_of_le (hyS₂ x hxI hx (eq_of_le_of_le (le_of_not_gt <| hxS₁ y hyI hy) (le_of_not_gt <| hyS₁ x hxI hx)).symm) (hxS₂ y hyI hy <| eq_of_le_of_le (le_of_not_gt <| hxS₁ y hyI hy) (le_of_not_gt <| hyS₁ x hxI hx))
+  exact eq_of_le_of_ge (hyS₂ x hxI hx (eq_of_le_of_ge (le_of_not_gt <| hxS₁ y hyI hy) (le_of_not_gt <| hyS₁ x hxI hx)).symm) (hxS₂ y hyI hy <| eq_of_le_of_ge (le_of_not_gt <| hxS₁ y hyI hy) (le_of_not_gt <| hyS₁ x hxI hx))
 
 
 lemma prop3d7₁ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
@@ -304,7 +304,7 @@ lemma prop3d7₂ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 ∀ y : ℒ, (hyI : InIntvl I y) → (hy : y > x) → ¬ μA μ ⟨(I.val.1 , x) , lt_of_le_of_ne hxSt.out.choose.1 hxSt.out.choose_spec.choose⟩ ≤ μA μ ⟨(x, y), hy⟩ := by
   by_contra!
   rcases this with ⟨y,⟨hyI,⟨hy,hy'⟩⟩⟩
-  exact (not_le_of_gt hy) (hxSt.out.choose_spec.choose_spec.2 y hyI (ne_of_lt <| lt_of_le_of_lt hxSt.out.choose.1 hy) <|eq_of_ge_of_not_gt ((inf_eq_left.2 hy') ▸ impl.prop2d6₁I I μ hμcvx I.val.1 ⟨le_rfl,le_of_lt I.prop⟩ x hxSt.out.choose y hyI ⟨lt_of_le_of_ne hxSt.out.choose.1 hxSt.out.choose_spec.choose,hy⟩) <| hxSt.out.choose_spec.choose_spec.1 y hyI <| ne_of_lt <| lt_of_le_of_lt hxSt.out.choose.1 hy)
+  exact (not_le_of_gt hy) (hxSt.out.choose_spec.choose_spec.2 y hyI (ne_of_lt <| lt_of_le_of_lt hxSt.out.choose.1 hy) <|eq_of_le_of_not_lt' ((inf_eq_left.2 hy') ▸ impl.prop2d6₁I I μ hμcvx I.val.1 ⟨le_rfl,le_of_lt I.prop⟩ x hxSt.out.choose y hyI ⟨lt_of_le_of_ne hxSt.out.choose.1 hxSt.out.choose_spec.choose,hy⟩) <| hxSt.out.choose_spec.choose_spec.1 y hyI <| ne_of_lt <| lt_of_le_of_lt hxSt.out.choose.1 hy)
 
 
 lemma prop3d8₁ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
@@ -345,7 +345,7 @@ lemma prop3d8₁' {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ]  [BoundedOrder �
   intro x hx
   cases' (prop3d8₁ μ I hμcvx h).total ⟨x, hx⟩ ⟨M, hM.1⟩ with c1 c2
   · exact c1
-  · exact le_of_eq <| eq_of_ge_of_not_gt c2 (hM.2 x hx)
+  · exact le_of_eq <| eq_of_le_of_not_lt' c2 (hM.2 x hx)
 
 
 lemma prop3d8₂ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
@@ -364,7 +364,7 @@ lemma prop3d8₂ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
     · exact Or.inr <| hattained y hyI (ne_of_lt <| lt_of_le_of_lt hxSt.out.choose.1 hxy)
   cases' (impl.prop2d6₃I I μ hμcvx I.val.1 ⟨le_rfl,le_of_lt I.prop⟩ x hxSt.out.choose y hyI ⟨lt_of_le_of_ne hxSt.out.choose.1 hxSt.out.choose_spec.choose,hxy⟩ h) with c1 c2
   · exact c1.symm
-  · exact False.elim  ((not_lt_of_ge <| hxSt.out.choose_spec.choose_spec.2 y hyI  (ne_of_lt <| lt_of_le_of_lt hxSt.out.choose.1 hxy) <| eq_of_ge_of_not_gt c2.1 (hxSt.out.choose_spec.choose_spec.1 y hyI <| ne_of_lt <| lt_of_le_of_lt hxSt.out.choose.1 hxy)) hxy)
+  · exact False.elim  ((not_lt_of_ge <| hxSt.out.choose_spec.choose_spec.2 y hyI  (ne_of_lt <| lt_of_le_of_lt hxSt.out.choose.1 hxy) <| eq_of_le_of_not_lt' c2.1 (hxSt.out.choose_spec.choose_spec.1 y hyI <| ne_of_lt <| lt_of_le_of_lt hxSt.out.choose.1 hxy)) hxy)
 
 
 theorem semistable_iff {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
@@ -406,14 +406,14 @@ theorem semistableI_iff {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrd
       · simp only [μA, ne_eq]
         congr 1
         ext
-        simp only [Set.mem_setOf_eq, Subtype.coe_mk]
+        simp only [Set.mem_setOf_eq]
         constructor
         · rintro ⟨a,⟨ha1,ha2⟩⟩
           rw [← ha2]
           use ⟨a,ha1.1⟩, ⟨in_TotIntvl _,Subtype.coe_ne_coe.1 ha1.2⟩
           simp only [μmax, ne_eq]
           congr 1; ext
-          simp only [Set.mem_setOf_eq, Subtype.coe_mk]
+          simp only [Set.mem_setOf_eq]
           constructor
           · rintro ⟨b,⟨hb1,hb2⟩⟩
             rw [← hb2]

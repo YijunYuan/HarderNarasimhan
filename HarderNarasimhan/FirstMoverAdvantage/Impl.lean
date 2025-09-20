@@ -23,7 +23,7 @@ noncomputable def prop4d1₁_seq {ℒ : Type*} [Nontrivial ℒ] [PartialOrder �
       by_contra! hcon
       simp only [Set.mem_setOf_eq, not_lt_top_iff.mp hcon, le_refl, not_true_eq_false] at h'''
     by_contra!
-    simp only [Set.mem_setOf_eq, not_exists, not_forall, Classical.not_imp, not_not] at this
+    simp only [Set.mem_setOf_eq, not_exists, not_forall, not_not] at this
     rcases this h' with ⟨xA,⟨hxA,hh⟩⟩
     have hhh : ∀ (xB : ℒ) (x_1 : xA < xB), μ ⟨(xA, xB), x_1⟩ ≤ μ ⟨(prop4d1₁_seq μ h₁ h₂ h₃ k, ⊤), (prop4d1₁_seq μ h₁ h₂ h₃ k).prop.choose⟩ := fun xB hAB ↦ le_trans (hh xB hAB) <| Or.resolve_left (h₂ ⟨(prop4d1₁_seq μ h₁ h₂ h₃ k, prop4d1₁_seqkp1.choose), prop4d1₁_seqkp1.choose_spec.choose⟩ h') h'''
     rcases (prop4d1₁_seq μ h₁ h₂ h₃ k).prop.out.choose_spec xA hxA with ⟨xB,⟨hAB,con⟩⟩
@@ -226,7 +226,7 @@ lemma rmk4d4 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ
     have : ⟨r (x (n + 1)),Set.mem_range_self (x (n + 1))⟩ ∈ W := by
       refine Set.mem_setOf.mpr ?_
       use n + 1
-    exact eq_of_ge_of_not_gt (hr₁ <| le_of_lt <| saf <| Nat.lt_add_one n) <| (hr₂.wf.has_min W hW).choose_spec.1.out.choose_spec ▸ (hr₂.wf.has_min W hW).choose_spec.2 ⟨r (x (n + 1)),Set.mem_range_self (x (n + 1))⟩ this
+    exact eq_of_le_of_not_lt' (hr₁ <| le_of_lt <| saf <| Nat.lt_add_one n) <| (hr₂.wf.has_min W hW).choose_spec.1.out.choose_spec ▸ (hr₂.wf.has_min W hW).choose_spec.2 ⟨r (x (n + 1)),Set.mem_range_self (x (n + 1))⟩ this
   use this.choose, (h ⟨(x (this.choose+1), x this.choose), saf <| Nat.lt_add_one this.choose⟩ this.choose_spec.symm) ▸ le_top
 
 end impl

@@ -63,7 +63,7 @@ theorem exists_relSeries_isIntervalSemistable {ℒ : Type*} [Nontrivial ℒ] [La
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
 [hμ : μA_DescendingChainCondition μ] [hμcvx : Convex μ] [h : μ_Admissible μ] :
 ------------
-∃ s : RelSeries (IsIntervalSemistable μ),
+∃ s : RelSeries (IntervalSemistableRel μ),
   s.head = ⊥ ∧ s.last = ⊤ ∧
   ∀ i : ℕ, (hi : i + 1 < s.length) →
     ¬   μA μ ⟨(s.toFun i, s.toFun ↑(i+1)), by simp [*]⟩
@@ -71,7 +71,7 @@ theorem exists_relSeries_isIntervalSemistable {ℒ : Type*} [Nontrivial ℒ] [La
 ------------
  := by
   let HNfil : HarderNarasimhanFiltration μ := default
-  let HNseq : RelSeries (IsIntervalSemistable μ) := {
+  let HNseq : RelSeries (IntervalSemistableRel μ) := {
     toFun := fun n ↦ HNfil.filtration n,
     length := Nat.find HNfil.fin_len
     step := by
@@ -99,7 +99,7 @@ theorem exists_unique_relSeries_isIntervalSemistable_of_completeLinearOrder {ℒ
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
 [hμ : μA_DescendingChainCondition μ] [hμcvx : Convex μ]:
 ------------
-∃! s : RelSeries (IsIntervalSemistable μ),
+∃! s : RelSeries (IntervalSemistableRel μ),
   s.head = ⊥ ∧ s.last = ⊤ ∧
   ∀ i : ℕ, (hi : i + 1 < s.length) →
     ¬   μA μ ⟨(s.toFun i, s.toFun ↑(i+1)), by simp [*]⟩
@@ -131,8 +131,7 @@ theorem exists_unique_relSeries_isIntervalSemistable_of_completeLinearOrder {ℒ
           have := Fin.is_le x
           exfalso
           linarith
-      · simp only [Fin.cast_val_eq_self]
-        if hx : ↑x ≤ F2.length then
+      · if hx : ↑x ≤ F2.length then
           simp only [hx, ↓reduceIte]
           congr
           refine Fin.eq_of_val_eq ?_

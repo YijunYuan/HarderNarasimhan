@@ -140,7 +140,7 @@ lemma rmk2d5₂
   (I : {p : ℒ × ℒ // p.1 < p.2})
   (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : ConvexI I μ) :
   μmax μ I = μmax (μmax μ) I := by
-  apply eq_of_le_of_le
+  apply eq_of_le_of_ge
   · apply le_sSup
     use I.val.2, ⟨⟨le_of_lt I.prop, le_refl I.val.2⟩, ne_of_lt I.prop⟩
   · apply sSup_le
@@ -157,7 +157,7 @@ lemma rmk2d5₃
   (I : {p : ℒ × ℒ // p.1 < p.2})
   (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : ConvexI I μ) :
   μA μ I = μA (μmax μ) I := by
-  apply eq_of_le_of_le
+  apply eq_of_le_of_ge
   · apply sInf_le_sInf
     rintro t ⟨a, ha, rfl⟩
     use a, ha
@@ -261,7 +261,7 @@ lemma prop2d6₃I
       have h''' : μA μ ⟨(y, z), h.2⟩ ≤ μmax μ ⟨(a, z), lt_of_le_of_ne ha₁.2 ha₂⟩ := by
           apply sInf_le
           use a , ⟨⟨hcontra, ha₁.2⟩, ha₂⟩
-      exact hnot <| eq_of_le_of_le (hres ▸ h''') <| prop2d6₀ μ x y z h
+      exact hnot <| eq_of_le_of_ge (hres ▸ h''') <| prop2d6₀ μ x y z h
     exact ⟨hres ▸ (le_trans (lem2d4₁ μ y a h' x (le_inf (le_of_lt h.1) ha₁.1)) <| lem2d4₂I I μ hμcvx y hyI a ⟨le_trans hxI.1 ha₁.1, le_trans ha₁.2 hzI.2⟩ h' z <| sup_le (le_of_lt h.2) ha₁.2),lt_of_le_of_ne (prop2d6₀ μ x y z h) <| Ne.symm hnot⟩
 
 
