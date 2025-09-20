@@ -94,12 +94,10 @@ lemma μmax_res_intvl {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [Bounded
   ext x
   constructor
   · intro hx
-    simp only [Set.mem_setOf_eq] at *
     rcases hx with ⟨u,hu1,hu2⟩
     use u.val
     use ⟨hu1.1,fun hc ↦ hu1.right (Subtype.coe_inj.1 hc)⟩
   · intro hx
-    simp only [Set.mem_setOf_eq] at *
     rcases hx with ⟨u,hu1,hu2⟩
     use ⟨u,le_trans ((J.val).1.prop.1) hu1.1.1
       ,le_trans hu1.1.2 ((J.val).2.prop.2)⟩
@@ -122,12 +120,10 @@ lemma μmin_res_intvl {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [Bounded
   ext x
   constructor
   · intro hx
-    simp only [Set.mem_setOf_eq] at *
     rcases hx with ⟨u,hu1,hu2⟩
     use u.val
     use ⟨hu1.1,fun hc ↦ hu1.right (Subtype.coe_inj.1 hc)⟩
   · intro hx
-    simp only [Set.mem_setOf_eq] at *
     rcases hx with ⟨u,hu1,hu2⟩
     use ⟨u,le_trans ((J.val).1.prop.1) hu1.1.1
       ,le_trans hu1.1.2 ((J.val).2.prop.2)⟩
@@ -150,12 +146,10 @@ lemma μA_res_intvl {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOr
   ext x
   constructor
   · intro hx
-    simp only [Set.mem_setOf_eq] at *
     rcases hx with ⟨u,hu1,hu2⟩
     use u.val
     use ⟨hu1.1,fun hc ↦ hu1.right (Subtype.coe_inj.1 hc)⟩
   · intro hx
-    simp only [Set.mem_setOf_eq] at *
     rcases hx with ⟨u,hu1,hu2⟩
     use ⟨u,le_trans ((J.val).1.prop.1) hu1.1.1
       ,le_trans hu1.1.2 ((J.val).2.prop.2)⟩
@@ -178,12 +172,10 @@ lemma μB_res_intvl {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOr
   ext x
   constructor
   · intro hx
-    simp only [Set.mem_setOf_eq] at *
     rcases hx with ⟨u,hu1,hu2⟩
     use u.val
     use ⟨hu1.1,fun hc ↦ hu1.right (Subtype.coe_inj.1 hc)⟩
   · intro hx
-    simp only [Set.mem_setOf_eq] at *
     rcases hx with ⟨u,hu1,hu2⟩
     use ⟨u,le_trans ((J.val).1.prop.1) hu1.1.1
       ,le_trans hu1.1.2 ((J.val).2.prop.2)⟩

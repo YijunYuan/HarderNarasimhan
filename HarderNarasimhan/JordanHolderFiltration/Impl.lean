@@ -524,8 +524,7 @@ lemma semistable_of_step_cond₂ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [B
 → (
 ∀ i : ℕ, (hi : i < Nat.find fin_len) → Semistable (Resμ ⟨(filtration (i+1), filtration i), strict_anti i (i+1) (lt_add_one i) hi⟩ μ)
 ) := by
-  intro h
-  intro i hi
+  intro h i hi
   have h := h i hi
   apply (impl.thm4d21 (Resμ ⟨(filtration (i+1), filtration i), strict_anti i (i+1) (lt_add_one i) hi⟩ μ) inferInstance inferInstance inferInstance).2.2 (fun _ _ ↦ inferInstance)
   apply (List.TFAE.out (impl.thm4d21 (Resμ ⟨(filtration (i+1), filtration i), strict_anti i (i+1) (lt_add_one i) hi⟩ μ) inferInstance inferInstance inferInstance).1 1 3).1
@@ -578,8 +577,7 @@ lemma stable_of_step_cond₂ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [Bound
 → (
 ∀ i : ℕ, (hi : i < Nat.find fin_len) → Stable (Resμ ⟨(filtration (i+1), filtration i), strict_anti i (i+1) (lt_add_one i) hi⟩ μ)
 ) := by
-    intro h
-    intro i hi
+    intro h i hi
     refine { toSemistable := semistable_of_step_cond₂ μ filtration fin_len strict_anti h i hi, stable := ?_ }
     · intro x hx hx'
       have := (proposition_4_1 (Resμ ⟨(filtration (i+1), filtration i), strict_anti i (i+1) (lt_add_one i) hi⟩ μ) inferInstance inferInstance).1

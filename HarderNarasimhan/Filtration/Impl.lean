@@ -48,7 +48,7 @@ lemma HNFil_of_fin_len {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrde
 [h : μ_Admissible μ]
 : ∃ N : Nat, HNFil μ N = ⊤ := by
   by_contra!
-  exact (WellFounded.wellFounded_iff_no_descending_seq.1 inst_3.wf).elim ⟨fun n => HNFil μ n, fun n => HNFil_is_strict_mono μ n (this n)⟩
+  exact (wellFounded_iff_isEmpty_descending_chain.1 inst_3.wf).elim ⟨fun n => HNFil μ n, fun n => HNFil_is_strict_mono μ n (this n)⟩
 
 
 noncomputable def HNlen {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
@@ -233,8 +233,8 @@ lemma hHFil_of_hNSeries {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrd
 (F1 : RelSeries (IntervalSemistableRel μ))
 (h1 : F1.head = ⊥ ∧ F1.last = ⊤ ∧
   ∀ i : ℕ, (hi : i + 1 < F1.length) →
-    ¬   μA μ ⟨(F1.toFun i, F1.toFun ↑(i+1)), by simp [*]⟩
-      ≤ μA μ ⟨(F1.toFun ↑(i+1), F1.toFun ↑(i+2)), by simp [*]⟩):
+    ¬   μA μ ⟨(F1.toFun i, F1.toFun ↑(i+1)), balabala1 F1 hi⟩
+      ≤ μA μ ⟨(F1.toFun ↑(i+1), F1.toFun ↑(i+2)), balabala2 F1 hi⟩):
 ∃ HN1 : HarderNarasimhanFiltration μ, HN1.filtration = (fun n ↦ if n ≤ F1.length then F1.toFun n else ⊤) ∧ (Nat.find HN1.fin_len = F1.length) := by
   let filtration1 := fun n ↦ if n ≤ F1.length then F1.toFun n else ⊤
   have hstrange : ∃ n, (if n ≤ F1.length then F1.toFun ↑n else ⊤) = ⊤ := by

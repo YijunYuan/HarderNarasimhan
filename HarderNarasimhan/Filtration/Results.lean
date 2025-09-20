@@ -66,8 +66,8 @@ theorem exists_relSeries_isIntervalSemistable {ℒ : Type*} [Nontrivial ℒ] [La
 ∃ s : RelSeries (IntervalSemistableRel μ),
   s.head = ⊥ ∧ s.last = ⊤ ∧
   ∀ i : ℕ, (hi : i + 1 < s.length) →
-    ¬   μA μ ⟨(s.toFun i, s.toFun ↑(i+1)), by simp [*]⟩
-      ≤ μA μ ⟨(s.toFun ↑(i+1), s.toFun ↑(i+2)), by simp [*]⟩
+    ¬   μA μ ⟨(s.toFun i, s.toFun ↑(i+1)), impl.balabala1 s hi⟩
+      ≤ μA μ ⟨(s.toFun ↑(i+1), s.toFun ↑(i+2)), impl.balabala2 s hi⟩
 ------------
  := by
   let HNfil : HarderNarasimhanFiltration μ := default
@@ -102,8 +102,8 @@ theorem exists_unique_relSeries_isIntervalSemistable_of_completeLinearOrder {ℒ
 ∃! s : RelSeries (IntervalSemistableRel μ),
   s.head = ⊥ ∧ s.last = ⊤ ∧
   ∀ i : ℕ, (hi : i + 1 < s.length) →
-    ¬   μA μ ⟨(s.toFun i, s.toFun ↑(i+1)), by simp [*]⟩
-      ≤ μA μ ⟨(s.toFun ↑(i+1), s.toFun ↑(i+2)), by simp [*]⟩
+    ¬   μA μ ⟨(s.toFun i, s.toFun ↑(i+1)), impl.balabala1 s hi⟩
+      ≤ μA μ ⟨(s.toFun ↑(i+1), s.toFun ↑(i+2)), impl.balabala2 s hi⟩
 ------------
 := by
   apply existsUnique_of_exists_of_unique

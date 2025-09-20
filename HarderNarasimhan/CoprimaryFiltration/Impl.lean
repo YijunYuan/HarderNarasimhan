@@ -479,8 +479,7 @@ instance prop3d13₂ {R : Type*} [CommRing R] [IsNoetherianRing R]
 lemma rmk4d14₁ {R : Type*} [CommRing R] [IsNoetherianRing R]
 {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] : Semistable (μ R M) ↔ ∀ N : (ℒ R M), (hN : ⊥ < N) → μA (μ R M) ⟨(⊥,N),hN⟩ = ({(((_μ R M) ⟨(⊥,⊤),bot_lt_top⟩).toFinset.min' (μ_nonempty _))} : S₀ R) := by
   constructor
-  · intro hst
-    intro N hN
+  · intro hst N hN
     have hst := hst.semistable N (bot_lt_iff_ne_bot.1 hN)
     simp only [Function.Embedding.toFun_eq_coe, RelEmbedding.coe_toEmbedding]
     rw [prop3d12 ⟨(⊥,N),hN⟩, prop3d12 ⟨((⊥ : ℒ R M), ⊤), bot_lt_top⟩] at hst

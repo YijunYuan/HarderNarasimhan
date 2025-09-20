@@ -1,4 +1,5 @@
 import HarderNarasimhan.SlopeLike.Defs
+import Mathlib.Tactic
 
 namespace HarderNarasimhan
 
