@@ -626,7 +626,7 @@ lemma stable_of_step_cond₂ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [Bound
           exact hx <| Subtype.coe_inj.1 <| id (Eq.symm hc)
           )) <| lt_iff_le_not_ge.mpr (lt_top_iff_ne_top.2 hx')
 
-lemma res_ss {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
+lemma semistable_resμ_of_jordanHolderFiltration {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLinearOrder S]
 {μ : {p : ℒ × ℒ // p.1 < p.2} → S}
 [FiniteTotalPayoff μ] [SlopeLike μ] [Semistable μ]
@@ -1015,7 +1015,7 @@ lemma induction_on_length_of_JordanHolderFiltration : ∀ n : ℕ, ∀ ℒ : Typ
         simp only [JHfun]; simp only [Eq.mpr (id (congrArg (fun _a ↦ i + 1 ≤ _a) hhard.symm)) hi,
           ↓reduceDIte, le_of_lt <| hhard ▸ hi, gt_iff_lt]
         exact JHx.step_cond₂ i (Nat.lt_of_lt_pred <| hhard ▸ hi) z htemp htemp2
-    exact Nat.le_add_of_sub_le <| hhard ▸ hn (Interval Ires) inferInstance inferInstance inferInstance inferInstance inferInstance S clo (Resμ Ires μ) ftpLres inferInstance (res_ss _ _) inferInstance inferInstance ⟨JH_FINAL,Nat.le_of_lt_succ <| Nat.lt_of_lt_of_le ha hJHy⟩ JHres
+    exact Nat.le_add_of_sub_le <| hhard ▸ hn (Interval Ires) inferInstance inferInstance inferInstance inferInstance inferInstance S clo (Resμ Ires μ) ftpLres inferInstance (semistable_resμ_of_jordanHolderFiltration _ _) inferInstance inferInstance ⟨JH_FINAL,Nat.le_of_lt_succ <| Nat.lt_of_lt_of_le ha hJHy⟩ JHres
 
 
 end impl

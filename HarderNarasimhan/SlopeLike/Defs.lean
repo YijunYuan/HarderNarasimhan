@@ -34,7 +34,7 @@ noncomputable def μQuotient {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [
 {V : Type*} [TotallyOrderedRealVectorSpace V]
 (r : {p :ℒ × ℒ // p.1 < p.2} → NNReal)
 (d : {p :ℒ × ℒ // p.1 < p.2} → V): {p :ℒ × ℒ // p.1 < p.2} → OrderTheory.DedekindMacNeilleCompletion V :=
-  fun z ↦ if _ : r z > 0 then OrderTheory.coe' ((r z)⁻¹ • d z) else ⊤
+  fun z ↦ if _ : r z > 0 then ↑((r z)⁻¹ • d z) else ⊤
 
 
 instance {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]

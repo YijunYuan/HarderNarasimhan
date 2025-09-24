@@ -87,7 +87,7 @@ noncomputable abbrev μ (R : Type*) [CommRing R] [IsNoetherianRing R]
 ------------
 {z: (ℒ R M) × (ℒ R M) // z.1 < z.2} → (S R)
 ------------
-:= fun I ↦ OrderTheory.coe'.toFun ((_μ R M) I).toFinset
+:= fun I ↦ ↑((_μ R M) I).toFinset
 
 class Coprimary (R : Type*) [CommRing R] [IsNoetherianRing R](M : Type*) [AddCommGroup M] [Module R M] : Prop where
   coprimary : ∃! p, p ∈ associatedPrimes R M

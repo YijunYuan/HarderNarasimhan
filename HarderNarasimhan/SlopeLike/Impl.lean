@@ -116,7 +116,8 @@ lemma prop4d8 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder �
           exact False.elim (not_top_lt ((h2 ▸ h3 ▸ hw₁).symm ▸ not_top_of_Nontrivial_TotallyOrderedRealVectorSpace w))
         · refine Or.inr <| Or.inl <| ⟨h3,?_⟩
           simp only [μQuotient, gt_iff_lt, Eq.mpr (id (congrArg (fun _a ↦ _a > 0) h4)) h'''.right,
-            ↓reduceDIte, h'''.2, OrderEmbedding.lt_iff_lt, μ]
+            ↓reduceDIte, Function.Embedding.toFun_eq_coe, RelEmbedding.coe_toEmbedding, h'''.2,
+            OrderEmbedding.lt_iff_lt, μ]
           exact h4 ▸ ((smul_lt_smul_iff_of_pos_left <| Right.inv_pos.mpr h').2 <| (h₁ x y z h).1 ▸ lt_add_of_pos_left (d ⟨(y, z), h.right⟩) <| h₂ x y h.1 h'''.1)
       · apply not_and_or.1 at h''
         apply not_and_or.1 at h'''
@@ -131,8 +132,9 @@ lemma prop4d8 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder �
           simp only [μ] at h3; simp only [μ] at h2
           exact False.elim (not_top_lt ((h2 ▸ h3 ▸ hw₁).symm ▸ not_top_of_Nontrivial_TotallyOrderedRealVectorSpace w))
         · refine Or.inl <| ⟨?_,h3⟩
-          simp only [μQuotient, gt_iff_lt, this', ↓reduceDIte,
-            Eq.mpr (id (congrArg (fun _a ↦ _a > 0) h4)), OrderEmbedding.lt_iff_lt, μ]
+          simp only [μQuotient, gt_iff_lt, this', ↓reduceDIte, Function.Embedding.toFun_eq_coe,
+            RelEmbedding.coe_toEmbedding, Eq.mpr (id (congrArg (fun _a ↦ _a > 0) h4)),
+            OrderEmbedding.lt_iff_lt, μ]
           exact h4 ▸ ((smul_lt_smul_iff_of_pos_left <| Right.inv_pos.mpr h').2 <| (h₁ x y z h).1 ▸ lt_add_of_pos_right (d ⟨(x, y), h.1⟩) <| h₂ y z h.2 this)
 end impl
 

@@ -15,7 +15,7 @@ lemma μmax_eq_μ {R : Type*} [CommRing R] [IsNoetherianRing R]
 ∀ I : {z: (ℒ R M) × (ℒ R M) // z.1 < z.2},
   μmax (μ R M) I = (μ R M) I
 ------------
-:= impl.noname
+:= impl.μmax_eq_μ
 
 instance proposition_3_11 {R : Type*} [CommRing R] [IsNoetherianRing R]
 {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] :
