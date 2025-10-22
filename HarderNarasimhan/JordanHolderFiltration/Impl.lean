@@ -626,6 +626,125 @@ lemma stable_of_step_cond₂ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [Bound
           exact hx <| Subtype.coe_inj.1 <| id (Eq.symm hc)
           )) <| lt_iff_le_not_ge.mpr (lt_top_iff_ne_top.2 hx')
 
+lemma strip_bot {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] {a b : ℒ} (h : a < b) : @Subtype.val ℒ (fun p ↦ a ≤ p ∧ p ≤ b) (⊥: Interval ⟨(a, b), h⟩) = a := rfl
+
+lemma strip_top {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] {a b : ℒ} (h : a < b) : @Subtype.val ℒ (fun p ↦ a ≤ p ∧ p ≤ b) (⊤: Interval ⟨(a, b), h⟩) = b := rfl
+
+lemma step_cond₂_of_stable {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
+{S : Type*} [CompleteLinearOrder S]
+(μ : {p : ℒ × ℒ // p.1 < p.2} → S) [SlopeLike μ] [sdc : StrongDescendingChainCondition' μ]
+(filtration : ℕ → ℒ) (fin_len : ∃ N : ℕ, filtration N =⊥)
+(strict_anti : ∀ i j : ℕ, i < j → j ≤ Nat.find (fin_len) → filtration j < filtration i):
+(
+∀ i : ℕ, (hi : i < Nat.find fin_len) → Stable (Resμ ⟨(filtration (i+1), filtration i), strict_anti i (i+1) (lt_add_one i) hi⟩ μ)
+)
+→ (∀ i : ℕ, (hi : i < Nat.find fin_len) →
+    ∀ z : ℒ, (h' : filtration (i+1) < z) → (h'' : z < filtration i) →
+    μ ⟨(filtration (i+1), z), h'⟩ < μ ⟨(filtration (i+1), filtration i), strict_anti i (i+1) (lt_add_one i) hi⟩
+) := by
+  intro hst i hi z hz hz'
+  have hss := (hst i hi).toSemistable.semistable ⟨z, le_of_lt hz, le_of_lt hz'⟩ (by
+    apply bot_lt_iff_ne_bot.1
+    by_contra hc
+    simp only [not_bot_lt_iff] at hc
+    apply Subtype.coe_inj.2 at hc
+    simp only at hc
+    rw [hc] at hz
+    exact False.elim <| (lt_self_iff_false (filtration (i + 1))).mp hz
+    )
+  simp at hss
+  have hst' := (hst i hi).stable ⟨z, le_of_lt hz, le_of_lt hz'⟩ (by
+    apply bot_lt_iff_ne_bot.1
+    by_contra hc
+    simp only [not_bot_lt_iff] at hc
+    apply Subtype.coe_inj.2 at hc
+    simp only at hc
+    rw [hc] at hz
+    exact False.elim <| (lt_self_iff_false (filtration (i + 1))).mp hz
+    ) (by
+      by_contra hc
+      apply Subtype.coe_inj.2 at hc
+      simp only at hc
+      rw [hc] at hz'
+      exact False.elim <| (lt_self_iff_false (filtration i)).mp hz'
+    )
+  have hst' := lt_of_le_of_ne hss hst'
+  have := (proposition_4_1 (Resμ ⟨(filtration (i+1), filtration i), strict_anti i (i+1) (lt_add_one i) hi⟩ μ) inferInstance inferInstance).1
+  unfold μAstar at this
+  rw [this] at hst'
+  have this' := (proposition_4_1 (Resμ ⟨(filtration (i+1), z), hz⟩ μ) inferInstance inferInstance).1
+  unfold μAstar at this'
+  have hb : μA (Resμ ⟨(filtration (i + 1), filtration i), gt_trans hz' hz⟩ μ) ⟨(⊥, ⟨z, le_of_lt hz, le_of_lt hz'⟩), by
+  simp
+  by_contra hc
+  simp only [not_bot_lt_iff] at hc
+  apply Subtype.coe_inj.2 at hc
+  simp only at hc
+  rw [hc] at hz
+  exact False.elim <| (lt_self_iff_false (filtration (i + 1))).mp hz⟩ = μA (Resμ ⟨(filtration (i + 1), z), hz⟩ μ) ⟨(⊥, ⊤), bot_lt_top⟩ := by
+    simp only [μA_res_intvl,μmin_res_intvl] at *
+    rfl
+  rw [hb, this'] at hst'
+  have := (List.TFAE.out (impl.thm4d21 (Resμ ⟨(filtration (i + 1), filtration i), strict_anti i (i + 1) (lt_add_one i) hi⟩ μ) inferInstance inferInstance inferInstance).1 1 3).2 <| (impl.thm4d21 (Resμ ⟨(filtration (i + 1), filtration i), strict_anti i (i + 1) (lt_add_one i) hi⟩ μ) inferInstance inferInstance inferInstance).2.1 (hst i hi).toSemistable
+  rw [this] at hst'
+  have := (List.TFAE.out (impl.thm4d21 (Resμ ⟨(filtration (i + 1), filtration i), strict_anti i (i + 1) (lt_add_one i) hi⟩ μ) inferInstance inferInstance inferInstance).1 0 3).2 <| (impl.thm4d21 (Resμ ⟨(filtration (i + 1), filtration i), strict_anti i (i + 1) (lt_add_one i) hi⟩ μ) inferInstance inferInstance inferInstance).2.1 (hst i hi).toSemistable
+  simp only [μmin_res_intvl,μ_res_intvl] at hst'
+  unfold μmax at this
+  apply le_of_eq at this
+  apply sSup_le_iff.1 at this
+  simp at this
+  have this_bak := this
+  have := this (Resμ ⟨(filtration (i + 1), filtration i), gt_trans hz' hz⟩ μ ⟨(⊥, ⟨z, le_of_lt hz, le_of_lt hz'⟩), by
+  simp
+  by_contra hc
+  simp only [not_bot_lt_iff] at hc
+  apply Subtype.coe_inj.2 at hc
+  simp only at hc
+  rw [hc] at hz
+  exact False.elim <| (lt_self_iff_false (filtration (i + 1))).mp hz⟩) ⟨z, le_of_lt hz, le_of_lt hz'⟩ (in_TotIntvl _) (by
+    apply Ne.symm
+    apply bot_lt_iff_ne_bot.1
+    by_contra hc
+    simp only [not_bot_lt_iff] at hc
+    apply Subtype.coe_inj.2 at hc
+    simp only at hc
+    rw [hc] at hz
+    exact False.elim <| (lt_self_iff_false (filtration (i + 1))).mp hz
+     ) rfl
+  refine lt_of_le_of_ne this ?_
+  by_contra hc
+  simp [strip_bot (gt_trans hz' hz), strip_top (gt_trans hz' hz)] at hst'
+  rw [← hc] at hst'
+  have t1 : ↑(@Bot.bot (Interval ⟨(filtration (i + 1), z), hz⟩) instBoundedOrderInterval.toBot : Interval ⟨(filtration (i + 1), z), hz⟩) = filtration (i + 1) := rfl
+  have t2 : ↑(@Top.top (Interval ⟨(filtration (i + 1), z), hz⟩) instBoundedOrderInterval.toTop : Interval ⟨(filtration (i + 1), z), hz⟩) = z := rfl
+  simp [t1, t2] at hst'
+  unfold μmin at hst'
+  apply sInf_lt_iff.1 at hst'
+  simp at hst'
+  rcases hst' with ⟨s,⟨y,hy1,hy2⟩,hs⟩
+  rw [← hy2] at hs
+  have := ((seesaw' μ inferInstance (filtration (i + 1)) y z ⟨by
+    refine lt_of_le_of_ne hy1.1.1 ?_
+    by_contra hc
+    simp [hc] at hs
+    ,lt_of_le_of_ne hy1.1.2 hy1.2⟩).2.1.2.2 hs).1
+  simp [hc] at this
+  have res := this_bak (Resμ ⟨(filtration (i + 1), filtration i), gt_trans hz' hz⟩ μ ⟨(⊥, ⟨y,hy1.1.1,le_of_lt <| lt_of_le_of_lt hy1.1.2 hz'⟩), by
+    refine lt_of_le_of_ne hy1.1.1 ?_
+    by_contra hc
+    simp at hc
+    apply Subtype.coe_inj.2 at hc
+    simp only at hc
+    simp [← hc, strip_bot (gt_trans hz' hz)] at hs⟩) ⟨y,hy1.1.1,le_of_lt <| lt_of_le_of_lt hy1.1.2 hz'⟩ (in_TotIntvl _) (by
+    by_contra hc
+    apply Subtype.coe_inj.2 at hc
+    simp only at hc
+    simp [← hc, strip_bot (gt_trans hz' hz)] at hs
+    ) rfl
+  simp [μ_res_intvl, strip_bot (gt_trans hz' hz), strip_top (gt_trans hz' hz)] at res
+  exact (not_le_of_gt this) res
+
+
 lemma semistable_resμ_of_jordanHolderFiltration {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLinearOrder S]
 {μ : {p : ℒ × ℒ // p.1 < p.2} → S}
