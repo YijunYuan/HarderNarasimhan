@@ -589,18 +589,16 @@ lemma stable_of_step_cond₂ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [Bound
       unfold μAstar at this'
       simp only [μA_res_intvl,μmin_res_intvl] at *
       rw [this]
-      have t1: @Bot.bot (Interval ⟨(filtration (i + 1), filtration i), strict_anti i (i + 1) (lt_add_one i) hi⟩) OrderBot.toBot = filtration (i + 1) := by rfl
-      have t2 : @Top.top (Interval ⟨(filtration (i + 1), ↑x), lt_of_le_of_ne (Subtype.prop x).left fun hc ↦ hx (Subtype.coe_inj.mp (id (Eq.symm hc)))⟩) OrderTop.toTop = x.val := by rfl
-      have t3 : (@Bot.bot (Interval ⟨(filtration (i + 1), ↑x), lt_of_le_of_ne (Subtype.prop x).left fun hc ↦ hx (Subtype.coe_inj.mp (id (Eq.symm hc)))⟩) OrderBot.toBot).val = filtration (i + 1) := by rfl
-      simp only [t1,t2,t3] at *
+      simp only [strip_bot <| strict_anti i (i + 1) (lt_add_one i) hi,
+        strip_top <| lt_of_le_of_ne (Subtype.prop x).left fun hc ↦ hx (Subtype.coe_inj.mp (id (Eq.symm hc))),
+        strip_bot <| lt_of_le_of_ne (Subtype.prop x).left fun hc ↦ hx (Subtype.coe_inj.mp (id (Eq.symm hc)))] at *
       rw [this']
       have hss := semistable_of_step_cond₂ μ filtration fin_len strict_anti h i hi
       have := (impl.thm4d21 (Resμ ⟨(filtration (i + 1), filtration i), strict_anti i (i + 1) (lt_add_one i) hi⟩ μ) inferInstance inferInstance inferInstance).2.1 hss
       have := (List.TFAE.out (impl.thm4d21 (Resμ ⟨(filtration (i + 1), filtration i), strict_anti i (i + 1) (lt_add_one i) hi⟩ μ) inferInstance inferInstance inferInstance).1 1 3).2 this
       simp only [μmin_res_intvl,μ_res_intvl] at this
-      have t4 : @Bot.bot (Interval ⟨(filtration (i + 1), filtration i), strict_anti i (i + 1) (lt_add_one i) hi⟩) OrderBot.toBot = filtration (i+1) := by rfl
-      have t5 : @Top.top (Interval ⟨(filtration (i + 1), filtration i), strict_anti i (i + 1) (lt_add_one i) hi⟩) OrderTop.toTop = filtration i := by rfl
-      simp only [t4, t5] at *
+      simp only [strip_bot <| strict_anti i (i + 1) (lt_add_one i) hi,
+        strip_top <| strict_anti i (i + 1) (lt_add_one i) hi] at *
       rw [this]
       apply ne_of_lt
       have : μmin μ ⟨(filtration (i + 1), ↑x), (lt_of_le_of_ne x.prop.1 (by
@@ -625,10 +623,6 @@ lemma stable_of_step_cond₂ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [Bound
           by_contra hc
           exact hx <| Subtype.coe_inj.1 <| id (Eq.symm hc)
           )) <| lt_iff_le_not_ge.mpr (lt_top_iff_ne_top.2 hx')
-
-lemma strip_bot {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] {a b : ℒ} (h : a < b) : @Subtype.val ℒ (fun p ↦ a ≤ p ∧ p ≤ b) (⊥: Interval ⟨(a, b), h⟩) = a := rfl
-
-lemma strip_top {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] {a b : ℒ} (h : a < b) : @Subtype.val ℒ (fun p ↦ a ≤ p ∧ p ≤ b) (⊤: Interval ⟨(a, b), h⟩) = b := rfl
 
 lemma step_cond₂_of_stable {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLinearOrder S]

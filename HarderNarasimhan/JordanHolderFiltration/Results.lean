@@ -84,14 +84,24 @@ theorem exists_JordanHolderSeries {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [
   exact ⟨JH, ⟨this.first_eq_top, Nat.find_spec this.fin_len⟩⟩
 
 
-theorem piecewise_stable_of_JordanHolderFiltration
-{ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
+theorem piecewise_stable_iff {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLinearOrder S]
-{μ : {p : ℒ × ℒ // p.1 < p.2} → S}
-[SlopeLike μ] [sdc : StrongDescendingChainCondition' μ]
-(JH : JordanHolderFiltration μ) :
-∀ i : ℕ, (hi : i < Nat.find JH.fin_len) → Stable (Resμ ⟨(JH.filtration (i+1), JH.filtration i), JH.strict_anti i (i+1) (lt_add_one i) hi⟩ μ) := by
-  exact impl.stable_of_step_cond₂ μ JH.filtration JH.fin_len JH.strict_anti JH.step_cond₂
+(μ : {p : ℒ × ℒ // p.1 < p.2} → S) [SlopeLike μ] [sdc : StrongDescendingChainCondition' μ]
+(filtration : ℕ → ℒ) (fin_len : ∃ N : ℕ, filtration N =⊥)
+(strict_anti : ∀ i j : ℕ, i < j → j ≤ Nat.find (fin_len) → filtration j < filtration i) :
+------------
+(
+∀ i : ℕ, (hi : i < Nat.find fin_len) → Stable (Resμ ⟨(filtration (i+1), filtration i), strict_anti i (i+1) (lt_add_one i) hi⟩ μ)
+)
+↔ (∀ i : ℕ, (hi : i < Nat.find fin_len) →
+    ∀ z : ℒ, (h' : filtration (i+1) < z) → (h'' : z < filtration i) →
+    μ ⟨(filtration (i+1), z), h'⟩ < μ ⟨(filtration (i+1), filtration i), strict_anti i (i+1) (lt_add_one i) hi⟩)
+------------
+:= by
+  constructor
+  · exact fun a i hi z h' h'' ↦
+    impl.step_cond₂_of_stable μ filtration fin_len strict_anti a i hi z h' h''
+  · exact fun a i hi ↦ impl.stable_of_step_cond₂ μ filtration fin_len strict_anti a i hi
 
 
 theorem length_eq_of_JordanHolderFiltration {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ] [IsModularLattice ℒ]

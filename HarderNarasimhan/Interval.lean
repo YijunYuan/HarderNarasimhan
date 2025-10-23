@@ -183,4 +183,8 @@ lemma μB_res_intvl {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOr
     simp only [exists_prop, and_true]
     exact ⟨hu1.1,fun hc ↦ hu1.right (Subtype.coe_inj.2 hc)⟩
 
+lemma strip_bot {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] {a b : ℒ} (h : a < b) : @Subtype.val ℒ (fun p ↦ a ≤ p ∧ p ≤ b) (⊥: Interval ⟨(a, b), h⟩) = a := rfl
+
+lemma strip_top {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] {a b : ℒ} (h : a < b) : @Subtype.val ℒ (fun p ↦ a ≤ p ∧ p ≤ b) (⊤: Interval ⟨(a, b), h⟩) = b := rfl
+
 end HarderNarasimhan
