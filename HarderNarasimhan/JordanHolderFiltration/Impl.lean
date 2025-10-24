@@ -384,7 +384,7 @@ lemma subseq_prop4 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
       exact ⟨k,⟨le_rfl,hcond ▸ hk.symm⟩⟩
     else
     rcases subseq_prop0' f atf hfat hf0 t with ⟨l,hl1,hl2⟩
-    exact ⟨l,⟨byContradiction fun this ↦ hcond (le_bot_iff.mp (hk ▸ hfat (le_of_lt (Eq.mp (Mathlib.Tactic.PushNeg.not_le_eq l k) this))) ▸ hl2),hl2⟩⟩
+    exact ⟨l,⟨byContradiction fun this ↦ hcond (le_bot_iff.mp (hk ▸ hfat (le_of_lt (not_le.1 this))) ▸ hl2),hl2⟩⟩
   let Φ : Fin (A+1) → 𝒮 := fun d ↦ ⟨f (Nat.find (helper d)),Set.mem_setOf.mpr ⟨Nat.find (helper d),⟨(Nat.find_spec (helper d)).1,rfl⟩⟩⟩
   have hΦ : Function.Injective Φ := by
     intro d1 d2 h
