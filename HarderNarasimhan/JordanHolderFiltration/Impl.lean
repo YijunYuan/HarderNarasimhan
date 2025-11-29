@@ -256,8 +256,7 @@ lemma subseq_prop0 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
       exact ⟨j,h' ▸ hj⟩
     else
       use j+1
-      simp only [subseq,hj ▸ h]
-      simp only [↓reduceDIte]
+      simp only [subseq,hj ▸ h, ↓reduceDIte]
       have hq := subseq._proof_2 f atf j (Eq.mpr_not (eq_false (hj ▸ h)) (of_eq_false (Eq.refl False)))
       have : i + 1 = Nat.find hq := by
         apply eq_of_le_of_ge
@@ -318,8 +317,7 @@ lemma subseq_prop2 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
     if hcond : subseq f atf n = ⊥ then
       simp only [hcond, ↓reduceDIte, le_refl]
     else
-    simp only [hcond, ↓reduceDIte]
-    exact le_of_lt <| Nat.find_spec <| subseq._proof_2 f atf n (of_eq_false (eq_false hcond))
+    simpa only [hcond, ↓reduceDIte] using le_of_lt <| Nat.find_spec <| subseq._proof_2 f atf n (of_eq_false (eq_false hcond))
 
 
 lemma subseq_prop3 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] (f : ℕ → ℒ) (hf0 : f 0 = ⊤) (atf : ∃ k, f k = ⊥) (hfat: Antitone f): ∀ k : ℕ, subseq f atf k ≤ f k := by
@@ -357,7 +355,7 @@ lemma subseq_prop5 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
         simp only [hcond, ↓reduceDIte]
         apply bot_lt_iff_ne_bot.2
         by_contra!
-        have := le_trans hj <| Nat.find_min' (subseq_prop1 f atf hfat hf0) this
+        replace := le_trans hj <| Nat.find_min' (subseq_prop1 f atf hfat hf0) this
         linarith
       else
       simp only [hcond, ↓reduceDIte]
@@ -409,7 +407,7 @@ lemma subseq_prop6 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
   simp only [subseq]
   have hcond : subseq f atf i ≠ ⊥ := by
     by_contra!
-    have := Nat.find_min' (subseq_prop1 f atf hfat hf0) this
+    replace := Nat.find_min' (subseq_prop1 f atf hfat hf0) this
     linarith
   simp only [hcond, ↓reduceDIte]
   rcases subseq_prop0' f atf hfat hf0 i with ⟨j,⟨_,hj⟩⟩
@@ -447,9 +445,7 @@ lemma subseq_prop6 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
       arg 1;
       apply Nat.sub_one_add_one <| fun this ↦ (lt_self_iff_false ⊤).mp <| hf0 ▸ lt_of_lt_of_le (this ▸ yah) le_top
     exact yah
-  have := ho (jtilde -1) (byContradiction fun this' ↦ not_le_of_gt (lt_of_le_of_lt bot_le yah) (Nat.find_spec atf ▸ hfat (le_of_not_gt this'))) this
-  simp only [← heq] at this
-  exact this
+  simpa only [← heq] using ho (jtilde -1) (byContradiction fun this' ↦ not_le_of_gt (lt_of_le_of_lt bot_le yah) (Nat.find_spec atf ▸ hfat (le_of_not_gt this'))) this
 
 lemma μA_eq_μmin {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLinearOrder S]
@@ -498,7 +494,7 @@ lemma μ_bot_JH_eq_μ_tot {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedO
       ,Ne.lt_top' fun a ↦ htop (id (Eq.symm a))
       ⟩
     refine (this.2.2.2.1 ?_).1
-    have hi' := hi' (Nat.lt_of_succ_lt hi)
+    specialize hi' (Nat.lt_of_succ_lt hi)
     have := seesaw' μ hsl ⊥ (JH.filtration i) ⊤ ⟨by
       rw [← Nat.find_spec JH.fin_len]
       apply JH.strict_anti
@@ -588,14 +584,14 @@ lemma stable_of_step_cond₂ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [Bound
         strip_bot <| lt_of_le_of_ne (Subtype.prop x).left fun hc ↦ hx (Subtype.coe_inj.mp (id (Eq.symm hc)))] at *
       rw [this']
       have hss := semistable_of_step_cond₂ μ filtration fin_len strict_anti h i hi
-      have := (impl.thm4d21 (Resμ ⟨(filtration (i + 1), filtration i), strict_anti i (i + 1) (lt_add_one i) hi⟩ μ) inferInstance inferInstance inferInstance).2.1 hss
-      have := (List.TFAE.out (impl.thm4d21 (Resμ ⟨(filtration (i + 1), filtration i), strict_anti i (i + 1) (lt_add_one i) hi⟩ μ) inferInstance inferInstance inferInstance).1 1 3).2 this
+      replace := (impl.thm4d21 (Resμ ⟨(filtration (i + 1), filtration i), strict_anti i (i + 1) (lt_add_one i) hi⟩ μ) inferInstance inferInstance inferInstance).2.1 hss
+      replace := (List.TFAE.out (impl.thm4d21 (Resμ ⟨(filtration (i + 1), filtration i), strict_anti i (i + 1) (lt_add_one i) hi⟩ μ) inferInstance inferInstance inferInstance).1 1 3).2 this
       simp only [μmin_res_intvl,μ_res_intvl] at this
       simp only [strip_bot <| strict_anti i (i + 1) (lt_add_one i) hi,
         strip_top <| strict_anti i (i + 1) (lt_add_one i) hi] at *
       rw [this]
       apply ne_of_lt
-      have : μmin μ ⟨(filtration (i + 1), ↑x), (lt_of_le_of_ne x.prop.1 (by
+      replace : μmin μ ⟨(filtration (i + 1), ↑x), (lt_of_le_of_ne x.prop.1 (by
           by_contra hc
           exact hx <| Subtype.coe_inj.1 <| id (Eq.symm hc)
           ))⟩ ≤ μ ⟨(filtration (i + 1), ↑x), (lt_of_le_of_ne x.prop.1 (by
