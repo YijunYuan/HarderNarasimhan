@@ -246,8 +246,7 @@ lemma hHFil_of_hNSeries {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrd
     simp [Iff.symm Nat.add_one_le_iff]
     apply Nat.le_induction
     · intro h
-      have := (F1.step ⟨i,h⟩).choose
-      convert this
+      convert (F1.step ⟨i,h⟩).choose
       · refine Fin.eq_mk_iff_val_eq.mpr ?_
         refine Fin.val_cast_of_lt ?_
         exact Nat.lt_add_right 1 h
@@ -285,8 +284,7 @@ lemma hHFil_of_hNSeries {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrd
           simp only [filtration1,hn, ↓reduceIte]
           if hn' : n + 1 ≤ F1.length then
             simp only [hn', ↓reduceIte]
-            have := le_of_lt (F1.step ⟨n,hn'⟩).choose
-            convert this
+            convert le_of_lt (F1.step ⟨n,hn'⟩).choose
             · simp only [Fin.castSucc_mk]
               refine Fin.eq_mk_iff_val_eq.mpr ?_
               refine Fin.val_cast_of_lt ?_
@@ -316,10 +314,9 @@ lemma hHFil_of_hNSeries {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrd
         exact Fmono i j hij hj,
       piecewise_semistable := by
         intro i hi
-        have := (F1.step ⟨i,hslen ▸ hi⟩).choose_spec
         unfold filtration1
         rw [hslen] at hi
-        convert this
+        convert (F1.step ⟨i,hslen ▸ hi⟩).choose_spec
         · simp only [le_of_lt hi, ↓reduceIte, Fin.castSucc_mk]
           congr
           refine Fin.eq_mk_iff_val_eq.mpr ?_

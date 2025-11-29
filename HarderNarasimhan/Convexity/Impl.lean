@@ -230,8 +230,7 @@ x < y ∨ y ≤ x := by
   nth_rw 2 [or_comm] at h
   rw [or_assoc] at h
   nth_rw 2 [←or_assoc, eq_comm] at h
-  rw [or_self, eq_comm, ← le_iff_eq_or_lt] at h
-  exact h
+  rwa [or_self, eq_comm, ← le_iff_eq_or_lt] at h
 
 
 lemma prop2d6₃I

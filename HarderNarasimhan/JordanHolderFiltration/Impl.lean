@@ -44,8 +44,7 @@ lemma JHFil_anti_mono {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder
   by_cases h : {p : ℒ | ∃ h : ⊥ < p, p < JHFil μ hμ hμsl hst hdc k ∧ μ ⟨(⊥,p),h⟩ = μ ⟨(⊥,⊤),bot_lt_top⟩}.Nonempty
   · simp only [h]
     exact (hacc.wf.has_min _ h).choose_spec.1.2.1
-  · simp only [h]
-    exact hk
+  · simpa only [h]
 
 
 lemma JHFil_prop₁ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [hacc: WellFoundedGT ℒ]
@@ -127,14 +126,11 @@ lemma JHFil_prop₁ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
           simp only [JHFil,this]
           simp only [↓reduceDIte, exists_and_left, Set.mem_setOf_eq, gt_iff_lt, and_imp,
             forall_exists_index]
-          have := (hacc.wf.has_min _ this).choose_spec.1.out.choose_spec.2
-          simp only [exists_and_left, Set.mem_setOf_eq, gt_iff_lt, and_imp,
-            forall_exists_index] at this
-          exact this
+          simpa only [exists_and_left, Set.mem_setOf_eq, gt_iff_lt, and_imp,
+            forall_exists_index] using (hacc.wf.has_min _ this).choose_spec.1.out.choose_spec.2
       simp only [← this']
       have : JHFil μ hμ hμsl hst hdc (k + 1) < JHFil μ hμ hμsl hst hdc k := by
-        simp only [JHFil,jh_kp1_ntop]
-        exact (hacc.wf.has_min _ jh_kp1_ntop).choose_spec.1.out.choose_spec.1
+        simpa only [JHFil,jh_kp1_ntop] using (hacc.wf.has_min _ jh_kp1_ntop).choose_spec.1.out.choose_spec.1
       have this'' :  μ ⟨(⊥, JHFil μ hμ hμsl hst hdc (k + 1)), hk'⟩ = μ ⟨(JHFil μ hμ hμsl hst hdc (k + 1), JHFil μ hμ hμsl hst hdc k), this⟩ := by
         rw [hk jh_kp1_ntop',← bot_jh_kp1_eq_ans]
         simp only [JHFil,jh_kp1_ntop]
@@ -165,9 +161,9 @@ lemma JHFil_prop₂ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
 ∀ k : ℕ,  (hk : JHFil μ hμ hμsl hst hdc k > ⊥) → ∀ z : ℒ, (h' : JHFil μ hμ hμsl hst hdc (k + 1) < z) → (h'' : z < JHFil μ hμ hμsl hst hdc k) →
   μ ⟨(JHFil μ hμ hμsl hst hdc (k + 1), z), h'⟩ < μ ⟨(JHFil μ hμ hμsl hst hdc (k + 1), JHFil μ hμ hμsl hst hdc k), JHFil_anti_mono μ hμ hμsl hst hdc k hk⟩ := by
   intro k hk z h' h''
-  have this_new : Semistable μ → μmax μ TotIntvl = μ TotIntvl := by
-    exact fun a ↦ (List.TFAE.out (impl.thm4d21 μ hμsl inferInstance inferInstance).1 0 3).2 ((impl.thm4d21 μ hμsl inferInstance inferInstance).2.1 a)
-  have this_new := this_new hst
+  have this_new : Semistable μ → μmax μ TotIntvl = μ TotIntvl :=
+    fun a ↦ (List.TFAE.out (impl.thm4d21 μ hμsl inferInstance inferInstance).1 0 3).2 ((impl.thm4d21 μ hμsl inferInstance inferInstance).2.1 a)
+  specialize this_new hst
   simp only [μmax, TotIntvl, ne_eq] at this_new
   have this_q: μ ⟨(⊥, z), lt_of_le_of_lt bot_le h'⟩ ≤ μ ⟨(⊥, ⊤), bot_lt_top⟩ := by
     rw [← this_new]
@@ -185,12 +181,11 @@ lemma JHFil_prop₂ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
       exact (ne_of_lt this) hfp1bot.symm
     apply Set.not_nonempty_iff_eq_empty.1 at this
     apply Set.eq_empty_iff_forall_notMem.1 at this
-    have := this z
+    specialize this z
     simp only [exists_and_left, Set.mem_setOf_eq, not_and, not_exists] at this
-    have := lt_of_le_of_ne this_q <| this h'' (lt_of_le_of_lt bot_le h')
+    replace := lt_of_le_of_ne this_q <| this h'' (lt_of_le_of_lt bot_le h')
     by_cases hk' : k = 0
-    · simp only [hk',JHFil]
-      exact this
+    · simpa only [hk',JHFil]
     · conv_rhs =>
         arg 1; arg 1; arg 2; arg 6
         rw [← Nat.sub_one_add_one hk']
@@ -206,8 +201,7 @@ lemma JHFil_prop₂ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
       simp only [JHFil,hne]
       simp only [↓reduceDIte, exists_and_left, Set.mem_setOf_eq, gt_iff_lt, and_imp,
         forall_exists_index]
-      simp only [exists_and_left, Set.mem_setOf_eq, gt_iff_lt, and_imp, forall_exists_index] at this
-      exact this
+      simpa only [exists_and_left, Set.mem_setOf_eq, gt_iff_lt, and_imp, forall_exists_index] using this
   · have h''' : μ ⟨(⊥, z), lt_of_le_of_lt bot_le h'⟩ < μ ⟨(⊥, ⊤), bot_lt_top⟩ := by
       refine lt_of_le_of_ne this_q ?_
       by_contra!

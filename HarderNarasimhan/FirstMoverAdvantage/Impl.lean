@@ -50,7 +50,7 @@ lemma prop4d1₁ (ℒ : Type*) [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder
   rw [← prop4d1_helper]
   have : ∀ yA : ℒ, (hyA : yA < ⊤) → ∃ xA : ℒ, xA < ⊤ ∧ (∀ xB : ℒ, (hAB : xA < xB) → μ ⟨(xA,xB), hAB⟩ ≤ μ ⟨(yA,⊤), hyA⟩) := by
     by_contra!
-    have : {YA : ℒ | ∃ (h : YA < ⊤), ∀ xA < ⊤, ∃ xB, ∃ (hAB : xA < xB), ¬μ ⟨(xA, xB), hAB⟩ ≤ μ ⟨(YA, ⊤), h⟩}.Nonempty := this
+    replace : {YA : ℒ | ∃ (h : YA < ⊤), ∀ xA < ⊤, ∃ xB, ∃ (hAB : xA < xB), ¬μ ⟨(xA, xB), hAB⟩ ≤ μ ⟨(YA, ⊤), h⟩}.Nonempty := this
     have hsmf : StrictMono (fun n ↦ prop4d1₁_seq μ h₁ h₂ this n) := strictMono_nat_of_lt_succ <| fun n ↦ ((prop4d1₁_seq μ h₁ h₂ this n).prop.out.choose_spec (prop4d1₁_seq μ h₁ h₂ this n) (prop4d1₁_seq μ h₁ h₂ this n).prop.out.choose).choose_spec.choose
     have hfinal : ∀ n : ℕ, ¬ μ ⟨((prop4d1₁_seq μ h₁ h₂ this n),(prop4d1₁_seq μ h₁ h₂ this (n+1))),hsmf (Nat.lt_add_one n)⟩ ≤ μ ⟨((prop4d1₁_seq μ h₁ h₂ this n),⊤),lt_of_lt_of_le (hsmf (Nat.lt_add_one n)) le_top⟩ := fun n ↦ ((prop4d1₁_seq μ h₁ h₂ this n).prop.out.choose_spec (prop4d1₁_seq μ h₁ h₂ this n) (prop4d1₁_seq μ h₁ h₂ this n).prop.out.choose).choose_spec.choose_spec
     rcases h₁ (fun n ↦ prop4d1₁_seq μ h₁ h₂ this n) hsmf with ⟨N,hN⟩
@@ -59,7 +59,7 @@ lemma prop4d1₁ (ℒ : Type*) [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder
   · apply le_sInf
     rintro y ⟨yA, hyA, h⟩
     rcases this yA hyA with ⟨xA, hxA, h'⟩
-    have : μmax μ ⟨(xA,⊤),hxA⟩ ∈ {μmax μ ⟨(a , ⊤),(lt_of_le_of_ne ha.1.2 ha.2)⟩ | (a : ℒ) (ha : InIntvl TotIntvl a ∧ a ≠ ⊤)} := by
+    replace : μmax μ ⟨(xA,⊤),hxA⟩ ∈ {μmax μ ⟨(a , ⊤),(lt_of_le_of_ne ha.1.2 ha.2)⟩ | (a : ℒ) (ha : InIntvl TotIntvl a ∧ a ≠ ⊤)} := by
       refine Set.mem_setOf.mpr ?_
       use xA, ⟨in_TotIntvl xA,ne_top_of_lt hxA⟩
     refine h.symm ▸ (sInf_le_of_le this <| sSup_le ?_)
@@ -67,7 +67,7 @@ lemma prop4d1₁ (ℒ : Type*) [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder
     exact hxB' ▸ h' xB (lt_of_le_of_ne hxB.1.1 hxB.2)
   · apply le_sInf
     rintro t ⟨x, hx, h⟩
-    have : μ ⟨(x,⊤),lt_top_iff_ne_top.2 hx.2⟩ ∈  {x | ∃ x_1, ∃ (hx : x_1 < ⊤), μ ⟨(x_1, ⊤), hx⟩ = x} := by
+    replace : μ ⟨(x,⊤),lt_top_iff_ne_top.2 hx.2⟩ ∈  {x | ∃ x_1, ∃ (hx : x_1 < ⊤), μ ⟨(x_1, ⊤), hx⟩ = x} := by
       refine Set.mem_setOf.mpr ?_
       use x, lt_top_iff_ne_top.2 hx.2
     refine h.symm ▸ (sInf_le_of_le this <| Set.mem_setOf.mpr <| le_sSup ?_)
