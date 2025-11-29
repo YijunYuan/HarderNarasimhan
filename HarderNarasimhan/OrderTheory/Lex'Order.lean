@@ -14,8 +14,9 @@ scoped instance (priority := 114513) {α : Type*} [LinearOrder α] (A B : Finset
 private lemma helper {P Q : Prop} : P ∨ Q ↔ P ∨ ((¬ P) ∧ Q) := by
   tauto
 
-private lemma inj_sort {α : Type*} (r : α → α → Prop) [DecidableRel r] [IsTrans α r] [IsAntisymm α r] [IsTotal α r] : Function.Injective (Finset.sort r) := by
+private lemma inj_sort {α : Type*} (r : α → α → Prop) [DecidableRel r] [IsTrans α r] [IsAntisymm α r] [IsTotal α r] : Function.Injective (fun S => Finset.sort S r) := by
   intro _ _ h
+  simp only at h
   refine Finset.ext fun x ↦ ⟨fun h' ↦ ?_, fun h' ↦ ?_⟩
   · exact (Finset.mem_sort r).1 <| h ▸ (Finset.mem_sort r).2 h'
   · exact (Finset.mem_sort r).1 <| h ▸ (Finset.mem_sort r).2 h'
@@ -97,7 +98,7 @@ private def Lex'LinearOrder {α : Type*} [LinearOrder α] : LinearOrder (Finset 
     intro h
     unfold LE.le LexLE at h
     simp only at h
-    have h : ¬(A.card < B.card) ∧ (¬ (A.card = B.card) ∨ ¬ (Finset.sort LE.le A ≤ Finset.sort LE.le B)) := by tauto
+    have h : ¬(A.card < B.card) ∧ (¬ (A.card = B.card) ∨ ¬ (Finset.sort A LE.le ≤ Finset.sort B LE.le)) := by tauto
     have h1 := h.1
     have h2 := h.2
     unfold LE.le LexLE

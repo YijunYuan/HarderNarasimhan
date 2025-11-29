@@ -714,7 +714,6 @@ lemma step_cond₂_of_stable {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [Bound
   simp [t1, t2] at hst'
   unfold μmin at hst'
   apply sInf_lt_iff.1 at hst'
-  simp at hst'
   rcases hst' with ⟨s,⟨y,hy1,hy2⟩,hs⟩
   rw [← hy2] at hs
   have := ((seesaw' μ inferInstance (filtration (i + 1)) y z ⟨by
