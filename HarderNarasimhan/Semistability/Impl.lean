@@ -18,8 +18,7 @@ lemma prop3d2 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 (a : ℒ) (haI : InIntvl I a) (hax : a < x):
 μA μ ⟨(a , x) , hax⟩ ≤ μA μ ⟨(a , z) , lt_trans hax h⟩ := by
   have h'' : μA μ ⟨(a , x) , hax⟩ ⊓ μA μ ⟨(x , z) , h⟩ ≤ μA μ ⟨(a,z),lt_trans hax h⟩ := impl.prop2d6₁I I μ hμcvx a haI x hxI z hzI ⟨hax,h⟩
-  rw [h', inf_top_eq] at h''
-  exact h''
+  rwa [h', inf_top_eq] at h''
 
 
 lemma cor3d3 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
@@ -84,8 +83,7 @@ lemma prop3d4₀func_defprop1 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [Boun
     by_contra hcontra
     simp only [prop3d4₀func, prop3d4₀func_helper μ I i hi, hcontra] at hi
     simp only [↓reduceDIte, ne_eq, not_true_eq_false] at hi
-  simp only [hne]
-  exact (inst_3.wf.has_min (ℒₛ μ I (prop3d4₀func μ I i) <| prop3d4₀func_helper μ I i hi) hne).choose_spec.1.out.choose_spec.choose_spec
+  simpa only [hne] using (inst_3.wf.has_min (ℒₛ μ I (prop3d4₀func μ I i) <| prop3d4₀func_helper μ I i hi) hne).choose_spec.1.out.choose_spec.choose_spec
 
 
 lemma prop3d4₀func_defprop2 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [inst_3: WellFoundedGT ℒ]
@@ -132,10 +130,9 @@ lemma prop3d4₀func_strict_decreasing {ℒ : Type*} [Nontrivial ℒ] [Lattice �
   · simp only [prop3d4₀func, hi]
     have hne : (ℒₛ μ I (prop3d4₀func μ I i) <| prop3d4₀func_helper μ I i h).Nonempty := by
       by_contra hcontra
-      simp only [prop3d4₀func, prop3d4₀func_helper μ I i h, hcontra] at h
-      simp only [↓reduceDIte, not_true_eq_false] at h
-    simp only [hne]
-    exact (inst_3.wf.has_min (ℒₛ μ I (prop3d4₀func μ I i) hi) hne).choose_spec.1.out.choose_spec.choose.2
+      simp only [prop3d4₀func, prop3d4₀func_helper μ I i h, hcontra,
+        ↓reduceDIte, not_true_eq_false] at h
+    simpa only [hne] using (inst_3.wf.has_min (ℒₛ μ I (prop3d4₀func μ I i) hi) hne).choose_spec.1.out.choose_spec.choose.2
 
 
 lemma prop3d4₀func_fin_len  {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]

@@ -48,7 +48,7 @@ lemma rmk4d10₂ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder
 NashEquilibrium μ ↔ ∀ y : ℒ, (hy : y ≠ ⊥) → μmin μ ⟨(⊥,y),bot_lt_iff_ne_bot.2 hy⟩ ≤ μmin μ TotIntvl := by
   constructor
   · intro h y hy
-    have h := h.nash_eq
+    replace h := h.nash_eq
     unfold NashEquilibrium at h
     rw [impl.prop4d1₁ ℒ S μ h₁.wacc h₂.wsl₁] at h
     simp only [TotIntvl, μBstar, μB, ne_eq] at h
@@ -74,7 +74,7 @@ lemma rmk4d10₃ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder
 NashEquilibrium μ ↔ ∀ y : ℒ, (hy : y ≠ ⊤) → μmax μ TotIntvl ≤ μmax μ ⟨(y,⊤),lt_top_iff_ne_top.2 hy⟩ := by
   constructor
   · intro h y hy
-    have h := h.nash_eq
+    replace h := h.nash_eq
     rw [impl.prop4d3₁ μ h₁.wdcc h₂.wsl₂] at h
     simp only [TotIntvl] at h
     rw [← h]
@@ -142,8 +142,7 @@ lemma rmk4d13 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder �
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : SlopeLike μ):
 ∀ x : ℒ, (hx : x ≠ ⊥ ∧ x ≠ ⊤) → ¬ μ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx.1⟩ ≤ μ TotIntvl ∨ μ TotIntvl ≤ μ ⟨(x,⊤),lt_top_iff_ne_top.2 hx.2⟩ := by
   intro x hx
-  have := (hμ.slopelike ⊥ x ⊤ ⟨bot_lt_iff_ne_bot.2 hx.1,lt_top_iff_ne_top.2 hx.2⟩).2.2.1
-  cases' this with this this
+  cases' (hμ.slopelike ⊥ x ⊤ ⟨bot_lt_iff_ne_bot.2 hx.1,lt_top_iff_ne_top.2 hx.2⟩).2.2.1 with this this
   · exact Or.inl <| not_le_of_gt this
   · exact Or.inr this
 
@@ -170,8 +169,7 @@ lemma rmk4d15 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder �
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : SlopeLike μ):
 ∀ x : ℒ, (hx : x ≠ ⊥ ∧ x ≠ ⊤) → μ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx.1⟩ ≤ μ TotIntvl ∨ ¬ μ TotIntvl ≤ μ ⟨(x,⊤),lt_top_iff_ne_top.2 hx.2⟩ := by
   intro x hx
-  have := (hμ.slopelike ⊥ x ⊤ ⟨bot_lt_iff_ne_bot.2 hx.1,lt_top_iff_ne_top.2 hx.2⟩).1
-  cases' this with this this
+  cases' (hμ.slopelike ⊥ x ⊤ ⟨bot_lt_iff_ne_bot.2 hx.1,lt_top_iff_ne_top.2 hx.2⟩).1 with this this
   · exact Or.inl this
   · exact Or.inr <| not_le_of_gt this
 
@@ -254,7 +252,7 @@ lemma prop4d20 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 (h₂ :  ∀ x : ℒ, (hx : x ≠ ⊥) → WeakSlopeLike₁ (Resμ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx⟩ μ)) :
 NashEquilibrium μ → Semistable μ := by
   intro h
-  have h := h.nash_eq
+  replace h := h.nash_eq
   have : sSup {μA μ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx⟩ | (x : ℒ) (hx : x ≠ ⊥)} = μBstar μ := by
     unfold μBstar μB
     congr 1; ext
@@ -353,7 +351,7 @@ NashEquilibrium μ → Semistable μ := by
           use ⟨ha1,ha2.1⟩, ⟨in_TotIntvl _,Subtype.coe_ne_coe.1 ha2.2⟩
           rw [← ha3]
           congr 1
-  have : ∀ x : ℒ, (hx : x ≠ ⊥) → μA μ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx⟩ ≤ μA μ TotIntvl := by
+  replace : ∀ x : ℒ, (hx : x ≠ ⊥) → μA μ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx⟩ ≤ μA μ TotIntvl := by
     rw [← h] at this
     simp only [ne_eq, μAstar] at this
     intro x hx
@@ -372,7 +370,6 @@ List.TFAE [
   μmin μ TotIntvl = μ TotIntvl,
   μmin μ TotIntvl = μmax μ TotIntvl,
   NashEquilibrium μ,
-  --Semistable μ
   ] ∧
 (Semistable μ → NashEquilibrium μ) ∧
 ((∀ x : ℒ, (hx : x ≠ ⊥) →
