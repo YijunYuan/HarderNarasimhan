@@ -31,7 +31,13 @@ lemma HNFil_prop_of_def {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrd
 IsGreatest (StI μ ⟨(HNFil μ n , ⊤), lt_top_iff_ne_top.2 h'⟩) (HNFil μ (n + 1)) := by
   intro n h'
   simp only [HNFil, h']
-  exact (HNFil._proof_4 μ n h').choose_spec
+  have := Ne.lt_top' (id (Ne.symm h'))
+  have : ∃ s, IsGreatest (StI μ ⟨(HNFil μ n, ⊤), this⟩) s := by
+    exact (impl.prop3d8₁' μ hμ (⟨(HNFil μ n, ⊤), this⟩)
+      (Convex_of_Convex_large TotIntvl _ ⟨bot_le,le_top⟩ μ hμcvx)
+      (Or.casesOn h.μ_adm (fun h ↦ Or.inl h) fun h ↦
+       Or.inr fun z hzI hz ↦ h ⟨((HNFil μ n, ⊤).1 , z) ,  lt_of_le_of_ne hzI.left hz⟩))
+  exact this.choose_spec
 
 
 lemma HNFil_is_strict_mono {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]

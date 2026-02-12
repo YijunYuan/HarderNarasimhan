@@ -282,6 +282,10 @@ noncomputable def subseq {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOr
       f <| Nat.find (⟨atf.choose,atf.choose_spec.symm ▸ bot_lt_iff_ne_bot.2 hcond⟩ :
         ∃ k : ℕ, f k < subseq f atf t)
 
+private lemma subseq.pf2 {ℒ : Type u_1} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] (f : ℕ → ℒ)
+  (atf : ∃ k, f k = ⊥) (t : ℕ) (hcond : ¬subseq f atf t = ⊥) : ∃ k, f k < subseq f atf t :=
+  ⟨atf.choose,atf.choose_spec.symm ▸ bot_lt_iff_ne_bot.2 hcond⟩
+
 open Classical in
 lemma subseq_prop0 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   (f : ℕ → ℒ) (atf : ∃ k, f k = ⊥) (hf : Antitone f) (hf0 : f 0 = ⊤) :
@@ -301,7 +305,7 @@ lemma subseq_prop0 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
     else
       use j+1
       simp only [subseq,hj ▸ h, ↓reduceDIte]
-      have hq := subseq._proof_2 f atf j (Eq.mpr_not (eq_false (hj ▸ h))
+      have hq := subseq.pf2 f atf j (Eq.mpr_not (eq_false (hj ▸ h))
         (of_eq_false (Eq.refl False)))
       have : i + 1 = Nat.find hq := by
         apply eq_of_le_of_ge
@@ -335,7 +339,7 @@ lemma subseq_prop0' {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
       exact ht.2 ▸ (Eq.symm <| le_bot_iff.1 <| ht.2 ▸ hf (Nat.le_succ t))
     else
     simp only [ge_iff_le, hcond, ↓reduceDIte]
-    have hq := subseq._proof_2 f atf i (of_eq_false (eq_false hcond))
+    have hq := subseq.pf2 f atf i (of_eq_false (eq_false hcond))
     rcases hi with ⟨t,ht⟩
     rw [ht.2] at hq
     use Nat.find hq
@@ -372,7 +376,7 @@ lemma subseq_prop2 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
       simp only [hcond, ↓reduceDIte, le_refl]
     else
     simpa only [hcond, ↓reduceDIte] using le_of_lt <| Nat.find_spec <|
-      subseq._proof_2 f atf n (of_eq_false (eq_false hcond))
+      subseq.pf2 f atf n (of_eq_false (eq_false hcond))
 
 
 lemma subseq_prop3 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
@@ -410,7 +414,7 @@ lemma subseq_prop5 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
         exact (Nat.find_min (subseq_prop1 f atf hfat hf0) (Nat.lt_of_add_one_le h)) hcond
       else
       simp only [hcond, ↓reduceDIte]
-      exact Nat.find_spec (subseq._proof_2 f atf i (of_eq_false (eq_false hcond)))
+      exact Nat.find_spec (subseq.pf2 f atf i (of_eq_false (eq_false hcond)))
     · intro j hij hind hj
       simp only [subseq]
       if hcond : subseq f atf j = ⊥ then
@@ -422,7 +426,7 @@ lemma subseq_prop5 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
       else
       simp only [hcond, ↓reduceDIte]
       if hcond' : j ≤ Nat.find (subseq_prop1 f atf hfat hf0) then
-        exact lt_trans (Nat.find_spec (subseq._proof_2 f atf j
+        exact lt_trans (Nat.find_spec (subseq.pf2 f atf j
           (of_eq_false (eq_false hcond)))) <| hind hcond'
       else
       by_contra!
@@ -497,7 +501,7 @@ lemma subseq_prop6 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
     (expose_names; exact Ne.bot_lt' (id (Ne.symm hcond_1)))
   let jtilde := Nat.find hcondnew
   expose_names
-  have heq : Nat.find ((funext fun k ↦ congrArg (LT.lt (f k)) hj) ▸ subseq._proof_2 f atf i
+  have heq : Nat.find ((funext fun k ↦ congrArg (LT.lt (f k)) hj) ▸ subseq.pf2 f atf i
     (of_eq_false (eq_false hcond_1))) = (jtilde -1) +1:= by
     refine (Nat.sub_eq_iff_eq_add ?_).mp rfl
     by_contra!
