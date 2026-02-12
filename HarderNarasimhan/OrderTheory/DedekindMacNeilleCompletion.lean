@@ -2,15 +2,20 @@ import Mathlib.SetTheory.Cardinal.Aleph
 import Mathlib.Order.Closure
 
 namespace OrderTheory
-instance {α : Type*} [PartialOrder α] (T : ClosureOperator (Set α)): CompleteLattice (ClosureOperator.Closeds T) where
+instance {α : Type*} [PartialOrder α] (T : ClosureOperator (Set α)) :
+CompleteLattice (ClosureOperator.Closeds T) where
   top :=⟨Set.univ,ClosureOperator.isClosed_iff_closure_le.mpr fun ⦃a⦄ a ↦ trivial⟩
   le_top A := fun ⦃a⦄ a ↦ trivial
   bot := ⟨T ∅, ClosureOperator.isClosed_closure T ∅⟩
   bot_le A := by
     intro a ha
     simp only at *
-    exact (ClosureOperator.IsClosed.closure_eq A.property) ▸ (T.monotone <| Set.empty_subset A.val) ha
-  inf A B := ⟨A.val ∩ B.val,ClosureOperator.isClosed_iff_closure_le.mpr fun x hx ↦ (ClosureOperator.IsClosed.closure_eq A.property) ▸ (ClosureOperator.IsClosed.closure_eq B.property) ▸ ⟨(T.monotone <| Set.inter_subset_left) hx,(T.monotone <| Set.inter_subset_right) hx⟩⟩
+    exact (ClosureOperator.IsClosed.closure_eq A.property) ▸
+      (T.monotone <| Set.empty_subset A.val) ha
+  inf A B := ⟨A.val ∩ B.val,ClosureOperator.isClosed_iff_closure_le.mpr fun x hx ↦
+    (ClosureOperator.IsClosed.closure_eq A.property) ▸
+    (ClosureOperator.IsClosed.closure_eq B.property) ▸
+    ⟨(T.monotone <| Set.inter_subset_left) hx,(T.monotone <| Set.inter_subset_right) hx⟩⟩
   le_inf A B C h1 h2 := fun a ha ↦ ⟨h1 ha,h2 ha⟩
   inf_le_left A B := fun ⦃a⦄ b ↦ b.1
   inf_le_right A B := fun ⦃a⦄ b ↦ b.right
@@ -18,7 +23,8 @@ instance {α : Type*} [PartialOrder α] (T : ClosureOperator (Set α)): Complete
   sup_le A B C h1 h2 := by
     intro a ha
     simp only at *
-    exact (ClosureOperator.IsClosed.closure_eq C.property) ▸ (T.monotone <| Set.union_subset h1 h2) ha
+    exact (ClosureOperator.IsClosed.closure_eq C.property) ▸
+      (T.monotone <| Set.union_subset h1 h2) ha
   le_sup_left := by
     intro A B
     nth_rw 1 [Subtype.coe_eq_of_eq_mk (ClosureOperator.IsClosed.closure_eq A.property).symm]
@@ -42,28 +48,38 @@ instance {α : Type*} [PartialOrder α] (T : ClosureOperator (Set α)): Complete
     simp only [Set.mem_iInter, Subtype.forall] at *
     exact hx A.val A.prop hA
   sSup 𝒮 := ⟨T (⋃ a ∈ 𝒮, a.val),ClosureOperator.isClosed_closure T (⋃ a ∈ 𝒮, a.val)⟩
-  le_sSup 𝒮 A hA:= fun x hx ↦ ClosureOperator.monotone T (Set.subset_biUnion_of_mem hA) <| (ClosureOperator.IsClosed.closure_eq A.property).symm ▸ hx
+  le_sSup 𝒮 A hA:= fun x hx ↦ ClosureOperator.monotone T (Set.subset_biUnion_of_mem hA) <|
+    (ClosureOperator.IsClosed.closure_eq A.property).symm ▸ hx
   sSup_le 𝒮 A hA := by
     intro x hx
     simp only
-    refine (ClosureOperator.IsClosed.closure_eq A.property) ▸ ClosureOperator.monotone T (fun y hy ↦ ?_) hx
+    refine (ClosureOperator.IsClosed.closure_eq A.property) ▸
+      ClosureOperator.monotone T (fun y hy ↦ ?_) hx
     simp only [Set.mem_iUnion, exists_prop, Subtype.exists, exists_and_right] at hy
-    exact Exists.casesOn hy fun S h ↦ And.casesOn h fun left hSb ↦ Exists.casesOn left fun hS hP ↦ hA ⟨S, hS⟩ hP hSb
+    exact Exists.casesOn hy
+      fun S h ↦ And.casesOn h fun left hSb ↦ Exists.casesOn left fun hS hP ↦ hA ⟨S, hS⟩ hP hSb
 
 
 section DedekindMacNeille
-lemma DedekindMacNeilleConnection (α : Type*) [PartialOrder α] : GaloisConnection (fun A ↦ (OrderDual.toDual (upperBounds A))) (fun A : (Set α)ᵒᵈ ↦ lowerBounds A.ofDual) := fun _ _ ↦ ⟨fun h _ ha ⦃_⦄ a_3 ↦ h a_3 ha, fun h _ ha ⦃_⦄ a_2 ↦ h a_2 ha⟩
+lemma DedekindMacNeilleConnection (α : Type*) [PartialOrder α] :
+GaloisConnection (fun A ↦ (OrderDual.toDual (upperBounds A)))
+(fun A : (Set α)ᵒᵈ ↦ lowerBounds A.ofDual) :=
+fun _ _ ↦ ⟨fun h _ ha ⦃_⦄ a_3 ↦ h a_3 ha, fun h _ ha ⦃_⦄ a_2 ↦ h a_2 ha⟩
 
 
-def DedekindMacNeilleClosureOperator (α : Type*) [PartialOrder α] : ClosureOperator (Set α) := GaloisConnection.closureOperator <| DedekindMacNeilleConnection α
+def DedekindMacNeilleClosureOperator (α : Type*) [PartialOrder α] :
+ClosureOperator (Set α) := GaloisConnection.closureOperator <| DedekindMacNeilleConnection α
 
 
-abbrev DedekindMacNeilleCompletion (α : Type*) [PartialOrder α] := (DedekindMacNeilleClosureOperator α).Closeds
+abbrev DedekindMacNeilleCompletion (α : Type*) [PartialOrder α] :=
+(DedekindMacNeilleClosureOperator α).Closeds
 
 
-instance {α : Type*} [PartialOrder α] : CompleteLattice (DedekindMacNeilleCompletion α) := inferInstance
+instance {α : Type*} [PartialOrder α] : CompleteLattice (DedekindMacNeilleCompletion α) :=
+inferInstance
 
-instance {α : Type*} [LinearOrder α] : IsTotal (DedekindMacNeilleCompletion α) instCompleteLatticeDedekindMacNeilleCompletion.le := by
+instance {α : Type*} [LinearOrder α] :
+@Std.Total (DedekindMacNeilleCompletion α) instCompleteLatticeDedekindMacNeilleCompletion.le := by
   refine { total := ?_ }
   intro a b
   rcases a with ⟨A, hA⟩
@@ -89,43 +105,49 @@ instance {α : Type*} [LinearOrder α] : IsTotal (DedekindMacNeilleCompletion α
 
 --open Classical
 
-noncomputable instance {α : Type*} [LinearOrder α] : LinearOrder (DedekindMacNeilleCompletion α) := {
+noncomputable instance {α : Type*} [LinearOrder α] :
+LinearOrder (DedekindMacNeilleCompletion α) := {
   instCompleteLatticeDedekindMacNeilleCompletion with
-  le_total := instIsTotalDedekindMacNeilleCompletionLe.total
+  le_total := by exact fun a b ↦ Std.le_total
   toDecidableLE := Classical.decRel LE.le
   min_def a b := by
     by_cases h : a ≤ b
     · simp only [h, inf_of_le_left, ↓reduceIte]
     · simp only [h, ↓reduceIte, inf_eq_right]
-      simpa [h] using instIsTotalDedekindMacNeilleCompletionLe.total a b
+      simpa [h] using (Std.le_of_not_ge h)
   max_def a b := by
     by_cases h : a ≤ b
     · simp only [h, sup_of_le_right, ↓reduceIte]
     · simp only [h, ↓reduceIte, sup_eq_left]
-      simpa only [h, false_or] using instIsTotalDedekindMacNeilleCompletionLe.total a b
+      simpa only [h, false_or] using (Std.le_of_not_ge h)
   }
 
-noncomputable instance {α : Type*} [LinearOrder α] : CompleteLinearOrder (DedekindMacNeilleCompletion α) :=
-  {instLinearOrderDedekindMacNeilleCompletion, LinearOrder.toBiheytingAlgebra (DedekindMacNeilleCompletion α), instCompleteLatticeDedekindMacNeilleCompletion with}
+noncomputable instance {α : Type*} [LinearOrder α] :
+CompleteLinearOrder (DedekindMacNeilleCompletion α) :=
+  {instLinearOrderDedekindMacNeilleCompletion, LinearOrder.toBiheytingAlgebra
+    (DedekindMacNeilleCompletion α), instCompleteLatticeDedekindMacNeilleCompletion with}
 
 
 def coe' {α : Type*} [PartialOrder α] : α ↪o DedekindMacNeilleCompletion α := by
-  have inj: ∀ x : α, (DedekindMacNeilleClosureOperator α).IsClosed (Set.Iic x) := fun x ↦ Set.ext fun y ↦ ⟨fun hy ↦ hy (by simp only [upperBounds,
+  have inj: ∀ x : α, (DedekindMacNeilleClosureOperator α).IsClosed (Set.Iic x) :=
+    fun x ↦ Set.ext fun y ↦ ⟨fun hy ↦ hy (by simp only [upperBounds,
     GaloisConnection.lowerAdjoint_toFun, Set.mem_Iic, OrderDual.ofDual_toDual, Set.mem_setOf_eq,
     imp_self, implies_true]),fun hy x_1 ha ↦ ha hy⟩
   have : Function.Injective fun x ↦ (⟨Set.Iic x,inj x⟩ : DedekindMacNeilleCompletion α) := by
     intro a b hab
     simp only [Subtype.mk.injEq] at hab
-    exact le_antisymm (hab ▸ Set.right_mem_Iic).out (hab.symm ▸ Set.right_mem_Iic).out
+    exact le_antisymm (hab ▸ Set.self_mem_Iic).out (hab.symm ▸ Set.self_mem_Iic).out
   use ⟨fun x ↦ ⟨Set.Iic x, inj x⟩,this⟩
   simp only [Function.Embedding.coeFn_mk, Subtype.mk_le_mk, Set.le_eq_subset, Set.Iic_subset_Iic,
     implies_true]
 
 
-instance {α : Type*} [PartialOrder α]: Coe α (DedekindMacNeilleCompletion α) := ⟨coe'.toFun⟩
+instance {α : Type*} [PartialOrder α] : Coe α (DedekindMacNeilleCompletion α) := ⟨coe'.toFun⟩
 
 
-theorem univ_prop_DedekindMacNeilleCompletion {α : Type*} [PartialOrder α] {β : Type*} [CompleteLattice β] (f : α ↪o β) : ∃ f' : DedekindMacNeilleCompletion α ↪o β, f = f' ∘ coe' := by
+theorem univ_prop_DedekindMacNeilleCompletion
+{α : Type*} [PartialOrder α] {β : Type*} [CompleteLattice β] (f : α ↪o β) :
+∃ f' : DedekindMacNeilleCompletion α ↪o β, f = f' ∘ coe' := by
   let g := fun x : DedekindMacNeilleCompletion α ↦ sSup <| lowerBounds <| upperBounds <| f '' x.val
   have : ∀ (A B : DedekindMacNeilleCompletion α), g A ≤ g B ↔ A ≤ B := by
     refine fun A B ↦ ⟨?_,?_⟩
@@ -147,12 +169,14 @@ theorem univ_prop_DedekindMacNeilleCompletion {α : Type*} [PartialOrder α] {β
       simp only [upperBounds, Set.mem_image, forall_exists_index, and_imp, forall_apply_eq_imp_iff₂,
         sSup_le_iff, g]
       exact fun y hy ↦ hy.out fun w hw ↦ le_sSup fun ⦃a⦄ a ↦ a w (h hw)
-  refine ⟨⟨⟨g,fun x y h ↦ le_antisymm ((this x y).1 <| (le_antisymm_iff.1 h).1) ((this y x).1 <| (le_antisymm_iff.1 h).2)⟩,?_⟩,?_⟩
+  refine ⟨⟨⟨g,fun x y h ↦ le_antisymm ((this x y).1 <| (le_antisymm_iff.1 h).1)
+    ((this y x).1 <| (le_antisymm_iff.1 h).2)⟩,?_⟩,?_⟩
   · simp only [Function.Embedding.coeFn_mk, Subtype.forall, Subtype.mk_le_mk, Set.le_eq_subset, g]
     exact fun x hx y hy ↦ this ⟨x, hx⟩ ⟨y, hy⟩
   · refine funext fun x ↦ ?_
     simp only [RelEmbedding.coe_mk, Function.Embedding.coeFn_mk, coe', Function.comp_apply, g]
-    refine le_antisymm (le_sSup fun a ha ↦ ha.out <| Set.mem_image_of_mem f Set.right_mem_Iic) <| sSup_le fun _ hb ↦ hb ?_
+    refine le_antisymm (le_sSup fun a ha ↦ ha.out <|
+      Set.mem_image_of_mem f Set.self_mem_Iic) <| sSup_le fun _ hb ↦ hb ?_
     simp only [upperBounds, Set.mem_image, Set.mem_Iic, forall_exists_index, and_imp,
       forall_apply_eq_imp_iff₂, Set.mem_setOf_eq, OrderEmbedding.le_iff_le, imp_self, implies_true]
 

@@ -13,15 +13,19 @@ lemma lemma_2_4 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 ------------
   (
   --`(2.2)`
-  μA μ ⟨(u, x), lt_of_le_of_lt huxw (inf_lt_left.2 hxw)⟩ ≤ μmax μ ⟨(x ⊓ w, x), inf_lt_left.2 hxw⟩ ∧
-  μmax μ ⟨(x ⊓ w, x), inf_lt_left.2 hxw⟩ ≤ μmax μ ⟨(w, t), lt_of_le_of_lt' hxwt <| right_lt_sup.2 hxw⟩
+  μA μ ⟨(u, x), lt_of_le_of_lt huxw (inf_lt_left.2 hxw)⟩ ≤
+    μmax μ ⟨(x ⊓ w, x), inf_lt_left.2 hxw⟩ ∧
+  μmax μ ⟨(x ⊓ w, x), inf_lt_left.2 hxw⟩ ≤
+    μmax μ ⟨(w, t), lt_of_le_of_lt' hxwt <| right_lt_sup.2 hxw⟩
   ) ∧
   --`(2.3)`
   μA μ ⟨(u, x), lt_of_le_of_lt huxw (inf_lt_left.2 hxw)⟩ ≤ μA μ ⟨(w, x ⊔ w), right_lt_sup.2 hxw⟩
 ------------
   := by
     apply (impl.ConvexI_TotIntvl_iff_Convex _).2 at hμcvx
-    exact ⟨⟨impl.lem2d4₁ μ x w hxw u huxw,impl.lem2d4₂I TotIntvl μ hμcvx x (in_TotIntvl x) w (in_TotIntvl w) hxw t hxwt⟩,impl.lem2d4₃I TotIntvl μ hμcvx x (in_TotIntvl x) w (in_TotIntvl w) hxw u huxw⟩
+    exact ⟨⟨impl.lem2d4₁ μ x w hxw u huxw,impl.lem2d4₂I TotIntvl μ hμcvx x (in_TotIntvl x) w
+      (in_TotIntvl w) hxw t hxwt⟩,impl.lem2d4₃I TotIntvl μ hμcvx x
+      (in_TotIntvl x) w (in_TotIntvl w) hxw u huxw⟩
 
 
 lemma remark_2_5 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
@@ -35,7 +39,9 @@ lemma remark_2_5 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   := by
     apply (impl.ConvexI_TotIntvl_iff_Convex _).2 at hμcvx
     rw [← impl.ConvexI_TotIntvl_iff_Convex]
-    exact ⟨impl.rmk2d5₁ TotIntvl μ hμcvx,fun I ↦ ⟨impl.rmk2d5₂ I μ (Convex_of_Convex_large TotIntvl I ⟨bot_le,le_top⟩ μ hμcvx),impl.rmk2d5₃ I μ (Convex_of_Convex_large TotIntvl I ⟨bot_le,le_top⟩ μ hμcvx)⟩⟩
+    exact ⟨impl.rmk2d5₁ TotIntvl μ hμcvx,fun I ↦ ⟨impl.rmk2d5₂ I μ
+      (Convex_of_Convex_large TotIntvl I ⟨bot_le,le_top⟩ μ hμcvx),
+      impl.rmk2d5₃ I μ (Convex_of_Convex_large TotIntvl I ⟨bot_le,le_top⟩ μ hμcvx)⟩⟩
 
 
 lemma proposition_2_6 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
@@ -72,7 +78,11 @@ lemma proposition_2_6 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder
 ------------
 := by
   rw [← impl.ConvexI_TotIntvl_iff_Convex]
-  exact ⟨impl.prop2d6₀ μ x y z h, fun hμcvx ↦ ⟨impl.prop2d6₁I TotIntvl μ hμcvx x (in_TotIntvl x) y (in_TotIntvl y) z (in_TotIntvl z) h,⟨⟨impl.prop2d6₂I₁ TotIntvl μ hμcvx x (in_TotIntvl x) y (in_TotIntvl y) z (in_TotIntvl z) h,impl.prop2d6₂I₂ TotIntvl μ hμcvx x (in_TotIntvl x) y (in_TotIntvl y) z (in_TotIntvl z) h⟩,impl.prop2d6₃I TotIntvl μ hμcvx x (in_TotIntvl x) y (in_TotIntvl y) z (in_TotIntvl z) h⟩⟩⟩
+  exact ⟨impl.prop2d6₀ μ x y z h, fun hμcvx ↦ ⟨impl.prop2d6₁I TotIntvl μ hμcvx x (in_TotIntvl x)
+    y (in_TotIntvl y) z (in_TotIntvl z) h,⟨⟨impl.prop2d6₂I₁ TotIntvl μ hμcvx x (in_TotIntvl x) y
+    (in_TotIntvl y) z (in_TotIntvl z) h,impl.prop2d6₂I₂ TotIntvl μ hμcvx x (in_TotIntvl x) y
+    (in_TotIntvl y) z (in_TotIntvl z) h⟩,impl.prop2d6₃I TotIntvl μ hμcvx x (in_TotIntvl x) y
+    (in_TotIntvl y) z (in_TotIntvl z) h⟩⟩⟩
 
 
 lemma remark_2_7 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
@@ -106,7 +116,8 @@ lemma proposition_2_8 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder
 ------------
 := by
   apply (impl.ConvexI_TotIntvl_iff_Convex _).2 at hμcvx
-  exact ⟨impl.prop2d8₁I TotIntvl μ hμcvx x (in_TotIntvl x) y (in_TotIntvl y) u (in_TotIntvl u) h,impl.prop2d8₂I TotIntvl μ hμcvx x (in_TotIntvl x) y (in_TotIntvl y) u (in_TotIntvl u) h⟩
+  exact ⟨impl.prop2d8₁I TotIntvl μ hμcvx x (in_TotIntvl x) y (in_TotIntvl y) u (in_TotIntvl u) h,
+  impl.prop2d8₂I TotIntvl μ hμcvx x (in_TotIntvl x) y (in_TotIntvl y) u (in_TotIntvl u) h⟩
 
 theorem ConvexI_iff_Convex_res {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
@@ -115,6 +126,7 @@ ConvexI I μ ↔ Convex (Resμ I μ) := by
   rw [← impl.ConvexI_TotIntvl_iff_Convex]
   constructor
   · exact fun h ↦ { convex := fun x y hx hy hxy ↦ h.convex x y x.prop y.prop hxy }
-  · exact fun h ↦ { convex := fun x y hx hy hxy ↦ h.convex ⟨x,hx⟩ ⟨y,hy⟩ (in_TotIntvl _) (in_TotIntvl _) hxy }
+  · exact fun h ↦
+      { convex := fun x y hx hy hxy ↦ h.convex ⟨x,hx⟩ ⟨y,hy⟩ (in_TotIntvl _) (in_TotIntvl _) hxy }
 
 end HarderNarasimhan

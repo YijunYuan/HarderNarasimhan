@@ -2,7 +2,6 @@ import HarderNarasimhan.NashEquilibrium.Impl
 import HarderNarasimhan.FirstMoverAdvantage.Results
 import HarderNarasimhan.SlopeLike.Result
 import Mathlib.Order.OrderIsoNat
-open Classical
 
 namespace HarderNarasimhan
 
@@ -17,7 +16,7 @@ class StrongDescendingChainCondition' {ℒ : Type*} [Nontrivial ℒ] [Lattice �
 (μ : {p : ℒ × ℒ // p.1 < p.2} → S) : Prop where
   wdcc' : ∀ x : ℕ → ℒ, (sax : StrictAnti x) → ∃ N : ℕ, μ ⟨(x (N +1), x N), sax <| lt_add_one N⟩ = ⊤
 
-
+open Classical in
 @[ext]
 structure JordanHolderFiltration {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
@@ -28,10 +27,12 @@ where
   fin_len : ∃ N : ℕ, filtration N =⊥
   strict_anti : ∀ i j : ℕ, i < j → j ≤ Nat.find (fin_len) → filtration j < filtration i
   first_eq_top : filtration 0 = ⊤
-  step_cond₁ : ∀ k : ℕ,  (hk : k < Nat.find (fin_len)) → μ ⟨(filtration (k + 1),filtration k),strict_anti k (k+1) (lt_add_one k) hk⟩ = μ ⟨(⊥,⊤),bot_lt_top⟩
+  step_cond₁ : ∀ k : ℕ,  (hk : k < Nat.find (fin_len)) → μ ⟨(filtration (k + 1), filtration k),
+    strict_anti k (k+1) (lt_add_one k) hk⟩ = μ ⟨(⊥,⊤),bot_lt_top⟩
   step_cond₂ : ∀ i : ℕ, (hi : i < Nat.find fin_len) →
     ∀ z : ℒ, (h' : filtration (i+1) < z) → (h'' : z < filtration i) →
-    μ ⟨(filtration (i+1), z), h'⟩ < μ ⟨(filtration (i+1), filtration i), strict_anti i (i+1) (lt_add_one i) hi⟩
+    μ ⟨(filtration (i+1), z), h'⟩ <
+    μ ⟨(filtration (i+1), filtration i), strict_anti i (i+1) (lt_add_one i) hi⟩
 
 def JordanHolderRel {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
@@ -55,19 +56,22 @@ StrongDescendingChainCondition μ where
 
 instance {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-{μ : {p : ℒ × ℒ // p.1 < p.2} → S} [h : StrongDescendingChainCondition' μ] {I : {p : ℒ × ℒ // p.1 < p.2}} : StrongDescendingChainCondition' (Resμ I μ) where
+{μ : {p : ℒ × ℒ // p.1 < p.2} → S} [h : StrongDescendingChainCondition' μ]
+{I : {p : ℒ × ℒ // p.1 < p.2}} : StrongDescendingChainCondition' (Resμ I μ) where
   wdcc' := fun f saf ↦ h.wdcc' (fun n ↦ (f n).val) fun ⦃_ _⦄ hn ↦ lt_iff_le_not_ge.mpr (saf hn)
 
 
 class Affine {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : {p : ℒ × ℒ // p.1 < p.2} → S) : Prop where
-  affine : ∀ a b : ℒ, (h : ¬ a ≤ b) → μ ⟨(a ⊓ b, a), inf_lt_left.2 h⟩ = μ ⟨(b, a ⊔ b), right_lt_sup.2 h⟩
+  affine : ∀ a b : ℒ, (h : ¬ a ≤ b) →
+    μ ⟨(a ⊓ b, a), inf_lt_left.2 h⟩ = μ ⟨(b, a ⊔ b), right_lt_sup.2 h⟩
 
 
 instance {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-{μ : {p : ℒ × ℒ // p.1 < p.2} → S} [haff : Affine μ] {I : {p : ℒ × ℒ // p.1 < p.2}} : Affine (Resμ I μ) where
+{μ : {p : ℒ × ℒ // p.1 < p.2} → S} [haff : Affine μ] {I : {p : ℒ × ℒ // p.1 < p.2}} :
+Affine (Resμ I μ) where
   affine := fun a b h ↦ haff.affine a b h
 
 instance {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
@@ -81,12 +85,15 @@ instance {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 instance {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLinearOrder S]
 {μ : {p : ℒ × ℒ // p.1 < p.2} → S}
-[hftp : FiniteTotalPayoff μ] [hsl : SlopeLike μ] [hst : Semistable μ] [hwdcc' : StrongDescendingChainCondition' μ] {x : ℒ} {hx : ⊥ < x}: FiniteTotalPayoff (Resμ ⟨(⊥, x), hx⟩ μ) := by
+[hftp : FiniteTotalPayoff μ] [hsl : SlopeLike μ] [hst : Semistable μ]
+[hwdcc' : StrongDescendingChainCondition' μ] {x : ℒ} {hx : ⊥ < x} :
+FiniteTotalPayoff (Resμ ⟨(⊥, x), hx⟩ μ) := by
   refine { fin_tot_payoff := ?_ }
   simp only [Resμ]
   by_contra h
   have : Semistable μ → μmax μ TotIntvl = μ TotIntvl := by
-    exact fun a ↦ (List.TFAE.out (impl.thm4d21 μ hsl inferInstance inferInstance).1 0 3).2 ((impl.thm4d21 μ hsl inferInstance inferInstance).2.1 a)
+    exact fun a ↦ (List.TFAE.out (impl.thm4d21 μ hsl inferInstance inferInstance).1 0 3).2
+      ((impl.thm4d21 μ hsl inferInstance inferInstance).2.1 a)
   have := this hst
   simp only [μmax, TotIntvl, ne_eq] at this
   have this_q: μ ⟨(⊥, x), hx⟩ ≤ μ ⟨(⊥, ⊤), bot_lt_top⟩ := by

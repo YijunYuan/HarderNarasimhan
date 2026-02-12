@@ -22,7 +22,8 @@ class SlopeLike {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder 
 )
 
 
-class TotallyOrderedRealVectorSpace (V : Type*) extends AddCommGroup V, Module ℝ V, LinearOrder V, PosSMulStrictMono ℝ V where
+class TotallyOrderedRealVectorSpace (V : Type*)
+  extends AddCommGroup V, Module ℝ V, LinearOrder V, PosSMulStrictMono ℝ V where
   elim_AddLeftMono : ∀ {y z : V} (x : V), y ≤ z → x + y ≤ x + z
 
 
@@ -33,7 +34,8 @@ instance {V : Type*} [TotallyOrderedRealVectorSpace V] : AddLeftMono V where
 noncomputable def μQuotient {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {V : Type*} [TotallyOrderedRealVectorSpace V]
 (r : {p :ℒ × ℒ // p.1 < p.2} → NNReal)
-(d : {p :ℒ × ℒ // p.1 < p.2} → V): {p :ℒ × ℒ // p.1 < p.2} → OrderTheory.DedekindMacNeilleCompletion V :=
+(d : {p :ℒ × ℒ // p.1 < p.2} → V) :
+{p :ℒ × ℒ // p.1 < p.2} → OrderTheory.DedekindMacNeilleCompletion V :=
   fun z ↦ if _ : r z > 0 then ↑((r z)⁻¹ • d z) else ⊤
 
 
@@ -41,6 +43,7 @@ instance {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 {μ : {p : ℒ × ℒ // p.1 < p.2} → S} [hsl : SlopeLike μ]
 {z : {p : ℒ × ℒ // p.1 < p.2}} : SlopeLike (Resμ z μ)
-:= { slopelike := fun x y z h ↦ hsl.slopelike x.val y.val z.val ⟨lt_iff_le_not_ge.2 h.1,lt_iff_le_not_ge.2 h.2⟩ }
+:= { slopelike :=
+  fun x y z h ↦ hsl.slopelike x.val y.val z.val ⟨lt_iff_le_not_ge.2 h.1,lt_iff_le_not_ge.2 h.2⟩ }
 
 end HarderNarasimhan

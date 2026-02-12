@@ -5,12 +5,14 @@ defaultTargets = ["HarderNarasimhan"]
 
 [leanOptions]
 pp.unicode.fun = true # pretty-prints `fun a ↦ b`
-autoImplicit = false
+relaxedAutoImplicit = false
+weak.linter.mathlibStandardSet = true
+maxSynthPendingDepth = 3
 
 [[require]]
 name = "mathlib"
 scope = "leanprover-community"
-version = "git#v4.25.1"
+rev = "v4.27.0"
 
 [[lean_lib]]
 name = "HarderNarasimhan"

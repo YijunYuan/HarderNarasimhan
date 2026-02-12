@@ -1,21 +1,21 @@
 import HarderNarasimhan.JordanHolderFiltration.Impl
 
-open Classical
-
 namespace HarderNarasimhan
 
 --`Theorem 4.25`
+open Classical in
 instance {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLinearOrder S]
-{μ : {p : ℒ × ℒ // p.1 < p.2} → S}
-[hftp : FiniteTotalPayoff μ] [hsl : SlopeLike μ] [hst : Semistable μ] [hwdcc' : StrongDescendingChainCondition' μ] :
+{μ : {p : ℒ × ℒ // p.1 < p.2} → S} [hftp : FiniteTotalPayoff μ] [hsl : SlopeLike μ]
+[hst : Semistable μ] [hwdcc' : StrongDescendingChainCondition' μ] :
 ------------
 Nonempty (JordanHolderFiltration μ)
 ------------
 := Nonempty.intro {
   filtration := impl.JHFil μ hftp.fin_tot_payoff hsl hst hwdcc'.wdcc',
   antitone := fun x y hxy ↦
-    if hy : y ≤ Nat.find (impl.JHFil_fin_len μ FiniteTotalPayoff.fin_tot_payoff hsl hst StrongDescendingChainCondition'.wdcc') then
+    if hy : y ≤ Nat.find (impl.JHFil_fin_len μ FiniteTotalPayoff.fin_tot_payoff hsl hst
+      StrongDescendingChainCondition'.wdcc') then
       (Nat.le_induction
         (fun a ↦ le_rfl)
         (fun n hn hind hn' ↦
@@ -60,14 +60,16 @@ Nonempty (JordanHolderFiltration μ)
         (Nat.find_min <| impl.JHFil_fin_len μ hftp.fin_tot_payoff hsl hst hwdcc'.wdcc') hk,
   step_cond₂ := fun i hi z h' h'' ↦
     impl.JHFil_prop₂ μ hftp.fin_tot_payoff hsl hst hwdcc'.wdcc' i
-      (bot_lt_iff_ne_bot.2 <| Nat.find_min (impl.JHFil_fin_len μ hftp.fin_tot_payoff hsl hst hwdcc'.wdcc') hi) z h' h''
+      (bot_lt_iff_ne_bot.2 <| Nat.find_min
+        (impl.JHFil_fin_len μ hftp.fin_tot_payoff hsl hst hwdcc'.wdcc') hi) z h' h''
 }
 
-
-theorem exists_JordanHolderSeries {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
+open Classical in
+theorem exists_JordanHolderSeries
+{ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLinearOrder S]
-{μ : {p : ℒ × ℒ // p.1 < p.2} → S}
-[hftp : FiniteTotalPayoff μ] [hsl : SlopeLike μ] [hst : Semistable μ] [hwdcc' : StrongDescendingChainCondition' μ] :
+{μ : {p : ℒ × ℒ // p.1 < p.2} → S} [hftp : FiniteTotalPayoff μ] [hsl : SlopeLike μ]
+[hst : Semistable μ] [hwdcc' : StrongDescendingChainCondition' μ] :
 ------------
 ∃ s : RelSeries (JordanHolderRel μ), s.head = ⊤ ∧ s.last = ⊥
 ------------
@@ -83,19 +85,22 @@ theorem exists_JordanHolderSeries {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [
   }
   exact ⟨JH, ⟨this.first_eq_top, Nat.find_spec this.fin_len⟩⟩
 
-
-theorem piecewise_stable_iff {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
+open Classical in
+theorem piecewise_stable_iff
+{ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLinearOrder S]
 (μ : {p : ℒ × ℒ // p.1 < p.2} → S) [SlopeLike μ] [sdc : StrongDescendingChainCondition' μ]
-(filtration : ℕ → ℒ) (fin_len : ∃ N : ℕ, filtration N =⊥)
+(filtration : ℕ → ℒ) (fin_len : ∃ N : ℕ, filtration N = ⊥)
 (strict_anti : ∀ i j : ℕ, i < j → j ≤ Nat.find (fin_len) → filtration j < filtration i) :
 ------------
 (
-∀ i : ℕ, (hi : i < Nat.find fin_len) → Stable (Resμ ⟨(filtration (i+1), filtration i), strict_anti i (i+1) (lt_add_one i) hi⟩ μ)
+∀ i : ℕ, (hi : i < Nat.find fin_len) →
+  Stable (Resμ ⟨(filtration (i+1), filtration i), strict_anti i (i+1) (lt_add_one i) hi⟩ μ)
 )
 ↔ (∀ i : ℕ, (hi : i < Nat.find fin_len) →
     ∀ z : ℒ, (h' : filtration (i+1) < z) → (h'' : z < filtration i) →
-    μ ⟨(filtration (i+1), z), h'⟩ < μ ⟨(filtration (i+1), filtration i), strict_anti i (i+1) (lt_add_one i) hi⟩)
+    μ ⟨(filtration (i+1), z), h'⟩ <
+    μ ⟨(filtration (i+1), filtration i), strict_anti i (i+1) (lt_add_one i) hi⟩)
 ------------
 := by
   constructor
@@ -103,8 +108,9 @@ theorem piecewise_stable_iff {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [Bound
     impl.step_cond₂_of_stable μ filtration fin_len strict_anti a i hi z h' h''
   · exact fun a i hi ↦ impl.stable_of_step_cond₂ μ filtration fin_len strict_anti a i hi
 
-
-theorem length_eq_of_JordanHolderFiltration {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ] [IsModularLattice ℒ]
+open Classical in
+theorem length_eq_of_JordanHolderFiltration
+{ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ] [IsModularLattice ℒ]
 {S : Type*} [CompleteLinearOrder S]
 {μ : {p : ℒ × ℒ // p.1 < p.2} → S}
 [FiniteTotalPayoff μ] [SlopeLike μ] [Semistable μ]
@@ -112,7 +118,12 @@ theorem length_eq_of_JordanHolderFiltration {ℒ : Type*} [Nontrivial ℒ] [Latt
 ------------
 ∀ JH1 JH2 : JordanHolderFiltration μ, Nat.find JH1.fin_len = Nat.find JH2.fin_len
 ------------
-:= fun JH1 JH2 ↦ eq_of_le_of_ge (impl.induction_on_length_of_JordanHolderFiltration (Nat.find JH2.fin_len) ℒ _ _ _ inferInstance inferInstance _ _ μ inferInstance inferInstance inferInstance inferInstance inferInstance ⟨JH2,rfl.le⟩ JH1) <| impl.induction_on_length_of_JordanHolderFiltration (Nat.find JH1.fin_len) ℒ _ _ _ inferInstance inferInstance _ _ _ inferInstance inferInstance inferInstance inferInstance inferInstance ⟨JH1,rfl.le⟩ JH2
+:= fun JH1 JH2 ↦ eq_of_le_of_ge (impl.induction_on_length_of_JordanHolderFiltration
+  (Nat.find JH2.fin_len) ℒ _ _ _ inferInstance inferInstance _ _ μ inferInstance inferInstance
+  inferInstance inferInstance inferInstance ⟨JH2,rfl.le⟩ JH1) <|
+  impl.induction_on_length_of_JordanHolderFiltration (Nat.find JH1.fin_len) ℒ _ _ _ inferInstance
+  inferInstance _ _ _ inferInstance inferInstance inferInstance inferInstance inferInstance
+  ⟨JH1,rfl.le⟩ JH2
 
 
 end HarderNarasimhan

@@ -20,19 +20,19 @@ abbrev S₀ (R : Type*) [CommRing R] [IsNoetherianRing R]
 ------------
 := Finset (LinearExtension (PrimeSpectrum R))
 
-noncomputable instance (priority:=114514) {R : Type*} [CommRing R] [IsNoetherianRing R] :
+noncomputable instance (priority := 114514) {R : Type*} [CommRing R] [IsNoetherianRing R] :
 ------------
 LinearOrder (S₀ R)
 ------------
 := (Lex'Order.Lex'Order_prop (LinearExtension (PrimeSpectrum R))).choose
 
-noncomputable instance (priority:=114513) {R : Type*} [CommRing R] [IsNoetherianRing R] :
+noncomputable instance (priority := 114513) {R : Type*} [CommRing R] [IsNoetherianRing R] :
 ------------
 PartialOrder (S₀ R)
 ------------
 := instLinearOrderS₀.toPartialOrder
 
-noncomputable instance (priority:=114512) {R : Type*} [CommRing R] [IsNoetherianRing R] :
+noncomputable instance (priority := 114512) {R : Type*} [CommRing R] [IsNoetherianRing R] :
 ------------
 LE (S₀ R)
 ------------
@@ -48,7 +48,8 @@ lemma S₀_order {R : Type*} [CommRing R] [IsNoetherianRing R] :
 ------------
 := (Lex'Order.Lex'Order_prop (LinearExtension (PrimeSpectrum R))).choose_spec
 
-lemma S₀_order' {R : Type*} [CommRing R] [IsNoetherianRing R] {a b : LinearExtension (PrimeSpectrum R)} :
+lemma S₀_order' {R : Type*} [CommRing R] [IsNoetherianRing R]
+  {a b : LinearExtension (PrimeSpectrum R)} :
 ------------
 a < b ↔ ({a} : (S₀ R)) < ({b} : (S₀ R))
 ------------
@@ -72,7 +73,8 @@ abbrev _μ (R : Type*) [CommRing R] [IsNoetherianRing R]
 Set (LinearExtension (PrimeSpectrum R))
 ------------
 :=
-{ {asIdeal := p, isPrime := h.out.1} | (p : Ideal R) (h : p ∈ associatedPrimes R (I.val.2⧸(I.val.1.submoduleOf I.val.2))) }
+{ {asIdeal := p, isPrime := h.out.1} |
+  (p : Ideal R) (h : p ∈ associatedPrimes R (I.val.2⧸(I.val.1.submoduleOf I.val.2))) }
 
 noncomputable instance {R : Type*} [CommRing R] [IsNoetherianRing R]
 {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]
@@ -80,7 +82,8 @@ noncomputable instance {R : Type*} [CommRing R] [IsNoetherianRing R]
 ------------
 Fintype ((_μ R M) I)
 ------------
-:= (Set.Finite.dependent_image (associatedPrimes.finite R (I.val.2⧸(I.val.1.submoduleOf I.val.2))) (fun I hI ↦ ({asIdeal := I, isPrime := hI.out.1} : LinearExtension (PrimeSpectrum R)))).fintype
+:= (Set.Finite.dependent_image (associatedPrimes.finite R (I.val.2⧸(I.val.1.submoduleOf I.val.2)))
+  (fun I hI ↦ ({asIdeal := I, isPrime := hI.out.1} : LinearExtension (PrimeSpectrum R)))).fintype
 
 noncomputable abbrev μ (R : Type*) [CommRing R] [IsNoetherianRing R]
 (M : Type*) [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] :
@@ -89,15 +92,15 @@ noncomputable abbrev μ (R : Type*) [CommRing R] [IsNoetherianRing R]
 ------------
 := fun I ↦ ↑((_μ R M) I).toFinset
 
-class Coprimary (R : Type*) [CommRing R] [IsNoetherianRing R](M : Type*) [AddCommGroup M] [Module R M] : Prop where
+class Coprimary (R : Type*) [CommRing R] [IsNoetherianRing R]
+  (M : Type*) [AddCommGroup M] [Module R M] : Prop where
   coprimary : ∃! p, p ∈ associatedPrimes R M
 
-open Classical
-
+open Classical in
 @[ext]
 structure CoprimaryFiltration (R : Type*) [CommRing R] [IsNoetherianRing R]
 (M : Type*) [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] where
-  filtration          : ℕ → Submodule R M
+  filtration : ℕ → Submodule R M
   monotone            : Monotone filtration
   first_eq_bot        : filtration 0 = ⊥
   fin_len             : ∃ n : ℕ, filtration n = ⊤
@@ -117,7 +120,8 @@ structure CoprimaryFiltration (R : Type*) [CommRing R] [IsNoetherianRing R]
           })
         ({
           asIdeal := (piecewise_coprimary n (Nat.lt_of_succ_lt hn)).coprimary.exists.choose,
-          isPrime := (piecewise_coprimary n (Nat.lt_of_succ_lt hn)).coprimary.exists.choose_spec.out.1
+          isPrime := (piecewise_coprimary n (Nat.lt_of_succ_lt hn)
+            ).coprimary.exists.choose_spec.out.1
           })
 
 

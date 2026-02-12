@@ -7,14 +7,15 @@ lemma proposition_3_2 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder
   {S : Type*} [CompleteLattice S]
   (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : Convex μ)
   (x : ℒ) (z : ℒ) (h : x < z)
-  (h' : μA μ ⟨(x , z) , h⟩ = ⊤)
+  (h' : μA μ ⟨(x, z), h⟩ = ⊤)
   (a : ℒ) (hax : a < x) :
 ------------
   μA μ ⟨(a , x) , hax⟩ ≤ μA μ ⟨(a , z) , lt_trans hax h⟩
 ------------
   := by
     rw [← impl.ConvexI_TotIntvl_iff_Convex] at hμcvx
-    exact impl.prop3d2 TotIntvl μ hμcvx x (in_TotIntvl x) z (in_TotIntvl z) h h' a (in_TotIntvl a) hax
+    exact impl.prop3d2 TotIntvl μ hμcvx x (in_TotIntvl x) z
+      (in_TotIntvl z) h h' a (in_TotIntvl a) hax
 
 
 alias corollary_3_3 := impl.cor3d3
@@ -52,43 +53,48 @@ lemma proposition_3_7 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder
   Semistable  (Resμ ⟨(⊥, x), lt_of_le_of_ne bot_le hxSt.out.choose_spec.choose⟩ μ)
   ∧
   --`(2)`
-  ∀ y : ℒ, (hy : y > x) → ¬ μA μ ⟨(⊥ , x) , lt_of_le_of_ne hxSt.out.choose.1 hxSt.out.choose_spec.choose⟩ ≤ μA μ ⟨(x, y), hy⟩
+  ∀ y : ℒ, (hy : y > x) →
+    ¬ μA μ ⟨(⊥ , x) , lt_of_le_of_ne hxSt.out.choose.1 hxSt.out.choose_spec.choose⟩ ≤
+      μA μ ⟨(x, y), hy⟩
 ------------
   := by
     rw [← impl.ConvexI_TotIntvl_iff_Convex] at hμcvx
     constructor
-    · apply (semistableI_iff μ ⟨(⊥, x), lt_of_le_of_ne bot_le hxSt.out.choose_spec.choose⟩).1 <| impl.prop3d7₁ μ TotIntvl x hxSt
+    · apply (semistableI_iff μ ⟨(⊥, x), lt_of_le_of_ne bot_le hxSt.out.choose_spec.choose⟩).1 <|
+        impl.prop3d7₁ μ TotIntvl x hxSt
     · exact fun y hy ↦ impl.prop3d7₂ μ TotIntvl hμcvx x hxSt y (in_TotIntvl y) hy
 
 
 lemma proposition_3_8 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
   {S : Type*} [CompleteLattice S]
   (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : Convex μ)
-  (h : (IsTotal S (· ≤ ·)) ∨
+  (h : (@Std.Total S (· ≤ ·)) ∨
      ∀ z : ℒ, (hz : ⊥ ≠ z) → IsAttained μ ⟨(⊥ , z) , lt_of_le_of_ne bot_le hz⟩) :
 ------------
   (
   --`(1)`
-  IsTotal (St μ) (· ≤ ·) ∧ (μA_DescendingChainCondition μ → ∃ s : ℒ, IsGreatest (St μ) s)
+  @Std.Total (St μ) (· ≤ ·) ∧ (μA_DescendingChainCondition μ → ∃ s : ℒ, IsGreatest (St μ) s)
   ) ∧
   --`(2)`
   ∀ x : ℒ, (hxSt : x ∈ St μ) →
-  (∀ y : ℒ, (hxy : y > x) → μA μ ⟨(⊥ , y), lt_of_le_of_lt hxSt.out.choose.1 hxy⟩ = μA μ ⟨(x , y), hxy⟩)
+  (∀ y : ℒ, (hxy : y > x) →
+    μA μ ⟨(⊥ , y), lt_of_le_of_lt hxSt.out.choose.1 hxy⟩ = μA μ ⟨(x , y), hxy⟩)
 ------------
  := by
   rw [← impl.ConvexI_TotIntvl_iff_Convex] at hμcvx
   constructor
   · constructor
-    · cases' h with c1 c2
+    · rcases h with c1 | c2
       · exact impl.prop3d8₁ μ TotIntvl hμcvx (Or.inl c1)
       · exact impl.prop3d8₁ μ TotIntvl hμcvx (Or.inr fun z _ hz ↦ c2 z hz)
     · intro hμDCC
-      cases' h with c1 c2
+      rcases h with c1 | c2
       · exact impl.prop3d8₁' μ hμDCC TotIntvl hμcvx (Or.inl c1)
       · exact impl.prop3d8₁' μ hμDCC TotIntvl hμcvx (Or.inr fun z _ hz ↦ c2 z hz)
   · intro x hxSt y hxy
-    cases' h with c1 c2
+    rcases h with c1 | c2
     · exact impl.prop3d8₂ μ TotIntvl hμcvx (Or.inl c1) x hxSt y (in_TotIntvl y) hxy
-    · exact impl.prop3d8₂ μ TotIntvl hμcvx (Or.inr fun z _ hz ↦ c2 z hz) x hxSt y (in_TotIntvl y) hxy
+    · exact impl.prop3d8₂ μ TotIntvl hμcvx (Or.inr fun z _ hz ↦ c2 z hz)
+        x hxSt y (in_TotIntvl y) hxy
 
 end HarderNarasimhan
