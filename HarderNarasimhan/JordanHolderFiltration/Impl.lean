@@ -1053,8 +1053,7 @@ instance {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [iml : 
     exact hxz
 
 open Classical in
-/--
-  `induction_on_length_of_JordanHolderFiltration` is the main internal induction principle.
+/-- `induction_on_length_of_JordanHolderFiltration` is the main internal induction principle.
 
   Fix `n`. Assuming there exists a Jordan–Hölder filtration of length `≤ n`, the lemma shows that
   every Jordan–Hölder filtration for the same slope function has length `≤ n`.
