@@ -49,7 +49,7 @@ API overview:
 
 namespace HarderNarasimhan
 
-/-
+/--
 The “discrete” slope codomain: finsets of a linearly extended prime spectrum.
 
 We work with `Finset (LinearExtension (PrimeSpectrum R))` so that `Lex'Order` can
@@ -59,7 +59,7 @@ abbrev S₀ (R : Type*) [CommRing R] [IsNoetherianRing R]
 ------------
 := Finset (LinearExtension (PrimeSpectrum R))
 
-/-
+/--
 Linear order on `S₀ R` induced by `Lex'Order`.
 
 This is an intentionally “local” instance with an explicit priority, so we do not
@@ -71,7 +71,7 @@ LinearOrder (S₀ R)
 ------------
 := (Lex'Order.Lex'Order_prop (LinearExtension (PrimeSpectrum R))).choose
 
-/-
+/--
 The induced partial order on `S₀ R`.
 
 This is obtained by forgetting the extra structure of the linear order instance.
@@ -82,7 +82,7 @@ PartialOrder (S₀ R)
 ------------
 := instLinearOrderS₀.toPartialOrder
 
-/-
+/--
 The `≤` relation on `S₀ R` exported as a standalone `LE` instance.
 
 Some downstream definitions refer to `LE` explicitly; we expose it to avoid
@@ -95,7 +95,7 @@ LE (S₀ R)
 where
   le := instLinearOrderS₀.le
 
-/-
+/--
 Core monotonicity property of the chosen `S₀ R` order.
 
 This packages two facts provided by `Lex'Order_prop`:
@@ -114,7 +114,7 @@ lemma S₀_order {R : Type*} [CommRing R] [IsNoetherianRing R] :
 ------------
 := (Lex'Order.Lex'Order_prop (LinearExtension (PrimeSpectrum R))).choose_spec
 
-/-
+/--
 Strict inequality on the linear extension matches strict inequality of singletons.
 
 This is a convenient corollary of `S₀_order` expressed in `<` form.
@@ -128,7 +128,7 @@ a < b ↔ ({a} : (S₀ R)) < ({b} : (S₀ R))
   refine le_iff_le_iff_lt_iff_lt.mp ?_
   simp only [S₀_order.2]
 
-/-
+/--
 The completed slope codomain `S R`.
 
 We use the Dedekind–MacNeille completion so that the codomain is a complete lattice,
@@ -138,7 +138,7 @@ abbrev S (R : Type*) [CommRing R] [IsNoetherianRing R]
 ------------
 := @OrderTheory.DedekindMacNeilleCompletion (S₀ R) instPartialOrderS₀
 
-/-
+/--
 The lattice of submodules of a finite module.
 
 This is the base lattice `ℒ` to which we apply the general filtration theory.
@@ -148,7 +148,7 @@ abbrev ℒ (R : Type*) [CommRing R] [IsNoetherianRing R]
 ------------
 := Submodule R M
 
-/-
+/--
 The underlying set-valued “slope”: associated primes of a quotient.
 
 Given an interval `I : N₁ < N₂` in the submodule lattice, `_μ R M I` is the set of
@@ -167,7 +167,7 @@ Set (LinearExtension (PrimeSpectrum R))
 { {asIdeal := p, isPrime := h.out.1} |
   (p : Ideal R) (h : p ∈ associatedPrimes R (I.val.2⧸(I.val.1.submoduleOf I.val.2))) }
 
-/-
+/--
 Finiteness of `_μ R M I`.
 
 For a Noetherian ring and a finite module, the set of associated primes of any
@@ -182,7 +182,7 @@ Fintype ((_μ R M) I)
 := (Set.Finite.dependent_image (associatedPrimes.finite R (I.val.2⧸(I.val.1.submoduleOf I.val.2)))
   (fun I hI ↦ ({asIdeal := I, isPrime := hI.out.1} : LinearExtension (PrimeSpectrum R)))).fintype
 
-/-
+/--
 The slope function `μ` valued in the complete lattice `S R`.
 Most downstream statements about coprimary filtrations (existence/uniqueness, convexity, etc.)
 are phrased in terms of `μ R M`.
@@ -199,7 +199,7 @@ noncomputable abbrev μ (R : Type*) [CommRing R] [IsNoetherianRing R]
 ------------
 := fun I ↦ ↑((_μ R M) I).toFinset
 
-/-
+/--
 Predicate asserting that a module is coprimary.
 We define `Coprimary R M` as “the set of associated primes of `M` is a singleton”,
 packaged as existence and uniqueness of such a prime.
@@ -212,7 +212,8 @@ class Coprimary (R : Type*) [CommRing R] [IsNoetherianRing R]
   (M : Type*) [AddCommGroup M] [Module R M] : Prop where
   coprimary : ∃! p, p ∈ associatedPrimes R M
 
-/-
+open Classical in
+/--
 A coprimary filtration of a finite module.
 The `Nonempty`/`Unique` instances live in `HarderNarasimhan.CoprimaryFiltration.Results`.
 
@@ -224,7 +225,6 @@ on the associated primes of successive factors (using the fixed linear extension
 
 API note: this is the main structure that users quantify over in the coprimary chapter.
 -/
-open Classical in
 @[ext]
 structure CoprimaryFiltration (R : Type*) [CommRing R] [IsNoetherianRing R]
 (M : Type*) [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] where

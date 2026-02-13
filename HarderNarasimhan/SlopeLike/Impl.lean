@@ -28,7 +28,7 @@ namespace impl
 Internal namespace containing proof-engineering lemmas for `SlopeLike`.
 -/
 
-/-
+/--
 Proposition 4.6 (implementation form): equivalence between `SlopeLike μ` and a tri-part “seesaw”
 disjunction.
 
@@ -98,7 +98,7 @@ SlopeLike μ ↔ ∀ (x y z : ℒ), (h : x < y ∧ y < z) → (
         with this | this <;> [exact le_of_lt this.1; exact le_of_eq this.1.symm]
 
 
-/-
+/--
 In a nontrivial totally ordered real vector space, the coercion of any vector is strictly below `⊤`
 in the Dedekind–MacNeille completion.
 
@@ -120,7 +120,7 @@ lemma not_top_of_Nontrivial_TotallyOrderedRealVectorSpace
     (OrderTheory.coe'.lt_iff_lt.2 <| lt_add_of_pos_right v hpos)
 
 
-/-
+/--
 Helper lemma for `μQuotient`: when `r z > 0`, the value `μQuotient r d z` is represented by an
 actual vector `μ : V`, and it satisfies `(r z) • μ = d z`.
 
@@ -136,7 +136,7 @@ lemma μQuotient_helper {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [Bound
       smul_inv_smul₀ (Ne.symm (ne_of_lt h)) (d z)⟩⟩
 
 
-/-
+/--
 Proposition 4.8 (implementation form): `μQuotient r d` is slope-like.
 
 Assumptions:

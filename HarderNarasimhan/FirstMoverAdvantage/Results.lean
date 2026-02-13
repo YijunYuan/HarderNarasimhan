@@ -23,7 +23,7 @@ API overview:
 
 namespace HarderNarasimhan
 
-/-
+/--
 Proposition 4.1: compute player A's value.
 Under weak ascending chain condition and a weak slope-like axiom, player A's value `μAstar`
 coincides with `μmin` on the total interval, and `μAstar ≤ μBstar`.
@@ -70,7 +70,7 @@ OrderDual.ofDual <| μBstar (fun (p : {p : ℒᵒᵈ × ℒᵒᵈ // p.1 < p.2})
 := impl.dualμBstar_eq_μAstar μ
 
 
-/-
+/--
 Proposition 4.3: compute player B's value.
 Under strong descending chain condition and the second weak slope-like axiom, player B's value
 `μBstar` coincides with `μmax` on the total interval, and `μAstar ≤ μBstar`.

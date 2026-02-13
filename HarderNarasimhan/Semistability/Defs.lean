@@ -30,7 +30,7 @@ definitions, as they are primarily implementation tools.
 
 namespace HarderNarasimhan
 
-/-
+/--
 Descending chain condition for `μA`.
 
 Given a fixed left endpoint `a` and a strictly descending chain `f : ℕ → ℒ` with all terms above
@@ -46,7 +46,7 @@ class μA_DescendingChainCondition {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] 
     ∃ N : ℕ, ¬ μA μ ⟨(a, f N), h₁ N⟩ < μA μ ⟨(a, f <| N + 1), h₁ <| N + 1⟩
 
 
-/-
+/--
 Auxiliary predicate `S₁I` (“no strictly better choice”).
 
 For an interval `I` and a candidate breakpoint `x` inside it (with `x ≠ I.left`), `S₁I μ I x` says:
@@ -66,7 +66,7 @@ def S₁I {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
     μA μ ⟨(I.val.1 , x) , lt_of_le_of_ne hxI.left hx⟩
 
 
-/-
+/--
 Auxiliary predicate `S₂I` (“minimality among ties”).
 
 For the same situation as `S₁I`, the predicate `S₂I μ I x` says: whenever another `y` has the same
@@ -85,7 +85,7 @@ def S₂I {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   μA μ ⟨(I.val.1 , x) , lt_of_le_of_ne hxI.1 hx⟩ → y ≤ x
 
 
-/-
+/--
 `StI μ I` is the set of “stable breakpoints” inside an interval `I`.
 
 An element `l` belongs to `StI μ I` if it lies in `I`, is not the left endpoint, and satisfies both
@@ -98,7 +98,7 @@ def StI {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {l : ℒ | ∃ hlI : InIntvl I l , ∃ hl : I.val.1 ≠ l ,  (S₁I μ I l hlI hl) ∧ (S₂I μ I l hlI hl)}
 
 
-/-
+/--
 The global set of stable breakpoints for the total interval.
 
 This is simply `StI μ TotIntvl`, but provided as a convenient abbreviation for statements on `ℒ`.
@@ -109,7 +109,7 @@ def St {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 StI μ TotIntvl
 
 
-/-
+/--
 Interval-local semistability: the right endpoint of `I` is a stable breakpoint for `I`.
 
 In other words, `I` is semistable if `I.right ∈ StI μ I`.
@@ -120,7 +120,7 @@ def semistableI {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 (I : {p : ℒ × ℒ // p.1 < p.2}) : Prop := I.val.2 ∈ StI μ I
 
 
-/-
+/--
 Global semistability class.
 
 This expresses that for every `x ≠ ⊥`, the value `μA μ (⊥,x)` is not strictly greater than the
@@ -135,7 +135,7 @@ class Semistable {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   semistable : ∀x : ℒ, (hx : x ≠ ⊥) →
     ¬ μA μ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx⟩ > μA μ ⟨(⊥,⊤),bot_lt_top⟩
 
-/-
+/--
 Global stability class.
 
 This strengthens `Semistable μ` by requiring strict inequality: for any proper `x` (non-bottom and

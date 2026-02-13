@@ -28,7 +28,7 @@ API overview:
 
 namespace HarderNarasimhan
 
-/-
+/--
 Public wrapper for the internal convexity-driven monotonicity statement.
 
 Intuitively: if the right endpoint `(x,z)` has maximal `μA` (equal to `⊤`), then
@@ -53,15 +53,14 @@ lemma proposition_3_2 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder
       (in_TotIntvl z) h h' a (in_TotIntvl a) hax
 
 
-/-(
-Re-export of the internal corollary `impl.cor3d3` under the name used in the paper.
+/-- Re-export of the internal corollary `impl.cor3d3` under the name used in the paper.
 
 This is kept as an `alias` to avoid duplicating proof terms.
 -/
 alias corollary_3_3 := impl.cor3d3
 
 
-/-
+/--
 Existence of a global “stable breakpoint”.
 
 Under the descending chain condition for `μA` and convexity of `μ`, the set `St μ`
@@ -82,7 +81,7 @@ lemma proposition_3_4 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder
     exact impl.prop3d4 μ hμDCC TotIntvl hμcvx
 
 
-/-
+/--
 Uniqueness of stable breakpoints in a linearly ordered codomain.
 
 When `S` is a complete linear order, the internal remark shows that `St μ` has at
@@ -99,7 +98,7 @@ lemma remark_3_5 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   := impl.rmk3d5 μ TotIntvl x hxSt y hySt
 
 
-/-
+/--
 Semistability of the initial segment and the “no improvement to the right” property.
 If `x ∈ St μ`, then:
 
@@ -132,7 +131,7 @@ lemma proposition_3_7 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder
     · exact fun y hy ↦ impl.prop3d7₂ μ TotIntvl hμcvx x hxSt y (in_TotIntvl y) hy
 
 
-/-
+/--
 Totality/maximality consequences and the slope decomposition formula.
 Assuming convexity and an additional admissibility hypothesis (either totality of
 `≤` on `S`, or an attainment condition on `μ`), the internal results show:

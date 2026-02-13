@@ -27,7 +27,7 @@ namespace HarderNarasimhan
 namespace AdmittedResults
 
 
-/-
+/--
 Minimal associated primes correspond to minimal elements of the support.
 
 Reference: Stacks Project, tag `02CE`.
@@ -41,7 +41,7 @@ lemma min_associated_prime_iff_min_supp {R : Type*} [CommRing R] [IsNoetherianRi
 Minimal (fun J ↦ J ∈ associatedPrimes R M) I.asIdeal ↔ Minimal (fun J ↦ J ∈ Module.support R M) I
 := by admit
 
-/-
+/--
 Associated primes under localization, characterized by the kernel of the localization map.
 
 This packages a classical statement (Bourbaki, *Algèbre commutative*, Ch. IV, §1,

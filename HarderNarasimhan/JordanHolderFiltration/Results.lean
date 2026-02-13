@@ -28,7 +28,7 @@ namespace HarderNarasimhan
 
 /- Theorem 4.25. -/
 open Classical in
-/-
+/--
 Existence of a Jordan–Hölder filtration (Theorem 4.25).
 Under finite total payoff, slope-likeness, semistability, and the strengthened descending chain
 condition, we construct a nonempty type of Jordan–Hölder filtrations for `μ`.
@@ -94,7 +94,7 @@ Nonempty (JordanHolderFiltration μ)
 }
 
 open Classical in
-/-
+/--
 Construct a Jordan–Hölder `RelSeries` from an existing filtration.
 Given the existence instance for `JordanHolderFiltration μ`, we build a `RelSeries` for the
 relation `JordanHolderRel μ` whose head is `⊤` and whose last element is `⊥`.
@@ -120,7 +120,7 @@ theorem exists_JordanHolderSeries
   exact ⟨JH, ⟨this.first_eq_top, Nat.find_spec this.fin_len⟩⟩
 
 open Classical in
-/-
+/--
 Reformulate the stability condition as piecewise `Stable` for restricted slopes.
 
 This lemma bridges the `step_cond₂` field of `JordanHolderFiltration` with the `Stable` predicate
@@ -147,7 +147,7 @@ theorem piecewise_stable_iff
   · exact fun a i hi ↦ impl.stable_of_step_cond₂ μ filtration fin_len strict_anti a i hi
 
 open Classical in
-/-
+/--
 Lengths of Jordan–Hölder filtrations agree under modularity.
 
 Assuming `ℒ` is modular and `μ` satisfies the standard hypotheses (including affinity), any two

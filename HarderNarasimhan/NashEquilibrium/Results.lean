@@ -34,7 +34,7 @@ lemma μmin_lt_μ_lt_μmax {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [Bo
 := impl.rmk4d10₀ μ
 
 
-/-
+/--
 Remark 4.10: equivalent formulations of the key inequality and Nash equilibrium.
 It packages the key comparison inequality `μBstar ≤ μAstar` and its two one-sided variants.
 
@@ -192,7 +192,7 @@ NashEquilibrium μ → Semistable μ
 := impl.prop4d20 μ h₁ h₂
 
 
-/-
+/--
 Theorem 4.21: a `TFAE` package for Nash equilibrium and the `μmin/μmax` equalities.
 It characterizes `NashEquilibrium μ` in terms of the equalities among `μmin`/`μmax` on `TotIntvl`.
 

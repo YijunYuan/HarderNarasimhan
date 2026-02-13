@@ -22,7 +22,7 @@ This file:
 
 namespace HarderNarasimhan
 
-/-
+/--
 Public seesaw characterization of `SlopeLike μ`.
 
 This is a direct re-export of `impl.prop4d6`. It states that for every triple `x<y<z`, the three
@@ -48,7 +48,7 @@ SlopeLike μ ↔
 := impl.prop4d6 μ
 
 
-/-
+/--
 Construct a slope-like function from the quotient construction `μQuotient`.
 
 This theorem packages `impl.prop4d8` as a user-facing API:
@@ -69,7 +69,7 @@ theorem SlopeLike_of_μQuotient {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ
 := impl.prop4d8 r d h₁ h₂
 
 
-/-
+/--
 An implication-style reformulation of the seesaw behavior.
 
 Assuming `SlopeLike μ`, this lemma provides several “if one comparison holds, then the other two

@@ -46,8 +46,7 @@ namespace HarderNarasimhan
 namespace impl
 
 open Classical in
-/-(
-  `JHFil` is the recursive construction of the underlying chain of a Jordan–Hölder
+/-- `JHFil` is the recursive construction of the underlying chain of a Jordan–Hölder
   filtration.
 
   At step `k+1`, it looks for lattice elements `p` strictly between `⊥` and the previous
@@ -80,8 +79,7 @@ noncomputable def JHFil
 
 
 
-/-
-  `JHFil_anti_mono` shows that the constructed chain is strictly decreasing whenever the
+/-- `JHFil_anti_mono` shows that the constructed chain is strictly decreasing whenever the
   current value is above `⊥`.
 
   This is immediate from the choice of a minimal element in the defining set.
@@ -104,8 +102,7 @@ lemma JHFil_anti_mono
   · simpa only [h]
 
 open Classical in
-/-(
-  `JHFil_prop₁` proves the first step condition for the chain `JHFil`.
+/-- `JHFil_prop₁` proves the first step condition for the chain `JHFil`.
 
   For each index `k` with `JHFil ... k > ⊥`, the payoff of the step
   `(JHFil ... (k+1), JHFil ... k)` is equal to the total payoff `μ (⊥, ⊤)`.
@@ -222,8 +219,7 @@ lemma JHFil_prop₁ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
 
 
 
-/-
-  `JHFil_fin_len` shows that the chain `JHFil` reaches `⊥` after finitely many steps.
+/-- `JHFil_fin_len` shows that the chain `JHFil` reaches `⊥` after finitely many steps.
 
   The proof uses the strengthened descending-chain condition `hdc` applied to the chain
   itself: if `⊥` were never reached, `hdc` would force a step payoff to be `⊤`, contradicting
@@ -243,8 +239,7 @@ lemma JHFil_fin_len {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
   exact hμ.symm <| hN ▸ JHFil_prop₁ μ hμ hμsl hst hdc N (bot_lt_iff_ne_bot.2 <| hc N)
 
 open Classical in
-/-(
-  `JHFil_prop₂` proves the stability step condition for the chain `JHFil`.
+/-- `JHFil_prop₂` proves the stability step condition for the chain `JHFil`.
 
   For each `k` with `JHFil ... k > ⊥` and any strict intermediate `z` between
   `JHFil ... (k+1)` and `JHFil ... k`, the payoff strictly decreases when refining the step
@@ -335,8 +330,7 @@ lemma JHFil_prop₂ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
       h'''' ▸ h''')) (not_and_iff_not_or_not.2 <| Or.inl <| ne_of_gt <| h'''' ▸ h''')).2 h'''
 
 open Classical in
-/-(
-  `JH_pos_len` is a small normalisation lemma: any Jordan–Hölder filtration has
+/-- `JH_pos_len` is a small normalisation lemma: any Jordan–Hölder filtration has
   positive length (i.e. its `fin_len` witness cannot be `0`) because the filtration starts
   at `⊤`.
 -/
@@ -347,8 +341,7 @@ lemma JH_pos_len {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   simp only [Nat.find_eq_zero, JH.first_eq_top, top_ne_bot] at h
 
 open Classical in
-/-(
-  `subseq f atf` is a normalised subsequence extracted from a chain `f : ℕ → ℒ` that
+/-- `subseq f atf` is a normalised subsequence extracted from a chain `f : ℕ → ℒ` that
   eventually hits `⊥`.
 
   The construction starts at `⊤`, then repeatedly jumps forward to the first index where
@@ -365,8 +358,7 @@ noncomputable def subseq {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOr
       f <| Nat.find (⟨atf.choose,atf.choose_spec.symm ▸ bot_lt_iff_ne_bot.2 hcond⟩ :
         ∃ k : ℕ, f k < subseq f atf t)
 
-/-
-  `subseq.pf2` packages the witness that, as long as `subseq f atf t ≠ ⊥`, there exists an
+/-- `subseq.pf2` packages the witness that, as long as `subseq f atf t ≠ ⊥`, there exists an
   index where `f` is strictly below the current subsequence value.
   This is used to justify the `Nat.find` step in the definition of `subseq`.
 -/
@@ -375,8 +367,7 @@ private lemma subseq.pf2 {ℒ : Type u_1} [Nontrivial ℒ] [Lattice ℒ] [Bounde
   ⟨atf.choose,atf.choose_spec.symm ▸ bot_lt_iff_ne_bot.2 hcond⟩
 
 open Classical in
-/-(
-  `subseq_prop0` states that every value of the original chain `f` appears somewhere in
+/-- `subseq_prop0` states that every value of the original chain `f` appears somewhere in
   the extracted subsequence.
 
   This is the basic surjectivity property needed to compare the two chains.
@@ -414,8 +405,7 @@ lemma subseq_prop0 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
       exact congrArg f this
 
 open Classical in
-/-(
-  `subseq_prop0'` is a monotone-index refinement of `subseq_prop0`.
+/-- `subseq_prop0'` is a monotone-index refinement of `subseq_prop0`.
 
   It produces an index `j ≥ i` such that `subseq f atf i = f j`.
 -/
@@ -455,8 +445,7 @@ lemma subseq_prop0' {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
       linarith
     simp only [ht]
 
-/-
-  `subseq_prop1` shows that the normalised subsequence `subseq f atf` eventually reaches `⊥`.
+/-- `subseq_prop1` shows that the normalised subsequence `subseq f atf` eventually reaches `⊥`.
 
   Concretely, it produces an index `N` with `subseq f atf N = ⊥`, using the witness from `atf` and
   the basic property `subseq_prop0`.
@@ -467,8 +456,7 @@ lemma subseq_prop1 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
   exact ⟨N, hN ▸ atf.choose_spec⟩
 
 open Classical in
-/-
-  `subseq_prop2` records that the subsequence construction preserves antitonicity.
+/-- `subseq_prop2` records that the subsequence construction preserves antitonicity.
 
   Even though indices are changed by a greedy choice, the values `subseq f atf i` form an antitone
   chain in `ℒ`.
@@ -490,8 +478,7 @@ lemma subseq_prop2 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
       subseq.pf2 f atf n (of_eq_false (eq_false hcond))
 
 
-/-
-  `subseq_prop3` compares the subsequence with the original chain pointwise.
+/-- `subseq_prop3` compares the subsequence with the original chain pointwise.
 
   It proves `subseq f atf k ≤ f k` for all `k`, i.e. the normalised chain does not sit above the
   original chain at the same index.
@@ -516,8 +503,7 @@ lemma subseq_prop3 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
     exact hjtilde.2 ▸ (hfat <| le_of_lt <| lt_of_le_of_ne hjtilde.1 <| Ne.symm hjt)
 
 open Classical in
-/-
-  `subseq_prop5` is the strict-decrease property for the normalised subsequence.
+/-- `subseq_prop5` is the strict-decrease property for the normalised subsequence.
 
   Up to the index where `subseq f atf` first hits `⊥`, consecutive values are strictly decreasing.
   This is the key fact used later to turn antitonicity into a `StrictAnti` chain.
@@ -558,8 +544,7 @@ lemma subseq_prop5 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
   exact fun j hij hle ↦ this j hij hle
 
 open Classical in
-/-
-  `subseq_prop4` is a technical combinatorial lemma about the index where `subseq f atf` hits `⊥`.
+/-- `subseq_prop4` is a technical combinatorial lemma about the index where `subseq f atf` hits `⊥`.
 
   It shows that this index cannot coincide with a specified `k` under a mild “plateau” hypothesis
   (`∃ N, N+1 ≤ k ∧ f N = f (N+1)`). The proof uses a finite-cardinality argument on the image set
@@ -607,8 +592,7 @@ lemma subseq_prop4 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
   exact ne_of_lt <| Nat.succ_lt_succ_iff.mp <| lt_of_le_of_lt ineq1 ineq2
 
 open Classical in
-/-
-  `subseq_prop6` transports a stepwise predicate from the original chain to the subsequence.
+/-- `subseq_prop6` transports a stepwise predicate from the original chain to the subsequence.
 
   Given a predicate `P` on strict steps of `f` (assumed for each `i < Nat.find atf`), the lemma
   produces the corresponding fact for each strict step of `subseq f atf` before it reaches `⊥`.
@@ -669,8 +653,7 @@ lemma subseq_prop6 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
   simpa only [← heq] using ho (jtilde -1) (byContradiction fun this' ↦
     not_le_of_gt (lt_of_le_of_lt bot_le yah) (Nat.find_spec atf ▸ hfat (le_of_not_gt this'))) this
 
-/-
-  `μA_eq_μmin` is a small bridge lemma between two “minimal slope” constructions.
+/-- `μA_eq_μmin` is a small bridge lemma between two “minimal slope” constructions.
 
   It rewrites `μmin μ I` as the value `μA μ I` by applying Proposition 4.1 to the restricted slope
   `Resμ I μ`.
@@ -688,8 +671,7 @@ lemma μA_eq_μmin {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
     rfl
 
 open Classical in
-/-
-  `μ_bot_JH_eq_μ_tot` is an invariance statement along a Jordan–Hölder filtration.
+/-- `μ_bot_JH_eq_μ_tot` is an invariance statement along a Jordan–Hölder filtration.
 
   For every index `i` before the terminal length, the payoff `μ (⊥, JH.filtration i)` equals the
   total payoff `μ (⊥, ⊤)`. The proof is by induction on `i` using the first step condition.
@@ -741,8 +723,7 @@ lemma μ_bot_JH_eq_μ_tot {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedO
     rw [← (this.2.2.1 hi').2,JH.step_cond₁ i <| Nat.lt_of_succ_lt hi]
 
 open Classical in
-/-
-  `semistable_of_step_cond₂` turns a strict step condition into semistability on each step.
+/-- `semistable_of_step_cond₂` turns a strict step condition into semistability on each step.
 
   Assuming that for every intermediate `z` strictly between consecutive values
   `filtration (i+1) < z < filtration i` the slope strictly improves, the restricted slope
@@ -808,8 +789,7 @@ lemma semistable_of_step_cond₂
     apply le_of_lt this
 
 open Classical in
-/-
-  `stable_of_step_cond₂` upgrades the previous lemma from semistability to stability.
+/-- `stable_of_step_cond₂` upgrades the previous lemma from semistability to stability.
 
   Under the same strict step condition, each restricted slope on a step interval is not only
   semistable but satisfies the strict inequality required for `Stable`.
@@ -883,8 +863,7 @@ lemma stable_of_step_cond₂
           )) <| lt_iff_le_not_ge.mpr (lt_top_iff_ne_top.2 hx')
 
 open Classical in
-/-
-  `step_cond₂_of_stable` is the converse direction: stability implies the strict step condition.
+/-- `step_cond₂_of_stable` is the converse direction: stability implies the strict step condition.
 
   If each restricted slope on the step intervals is stable, then for every strict intermediate
   `z` one has the strict inequality comparing `μ (filtration (i+1), z)` with the step value.
@@ -1020,8 +999,7 @@ lemma step_cond₂_of_stable {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [Bound
   exact (not_le_of_gt this) res
 
 open Classical in
-/-
-  `semistable_resμ_of_jordanHolderFiltration` deduces semistability for the final restriction.
+/-- `semistable_resμ_of_jordanHolderFiltration` deduces semistability for the final restriction.
 
   If the last nontrivial step of a Jordan–Hölder filtration lies strictly below `⊤`, then the
   restricted slope on the interval `(JH.filtration (len-1), ⊤)` is semistable.
@@ -1063,8 +1041,7 @@ Semistable (Resμ ⟨(JH.filtration (Nat.find JH.fin_len - 1),⊤),h⟩ μ) := b
       exact (Nat.find_min JH.fin_len <| Nat.sub_one_lt <| JH_pos_len JH) hc
       ,h⟩).2.2.1 this).2] at this'
 
-/-
-  Intervals in a modular lattice inherit modularity.
+/-- Intervals in a modular lattice inherit modularity.
 
   This instance transports `IsModularLattice` from `ℒ` to the interval type `Interval I`.
 -/
@@ -1076,7 +1053,7 @@ instance {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [iml : 
     exact hxz
 
 open Classical in
-/-
+/--
   `induction_on_length_of_JordanHolderFiltration` is the main internal induction principle.
 
   Fix `n`. Assuming there exists a Jordan–Hölder filtration of length `≤ n`, the lemma shows that

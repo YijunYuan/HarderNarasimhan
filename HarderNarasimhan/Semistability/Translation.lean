@@ -22,7 +22,7 @@ they form part of the public API and are frequently used to move between:
 
 namespace HarderNarasimhan
 
-/-
+/--
 Global semistability is equivalent to semistability on the total interval `TotIntvl`.
 This is mostly a normalization lemma: many internal arguments are phrased using the
 interval-indexed predicates, while user-facing statements prefer `Semistable μ`.
@@ -37,7 +37,7 @@ theorem semistable_iff {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrde
 ------------
 := impl.semistable_iff μ
 
-/-
+/--
 Semistability on an interval is equivalent to global semistability of the restriction.
 This is the key transport lemma: it lets one turn an interval-local hypothesis into a
 global `Semistable` hypothesis on `Resμ I μ`, and conversely.

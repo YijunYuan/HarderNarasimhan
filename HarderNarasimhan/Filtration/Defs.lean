@@ -33,7 +33,7 @@ API overview:
 
 namespace HarderNarasimhan
 
-/-
+/--
 Admissibility hypothesis for building Harder–Narasimhan filtrations.
 If your codomain `S` is a complete linear order, you typically get `μ_Admissible μ` for free.
 
@@ -52,7 +52,7 @@ class μ_Admissible {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) where
   μ_adm : (Std.Total (· ≤ · : S → S → Prop)) ∨ ∀ I : {p : ℒ × ℒ // p.1 < p.2},  IsAttained μ I
 
-/-
+/--
 In a complete linear order, admissibility is automatic.
 
 This instance uses the fact that linearity implies totality of `≤`.
@@ -63,8 +63,8 @@ instance {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFo
 μ_Admissible μ where
   μ_adm := Or.inl Std.instTotalLeOfIsLinearPreorder
 
-
-/-
+open Classical in
+/--
 A Harder–Narasimhan filtration as a finite increasing chain.
 For the canonical inhabitant and uniqueness theorems, prefer importing
 `HarderNarasimhan.Filtration.Results`.
@@ -83,7 +83,6 @@ The filtration is expressed using restrictions `Resμ` to successive intervals.
 
 API note: this structure is the central user-facing object of the filtration layer.
 -/
-open Classical in
 @[ext]
 structure HarderNarasimhanFiltration
 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
@@ -101,13 +100,12 @@ structure HarderNarasimhanFiltration
     μA μ ⟨(filtration (i+1), filtration (i+2)), strict_mono (i+1) (i+2) (Nat.lt_add_one (i + 1)) hi⟩
 
 
-  /-
-  The relation “there is a semistable interval from `x` to `y`”.
+/-- The relation “there is a semistable interval from `x` to `y`”.
   This is a `SetRel ℒ ℒ` so that a filtration can be interpreted as a `RelSeries` whose
   successor steps certify semistability of each interval.
 
   API note: this relation is intended for consumers who prefer `RelSeries` packaging.
-  -/
+-/
 def IntervalSemistableRel {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)

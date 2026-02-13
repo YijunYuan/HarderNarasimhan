@@ -27,7 +27,7 @@ API overview:
 
 namespace Lex'Order
 
-/-
+/--
 Lexicographic `≤` on finsets: first by `card`, then by lexicographic comparison of sorted lists.
 
 API note: declared as a scoped instance so users can opt in locally.
@@ -35,7 +35,7 @@ API note: declared as a scoped instance so users can opt in locally.
 scoped instance (priority := 114514) LexLE {α : Type*} [LinearOrder α] : LE (Finset α) where
   le A B := (A.card < B.card) ∨ (A.card = B.card) ∧ (A.sort (LE.le) ≤ B.sort (LE.le))
 
-/-
+/--
 Strict order induced from `≤` by adding inequality.
 
 This makes `<` definitionally `A ≤ B ∧ A ≠ B`.
@@ -43,7 +43,7 @@ This makes `<` definitionally `A ≤ B ∧ A ≠ B`.
 scoped instance (priority := 114514) LexLT {α : Type*} [LinearOrder α] : LT (Finset α) where
   lt A B := A ≤ B ∧ A ≠ B
 
-/-
+/--
 Decidability of the lexicographic `≤` relation.
 
 This follows from decidability of comparisons on naturals and on sorted lists.
@@ -51,13 +51,13 @@ This follows from decidability of comparisons on naturals and on sorted lists.
 scoped instance (priority := 114513) {α : Type*} [LinearOrder α] (A B : Finset α) :
 Decidable (A ≤ B) := id (id instDecidableOr)
 
-/-
+/--
 Propositional helper used to reorganize disjunctions in the transitivity proof.
 -/
 private lemma helper {P Q : Prop} : P ∨ Q ↔ P ∨ ((¬ P) ∧ Q) := by
   tauto
 
-/-
+/--
 Injectivity of `Finset.sort` under totality/antisymmetry/transitivity.
 
 This lemma lets us recover finset equality from equality of sorted lists.
@@ -82,7 +82,7 @@ private lemma le_antisymm {α : Type*} [LinearOrder α] :
     · linarith
     · exact inj_sort _ <| eq_of_le_of_ge h1.2 h2.2
 
-/-
+/--
 From `A ≤ B` we can derive the cardinal inequality `A.card ≤ B.card`.
 
 This is used to relate the “cardinality” and “sorted list” parts of the order.
@@ -95,7 +95,7 @@ private lemma le_card {α : Type*} [LinearOrder α] (A B : Finset α) : A ≤ B 
   · linarith
   · exact (lt_self_iff_false B.card).mp <| (le_antisymm A B h' <| id (id (id (Or.inl this)))) ▸ this
 
-/-
+/--
 The resulting `LinearOrder` on `Finset α`.
 
 This bundles the scoped `≤` into a `LinearOrder` structure, proving reflexivity, transitivity,
@@ -176,8 +176,7 @@ private def Lex'LinearOrder {α : Type*} [LinearOrder α] : LinearOrder (Finset 
       simp only [not_lt] at h1
       exact h2.1.symm
 
-    /-
-    Existence theorem packaging the lexicographic construction.
+/-- Existence theorem packaging the lexicographic construction.
 
     It produces a `LinearOrder (Finset α)` with two convenient properties:
     1. Subset-monotonicity: `A ⊆ B` implies `A ≤ B`.
@@ -185,7 +184,7 @@ private def Lex'LinearOrder {α : Type*} [LinearOrder α] : LinearOrder (Finset 
 
     API note: returning the order via `∃ lo` allows users to avoid a global instance and keep the
       order local.
-    -/
+-/
 theorem Lex'Order_prop (α : Type*) [lo : LinearOrder α] : ∃ lo : LinearOrder (Finset α),
 (∀ A B : Finset α, A ⊆ B → lo.le A B) ∧
 (∀ a b : α, a ≤ b ↔ lo.le {a} {b}) := by

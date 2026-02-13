@@ -31,7 +31,7 @@ API overview:
 
 namespace HarderNarasimhan
 
-/-
+/--
 Finite total payoff.
 This is the hypothesis that the payoff on the total interval `(⊥, ⊤)` is not `⊤`. It is used to
 avoid degenerate situations in the Jordan–Hölder construction where all steps immediately collapse.
@@ -44,7 +44,7 @@ class FiniteTotalPayoff {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrd
   fin_tot_payoff : μ ⟨(⊥,⊤),bot_lt_top⟩ ≠ ⊤
 
 
-/-
+/--
 A strengthened descending chain condition used for Jordan–Hölder filtrations.
 
 Given a strictly decreasing sequence `x`, the condition produces an index `N` such that the
@@ -57,8 +57,7 @@ class StrongDescendingChainCondition' {ℒ : Type*} [Nontrivial ℒ] [Lattice �
   wdcc' : ∀ x : ℕ → ℒ, (sax : StrictAnti x) → ∃ N : ℕ, μ ⟨(x (N +1), x N), sax <| lt_add_one N⟩ = ⊤
 
 open Classical in
-@[ext]
-/-
+/--
 `JordanHolderFiltration μ` is a finite strictly decreasing chain in `ℒ` with stable steps.
 Fields:
 - `filtration` is the chain `ℕ → ℒ`.
@@ -71,6 +70,7 @@ Fields:
 
 API note: this structure is the central object of the Jordan–Hölder layer.
 -/
+@[ext]
 structure JordanHolderFiltration {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : {p : ℒ × ℒ // p.1 < p.2} → S)
@@ -87,7 +87,7 @@ where
     μ ⟨(filtration (i+1), z), h'⟩ <
     μ ⟨(filtration (i+1), filtration i), strict_anti i (i+1) (lt_add_one i) hi⟩
 
-/-
+/--
 The step relation associated to `μ` for Jordan–Hölder filtrations.
 We declare `(x, y)` to be related if `y < x`, the payoff `μ (y, x)` equals the total payoff
 `μ (⊥, ⊤)`, and any strict intermediate `z` yields a strictly smaller payoff.
@@ -105,7 +105,7 @@ def JordanHolderRel {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
     μ ⟨(y, z), h'⟩ < μ ⟨(y , x), h⟩
 }
 
-/-
+/--
 `StrongDescendingChainCondition'` implies the weaker `StrongDescendingChainCondition`.
 
 The primed version produces an index where the payoff equals `⊤`; this is stronger than the
@@ -122,7 +122,7 @@ StrongDescendingChainCondition μ where
     exact hN ▸ le_top
 
 
-/-
+/--
 `StrongDescendingChainCondition'` is stable under restriction of the slope to an interval.
 -/
 instance {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
@@ -132,7 +132,7 @@ instance {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   wdcc' := fun f saf ↦ h.wdcc' (fun n ↦ (f n).val) fun ⦃_ _⦄ hn ↦ lt_iff_le_not_ge.mpr (saf hn)
 
 
-/-
+/--
 Affine property for a slope.
 
 This axiom relates the payoffs of two canonical intervals built from `a` and `b`, expressing a
@@ -144,7 +144,7 @@ class Affine {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   affine : ∀ a b : ℒ, (h : ¬ a ≤ b) →
     μ ⟨(a ⊓ b, a), inf_lt_left.2 h⟩ = μ ⟨(b, a ⊔ b), right_lt_sup.2 h⟩
 
-/-
+/--
 Restriction preserves the affine property.
 
 If `μ` is affine, then its restriction `Resμ I μ` to any interval `I` is affine as well.
@@ -155,7 +155,7 @@ instance {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 Affine (Resμ I μ) where
   affine := fun a b h ↦ haff.affine a b h
 
-/-
+/--
 An affine slope is convex.
 
 This instance packages the standard implication by reducing to the internal convexity predicate
@@ -169,7 +169,7 @@ instance {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   intro x y hx hy hxy
   rw [haff.affine x y hxy]
 
-/-
+/--
 Restriction preserves finite total payoff under semistability and slope-likeness.
 
 This is used to apply Jordan–Hölder and Harder–Narasimhan results to initial segments of a

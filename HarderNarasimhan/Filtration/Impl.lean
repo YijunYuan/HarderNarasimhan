@@ -39,7 +39,8 @@ namespace HarderNarasimhan
 
 namespace impl
 
-/-
+open Classical in
+/--
 The canonical Harder–Narasimhan filtration sequence.
 
 * Base case: `HNFil μ 0 = ⊥`.
@@ -49,7 +50,6 @@ The canonical Harder–Narasimhan filtration sequence.
 The definition is noncomputable because it uses choice (`Classical.choose`) to pick
 greatest elements.
 -/
-open Classical in
 noncomputable def HNFil {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) [hμ : μA_DescendingChainCondition μ] [hμcvx : ConvexI TotIntvl μ]
@@ -68,15 +68,14 @@ noncomputable def HNFil {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrd
        Or.inr fun z hzI hz ↦ h ⟨(I'.val.1 , z) ,  lt_of_le_of_ne hzI.left hz⟩)).choose
 
 
-    /-
-    Specification lemma for the defining choice in `HNFil`.
+/-- Specification lemma for the defining choice in `HNFil`.
 
     If `HNFil μ n` is not yet `⊤`, then `HNFil μ (n+1)` is a greatest element of the
     stable set on the tail interval `(HNFil μ n, ⊤)`.
 
     This lemma is used to derive strict monotonicity and the semistability/slope
     properties of the successive steps.
-    -/
+-/
 lemma HNFil_prop_of_def {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) [hμ : μA_DescendingChainCondition μ] [hμcvx : ConvexI TotIntvl μ]
@@ -94,7 +93,7 @@ IsGreatest (StI μ ⟨(HNFil μ n , ⊤), lt_top_iff_ne_top.2 h'⟩) (HNFil μ (
   exact this.choose_spec
 
 
-/-
+/--
 One-step strict growth of `HNFil` before termination.
 
 As long as `HNFil μ n ≠ ⊤`, the next term is strictly larger. This is obtained from
@@ -108,7 +107,7 @@ lemma HNFil_is_strict_mono {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [Bounded
     n hn ↦ lt_of_le_of_ne (HNFil_prop_of_def μ n hn).1.1.1 (HNFil_prop_of_def μ n hn).1.2.1
 
 
-/-
+/--
 `HNFil` reaches `⊤` in finite time.
 
 If it never reached `⊤`, the strict monotonicity lemma would produce an infinite
@@ -123,23 +122,22 @@ lemma HNFil_of_fin_len {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrde
   exact (wellFounded_iff_isEmpty_descending_chain.1 inst_3.wf).elim
     ⟨fun n => HNFil μ n, fun n => HNFil_is_strict_mono μ n (this n)⟩
 
-  /-
-  The length of the canonical filtration.
+open Classical in
+/-- The length of the canonical filtration.
 
   Defined as the minimal `N` such that `HNFil μ N = ⊤`.
-  -/
-open Classical in
+-/
 noncomputable def HNlen {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) [hμ : μA_DescendingChainCondition μ] [hμcvx : ConvexI TotIntvl μ]
 [h : μ_Admissible μ] : Nat := Nat.find (HNFil_of_fin_len μ)
 
-  /-
+open Classical in
+  /--
   Characterization of “not yet terminated” via `HNlen`.
 
   This is the expected property of `Nat.find`: `HNFil μ n ≠ ⊤` iff `n < HNlen μ`.
   -/
-open Classical in
 lemma HNFil_ne_top_iff_lt_len {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 [WellFoundedGT ℒ] {S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) [hμ : μA_DescendingChainCondition μ] [hμcvx : ConvexI TotIntvl μ]
@@ -158,7 +156,7 @@ lemma HNFil_ne_top_iff_lt_len {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [Boun
   · exact fun hn ↦ Nat.find_min (HNFil_of_fin_len μ) hn
 
 
-/-
+/--
 Strict monotonicity of `HNFil` on the active range.
 
 If `i < j ≤ HNlen μ`, then `HNFil μ i < HNFil μ j`.
@@ -179,14 +177,14 @@ lemma HNFil_is_strict_mono' {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [Bounde
         ((HNFil_ne_top_iff_lt_len μ k).2 (Nat.add_one_le_iff.1 hk'')))
   exact fun j hj hij ↦ h' j (Nat.add_one_le_iff.2 hj) hij
 
-/-
+open Classical in
+/--
 Each successive interval of `HNFil` is semistable.
 
 This is exactly the `piecewise_semistable` axiom of a Harder–Narasimhan filtration,
 proved using the semistability statement for stable breakpoints (`prop3d7₁`) and the
 translation lemma `semistableI_iff`.
 -/
-open Classical in
 lemma HNFil_piecewise_semistable {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 [WellFoundedGT ℒ] {S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
@@ -200,7 +198,8 @@ lemma HNFil_piecewise_semistable {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [B
     Nat.find_min (HNFil_of_fin_len μ) hi⟩ (HNFil μ (i + 1))
     (HNFil_prop_of_def μ i (Nat.find_min (HNFil_of_fin_len μ) hi)).1
 
-/-
+open Classical in
+/--
 Strict decrease condition on consecutive `μA`-slopes for `HNFil`.
 
 This is the analogue of “HN slopes are strictly decreasing”, phrased as the
@@ -208,7 +207,6 @@ non-comparability statement `¬ μA(i,i+1) ≤ μA(i+1,i+2)`.
 
 The proof is an application of the internal obstruction lemma `prop3d7₂`.
 -/
-open Classical in
 lemma HNFil_μA_pseudo_strict_anti {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 [WellFoundedGT ℒ] {S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
@@ -228,7 +226,7 @@ lemma HNFil_μA_pseudo_strict_anti {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] 
     lt_trans (lt_add_one i) hj) <| HNFil_is_strict_mono μ (i + 1) <|
     Nat.find_min (HNFil_of_fin_len μ) <| hj,le_top⟩
 
-/-
+/--
 Convenience: admissibility is automatic for complete linear orders.
 
 This duplicates the instance from `Filtration.Defs` inside the implementation file so
@@ -239,7 +237,8 @@ instance {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFo
 {μ : {p :ℒ × ℒ // p.1 < p.2} → S} : μ_Admissible μ :=
 {μ_adm := Or.inl Std.instTotalLeOfIsLinearPreorder}
 
-/-
+open Classical in
+/--
 Uniqueness of the canonical Harder–Narasimhan filtration (`theorem3d10`).
 
 Given any function `f : ℕ → ℒ` that:
@@ -254,7 +253,6 @@ then `f` agrees pointwise with the canonical construction `HNFil μ`.
 This is a key correctness statement: the filtration produced by the construction is
 the unique one satisfying the expected axioms.
 -/
-open Classical in
 theorem theorem3d10 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLinearOrder S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : μA_DescendingChainCondition μ) (hμcvx : ConvexI TotIntvl μ)
@@ -362,7 +360,7 @@ theorem theorem3d10 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
 section Fil_to_RelSeries
 open Fin.NatCast
 
-/-
+/--
 Helper lemma: consecutive elements in a `RelSeries` are strictly increasing.
 
 This extracts the `<` witness from the step relation, rewriting indices so it can be
@@ -381,7 +379,7 @@ lemma balabala1 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   · exact Fin.val_cast_of_lt <| lt_trans (Nat.lt_add_one _) <| lt_trans hi <| Nat.lt_add_one _
   · exact Fin.val_cast_of_lt <| lt_trans hi <| Nat.lt_add_one _
 
-/-
+/--
 Helper lemma: the “next” consecutive inequality, shifted by one.
 
 Together with `balabala1`, this is used to express the slope comparison condition in
@@ -401,7 +399,8 @@ lemma balabala2 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   · simp only [Fin.val_natCast, Nat.mod_succ_eq_iff_lt, Nat.succ_eq_add_one]
     exact Nat.succ_lt_succ hi
 
-/-
+open Classical in
+/--
 Construct a `HarderNarasimhanFiltration` from a `RelSeries`.
 
 Assuming `F1` starts at `⊥`, ends at `⊤`, and satisfies the strict slope decrease
@@ -412,7 +411,6 @@ to `F1.length`.
 This is a bridge lemma used when switching between the “series” and “filtration”
 presentations.
 -/
-open Classical in
 lemma hHFil_of_hNSeries {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLinearOrder S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)

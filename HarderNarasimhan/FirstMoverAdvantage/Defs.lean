@@ -27,7 +27,7 @@ API overview:
 
 namespace HarderNarasimhan
 
-/-
+/--
 Weak ascending chain condition.
 Given a strictly increasing sequence `x : ℕ → ℒ`, this asserts existence of an index `N` where the
 payoff of the step `(x N, x (N+1))` is bounded above by the payoff of the interval `(x N, ⊤)`.
@@ -42,7 +42,7 @@ class WeakAscendingChainCondition {ℒ : Type*} [Nontrivial ℒ] [PartialOrder �
     ∃ N : ℕ, μ ⟨(x N, x (N+1)), smf <| Nat.lt_add_one N⟩ ≤
       μ ⟨(x N,⊤), lt_of_lt_of_le (smf <| Nat.lt_add_one N) le_top⟩
 
-/-
+/--
 In a well-founded partial order, strictly increasing sequences do not exist.
 
 Consequently, `WeakAscendingChainCondition μ` holds trivially.
@@ -52,7 +52,7 @@ instance {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ] [W
 {wacc := (fun f smf ↦ False.elim (not_strictMono_of_wellFoundedGT f smf))}
 
 
-/-
+/--
 Strong descending chain condition.
 Given a strictly decreasing sequence `x : ℕ → ℒ`, this asserts existence of an index `N` where the
 payoff of the "initial" interval `(⊥, x N)` is bounded above by the payoff of the step
@@ -70,7 +70,7 @@ class StrongDescendingChainCondition {ℒ : Type*} [Nontrivial ℒ] [PartialOrde
       μ ⟨(x (N+1), x N), saf <| Nat.lt_add_one N⟩
 
 
-/-
+/--
 First weak slope-like axiom.
 This is the disjunctive inequality obtained from `SlopeLike` by specializing to the top element.
 It is used in the proof of Proposition 4.1 (first-mover advantage for player A).
@@ -85,7 +85,7 @@ class WeakSlopeLike₁ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [Bounde
     μ ⟨(z.val.2,⊤),hz⟩ ≤ μ ⟨(z.val.1,⊤),lt_trans z.prop hz⟩
 
 
-/-
+/--
 Second weak slope-like axiom.
 This is the disjunctive inequality obtained from `SlopeLike` by specializing to the bottom
 element. It is used in the proof of Proposition 4.3 (first-mover advantage for player B).
@@ -99,7 +99,7 @@ class WeakSlopeLike₂ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [Bounde
     μ ⟨(⊥,z.val.2),lt_trans hz z.prop⟩ ≤ μ z ∨
     μ ⟨(⊥,z.val.2),lt_trans hz z.prop⟩ ≤ μ ⟨(⊥,z.val.1),hz⟩
 
-/-
+/--
 `SlopeLike` implies `WeakSlopeLike₁` when the codomain is linearly ordered.
 
 This instance extracts the relevant disjunction by applying the `SlopeLike` axiom with `c = ⊤`.
@@ -113,7 +113,7 @@ WeakSlopeLike₁ μ := by
   · exact Or.inl this
   · exact Or.inr <| le_of_lt this
 
-/-
+/--
 `SlopeLike` implies `WeakSlopeLike₂` when the codomain is linearly ordered.
 
 This instance extracts the relevant disjunction by applying the `SlopeLike` axiom with `a = ⊥`.

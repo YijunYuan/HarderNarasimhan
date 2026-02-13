@@ -23,7 +23,7 @@ API overview:
 
 namespace HarderNarasimhan
 
-/-
+/--
 `NashEquilibrium μ` asserts equality of the two game values `μAstar μ` and `μBstar μ`.
 Intuitively, this means the minimax and maximin values coincide, so the Harder–Narasimhan
 game associated to `μ` has a value.

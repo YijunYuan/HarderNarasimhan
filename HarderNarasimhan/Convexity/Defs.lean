@@ -25,7 +25,7 @@ Design note: convexity is expressed as a typeclass `Prop` so that it can be pass
 
 namespace HarderNarasimhan
 
-/-
+/--
 Global convexity condition for `μ` on a lattice `ℒ`.
 
 Given `x,y` with `¬ x ≤ y` (so `x` is not below `y`), the inequality compares two intervals:
@@ -41,7 +41,7 @@ class Convex {ℒ : Type*} [Lattice ℒ]
   convex : ∀ x y : ℒ, (h : ¬ x ≤ y) →
     μ ⟨(x ⊓ y, x), inf_lt_left.2 h⟩ ≤ μ ⟨(y, x ⊔ y), right_lt_sup.2 h⟩
 
-/-
+/--
 Interval-localized convexity condition.
 
 This is the same inequality as `Convex`, but only required for `x,y` that lie in a fixed interval
@@ -54,7 +54,7 @@ class ConvexI {ℒ : Type*} [Lattice ℒ]
   convex : ∀ x y : ℒ, InIntvl I x → InIntvl I y → (h : ¬ x ≤ y) →
     μ ⟨(x ⊓ y, x), inf_lt_left.2 h⟩ ≤ μ ⟨(y, x ⊔ y), right_lt_sup.2 h⟩
 
-/-
+/--
 Monotonicity of interval-local convexity under shrinking the interval.
 
 If `I₂` is contained in `I₁` (written as endpoint inequalities `I₁.left ≤ I₂.left` and

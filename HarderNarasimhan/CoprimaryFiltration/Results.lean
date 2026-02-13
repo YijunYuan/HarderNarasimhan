@@ -21,7 +21,7 @@ API overview:
 
 namespace HarderNarasimhan
 
-/-
+/--
 Nonemptiness of the associated-primes finset for any strict interval.
 
 This is used to define `Finset.min'` (and hence `μA`) for the slope built from
@@ -34,7 +34,7 @@ lemma μ_nonempty {R : Type*} [CommRing R] [IsNoetherianRing R]
 ------------
 := impl.μ_nonempty
 
-/-
+/--
 `μmax` does not change the slope `μ`.
 
 The definition of `μ` already produces the maximal element in the relevant
@@ -48,7 +48,7 @@ lemma μmax_eq_μ {R : Type*} [CommRing R] [IsNoetherianRing R]
 ------------
 := impl.μmax_eq_μ
 
-/-
+/--
 Proposition 3.11: convexity of the slope `μ R M`.
 
 Internally we build a `ConvexI TotIntvl` instance and then translate it to the
@@ -64,7 +64,7 @@ Convex (μ R M)
   infer_instance
 
 
-/-
+/--
 Proposition 3.12: explicit computation of `μA` for `μ R M`.
 
 The `μA` value on an interval is the singleton containing the minimal associated
@@ -78,7 +78,7 @@ lemma proposition_3_12 {R : Type*} [CommRing R] [IsNoetherianRing R]
 ------------
 := impl.prop3d12
 
-/-
+/--
 Proposition 3.13: well-foundedness and descending chain condition.
 
 These two hypotheses are exactly what the general filtration existence theorem
@@ -92,7 +92,7 @@ WellFoundedGT (ℒ R M) ∧
 ------------
 := ⟨inferInstance,inferInstance⟩
 
-/-
+/--
 Remark 3.14: a `TFAE` package of equivalent statements.
 It lets you replace semistability of `μ R M` with the uniqueness-of-associated-prime condition.
 
@@ -121,7 +121,7 @@ Semistable (μ R M),
   tfae_have 1 ↔ 3 := impl.rmk4d14₂
   tfae_finish
 
-/-
+/--
 Theorem 3.15 (existence): there exists a coprimary filtration.
 
 API note: this is the canonical existence statement for the coprimary chapter.
@@ -133,7 +133,7 @@ Nonempty (CoprimaryFiltration R M)
 ------------
 := inferInstance
 
-/-
+/--
 Theorem 3.15 (uniqueness): the coprimary filtration is unique.
 This is derived from the uniqueness of the underlying Harder–Narasimhan filtration
 when the codomain order is linear.

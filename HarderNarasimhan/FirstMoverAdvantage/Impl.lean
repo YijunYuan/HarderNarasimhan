@@ -27,14 +27,12 @@ namespace HarderNarasimhan
 
 namespace impl
 
-/-
-  `prop4d1₁_seq` is the auxiliary sequence used in the contradiction argument for
+/-- `prop4d1₁_seq` is the auxiliary sequence used in the contradiction argument for
   Proposition 4.1.
 
   Starting from a nonempty set of “bad” candidates `YA`, it recursively constructs
   a new candidate by applying the witness condition at the previous step.
 -/
-
 noncomputable def prop4d1₁_seq {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
@@ -69,8 +67,7 @@ noncomputable def prop4d1₁_seq {ℒ : Type*} [Nontrivial ℒ] [PartialOrder �
 
 
 
-/-
-  `prop4d1_helper` rewrites the “top-anchored” sInf that appears naturally in the
+/-- `prop4d1_helper` rewrites the “top-anchored” sInf that appears naturally in the
   proof of Proposition 4.1 as `μmin μ TotIntvl`.
 -/
 lemma prop4d1_helper {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
@@ -86,8 +83,7 @@ sInf {x | ∃ x_1, ∃ (hx : x_1 < ⊤), μ ⟨(x_1, ⊤), hx⟩ = x} = μmin μ
 
 
 
-/-
-  `prop4d1₁` is the core statement behind Proposition 4.1: under the two hypotheses
+/-- `prop4d1₁` is the core statement behind Proposition 4.1: under the two hypotheses
   `h₁` (a weak “eventual improvement” along strict chains) and `h₂` (a weak slope-like
   alternative towards the top), the best-response value `μAstar μ` coincides with the
   global infimum `μmin μ TotIntvl`.
@@ -141,8 +137,7 @@ lemma prop4d1₁ (ℒ : Type*) [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder
 
 
 
-/-
-  `prop4d1₂` is the easy inequality direction derived from `prop4d1₁`:
+/-- `prop4d1₂` is the easy inequality direction derived from `prop4d1₁`:
   once `μAstar μ = μmin μ TotIntvl`, we get `μAstar μ ≤ μBstar μ` by exhibiting a
   single witness in the defining `sSup` for `μBstar`.
 -/
@@ -161,8 +156,7 @@ lemma prop4d1₂ (ℒ : Type*) [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder
 
 
 
-/-
-  Coercion sending an interval in `ℒ` to the corresponding interval in the order dual.
+/-- Coercion sending an interval in `ℒ` to the corresponding interval in the order dual.
   This swaps the endpoints.
 -/
 instance {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ] :
@@ -170,8 +164,7 @@ Coe ({p :ℒ × ℒ // p.1 < p.2}) ({p :ℒᵒᵈ × ℒᵒᵈ // p.1 < p.2}) wh
   coe p := ⟨(p.val.2, p.val.1), p.prop⟩
 
 
-/-
-  Coercion sending an interval in `ℒᵒᵈ` back to an interval in `ℒ`.
+/-- Coercion sending an interval in `ℒᵒᵈ` back to an interval in `ℒ`.
   This is the same endpoint swap, viewed in the opposite direction.
 -/
 instance {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ] :
@@ -179,8 +172,7 @@ Coe ({p :ℒᵒᵈ × ℒᵒᵈ // p.1 < p.2}) ({p :ℒ × ℒ // p.1 < p.2}) wh
   coe p := ⟨(p.val.2, p.val.1), p.prop⟩
 
 
-/-
-  Coercion transporting a function `μ` on intervals of `ℒ` to a function on intervals
+/-- Coercion transporting a function `μ` on intervals of `ℒ` to a function on intervals
   of `ℒᵒᵈ`, with values in the order dual `Sᵒᵈ`.
 
   This is a notational convenience for duality arguments.
@@ -191,8 +183,7 @@ Coe ({p :ℒ × ℒ // p.1 < p.2} → S) ({p :ℒᵒᵈ × ℒᵒᵈ // p.1 < p.
   coe f := fun p ↦ f p
 
 
-/-
-  `fine` is a small definitional lemma ensuring that the coercion-defined dual map
+/-- `fine` is a small definitional lemma ensuring that the coercion-defined dual map
   agrees with explicit endpoint swapping.
 -/
 private lemma fine {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
@@ -201,8 +192,7 @@ private lemma fine {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrd
   OrderDual.ofDual ((↑μ : {p :ℒᵒᵈ × ℒᵒᵈ // p.1 < p.2} → Sᵒᵈ) I) := fun _ ↦ rfl
 
 
-/-
-  `h₁_dual_of_h₁` transports the “descending-chain” hypothesis `h₁` on `ℒ` to the
+/-- `h₁_dual_of_h₁` transports the “descending-chain” hypothesis `h₁` on `ℒ` to the
   corresponding “ascending-chain” hypothesis on the order dual `ℒᵒᵈ`.
 -/
 lemma h₁_dual_of_h₁ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
@@ -223,8 +213,7 @@ lemma h₁_dual_of_h₁ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [Bound
 
 
 
-/-
-  `h₂_dual_of_h₂` transports the “bottom-anchored” weak alternative `h₂` to the
+/-- `h₂_dual_of_h₂` transports the “bottom-anchored” weak alternative `h₂` to the
   corresponding “top-anchored” alternative on `ℒᵒᵈ`.
 -/
 lemma h₂_dual_of_h₂ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
@@ -243,8 +232,7 @@ lemma h₂_dual_of_h₂ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [Bound
 
 
 
-/-
-  `dualμAstar_eq_μBstar` identifies `μAstar` computed for the dualised `μ` with
+/-- `dualμAstar_eq_μBstar` identifies `μAstar` computed for the dualised `μ` with
   `μBstar μ`.
 
   This is an explicit unfolding of definitions and a reindexing of the `sInf`/`sSup`
@@ -278,8 +266,7 @@ OrderDual.ofDual <| μAstar (fun (p : {p : ℒᵒᵈ × ℒᵒᵈ // p.1 < p.2})
 
 
 
-/-
-  `dualμBstar_eq_μAstar` is the dual companion to `dualμAstar_eq_μBstar`.
+/-- `dualμBstar_eq_μAstar` is the dual companion to `dualμAstar_eq_μBstar`.
 -/
 lemma dualμBstar_eq_μAstar {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
@@ -309,8 +296,7 @@ OrderDual.ofDual <| μBstar (fun (p : {p : ℒᵒᵈ × ℒᵒᵈ // p.1 < p.2})
 
 
 
-/-
-  `prop4d3_helper` rewrites the “bottom-anchored” sSup that appears naturally in the
+/-- `prop4d3_helper` rewrites the “bottom-anchored” sSup that appears naturally in the
   dual argument as `μmax μ TotIntvl`.
 -/
 lemma prop4d3_helper {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
@@ -326,8 +312,7 @@ sSup {μ ⟨(⊥, y),hy⟩ | (y : ℒ) (hy : ⊥ < y) } = μmax μ TotIntvl := b
 
 
 
-/-
-  `prop4d3₁` is the dual form of Proposition 4.1: under hypotheses `h₁` and `h₂`
+/-- `prop4d3₁` is the dual form of Proposition 4.1: under hypotheses `h₁` and `h₂`
   phrased for strict anti-chains and bottom-anchored alternatives, the best-response
   value `μBstar μ` coincides with the global supremum `μmax μ TotIntvl`.
 
@@ -359,8 +344,7 @@ lemma prop4d3₁ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder
 
 
 
-/-
-  `prop4d3₂` packages the inequality direction corresponding to `prop4d3₁`.
+/-- `prop4d3₂` packages the inequality direction corresponding to `prop4d3₁`.
   It is obtained by combining the two duality equalities with `prop4d1₂` on `ℒᵒᵈ`.
 -/
 lemma prop4d3₂ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
@@ -375,8 +359,7 @@ lemma prop4d3₂ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder
 
 
 
-/-
-  `rmk4d4` is a well-ordering / ranking-function criterion that produces the
+/-- `rmk4d4` is a well-ordering / ranking-function criterion that produces the
   strict-anti-chain hypothesis needed in `prop4d3₁`.
 
   Given a monotone rank function `r : ℒ → ℝ` whose range is well-ordered, any strict

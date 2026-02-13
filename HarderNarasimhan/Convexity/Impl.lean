@@ -31,7 +31,7 @@ API note: names here often mirror lemma/proposition numbers from the accompanyin
 intended to be stable user-facing identifiers.
 -/
 
-/-
+/--
 Convexity on the total interval is equivalent to global convexity.
 
 This lemma bridges the localized class `ConvexI TotIntvl μ` and the global class `Convex μ`.
@@ -50,7 +50,7 @@ Convex μ := by
     refine { convex := ?_ }
     exact fun x y a a h_4 ↦ Convex.convex x y h_4
 
-/-
+/--
 Interval-local convexity is equivalent to global convexity of the restricted measure `Resμ I μ`.
 
 Mathematically: convexity on an interval `I` for `μ` is the same as convexity on the total interval
@@ -75,7 +75,7 @@ lemma ConvexI_iff_Convex_Res {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [Bound
     intro x y hxI hyI hxy
     exact h.convex ⟨x,hxI⟩ ⟨y,hyI⟩ hxy
 
-/-
+/--
 Typeclass instance: a globally convex `μ` induces interval-local convexity on the total interval.
 
 This is a convenience instance so that `Convex μ` can be used wherever `ConvexI TotIntvl μ` is
@@ -87,7 +87,7 @@ ConvexI TotIntvl μ := by
   simp only [ConvexI_TotIntvl_iff_Convex]
   infer_instance
 
-/-
+/--
 Typeclass instance: interval-local convexity on the total interval implies global convexity.
 
 This is the reverse direction of the previous instance.
@@ -104,7 +104,7 @@ section
 variable {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 variable {S : Type*} [CompleteLattice S]
 
-/-
+/--
 Paper Lemma 2.4 (part 1) in interval form: a basic bound comparing `μA` to `μmax`.
 
 This lemma is used as the leftmost inequality in the main inequality chain of Lemma 2.4.
@@ -128,7 +128,7 @@ lemma lem2d4₁
   exact le_trans h1 h2
 
 
-/-
+/--
 Paper Lemma 2.4 (part 2) localized to an interval `I`.
 
 Assuming convexity of `μ` on `I`, this gives a bound between two `μmax` values obtained from a
@@ -169,7 +169,7 @@ lemma lem2d4₂I
     exact h w_1 ⟨lt_of_le_of_ne hf₁.1.1 hf₁.2, hf₁.1.2⟩
 
 
-/-
+/--
 Paper Lemma 2.4 (part 3) localized to an interval `I`.
 
 This combines `lem2d4₁` and `lem2d4₂I` to compare `μA` values on two different intervals determined
@@ -196,7 +196,7 @@ lemma lem2d4₃I
       h₁ (x ⊔ w) <| sup_le le_sup_left hy₁.1.2
 
 
-/-
+/--
 Bundled version of Lemma 2.4 on an interval `I`.
 
 The result returns a triple of inequalities as a nested conjunction, matching the structure used in
@@ -221,7 +221,7 @@ lemma lem2d4I
     ⟨lem2d4₂I I μ hμcvx x hxI w hwI hxw t hxwt, lem2d4₃I I μ hμcvx x hxI w hwI hxw u huxw⟩⟩
 
 
-/-
+/--
 Remark 2.5 (part 1), interval-local form: `μmax μ` inherits convexity from `μ`.
 
 This is a key closure property: convexity is preserved by the `μmax` construction.
@@ -233,7 +233,7 @@ lemma rmk2d5₁
   {convex :=fun x y hxI hyI hxy ↦ lem2d4₂I I μ hμcvx x hxI y hyI hxy (x ⊔ y) le_rfl}
 
 
-/-
+/--
 Remark 2.5 (part 2): idempotence of `μmax`.
 
 The statement `μmax μ I = μmax (μmax μ) I` says that applying `μmax` twice does not change the
@@ -260,7 +260,7 @@ lemma rmk2d5₂
     exact h
 
 
-/-
+/--
 Remark 2.5 (part 3): invariance of `μA` under replacing `μ` by `μmax μ`.
 
 Together with `rmk2d5₂`, this shows that the outer optimization `μA` is stable under the `μmax`
@@ -285,7 +285,7 @@ lemma rmk2d5₃
       ⟨(a, I.val.2), lt_of_le_of_ne ha.1.2 ha.2⟩ ⟨ha.1.1, le_rfl⟩ μ hμcvx
 
 
-/-
+/--
 Proposition 2.6 (monotonicity part): `μA (x,z) ≤ μA (y,z)` when `x<y<z`.
 
 This does not use convexity; it is a formal consequence of the definition of `μA` as an infimum.
@@ -302,7 +302,7 @@ lemma prop2d6₀
   use v, ⟨⟨le_of_lt <| lt_of_lt_of_le h.1 hv.1.1, hv.1.2⟩, hv.2⟩
 
 
-/-
+/--
 Proposition 2.6 (a): a lower bound on `μA (x,z)` by the infimum of the two adjacent `μA` values.
 
 This is the first convexity-dependent inequality in Proposition 2.6.
@@ -325,7 +325,7 @@ lemma prop2d6₁I
       sup_le (le_of_lt h.2) ha.1.2
 
 
-/-
+/--
 Proposition 2.6 (b), case 1: if `μA (x,y) ≥ μA (y,z)` then `μA (y,z) = μA (x,z)`.
 
 This is a clean equality criterion extracted from the general inequality chain.
@@ -343,7 +343,7 @@ lemma prop2d6₂I₁
     prop2d6₁I I μ hμcvx x hxI y hyI z hzI h) <| prop2d6₀ μ x y z h
 
 
-/-
+/--
 Proposition 2.6 (b), case 2: if `μA (x,y) < μA (y,z)` then `μA (x,y) ≤ μA (x,z) ≤ μA (y,z)`.
 
 This provides the comparison bounds needed for the strict-inequality branch.
@@ -362,7 +362,7 @@ lemma prop2d6₂I₂
     prop2d6₁I I μ hμcvx x hxI y hyI z hzI h, prop2d6₀ μ x y z h⟩
 
 
-/-
+/--
 Helper lemma: unpack `IsComparable x y` into a useful disjunction for strict/weak comparisons.
 
 This is a small propositional normalization used in the proof of `prop2d6₃I`.
@@ -379,7 +379,7 @@ x < y ∨ y ≤ x := by
   rwa [or_self, eq_comm, ← le_iff_eq_or_lt] at h
 
 
-/-
+/--
 Proposition 2.6 (c): a case split yielding either equality or a strict inequality chain.
 
 The hypothesis allows either comparability of the two adjacent `μA` values, or attainment of the
@@ -422,7 +422,7 @@ lemma prop2d6₃I
       sup_le (le_of_lt h.2) ha₁.2),lt_of_le_of_ne (prop2d6₀ μ x y z h) <| Ne.symm hnot⟩
 
 
-/-
+/--
 Remark 2.7: in a complete linear order, a strict improvement on the left forces equality on the
 right.
 
@@ -445,7 +445,7 @@ lemma rmk2d7
     · exact Classical.byContradiction fun x_1 ↦ not_le_of_gt h' h₃.left
 
 
-/-
+/--
 Proposition 2.8 (auxiliary step): a disjunction bounding one of two `μA` values by a `μmax` value.
 
 This is an interval-local statement used to derive the “meet” inequality in Proposition 2.8.
@@ -471,7 +471,7 @@ lemma prop2d8₀I
       lem2d4₂I I μ hμcvx y hyI w hwI h₂ (x ⊔ y) <| sup_le le_sup_right <| le_of_lt hw.2
 
 
-/-
+/--
 Proposition 2.8 (a): `μA (u, x ⊔ y)` dominates the meet `μA (u,x) ⊓ μA (u,y)`.
 
 This is obtained by taking an infimum and using `prop2d8₀I` to select the relevant branch.
@@ -495,7 +495,7 @@ lemma prop2d8₁I
   · exact le_trans inf_le_right h₂
 
 
-/-
+/--
 Proposition 2.8 (b): under comparability or attainment, one of the two `μA` values is dominated by
 `μA (u, x ⊔ y)`.
 

@@ -36,7 +36,7 @@ Internal namespace containing proof-engineering lemmas for semistability.
 The objects here are designed to be composable building blocks for the public-facing theorems.
 -/
 
-/-
+/--
 Proposition 3.2 (interval-local form): monotonicity of `μA` under enlarging the right endpoint,
 in the special case where `μA (x,z) = ⊤`.
 
@@ -60,7 +60,7 @@ lemma prop3d2 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   rwa [h', inf_top_eq] at h''
 
 
-/-
+/--
 Corollary 3.3: a convenient sufficient condition for the DCC on `μA`.
 
 Given a hypothesis that any strict descending chain `f` eventually produces an interval
@@ -81,7 +81,7 @@ lemma cor3d3 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   exact not_lt_of_ge this
 
 
-/-
+/--
 Auxiliary set `ℒₛ μ I x`: candidates that strictly improve the `μA`-value.
 
  Given a current breakpoint candidate `x` (as a subtype element of `I`), this set consists of
@@ -102,7 +102,7 @@ def ℒₛ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [Well
   μA μ ⟨(I.val.1 , x.val) , lt_of_le_of_ne x.prop.1 hx⟩}
 
 
-/-
+/--
 Core recursive construction used in Proposition 3.4.
 
 `prop3d4₀func μ I k` produces a point of the interval `I` (as a subtype `{p // InIntvl I p}`) by
@@ -136,7 +136,7 @@ noncomputable def prop3d4₀func
         ⟨I.val.1, ⟨le_rfl,le_of_lt I.prop⟩⟩
 
 
-/-
+/--
 Helper lemma: if step `i+1` is not at the left endpoint, then step `i` is also not at the left
 endpoint.
 
@@ -153,7 +153,7 @@ I.val.1 ≠ (prop3d4₀func μ I i).val := by
   exact hi rfl
 
 
-/-
+/--
 Key property of the recursion: when the process has not terminated at step `i+1`, the `μA`-value
 strictly increases from step `i` to step `i+1`.
 
@@ -177,7 +177,7 @@ lemma prop3d4₀func_defprop1
     prop3d4₀func_helper μ I i hi) hne).choose_spec.1.out.choose_spec.choose_spec
 
 
-/-
+/--
 Another key property of the recursion: step `i+1` is chosen to be “maximal among those with at least
 its `μA`-value”, in the sense that no `z` strictly between step `i+1` and step `i` can have
 `μA (I.left, z)` greater-or-equal to `μA (I.left, step(i+1))`.
@@ -220,7 +220,7 @@ lemma prop3d4₀func_defprop2
     ).choose_spec.2 z h' hz.1
 
 
-/-
+/--
 The recursion produces a strictly decreasing chain of underlying values until it reaches the left
 endpoint.
 
@@ -252,7 +252,7 @@ lemma prop3d4₀func_strict_decreasing
       ).choose_spec.1.out.choose_spec.choose.2
 
 
-/-
+/--
 Finite-length termination: under the DCC hypothesis on `μA`, the recursion reaches the left endpoint
 in finitely many steps.
 
@@ -279,7 +279,7 @@ lemma prop3d4₀func_fin_len
   exact hN (h₂ N)
 
 
-/-
+/--
 Define the length `prop3d4₀func_len μ I hμDCC` as the first time the recursion hits the left
 endpoint.
 
@@ -295,7 +295,7 @@ noncomputable def prop3d4₀func_len
   exact Nat.find (prop3d4₀func_fin_len μ I hμDCC)
 
 
-/-
+/--
 The termination length is nonzero.
 
 Intuitively, at step `0` the recursion starts at the right endpoint, which cannot equal the left
@@ -315,7 +315,7 @@ prop3d4₀func_len μ I hμDCC ≠ 0 := by
   exact (lt_self_iff_false I.val.1).1 (h ▸ I.prop)
 
 
-/-
+/--
 Before termination, every step lies strictly above the left endpoint.
 
 This lemma is phrased as a strict inequality `I.left < (prop3d4₀func μ I i).val` for `i < len`.
@@ -332,7 +332,7 @@ I.val.1 < (prop3d4₀func μ I i).val := by
     fun hcontra ↦ (eq_of_le_of_not_lt (prop3d4₀func μ I i).prop.1 hcontra).symm
 
 
-/-
+/--
 Optimality at the last pre-termination step.
 
 Let `len` be the first index such that step `len` equals `I.left`. Then at index `len-1`, no
@@ -377,7 +377,7 @@ lemma prop3d4₀func_defprop3
       prop3d4₀func_len_nonzero μ I hμDCC⟩).1 hcontra
 
 
-/-
+/--
 Proposition 3.4: nonemptiness of the set of stable breakpoints `StI μ I`.
 
 Under well-foundedness and the DCC hypothesis, and assuming convexity on `I`, the selection
@@ -475,7 +475,7 @@ lemma prop3d4 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [W
     · exact (func (len - 1)).prop
 
 
-/-
+/--
 Remark 3.5: uniqueness of stable breakpoints in a complete linear order.
 
 If the target lattice `S` is a complete linear order, then any two elements of `StI μ I` must be
@@ -496,7 +496,7 @@ lemma rmk3d5 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [We
     (le_of_not_gt <| hxS₁ y hyI hy) (le_of_not_gt <| hyS₁ x hxI hx))
 
 
-/-
+/--
 Proposition 3.7 (part 1): a stable breakpoint induces semistability of the corresponding
 subinterval.
 
@@ -514,7 +514,7 @@ semistableI μ ⟨(I.val.1 , x), lt_of_le_of_ne hxSt.out.choose.1 hxSt.out.choos
     fun z hzI hz hz' ↦ hxS₂I z ⟨hzI.1,le_trans hzI.2 hxI.2⟩ hz hz'⟩⟩
 
 
-/-
+/--
 Proposition 3.7 (part 2): strict inequality obstruction above a stable breakpoint.
 
 Assuming convexity, if `x ∈ StI μ I` and `y > x` lies in `I`, then `μA (I.left, x)` is not
@@ -539,7 +539,7 @@ lemma prop3d7₂ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
     hxSt.out.choose_spec.choose_spec.1 y hyI <| ne_of_lt <| lt_of_le_of_lt hxSt.out.choose.1 hy)
 
 
-/-
+/--
 Proposition 3.8 (part 1): totality on `StI μ I` under comparability/attainment hypotheses.
 
 Under convexity and well-foundedness, if either:
@@ -597,7 +597,7 @@ lemma prop3d8₁ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   · exact Or.inl (sup_le_iff.1 c2).1
 
 
-/-
+/--
 Existence of a greatest element of `StI μ I`.
 
 Assuming the DCC (as a typeclass), convexity, and one of the comparability/attainment hypotheses,
@@ -621,7 +621,7 @@ lemma prop3d8₁' {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ
   · exact le_of_eq <| eq_of_le_of_not_lt' c2 (hM.2 x hx)
 
 
-/-
+/--
 Proposition 3.8 (part 2): decomposition at a stable breakpoint.
 
 Under convexity and the comparability/attainment hypothesis, if `x ∈ StI μ I` and `x<y` in `I`, then
@@ -657,7 +657,7 @@ lemma prop3d8₂ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
       ) hxy)
 
 
-/-
+/--
 Equivalence between the global typeclass `Semistable μ` and interval-local semistability on the
 total interval.
 
@@ -677,7 +677,7 @@ theorem semistable_iff {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrde
   · exact fun h ↦ {semistable := fun y hyI hy ↦ (h.choose_spec y (in_TotIntvl _) (Ne.symm hyI)) hy}
 
 
-/-
+/--
 Small rewriting helper: chain three equalities.
 
 This is used to keep some long proofs readable when transporting equalities across definitional
@@ -686,7 +686,7 @@ expansions.
 lemma smart_helper {α : Type*} {a b c d : α} (h : a = b) (h' : b = c) (h'' : c = d) : a = d :=
 h ▸ h' ▸ h''
 
-/-
+/--
 Transport semistability along restriction.
 
 This theorem relates:

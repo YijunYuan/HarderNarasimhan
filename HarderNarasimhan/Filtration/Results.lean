@@ -34,7 +34,8 @@ API overview:
 
 namespace HarderNarasimhan
 
-/-
+open Classical in
+/--
 The canonical Harder–Narasimhan filtration exists as an inhabitant.
 Downstream code can write `default : HarderNarasimhanFiltration μ` rather than referring to
 implementation details.
@@ -47,7 +48,6 @@ the fact that the sequence is constantly `⊤` after termination.
 
 API note: this instance is the standard way to access the canonical filtration.
 -/
-open Classical in
 noncomputable instance instInhabitedHarderNarasimhanFiltration
 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLattice S]
@@ -73,7 +73,7 @@ default :=
   }
 
 
-/-
+/--
 Convenience instance: existence of a Harder–Narasimhan filtration.
 
 This follows immediately from the `Inhabited` instance above.
@@ -88,7 +88,8 @@ Nonempty (HarderNarasimhanFiltration μ)
 ------------
 := inferInstance
 
-/-
+open Classical in
+/--
 Uniqueness of Harder–Narasimhan filtrations in a complete linear order.
 When the codomain `S` is a complete linear order, the internal uniqueness theorem
 `impl.theorem3d10` shows that any filtration satisfying the defining axioms must
@@ -100,7 +101,6 @@ expected by the internal proof.
 API note: when this instance is available, any two filtrations are definitionally equal
 after extensionality, so you can treat the HN filtration as canonical.
 -/
-open Classical in
 noncomputable instance instUniqueHarderNarasimhanFiltration
 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLinearOrder S]
@@ -129,7 +129,8 @@ where
     exact fun j hij hj ↦ this j hij hj
   ) n)
 
-/-
+open Fin.NatCast Classical in
+/--
 Existence of a semistable `RelSeries` from `⊥` to `⊤` with strictly decreasing slopes.
 From the canonical `HarderNarasimhanFiltration μ`, we build a `RelSeries` over the
 relation `IntervalSemistableRel μ`. The `step` field is given by the strict-mono
@@ -140,7 +141,6 @@ The final conjunct states the slope strictness condition in a form suitable for
 
 API note: this is the `RelSeries`-shaped entry point extracted from the canonical filtration.
 -/
-open Fin.NatCast Classical in
 theorem exists_relSeries_isIntervalSemistable
 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLattice S]
@@ -177,7 +177,8 @@ theorem exists_relSeries_isIntervalSemistable
     exact Nat.succ_lt_succ hi
 
 
-/-
+open Fin.NatCast in
+/--
 Uniqueness of the semistable `RelSeries` in the complete linear order case.
 
 When `S` is a complete linear order, Harder–Narasimhan filtrations are unique.
@@ -185,7 +186,6 @@ Using `impl.hHFil_of_hNSeries`, any `RelSeries` satisfying the slope condition
 produces a filtration; uniqueness of filtrations then implies uniqueness of such
 series (up to extensional equality).
 -/
-open Fin.NatCast in
 theorem exists_unique_relSeries_isIntervalSemistable_of_completeLinearOrder
 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLinearOrder S]

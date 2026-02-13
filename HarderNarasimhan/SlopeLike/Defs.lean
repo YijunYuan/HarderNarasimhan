@@ -32,7 +32,7 @@ Main API:
 
 namespace HarderNarasimhan
 
-/-
+/--
 Slope-like axiom for an interval-indexed function `μ`.
 
 For any triple `x<y<z`, the four conjuncts express a “seesaw” behavior: the value on the long
@@ -59,7 +59,7 @@ class SlopeLike {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder 
 )
 
 
-/-
+/--
 A bundled structure for a totally ordered real vector space.
 
 This extends `AddCommGroup` and `Module ℝ` with a linear order and a strict-mono scalar action,
@@ -74,7 +74,7 @@ class TotallyOrderedRealVectorSpace (V : Type*)
   elim_AddLeftMono : ∀ {y z : V} (x : V), y ≤ z → x + y ≤ x + z
 
 
-/-
+/--
 From a `TotallyOrderedRealVectorSpace`, we obtain the `AddLeftMono` typeclass.
 
 API note: `AddLeftMono` is a Mathlib abstraction used by order/algebra lemmas; we provide this
@@ -84,7 +84,7 @@ instance {V : Type*} [TotallyOrderedRealVectorSpace V] : AddLeftMono V where
   elim := fun x _ _ h ↦ TotallyOrderedRealVectorSpace.elim_AddLeftMono x h
 
 
-/-
+/--
 Construct a “quotient slope” from a nonnegative real-valued rank `r` and a vector-valued degree `d`.
 
 The target is `OrderTheory.DedekindMacNeilleCompletion V` to accommodate the case `r z = 0`:
@@ -103,7 +103,7 @@ noncomputable def μQuotient {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [
   fun z ↦ if _ : r z > 0 then ↑((r z)⁻¹ • d z) else ⊤
 
 
-/-
+/--
 Slope-likeness is stable under restriction to a subinterval.
 
 If `μ` is slope-like on `ℒ`, then the restricted function `Resμ z μ` is slope-like on `Interval z`.

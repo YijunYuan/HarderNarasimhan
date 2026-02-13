@@ -25,7 +25,7 @@ Main results:
 
 namespace HarderNarasimhan
 
-/-
+/--
 Lemma 2.4 (paper-facing form).
 
 Assuming global convexity of `μ`, this provides the two inequalities labelled (2.2) and (2.3) in the
@@ -58,7 +58,7 @@ lemma lemma_2_4 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
       (in_TotIntvl x) w (in_TotIntvl w) hxw u huxw⟩
 
 
-/-
+/--
 Remark 2.5 (paper-facing form).
 
 Under convexity, this states:
@@ -84,7 +84,7 @@ lemma remark_2_5 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
       impl.rmk2d5₃ I μ (Convex_of_Convex_large TotIntvl I ⟨bot_le,le_top⟩ μ hμcvx)⟩⟩
 
 
-/-
+/--
 Proposition 2.6 (paper-facing form).
 
 For `x<y<z`, the statement consists of:
@@ -135,7 +135,7 @@ lemma proposition_2_6 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder
     (in_TotIntvl y) z (in_TotIntvl z) h⟩⟩⟩
 
 
-/-
+/--
 Remark 2.7 (paper-facing form).
 
 In a complete linear order, if the left subinterval gives a strictly larger `μA` value than the
@@ -156,7 +156,7 @@ lemma remark_2_7 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   exact impl.rmk2d7 μ hμcvx x h h'
 
 
-/-
+/--
 Proposition 2.8 (paper-facing form).
 
 Under convexity, `μA (u, x ⊔ y)` dominates the meet of the two values `μA (u,x)` and `μA (u,y)`.
@@ -184,7 +184,7 @@ lemma proposition_2_8 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder
   exact ⟨impl.prop2d8₁I TotIntvl μ hμcvx x (in_TotIntvl x) y (in_TotIntvl y) u (in_TotIntvl u) h,
   impl.prop2d8₂I TotIntvl μ hμcvx x (in_TotIntvl x) y (in_TotIntvl y) u (in_TotIntvl u) h⟩
 
-/-
+/--
 User-facing equivalence between localized convexity and convexity of the restricted measure.
 
 This is essentially `impl.ConvexI_iff_Convex_Res`, but presented as a theorem in the public

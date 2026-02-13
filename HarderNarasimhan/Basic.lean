@@ -37,7 +37,7 @@ work
 uniformly for any `CompleteLattice S`.
 -/
 
-/-
+/--
 Membership predicate for a strict interval `I` in a partial order.
 
 If `I = (a,b)` with `a < b`, then `InIntvl I x` means `a ≤ x ≤ b`.
@@ -50,7 +50,7 @@ def InIntvl {ℒ : Type*} [PartialOrder ℒ]
   I.val.1 ≤ x ∧ x ≤ I.val.2
 
 
-/-
+/--
 The total interval `(⊥, ⊤)` in a nontrivial bounded poset.
 
 API note: we package it as a strict pair so that it can be passed to constructions expecting an
@@ -60,7 +60,7 @@ abbrev TotIntvl {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder 
 {p : ℒ × ℒ // p.1 < p.2} := ⟨(⊥,⊤),bot_lt_top⟩
 
 
-/-
+/--
 Every element lies in the total interval.
 
 This lemma is the canonical source of `InIntvl TotIntvl x`.
@@ -69,7 +69,7 @@ lemma in_TotIntvl {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrde
 InIntvl TotIntvl x := ⟨bot_le,le_top⟩
 
 
-/-
+/--
 `μmax μ I` is the supremum of `μ (I.left, u)` as `u` ranges over points in `I` distinct from the
 left endpoint.
 
@@ -88,7 +88,7 @@ def μmax {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 sSup {μ ⟨(I.val.1 , u), lt_of_le_of_ne h.1.1 h.2⟩ | (u : ℒ) (h : InIntvl I u ∧ I.val.1 ≠ u) }
 
 
-/-
+/--
 `μA μ I` is the infimum, over `a` in the interval distinct from the right endpoint, of `μmax`
 computed on
 the right-anchored subinterval `(a, I.right)`.
@@ -109,7 +109,7 @@ sInf {μmax μ ⟨(a , I.val.2),(lt_of_le_of_ne ha.1.2 ha.2)⟩ |
   (a : ℒ) (ha : InIntvl I a ∧ a ≠ I.val.2)}
 
 
-/-
+/--
 `μAstar μ` is `μA μ` evaluated on the total interval `(⊥, ⊤)`.
 
 This is a common global invariant used in later semistability and equilibrium statements.
@@ -120,7 +120,7 @@ def μAstar {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 μA μ ⟨(⊥,⊤) , bot_lt_top⟩
 
 
-/-
+/--
 `μmin μ I` is the infimum of `μ (u, I.right)` as `u` ranges over points in `I` distinct from the
 right endpoint.
 
@@ -133,7 +133,7 @@ def μmin {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 sInf {μ ⟨(u, I.val.2), lt_of_le_of_ne h.1.2 h.2⟩ | (u : ℒ) (h : InIntvl I u ∧ u ≠ I.val.2) }
 
 
-/-
+/--
 `μB μ I` is the supremum, over `a` in the interval distinct from the left endpoint, of `μmin`
 computed on
 the left-anchored subinterval `(I.left, a)`.
@@ -148,7 +148,7 @@ sSup {μmin μ ⟨(I.val.1 , a),(lt_of_le_of_ne ha.1.1 ha.2)⟩ |
   (a : ℒ) (ha : InIntvl I a ∧ I.val.1 ≠ a)}
 
 
-/-
+/--
 `μBstar μ` is `μB μ` evaluated on the total interval `(⊥, ⊤)`.
 -/
 def μBstar {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
@@ -157,7 +157,7 @@ def μBstar {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 μB μ ⟨(⊥,⊤) , bot_lt_top⟩
 
 
-/-
+/--
 Convenience predicate: two elements are comparable in a partial order.
 
 This is often used to state that a poset is (locally) a total preorder.
@@ -166,7 +166,7 @@ def IsComparable {ℒ : Type*} [PartialOrder ℒ] : (x : ℒ) → (y : ℒ) → 
   fun x y => x ≤ y ∨ y ≤ x
 
 
-/-
+/--
 `IsAttained μ I` asserts that the infimum defining `μA μ I` is realized by some `a` in the interval.
 
 More precisely, there exists `a` with `a` in `I` and `a ≠ I.right` such that

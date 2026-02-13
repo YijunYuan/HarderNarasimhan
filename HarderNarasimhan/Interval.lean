@@ -31,7 +31,7 @@ API design notes:
 
 namespace HarderNarasimhan
 
-/-
+/--
 `Interval z` is the subtype of elements of `ℒ` lying between the endpoints of the strict pair `z`.
 
 Mathematically, if `z = (x,y)` with `x < y`, then `Interval z = { p ∈ ℒ | x ≤ p ∧ p ≤ y }`.
@@ -43,7 +43,7 @@ def Interval {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ
 {p : ℒ // z.val.1 ≤ p ∧ p ≤ z.val.2}
 
 
-/-
+/--
 `Interval z` is nontrivial whenever `ℒ` is nontrivial and the endpoints satisfy `x < y`.
 
 API note: we exhibit two distinct elements by using the embedded endpoints `x` and `y`.
@@ -56,7 +56,7 @@ instance {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
         exact Subtype.coe_ne_coe.mp <| ne_of_lt hxy
 
 
-/-
+/--
 The order on `Interval z` is inherited from the ambient order on `ℒ` via the subtype coercion.
 
 API note: this is the standard subtype order; antisymmetry uses `Subtype.ext`.
@@ -70,7 +70,7 @@ instance {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
   le_antisymm := fun a b h1 h2 ↦ Subtype.ext <| le_antisymm h1 h2
 
 
-/-
+/--
 If `ℒ` is a lattice, then `Interval z` is a lattice with `⊔`/`⊓` defined pointwise.
 
 Mathematically, the interval is closed under sup/inf; the proof obligations are discharged
@@ -88,7 +88,7 @@ instance {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
     inf_le_right := fun _ _ ↦ inf_le_right
 
 
-/-
+/--
 `Interval z` inherits a bounded order structure: `⊥` is the left endpoint and `⊤` is the right
 endpoint.
 
@@ -102,7 +102,7 @@ instance {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
     le_top := fun a ↦ a.prop.2
 
 
-/-
+/--
 Coercion from `Interval z` to the ambient type `ℒ`.
 
 API note: `CoeOut` is used so that `a.val` and coercions both work smoothly.
@@ -112,7 +112,7 @@ instance {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
     coe := fun a ↦ a.val
 
 
-/-
+/--
 When the interval is the total interval `(⊥, ⊤)`, every element of `ℒ` canonically lies in it.
 
 API note: this coercion lets users reuse lemmas about `Interval TotIntvl` as a “repackaging” of `ℒ`.
@@ -122,7 +122,7 @@ Coe ℒ (Interval (⟨(⊥,⊤),bot_lt_top⟩ : {p : ℒ × ℒ // p.1 < p.2})) 
     coe := fun a ↦ ⟨a,⟨bot_le,le_top⟩⟩
 
 
-/-
+/--
 Helper lemma: stripping away the interval subtype yields a strict inequality between the underlying
 endpoints.
 
@@ -135,7 +135,7 @@ lemma lt_lt {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
   refine Subtype.mk_lt_mk.2 (lt_iff_le_not_ge.mpr p.prop)
 
 
-/-
+/--
 `Resμ z μ` restricts an interval-indexed function `μ` on `ℒ` to the interval `Interval z`.
 
 Concretely, a strict pair `(a,b)` in `Interval z` maps to the strict pair of their underlying values
@@ -148,7 +148,7 @@ def Resμ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {p :(Interval z) × (Interval z) // p.1 < p.2} → S := fun p ↦ μ ⟨(p.val.1.val,p.val.2.val), lt_lt⟩
 
 
-/-
+/--
 Coercion: treat a function `μ` on strict pairs in `ℒ` as a function on strict pairs in `Interval z`
 by implicitly restricting via `Resμ`.
 
@@ -160,7 +160,7 @@ instance {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 Coe ({p :ℒ × ℒ // p.1 < p.2} → S) ({p :(Interval z) × (Interval z) // p.1 < p.2} → S) where
     coe := Resμ z
 
-/-
+/--
 Well-foundedness is inherited by intervals: if `ℒ` is well-founded with respect to `>` (i.e. no
 infinite
 strictly descending chains), then so is `Interval z`.
@@ -180,7 +180,7 @@ instance {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ] [h
       (Set.mem_image_of_mem Subtype.val hy) (lt_iff_le_not_ge.2 h)⟩
 
 
-/-
+/--
 Unfolding lemma for restriction: evaluating `Resμ` is definitionally `μ` on the underlying strict
 pair.
 
@@ -196,7 +196,7 @@ lemma μ_res_intvl {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrd
 ------------
 := rfl
 
-/-
+/--
 Restriction commutes with the “left-anchored supremum” construction `μmax` from `Basic.lean`.
 
 Mathematically, taking `μmax` inside an interval is the same as taking `μmax` in `ℒ` after
@@ -229,7 +229,7 @@ lemma μmax_res_intvl {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [Bounded
     simp only [exists_prop, and_true]
     exact ⟨hu1.1,fun hc ↦ hu1.right (Subtype.coe_inj.2 hc)⟩
 
-/-
+/--
 Restriction commutes with the “right-anchored infimum” construction `μmin` from `Basic.lean`.
 
 This is the dual statement to `μmax_res_intvl`.
@@ -260,7 +260,7 @@ lemma μmin_res_intvl {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [Bounded
     simp only [exists_prop, and_true]
     exact ⟨hu1.1,fun hc ↦ hu1.right (Subtype.coe_inj.2 hc)⟩
 
-/-
+/--
 Restriction commutes with `μA`, the infimum over right-endpoints of `μmax` values.
 
 This lemma is a key “locality” principle: computations of `μA` can be performed on subintervals.
@@ -291,7 +291,7 @@ lemma μA_res_intvl {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOr
     simp only [exists_prop, and_true]
     exact ⟨hu1.1,fun hc ↦ hu1.right (Subtype.coe_inj.2 hc)⟩
 
-/-
+/--
 Restriction commutes with `μB`, the supremum over left-endpoints of `μmin` values.
 
 This is the `μB`-analogue of `μA_res_intvl`.
@@ -322,7 +322,7 @@ lemma μB_res_intvl {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOr
     simp only [exists_prop, and_true]
     exact ⟨hu1.1,fun hc ↦ hu1.right (Subtype.coe_inj.2 hc)⟩
 
-/-
+/--
 Projection lemma: the bottom element of `Interval ⟨(a,b), h⟩` is definitionally the left endpoint
 `a`.
 
@@ -331,7 +331,7 @@ API note: phrased using `Subtype.val` to make rewriting in proofs convenient.
 lemma strip_bot {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] {a b : ℒ} (h : a < b) :
 @Subtype.val ℒ (fun p ↦ a ≤ p ∧ p ≤ b) (⊥: Interval ⟨(a, b), h⟩) = a := rfl
 
-/-
+/--
 Projection lemma: the top element of `Interval ⟨(a,b), h⟩` is definitionally the right endpoint `b`.
 -/
 lemma strip_top {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] {a b : ℒ} (h : a < b) :
