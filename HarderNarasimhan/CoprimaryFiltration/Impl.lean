@@ -21,7 +21,7 @@ import HarderNarasimhan.OrderTheory.DedekindMacNeilleCompletion
 import HarderNarasimhan.Semistability.Defs
 import HarderNarasimhan.Filtration.Results
 import HarderNarasimhan.OrderTheory.Lex'Order
-import HarderNarasimhan.CoprimaryFiltration.AdmittedResults
+import HarderNarasimhan.CoprimaryFiltration.CommutativeAlgebra
 
 import HarderNarasimhan.CoprimaryFiltration.Defs
 
@@ -44,7 +44,7 @@ High-level structure:
 * Relate semistability of restricted slopes to semistability on quotient modules,
   and use this to build coprimary filtrations.
 
-Some classical results are still assumed via `HarderNarasimhan.AdmittedResults`.
+Some classical results are still assumed via `HarderNarasimhan.CommutativeAlgebra`.
 
 API note: most downstream files should import `HarderNarasimhan.CoprimaryFiltration.Results`
 instead of this implementation file. This module is large and contains commutative-algebraic
@@ -330,7 +330,7 @@ lemma prop3d12p1 {R : Type*} [CommRing R] [IsNoetherianRing R]
   have hq' := support_quotient_mono I.val.1 N'' I.val.2 (ha1.1) <|
     mem_support_of_mem_associatedPrimes hq
   obtain ⟨r,hr,hr'⟩ := exists_minimal_prime_contained_supp {asIdeal := q, isPrime := hq.out.1 } hq'
-  rw [← AdmittedResults.min_associated_prime_iff_min_supp] at hr
+  rw [← CommutativeAlgebra.min_associated_prime_iff_min_supp] at hr
   refine le_trans ?_ <| toLinearExtension.monotone' hr'
   refine (((_μ R M) I).toFinset.min'_le) r ?_
   simp only [Set.mem_toFinset, Set.mem_setOf_eq]
@@ -505,7 +505,7 @@ associatedPrimes R (I.val.2⧸(ker_of_quot_comp_localization I).submoduleOf I.va
 := by
   rcases koqcl_iso I with ⟨h, _⟩
   rw [LinearEquiv.AssociatedPrimes.eq h]
-  have := AdmittedResults.bourbaki_elements_math_alg_comm_chIV_sec1_no2_prop6
+  have := CommutativeAlgebra.bourbaki_elements_math_alg_comm_chIV_sec1_no2_prop6
     ((((_μ R M) I).toFinset.min' (μ_nonempty I)).asIdeal.primeCompl) (LinearMap.ker (CP.f1 I))
   simp only [iff_true] at this
   rw [this.2]

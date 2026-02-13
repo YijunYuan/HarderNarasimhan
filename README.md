@@ -93,8 +93,8 @@ lake build
 
 ## Notes
 
-- Some modules may contain admitted statements (`sorry`) intended as placeholders (e.g.
-	[HarderNarasimhan/CoprimaryFiltration/AdmittedResults.lean](HarderNarasimhan/CoprimaryFiltration/AdmittedResults.lean)).
+- [HarderNarasimhan/CoprimaryFiltration/CommutativeAlgebra.lean](HarderNarasimhan/CoprimaryFiltration/CommutativeAlgebra.lean)
+	collects commutative algebra lemmas used by the coprimary filtration development.
 - The codebase aims to keep documentation and style consistent (including line-length checks).
 
 ## License
