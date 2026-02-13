@@ -6,9 +6,29 @@ import HarderNarasimhan.Semistability.Translation
 import Mathlib.Tactic.TFAE
 import Mathlib.Data.List.TFAE
 
+/-!
+  # Nash equilibrium: internal implementation lemmas
+
+  This file contains the internal (non-export) proofs for the Nash-equilibrium layer
+  of the development. The key technical theme is to relate the global extremal values
+  `μmin μ TotIntvl` and `μmax μ TotIntvl` to the “best responses” quantities `μAstar μ`
+  and `μBstar μ`, and to package the resulting equivalences as TFAE chains.
+
+  The statements are named after the corresponding remarks/propositions/theorem in the
+  accompanying text (e.g. `rmk4d10₀`, `prop4d16₂`, `thm4d21`).
+
+  API note: this file is internal (lemmas live in `HarderNarasimhan.impl`). For a stable
+  interface, prefer importing `HarderNarasimhan.NashEquilibrium.Results`.
+-/
+
 namespace HarderNarasimhan
 
 namespace impl
+
+/-
+  `rmk4d10₀` records the basic bounds: for any interval `I`, `μmin μ I ≤ μ I ≤ μmax μ I`.
+  This is a direct consequence of the defining `sInf`/`sSup` characterisations.
+-/
 
 lemma rmk4d10₀ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
@@ -22,6 +42,12 @@ lemma rmk4d10₀ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder
     use I.val.2, ⟨⟨le_of_lt I.prop,le_rfl⟩,ne_of_lt I.prop⟩
 
 
+
+/-
+  `rmk4d10₁` rewrites the inequality `μBstar μ ≤ μAstar μ` as an explicit family of
+  inequalities comparing the extremal values on bottom- and top-anchored intervals.
+  This is a convenient “unfolded” form for later arguments.
+-/
 lemma rmk4d10₁ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) :
@@ -45,6 +71,14 @@ lemma rmk4d10₁ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder
     exact fun _ x' _ h'' ↦ h'' ▸ h x' (by tauto) x _
 
 
+
+/-
+  `rmk4d10₂` specialises Nash equilibrium to the case where we have a weak ascending
+  chain condition together with the first weak slope-like axiom.
+
+  Under these hypotheses, Nash equilibrium is equivalent to a single family of
+  inequalities comparing `μmin` on bottom-anchored intervals with `μmin` on `TotIntvl`.
+-/
 lemma rmk4d10₂ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
@@ -72,6 +106,14 @@ NashEquilibrium μ ↔
       exact h3 ▸ (h h1 <| Ne.symm h2.2)
 
 
+
+/-
+  `rmk4d10₃` is the dual counterpart of `rmk4d10₂`.
+
+  Assuming a strong descending chain condition and the second weak slope-like axiom,
+  Nash equilibrium is equivalent to a family of inequalities comparing `μmax` on
+  `TotIntvl` with `μmax` on top-anchored intervals.
+-/
 lemma rmk4d10₃ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
@@ -99,6 +141,11 @@ NashEquilibrium μ ↔
       exact h3 ▸ (h h1 h2.2)
 
 
+
+/-
+  `prop4d11₁` shows that if the global extremal values on `TotIntvl` coincide, then
+  the best-response inequality `μBstar μ ≤ μAstar μ` holds.
+-/
 lemma prop4d11₁ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) :
@@ -119,6 +166,12 @@ lemma prop4d11₁ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrde
   exact fun h ↦ le_trans h₁ (h ▸ h₂)
 
 
+
+/-
+  `prop4d11₂` is a converse direction: under the weak chain/slope hypotheses on both
+  sides, the inequality `μBstar μ ≤ μAstar μ` forces equality of the global extremal
+  values `μmin μ TotIntvl` and `μmax μ TotIntvl`.
+-/
 lemma prop4d11₂ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
@@ -129,6 +182,12 @@ lemma prop4d11₂ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrde
     (impl.prop4d3₁ μ h₁'.wdcc h₂'.wsl₂) ▸ (impl.prop4d1₁ ℒ S μ h₁.wacc h₂.wsl₁) ▸ h
 
 
+
+/-
+  `prop4d12` derives the equality `μmin μ TotIntvl = μmax μ TotIntvl` from the
+  stronger equality `μmax μ TotIntvl = μ TotIntvl`, provided a pointwise dichotomy
+  that rules out “intermediate” points simultaneously satisfying both comparisons.
+-/
 lemma prop4d12 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
@@ -147,6 +206,11 @@ lemma prop4d12 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder �
     use hb1, ⟨in_TotIntvl hb1, Ne.symm hbot⟩
 
 
+
+/-
+  `rmk4d13` shows that the dichotomy assumption used in `prop4d12` follows from a
+  genuine `SlopeLike μ` structure.
+-/
 lemma rmk4d13 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : SlopeLike μ) :
@@ -159,6 +223,11 @@ lemma rmk4d13 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder �
   · exact Or.inr this
 
 
+
+/-
+  `prop4d14` is the dual analogue of `prop4d12`: starting from `μmin μ TotIntvl = μ TotIntvl`
+  and a suitable dichotomy, it deduces `μmax μ TotIntvl = μmin μ TotIntvl`.
+-/
 lemma prop4d14 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
@@ -177,6 +246,11 @@ lemma prop4d14 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder �
     use hb1, ⟨in_TotIntvl hb1, htop⟩
 
 
+
+/-
+  `rmk4d15` shows that the dichotomy assumption used in `prop4d14` also follows from
+  a `SlopeLike μ` structure.
+-/
 lemma rmk4d15 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : SlopeLike μ) :
@@ -188,6 +262,12 @@ lemma rmk4d15 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder �
   · exact Or.inr <| not_le_of_gt this
 
 
+
+/-
+  `prop4d16₁` bundles three “endpoint equalities” into a `List.TFAE` statement.
+  It uses `prop4d12/prop4d14` (with `rmk4d13/rmk4d15`) to connect them, and the
+  elementary bounds from `rmk4d10₀` for the remaining implications.
+-/
 lemma prop4d16₁ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : SlopeLike μ) :
@@ -209,6 +289,14 @@ List.TFAE [
   tfae_finish
 
 
+
+/-
+  `prop4d16₂` is the main bridge: under `SlopeLike μ` and both chain conditions,
+  Nash equilibrium is equivalent to the equality `μmin μ TotIntvl = μmax μ TotIntvl`.
+
+  The proof packages the slope-like axiom into weak slope-like data on restrictions,
+  and then combines `prop4d11₁` and `prop4d11₂` with the earlier characterisations.
+-/
 lemma prop4d16₂ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : SlopeLike μ)
@@ -228,6 +316,11 @@ lemma prop4d16₂ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrde
   · exact Or.inl <| this
 
 
+
+/-
+  `prop4d18₁` shows that semistability implies the best-response inequality
+  `μBstar μ ≤ μAstar μ` in a linearly ordered setting.
+-/
 lemma prop4d18₁ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLinearOrder S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : Semistable μ) : μBstar μ ≤ μAstar μ := by
@@ -252,6 +345,11 @@ lemma prop4d18₁ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ
     · exact hy3 ▸ (rmk4d10₀ μ ⟨(hy1,hx1), lt_of_le_of_ne hy2.1.2 hy2.2⟩).2
 
 
+
+/-
+  `prop4d18₂` deduces Nash equilibrium from semistability together with either
+  (WACC + WSL₁) or (WDCC + WSL₂).
+-/
 lemma prop4d18₂ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLinearOrder S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : Semistable μ)
@@ -264,6 +362,11 @@ NashEquilibrium μ := by
   · exact impl.prop4d3₂ μ h.1.wdcc h.2.wsl₂
 
 
+
+/-
+  `prop4d20` shows that Nash equilibrium forces semistability, provided that on each
+  bottom-anchored restriction `Resμ` we have WACC and the first weak slope-like axiom.
+-/
 lemma prop4d20 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
@@ -384,6 +487,14 @@ NashEquilibrium μ → Semistable μ := by
   exact {semistable := fun x hx ↦ LE.le.not_gt <| this x hx}
 
 
+
+/-
+  `thm4d21` is the main “Section 4” synthesis theorem.
+
+  It packages:
+  * a TFAE chain relating the endpoint equalities and Nash equilibrium, and
+  * two implication directions connecting semistability and Nash equilibrium.
+-/
 theorem thm4d21 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLinearOrder S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : SlopeLike μ)

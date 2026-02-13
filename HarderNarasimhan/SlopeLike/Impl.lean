@@ -1,9 +1,40 @@
 import HarderNarasimhan.SlopeLike.Defs
 import Mathlib.Tactic
 
+/-!
+This file contains implementation lemmas for the slope-like module.
+
+It has two main roles:
+1. Provide a more “case-split friendly” characterization of `SlopeLike μ` (`prop4d6`), turning the
+  four conjunctive axioms into a disjunction of three mutually exclusive patterns (increasing,
+  decreasing, constant).
+2. Prove that the quotient construction `μQuotient r d` is slope-like under additivity hypotheses on
+  `r` and `d` and a positivity condition when `r = 0`.
+
+As an `Impl.lean` file, these lemmas are intended to support the public results in
+`SlopeLike/Result.lean`.
+-/
+
 namespace HarderNarasimhan
 
 namespace impl
+
+/-
+Internal namespace containing proof-engineering lemmas for `SlopeLike`.
+-/
+
+/-
+Proposition 4.6 (implementation form): equivalence between `SlopeLike μ` and a tri-part “seesaw”
+disjunction.
+
+The right-hand side states that for any `x<y<z`, exactly one of the following patterns holds:
+- strict increase: `μ(x,y) < μ(x,z) < μ(y,z)`,
+- strict decrease: `μ(x,y) > μ(x,z) > μ(y,z)`, or
+- constant: `μ(x,y) = μ(x,z) = μ(y,z)`.
+
+API note: this form is often easier to use in proofs by cases, especially when `S` is (or behaves
+like) a linear order.
+-/
 lemma prop4d6 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) :
@@ -62,6 +93,12 @@ SlopeLike μ ↔ ∀ (x y z : ℒ), (h : x < y ∧ y < z) → (
         with this | this <;> [exact le_of_lt this.1; exact le_of_eq this.1.symm]
 
 
+/-
+In a nontrivial totally ordered real vector space, the coercion of any vector is strictly below `⊤`
+in the Dedekind–MacNeille completion.
+
+This lemma is used to derive contradictions when an equality forces a coerced value to be `⊤`.
+-/
 lemma not_top_of_Nontrivial_TotallyOrderedRealVectorSpace
 {V : Type*} [TotallyOrderedRealVectorSpace V] [hnt : Nontrivial V] :
 ∀ v : V, OrderTheory.coe' v < (⊤ : OrderTheory.DedekindMacNeilleCompletion V) := by
@@ -78,6 +115,12 @@ lemma not_top_of_Nontrivial_TotallyOrderedRealVectorSpace
     (OrderTheory.coe'.lt_iff_lt.2 <| lt_add_of_pos_right v hpos)
 
 
+/-
+Helper lemma for `μQuotient`: when `r z > 0`, the value `μQuotient r d z` is represented by an
+actual vector `μ : V`, and it satisfies `(r z) • μ = d z`.
+
+API note: this provides a convenient witness for rewriting inequalities in the “positive rank” case.
+-/
 lemma μQuotient_helper {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {V : Type*} [TotallyOrderedRealVectorSpace V]
 (r : {p :ℒ × ℒ // p.1 < p.2} → NNReal)
@@ -88,6 +131,20 @@ lemma μQuotient_helper {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [Bound
       smul_inv_smul₀ (Ne.symm (ne_of_lt h)) (d z)⟩⟩
 
 
+/-
+Proposition 4.8 (implementation form): `μQuotient r d` is slope-like.
+
+Assumptions:
+- Additivity of `d` and `r` along composable intervals: for `x<y<z`, we have
+  `d(x,z) = d(x,y) + d(y,z)` and `r(x,z) = r(x,y) + r(y,z)`.
+- Positivity condition: if `r(x,y) = 0` then `d(x,y) > 0`.
+
+Conclusion:
+- The quotient construction `μQuotient r d` satisfies the slope-like axiom.
+
+API note: the proof proceeds by splitting on whether the relevant ranks are zero or positive, using
+the Dedekind–MacNeille completion to model “infinite slope” as `⊤`.
+-/
 lemma prop4d8 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {V : Type*} [TotallyOrderedRealVectorSpace V] [Nontrivial V]
 (r : {p :ℒ × ℒ // p.1 < p.2} → NNReal)

@@ -1,7 +1,32 @@
 import HarderNarasimhan.SlopeLike.Impl
 
+/-!
+This file exposes the main user-facing results of the `SlopeLike` module.
+
+The `SlopeLike` axiom in
+[HarderNarasimhan/SlopeLike/Defs.lean](HarderNarasimhan/SlopeLike/Defs.lean) is given
+as four conjunctive inequalities that work in a general complete lattice. The implementation file
+`SlopeLike/Impl.lean` proves an equivalent “seesaw” formulation as a disjunction of three patterns.
+
+This file:
+- re-exports that equivalence as `seesaw`,
+- provides a convenient theorem `SlopeLike_of_μQuotient` constructing slope-like functions from the
+  quotient construction `μQuotient`,
+- derives a more implication-oriented helper lemma `seesaw'` for common proof patterns.
+-/
+
 namespace HarderNarasimhan
 
+/-
+Public seesaw characterization of `SlopeLike μ`.
+
+This is a direct re-export of `impl.prop4d6`. It states that for every triple `x<y<z`, the three
+values `μ(x,y)`, `μ(x,z)`, `μ(y,z)` are either strictly increasing, strictly decreasing, or all
+equal.
+
+API note: this form is often significantly easier to use in proofs than the original four-conjunct
+definition.
+-/
 lemma seesaw {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) :
@@ -18,6 +43,13 @@ SlopeLike μ ↔
 := impl.prop4d6 μ
 
 
+/-
+Construct a slope-like function from the quotient construction `μQuotient`.
+
+This theorem packages `impl.prop4d8` as a user-facing API:
+given additivity of rank `r` and degree `d` on composable intervals and a positivity condition when
+`r=0`, the induced `μQuotient r d` is slope-like.
+-/
 theorem SlopeLike_of_μQuotient {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {V : Type*} [TotallyOrderedRealVectorSpace V] [Nontrivial V]
 (r : {p :ℒ × ℒ // p.1 < p.2} → NNReal)
@@ -32,6 +64,15 @@ theorem SlopeLike_of_μQuotient {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ
 := impl.prop4d8 r d h₁ h₂
 
 
+/-
+An implication-style reformulation of the seesaw behavior.
+
+Assuming `SlopeLike μ`, this lemma provides several “if one comparison holds, then the other two
+follow” statements, separately for the increasing, decreasing, and constant cases.
+
+API note: this is tailored for forward reasoning in proofs where one inequality is known and the
+remaining relations need to be derived.
+-/
 lemma seesaw' {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) :

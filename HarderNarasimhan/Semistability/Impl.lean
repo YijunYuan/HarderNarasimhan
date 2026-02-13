@@ -3,10 +3,43 @@ import HarderNarasimhan.Convexity.Impl
 import HarderNarasimhan.Semistability.Defs
 import Mathlib.Tactic.Linarith
 
+/-!
+This file contains implementation lemmas for the semistability module.
+
+Semistability in this project is formulated in terms of the extremal invariant `μA` (from
+`Basic.lean`) and the
+selection predicates `S₁I`/`S₂I` (from `Semistability/Defs.lean`). The results in this file build
+the internal machinery needed to:
+- prove a descending chain condition for `μA` from simpler hypotheses,
+- construct a nonempty set `StI μ I` of “stable breakpoints” inside an interval,
+- show uniqueness and comparison properties of such breakpoints under additional hypotheses,
+- relate the interval-local notion `semistableI` to the global typeclass `Semistable`, and
+- transport semistability along restriction (`Resμ`).
+
+As an `Impl.lean` file, many names mirror the numbering of the accompanying paper (e.g. `prop3d4`),
+and are primarily intended for internal reuse; most users should import
+`HarderNarasimhan.Semistability.Results`.
+-/
+
 namespace HarderNarasimhan
 
 namespace impl
 
+/-
+Internal namespace containing proof-engineering lemmas for semistability.
+
+The objects here are designed to be composable building blocks for the public-facing theorems.
+-/
+
+/-
+Proposition 3.2 (interval-local form): monotonicity of `μA` under enlarging the right endpoint,
+in the special case where `μA (x,z) = ⊤`.
+
+Assuming convexity on `I`, if `x<z` and `μA (x,z)` is top, then for any `a<x` in the interval,
+we have `μA (a,x) ≤ μA (a,z)`.
+
+API note: this lemma is used to derive a descending chain condition by contradiction.
+-/
 lemma prop3d2 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (I : {p : ℒ × ℒ // p.1 < p.2})
@@ -22,6 +55,14 @@ lemma prop3d2 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   rwa [h', inf_top_eq] at h''
 
 
+/-
+Corollary 3.3: a convenient sufficient condition for the DCC on `μA`.
+
+Given a hypothesis that any strict descending chain `f` eventually produces an interval
+`(f(N+1), f(N))` with `μA = ⊤`, we deduce the class `μA_DescendingChainCondition μ`.
+
+API note: this turns a “top occurs along chains” assumption into the formal DCC typeclass.
+-/
 lemma cor3d3 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 (S : Type*) [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : ConvexI TotIntvl μ)
@@ -35,6 +76,17 @@ lemma cor3d3 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   exact not_lt_of_ge this
 
 
+/-
+Auxiliary set `ℒₛ μ I x`: candidates that strictly improve the `μA`-value.
+
+ Given a current breakpoint candidate `x` (as a subtype element of `I`), this set consists of
+ `p ∈ ℒ` such that:
+- `p` lies in `I`,
+- `p` is not the left endpoint and lies strictly below `x`, and
+- `μA (I.left, p)` is strictly greater than `μA (I.left, x)`.
+
+This set is used to define an iterative process that searches for better breakpoints.
+-/
 def ℒₛ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
@@ -45,6 +97,19 @@ def ℒₛ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [Well
   μA μ ⟨(I.val.1 , x.val) , lt_of_le_of_ne x.prop.1 hx⟩}
 
 
+/-
+Core recursive construction used in Proposition 3.4.
+
+`prop3d4₀func μ I k` produces a point of the interval `I` (as a subtype `{p // InIntvl I p}`) by
+iterating:
+- start at the right endpoint for `k=0`,
+- if the previous point is the left endpoint, stay there,
+- otherwise, if there is a “strictly improving” point in `ℒₛ`, pick a minimal such point using
+  well-foundedness,
+- if there is no improvement, jump to the left endpoint.
+
+API note: the definition is noncomputable due to classical choice and well-founded `has_min`.
+-/
 noncomputable def prop3d4₀func
 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [h : WellFoundedGT ℒ]
 {S : Type*} [CompleteLattice S]
@@ -66,6 +131,12 @@ noncomputable def prop3d4₀func
         ⟨I.val.1, ⟨le_rfl,le_of_lt I.prop⟩⟩
 
 
+/-
+Helper lemma: if step `i+1` is not at the left endpoint, then step `i` is also not at the left
+endpoint.
+
+This is used repeatedly to justify that the “improvement set” `ℒₛ` is well-defined at earlier steps.
+-/
 lemma prop3d4₀func_helper {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
@@ -77,6 +148,12 @@ I.val.1 ≠ (prop3d4₀func μ I i).val := by
   exact hi rfl
 
 
+/-
+Key property of the recursion: when the process has not terminated at step `i+1`, the `μA`-value
+strictly increases from step `i` to step `i+1`.
+
+This is extracted directly from the choice of a minimal “improving” element in `ℒₛ`.
+-/
 lemma prop3d4₀func_defprop1
 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [inst_3 : WellFoundedGT ℒ]
 {S : Type*} [CompleteLattice S]
@@ -95,6 +172,14 @@ lemma prop3d4₀func_defprop1
     prop3d4₀func_helper μ I i hi) hne).choose_spec.1.out.choose_spec.choose_spec
 
 
+/-
+Another key property of the recursion: step `i+1` is chosen to be “maximal among those with at least
+its `μA`-value”, in the sense that no `z` strictly between step `i+1` and step `i` can have
+`μA (I.left, z)` greater-or-equal to `μA (I.left, step(i+1))`.
+
+This is a tie-breaking/optimality condition derived from minimality in the well-founded `has_min`
+choice.
+-/
 lemma prop3d4₀func_defprop2
 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [inst_3 : WellFoundedGT ℒ]
 {S : Type*} [CompleteLattice S]
@@ -130,6 +215,13 @@ lemma prop3d4₀func_defprop2
     ).choose_spec.2 z h' hz.1
 
 
+/-
+The recursion produces a strictly decreasing chain of underlying values until it reaches the left
+endpoint.
+
+More precisely: if step `i` is not the left endpoint, then `(prop3d4₀func μ I i).val > (prop3d4₀func
+μ I (i+1)).val`.
+-/
 lemma prop3d4₀func_strict_decreasing
 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [inst_3 : WellFoundedGT ℒ]
 {S : Type*} [CompleteLattice S]
@@ -155,6 +247,14 @@ lemma prop3d4₀func_strict_decreasing
       ).choose_spec.1.out.choose_spec.choose.2
 
 
+/-
+Finite-length termination: under the DCC hypothesis on `μA`, the recursion reaches the left endpoint
+in finitely many steps.
+
+API note: the proof uses the fact that the recursion yields a strict anti-chain of underlying
+elements
+and simultaneously a strict increase in `μA`, contradicting DCC if it never hits the left endpoint.
+-/
 lemma prop3d4₀func_fin_len
 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLattice S]
@@ -174,6 +274,12 @@ lemma prop3d4₀func_fin_len
   exact hN (h₂ N)
 
 
+/-
+Define the length `prop3d4₀func_len μ I hμDCC` as the first time the recursion hits the left
+endpoint.
+
+This is the `Nat.find` of the termination statement `prop3d4₀func_fin_len`.
+-/
 noncomputable def prop3d4₀func_len
 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLattice S]
@@ -184,6 +290,12 @@ noncomputable def prop3d4₀func_len
   exact Nat.find (prop3d4₀func_fin_len μ I hμDCC)
 
 
+/-
+The termination length is nonzero.
+
+Intuitively, at step `0` the recursion starts at the right endpoint, which cannot equal the left
+endpoint for a strict interval.
+-/
 lemma prop3d4₀func_len_nonzero
 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLattice S]
@@ -198,6 +310,11 @@ prop3d4₀func_len μ I hμDCC ≠ 0 := by
   exact (lt_self_iff_false I.val.1).1 (h ▸ I.prop)
 
 
+/-
+Before termination, every step lies strictly above the left endpoint.
+
+This lemma is phrased as a strict inequality `I.left < (prop3d4₀func μ I i).val` for `i < len`.
+-/
 lemma prop3d4₀func_defprop3₀
 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLattice S]
@@ -210,6 +327,15 @@ I.val.1 < (prop3d4₀func μ I i).val := by
     fun hcontra ↦ (eq_of_le_of_not_lt (prop3d4₀func μ I i).prop.1 hcontra).symm
 
 
+/-
+Optimality at the last pre-termination step.
+
+Let `len` be the first index such that step `len` equals `I.left`. Then at index `len-1`, no
+intermediate point `y` between `I.left` and `(func (len-1)).val` yields a strictly larger value of
+`μA (I.left, y)`.
+
+This is used to show that the final candidate satisfies the selection predicate `S₁I`.
+-/
 lemma prop3d4₀func_defprop3
 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [inst_3 : WellFoundedGT ℒ]
 {S : Type*} [CompleteLattice S]
@@ -246,6 +372,15 @@ lemma prop3d4₀func_defprop3
       prop3d4₀func_len_nonzero μ I hμDCC⟩).1 hcontra
 
 
+/-
+Proposition 3.4: nonemptiness of the set of stable breakpoints `StI μ I`.
+
+Under well-foundedness and the DCC hypothesis, and assuming convexity on `I`, the selection
+predicates `S₁I`/`S₂I` can be satisfied by a canonical choice produced by the recursion
+`prop3d4₀func`.
+
+API note: this provides the key existential input for later uniqueness/maximality arguments.
+-/
 lemma prop3d4 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμDCC : μA_DescendingChainCondition μ)
@@ -335,6 +470,14 @@ lemma prop3d4 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [W
     · exact (func (len - 1)).prop
 
 
+/-
+Remark 3.5: uniqueness of stable breakpoints in a complete linear order.
+
+If the target lattice `S` is a complete linear order, then any two elements of `StI μ I` must be
+equal.
+
+This uses the tie-breaking predicate `S₂I` together with totality of comparisons in `S`.
+-/
 lemma rmk3d5 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLinearOrder S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
@@ -348,6 +491,13 @@ lemma rmk3d5 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [We
     (le_of_not_gt <| hxS₁ y hyI hy) (le_of_not_gt <| hyS₁ x hxI hx))
 
 
+/-
+Proposition 3.7 (part 1): a stable breakpoint induces semistability of the corresponding
+subinterval.
+
+If `x ∈ StI μ I`, then the interval `(I.left, x)` is semistable in the interval-local sense
+`semistableI`.
+-/
 lemma prop3d7₁ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
@@ -359,6 +509,15 @@ semistableI μ ⟨(I.val.1 , x), lt_of_le_of_ne hxSt.out.choose.1 hxSt.out.choos
     fun z hzI hz hz' ↦ hxS₂I z ⟨hzI.1,le_trans hzI.2 hxI.2⟩ hz hz'⟩⟩
 
 
+/-
+Proposition 3.7 (part 2): strict inequality obstruction above a stable breakpoint.
+
+Assuming convexity, if `x ∈ StI μ I` and `y > x` lies in `I`, then `μA (I.left, x)` is not
+less-or-equal to `μA (x,y)`.
+
+Intuition: above the chosen breakpoint, the interval `(x,y)` cannot dominate the “best” value at
+`x`.
+-/
 lemma prop3d7₂ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
@@ -375,6 +534,16 @@ lemma prop3d7₂ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
     hxSt.out.choose_spec.choose_spec.1 y hyI <| ne_of_lt <| lt_of_le_of_lt hxSt.out.choose.1 hy)
 
 
+/-
+Proposition 3.8 (part 1): totality on `StI μ I` under comparability/attainment hypotheses.
+
+Under convexity and well-foundedness, if either:
+- the target `S` is totally ordered, or
+- all relevant `μA` infima are attained,
+then the order on the set of stable breakpoints becomes total.
+
+API note: this produces an instance of `Std.Total` for the subtype `StI μ I`.
+-/
 lemma prop3d8₁ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)-- (hμ : μDCC μ)
@@ -423,6 +592,14 @@ lemma prop3d8₁ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   · exact Or.inl (sup_le_iff.1 c2).1
 
 
+/-
+Existence of a greatest element of `StI μ I`.
+
+Assuming the DCC (as a typeclass), convexity, and one of the comparability/attainment hypotheses,
+we obtain an element `s` that is greatest in the set `StI μ I`.
+
+API note: the proof uses `has_min` on `StI μ I` together with the totality lemma `prop3d8₁`.
+-/
 lemma prop3d8₁' {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [inst_3 : WellFoundedGT ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : μA_DescendingChainCondition μ)
@@ -439,6 +616,15 @@ lemma prop3d8₁' {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ
   · exact le_of_eq <| eq_of_le_of_not_lt' c2 (hM.2 x hx)
 
 
+/-
+Proposition 3.8 (part 2): decomposition at a stable breakpoint.
+
+Under convexity and the comparability/attainment hypothesis, if `x ∈ StI μ I` and `x<y` in `I`, then
+`μA (I.left, y) = μA (x,y)`.
+
+Intuition: once `x` is chosen as a stable breakpoint, the “best value” up to `y` is fully determined
+by the subinterval starting at `x`.
+-/
 lemma prop3d8₂ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)-- (hμ : μDCC μ)
@@ -466,6 +652,13 @@ lemma prop3d8₂ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
       ) hxy)
 
 
+/-
+Equivalence between the global typeclass `Semistable μ` and interval-local semistability on the
+total interval.
+
+This lemma is an API bridge: it lets one freely move between the class-based semistability used in
+later modules and the predicate `semistableI μ TotIntvl` defined via `StI`.
+-/
 theorem semistable_iff {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) :
@@ -479,9 +672,26 @@ theorem semistable_iff {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrde
   · exact fun h ↦ {semistable := fun y hyI hy ↦ (h.choose_spec y (in_TotIntvl _) (Ne.symm hyI)) hy}
 
 
+/-
+Small rewriting helper: chain three equalities.
+
+This is used to keep some long proofs readable when transporting equalities across definitional
+expansions.
+-/
 lemma smart_helper {α : Type*} {a b c d : α} (h : a = b) (h' : b = c) (h'' : c = d) : a = d :=
 h ▸ h' ▸ h''
 
+/-
+Transport semistability along restriction.
+
+This theorem relates:
+- `semistableI μ I`, i.e. semistability of the interval `I` with respect to `μ`, and
+- `Semistable (Resμ I μ)`, i.e. global semistability of the restricted function on the interval
+  subtype.
+
+API note: this is a key adapter used whenever proofs switch between the “ambient interval” viewpoint
+and the “interval as a bounded lattice” viewpoint.
+-/
 theorem semistableI_iff {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)

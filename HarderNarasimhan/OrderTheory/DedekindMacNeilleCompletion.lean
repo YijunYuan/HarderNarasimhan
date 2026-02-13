@@ -1,7 +1,39 @@
 import Mathlib.SetTheory.Cardinal.Aleph
 import Mathlib.Order.Closure
 
+/-!
+This file provides a small amount of order-theoretic infrastructure around the Dedekind–MacNeille
+completion.
+
+The Dedekind–MacNeille completion of a poset `α` is the complete lattice obtained by closing sets
+under the Galois connection between lower and upper bounds. In this project it is used as a
+convenient ambient complete lattice in which certain “quotient” constructions can safely take the
+value `⊤` (e.g. to model division by zero).
+
+Main contents:
+- A `CompleteLattice` instance for the type of closed sets of a closure operator.
+- Definitions of the Dedekind–MacNeille Galois connection, the induced closure operator, and the
+  completion.
+- Order structure instances for the completion when `α` is linearly ordered.
+- An order embedding `coe' : α ↪o DedekindMacNeilleCompletion α` and a coercion `Coe`.
+- A universal property statement `univ_prop_DedekindMacNeilleCompletion` for extending order
+  embeddings.
+
+This file lives in the `OrderTheory` namespace because it provides general tools independent of the
+  specific Harder–Narasimhan game development.
+-/
+
 namespace OrderTheory
+
+/-
+The closed sets of a closure operator form a complete lattice.
+
+Mathematically, if `T` is a closure operator on `Set α`, then its fixed points (closed sets) are
+closed under bitrary intersections and under closure of unions, which yields `sInf`/`sSup`.
+
+API note: we provide the full `CompleteLattice` instance for `ClosureOperator.Closeds T`, with order
+given by subset inclusion on underlying sets.
+-/
 instance {α : Type*} [PartialOrder α] (T : ClosureOperator (Set α)) :
 CompleteLattice (ClosureOperator.Closeds T) where
   top :=⟨Set.univ,ClosureOperator.isClosed_iff_closure_le.mpr fun ⦃a⦄ a ↦ trivial⟩
@@ -61,23 +93,54 @@ CompleteLattice (ClosureOperator.Closeds T) where
 
 
 section DedekindMacNeille
+
+/-
+The Dedekind–MacNeille Galois connection.
+
+The left adjoint sends a set `A` to its set of upper bounds (viewed in the order dual), and the
+right adjoint sends a set of upper bounds back to the set of lower bounds.
+
+This Galois connection is the standard starting point for defining the Dedekind–MacNeille closure.
+-/
 lemma DedekindMacNeilleConnection (α : Type*) [PartialOrder α] :
 GaloisConnection (fun A ↦ (OrderDual.toDual (upperBounds A)))
 (fun A : (Set α)ᵒᵈ ↦ lowerBounds A.ofDual) :=
 fun _ _ ↦ ⟨fun h _ ha ⦃_⦄ a_3 ↦ h a_3 ha, fun h _ ha ⦃_⦄ a_2 ↦ h a_2 ha⟩
 
 
+/-
+The Dedekind–MacNeille closure operator on `Set α`.
+
+It is obtained from the Galois connection by the standard `GaloisConnection.closureOperator`
+construction.
+-/
 def DedekindMacNeilleClosureOperator (α : Type*) [PartialOrder α] :
 ClosureOperator (Set α) := GaloisConnection.closureOperator <| DedekindMacNeilleConnection α
 
 
+/-
+The Dedekind–MacNeille completion of `α`.
+
+This is defined as the type of closed sets for the Dedekind–MacNeille closure operator.
+It carries a complete lattice structure by the general instance above.
+-/
 abbrev DedekindMacNeilleCompletion (α : Type*) [PartialOrder α] :=
 (DedekindMacNeilleClosureOperator α).Closeds
 
 
+/-
+The Dedekind–MacNeille completion is a complete lattice.
+
+This is obtained by typeclass inference from the `Closeds` complete lattice instance.
+-/
 instance {α : Type*} [PartialOrder α] : CompleteLattice (DedekindMacNeilleCompletion α) :=
 inferInstance
 
+/-
+If `α` is a linear order, then the completion is totally ordered.
+
+API note: we provide `Std.Total` for `≤`, which is then used to build a `LinearOrder` instance.
+-/
 instance {α : Type*} [LinearOrder α] :
 @Std.Total (DedekindMacNeilleCompletion α) instCompleteLatticeDedekindMacNeilleCompletion.le := by
   refine { total := ?_ }
@@ -105,6 +168,12 @@ instance {α : Type*} [LinearOrder α] :
 
 --open Classical
 
+/-
+If `α` is linearly ordered, then the completion is linearly ordered.
+
+This instance is noncomputable because we use classical decidability for `≤`.
+The order is the inherited one from the complete lattice structure.
+-/
 noncomputable instance {α : Type*} [LinearOrder α] :
 LinearOrder (DedekindMacNeilleCompletion α) := {
   instCompleteLatticeDedekindMacNeilleCompletion with
@@ -122,12 +191,25 @@ LinearOrder (DedekindMacNeilleCompletion α) := {
       simpa only [h, false_or] using (Std.le_of_not_ge h)
   }
 
+/-
+If `α` is linearly ordered, the completion is a complete linear order.
+
+API note: this bundles `CompleteLattice` with `LinearOrder`.
+-/
 noncomputable instance {α : Type*} [LinearOrder α] :
 CompleteLinearOrder (DedekindMacNeilleCompletion α) :=
   {instLinearOrderDedekindMacNeilleCompletion, LinearOrder.toBiheytingAlgebra
     (DedekindMacNeilleCompletion α), instCompleteLatticeDedekindMacNeilleCompletion with}
 
 
+/-
+Order embedding of `α` into its Dedekind–MacNeille completion.
+
+The map sends `x : α` to the principal down-set `Set.Iic x`, which is closed under the
+Dedekind–MacNeille closure. Order preservation is `Set.Iic_subset_Iic`.
+
+API note: this is provided as an `OrderEmbedding` so that monotonicity is built in.
+-/
 def coe' {α : Type*} [PartialOrder α] : α ↪o DedekindMacNeilleCompletion α := by
   have inj: ∀ x : α, (DedekindMacNeilleClosureOperator α).IsClosed (Set.Iic x) :=
     fun x ↦ Set.ext fun y ↦ ⟨fun hy ↦ hy (by simp only [upperBounds,
@@ -142,9 +224,24 @@ def coe' {α : Type*} [PartialOrder α] : α ↪o DedekindMacNeilleCompletion α
     implies_true]
 
 
+/-
+Coercion from `α` to its Dedekind–MacNeille completion.
+
+This allows writing `((x : α) : DedekindMacNeilleCompletion α)`.
+-/
 instance {α : Type*} [PartialOrder α] : Coe α (DedekindMacNeilleCompletion α) := ⟨coe'.toFun⟩
 
 
+/-
+Universal property (extension) for the Dedekind–MacNeille completion.
+
+Given an order embedding `f : α ↪o β` into a complete lattice `β`, this theorem produces an order
+embedding `f' : DedekindMacNeilleCompletion α ↪o β` such that `f = f' ∘ coe'`.
+
+API note: the constructed `f'` is defined by a `sSup` over lower bounds of upper bounds of the image
+of `x`. The statement is used in the project to justify viewing the completion as a canonical
+completion object.
+-/
 theorem univ_prop_DedekindMacNeilleCompletion
 {α : Type*} [PartialOrder α] {β : Type*} [CompleteLattice β] (f : α ↪o β) :
 ∃ f' : DedekindMacNeilleCompletion α ↪o β, f = f' ∘ coe' := by

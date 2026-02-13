@@ -1,9 +1,34 @@
 import HarderNarasimhan.Semistability.Results
 import Mathlib.Data.Real.Basic
 
+/-!
+  # First-mover advantage: internal implementation lemmas
+
+  This file contains the internal proofs used to relate the “A/B-star” quantities
+  (`μAstar`, `μBstar`) to the global extremal values on `TotIntvl`.
+
+  The main results are Proposition 4.1 (the characterisation of `μAstar`) and
+  Proposition 4.3 (the dual characterisation of `μBstar`), together with the
+  order-duality lemmas transporting hypotheses and rewriting `μAstar`/`μBstar`.
+
+  All declarations here live in the private `HarderNarasimhan.impl` namespace and
+  are intended to be used by the public-facing `Results` files.
+
+  API note: downstream users should normally import
+  `HarderNarasimhan.FirstMoverAdvantage.Results` instead of this implementation file.
+-/
+
 namespace HarderNarasimhan
 
 namespace impl
+
+/-
+  `prop4d1₁_seq` is the auxiliary sequence used in the contradiction argument for
+  Proposition 4.1.
+
+  Starting from a nonempty set of “bad” candidates `YA`, it recursively constructs
+  a new candidate by applying the witness condition at the previous step.
+-/
 
 noncomputable def prop4d1₁_seq {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
@@ -38,6 +63,11 @@ noncomputable def prop4d1₁_seq {ℒ : Type*} [Nontrivial ℒ] [PartialOrder �
     exact con (hhh xB hAB)
 
 
+
+/-
+  `prop4d1_helper` rewrites the “top-anchored” sInf that appears naturally in the
+  proof of Proposition 4.1 as `μmin μ TotIntvl`.
+-/
 lemma prop4d1_helper {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) :
@@ -50,6 +80,13 @@ sInf {x | ∃ x_1, ∃ (hx : x_1 < ⊤), μ ⟨(x_1, ⊤), hx⟩ = x} = μmin μ
       use w, lt_top_iff_ne_top.2 hw.2
 
 
+
+/-
+  `prop4d1₁` is the core statement behind Proposition 4.1: under the two hypotheses
+  `h₁` (a weak “eventual improvement” along strict chains) and `h₂` (a weak slope-like
+  alternative towards the top), the best-response value `μAstar μ` coincides with the
+  global infimum `μmin μ TotIntvl`.
+-/
 lemma prop4d1₁ (ℒ : Type*) [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 (S : Type*) [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
@@ -98,6 +135,12 @@ lemma prop4d1₁ (ℒ : Type*) [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder
     use ⊤, ⟨⟨le_top,le_top⟩,hx.2⟩
 
 
+
+/-
+  `prop4d1₂` is the easy inequality direction derived from `prop4d1₁`:
+  once `μAstar μ = μmin μ TotIntvl`, we get `μAstar μ ≤ μBstar μ` by exhibiting a
+  single witness in the defining `sSup` for `μBstar`.
+-/
 lemma prop4d1₂ (ℒ : Type*) [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 (S : Type*) [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
@@ -112,28 +155,51 @@ lemma prop4d1₂ (ℒ : Type*) [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder
   use ⊤, ⟨⟨bot_le,le_rfl⟩,ne_of_lt bot_lt_top⟩
 
 
+
+/-
+  Coercion sending an interval in `ℒ` to the corresponding interval in the order dual.
+  This swaps the endpoints.
+-/
 instance {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ] :
 Coe ({p :ℒ × ℒ // p.1 < p.2}) ({p :ℒᵒᵈ × ℒᵒᵈ // p.1 < p.2}) where
   coe p := ⟨(p.val.2, p.val.1), p.prop⟩
 
 
+/-
+  Coercion sending an interval in `ℒᵒᵈ` back to an interval in `ℒ`.
+  This is the same endpoint swap, viewed in the opposite direction.
+-/
 instance {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ] :
 Coe ({p :ℒᵒᵈ × ℒᵒᵈ // p.1 < p.2}) ({p :ℒ × ℒ // p.1 < p.2}) where
   coe p := ⟨(p.val.2, p.val.1), p.prop⟩
 
 
+/-
+  Coercion transporting a function `μ` on intervals of `ℒ` to a function on intervals
+  of `ℒᵒᵈ`, with values in the order dual `Sᵒᵈ`.
+
+  This is a notational convenience for duality arguments.
+-/
 instance {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S] :
 Coe ({p :ℒ × ℒ // p.1 < p.2} → S) ({p :ℒᵒᵈ × ℒᵒᵈ // p.1 < p.2} → Sᵒᵈ) where
   coe f := fun p ↦ f p
 
 
+/-
+  `fine` is a small definitional lemma ensuring that the coercion-defined dual map
+  agrees with explicit endpoint swapping.
+-/
 private lemma fine {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S] (μ : {p :ℒ × ℒ // p.1 < p.2} → S) :
 ∀ I : {p :ℒᵒᵈ × ℒᵒᵈ // p.1 < p.2}, μ ⟨(I.val.2.ofDual,I.val.1.ofDual),I.prop⟩ =
   OrderDual.ofDual ((↑μ : {p :ℒᵒᵈ × ℒᵒᵈ // p.1 < p.2} → Sᵒᵈ) I) := fun _ ↦ rfl
 
 
+/-
+  `h₁_dual_of_h₁` transports the “descending-chain” hypothesis `h₁` on `ℒ` to the
+  corresponding “ascending-chain” hypothesis on the order dual `ℒᵒᵈ`.
+-/
 lemma h₁_dual_of_h₁ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S] {μ : {p :ℒ × ℒ // p.1 < p.2} → S}
 (h₁ : ∀ x : ℕ → ℒ, (saf : StrictAnti x) →
@@ -151,6 +217,11 @@ lemma h₁_dual_of_h₁ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [Bound
   use N, OrderDual.ofDual_le_ofDual.1 hN
 
 
+
+/-
+  `h₂_dual_of_h₂` transports the “bottom-anchored” weak alternative `h₂` to the
+  corresponding “top-anchored” alternative on `ℒᵒᵈ`.
+-/
 lemma h₂_dual_of_h₂ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S] {μ : {p :ℒ × ℒ // p.1 < p.2} → S}
 (h₂ : ∀ z : {p :ℒ × ℒ // p.1 < p.2}, (hz : ⊥ < z.val.1) →
@@ -166,6 +237,14 @@ lemma h₂_dual_of_h₂ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [Bound
   exact h₂ z hz
 
 
+
+/-
+  `dualμAstar_eq_μBstar` identifies `μAstar` computed for the dualised `μ` with
+  `μBstar μ`.
+
+  This is an explicit unfolding of definitions and a reindexing of the `sInf`/`sSup`
+  expressions.
+-/
 lemma dualμAstar_eq_μBstar {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) :
@@ -193,6 +272,10 @@ OrderDual.ofDual <| μAstar (fun (p : {p : ℒᵒᵈ × ℒᵒᵈ // p.1 < p.2})
       exact ⟨b, ⟨⟨hb.1.2,hb.1.1⟩,Ne.symm hb.2⟩, hb'.symm ▸ rfl⟩
 
 
+
+/-
+  `dualμBstar_eq_μAstar` is the dual companion to `dualμAstar_eq_μBstar`.
+-/
 lemma dualμBstar_eq_μAstar {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) :
@@ -220,6 +303,11 @@ OrderDual.ofDual <| μBstar (fun (p : {p : ℒᵒᵈ × ℒᵒᵈ // p.1 < p.2})
       exact ⟨b, ⟨⟨hb.1.2,hb.1.1⟩,Ne.symm hb.2⟩, hb'.symm ▸ rfl⟩
 
 
+
+/-
+  `prop4d3_helper` rewrites the “bottom-anchored” sSup that appears naturally in the
+  dual argument as `μmax μ TotIntvl`.
+-/
 lemma prop4d3_helper {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) :
@@ -232,6 +320,15 @@ sSup {μ ⟨(⊥, y),hy⟩ | (y : ℒ) (hy : ⊥ < y) } = μmax μ TotIntvl := b
       use w, bot_lt_iff_ne_bot.2 <| Ne.symm hw.2
 
 
+
+/-
+  `prop4d3₁` is the dual form of Proposition 4.1: under hypotheses `h₁` and `h₂`
+  phrased for strict anti-chains and bottom-anchored alternatives, the best-response
+  value `μBstar μ` coincides with the global supremum `μmax μ TotIntvl`.
+
+  The proof reduces to `prop4d1₁` on the order dual, and then translates the result
+  back via the duality lemmas.
+-/
 lemma prop4d3₁ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
@@ -256,6 +353,11 @@ lemma prop4d3₁ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder
     use a, ha, ha'
 
 
+
+/-
+  `prop4d3₂` packages the inequality direction corresponding to `prop4d3₁`.
+  It is obtained by combining the two duality equalities with `prop4d1₂` on `ℒᵒᵈ`.
+-/
 lemma prop4d3₂ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
@@ -267,6 +369,15 @@ lemma prop4d3₂ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder
   prop4d1₂ ℒᵒᵈ Sᵒᵈ (↑μ : {p :ℒᵒᵈ × ℒᵒᵈ // p.1 < p.2} → Sᵒᵈ) (h₁_dual_of_h₁ h₁) (h₂_dual_of_h₂ h₂)
 
 
+
+/-
+  `rmk4d4` is a well-ordering / ranking-function criterion that produces the
+  strict-anti-chain hypothesis needed in `prop4d3₁`.
+
+  Given a monotone rank function `r : ℒ → ℝ` whose range is well-ordered, any strict
+  descending chain must eventually stabilise in rank; the hypothesis `h` then forces
+  the required inequality by turning equal ranks into a `μ = ⊤` statement.
+-/
 lemma rmk4d4 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)

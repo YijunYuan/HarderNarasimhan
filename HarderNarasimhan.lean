@@ -1,5 +1,3 @@
--- This module serves as the root of the `HarderNarasimhan` library.
--- Import modules here that should be built as part of the library.
 import HarderNarasimhan.Basic
 import HarderNarasimhan.Interval
 
@@ -27,3 +25,17 @@ import HarderNarasimhan.JordanHolderFiltration.Results
 
 import HarderNarasimhan.CoprimaryFiltration.Defs
 import HarderNarasimhan.CoprimaryFiltration.Results
+
+/-!
+# `HarderNarasimhan`: library root
+
+This module is the umbrella import for the project. It re-exports the main definitions and the
+public-facing results of each chapter.
+
+API overview:
+
+* Import `HarderNarasimhan` when you want the standard collection of definitions and theorems.
+* For more granular dependencies, prefer importing individual `.../Defs` and `.../Results` modules.
+
+API note: this file declares no new definitions/lemmas; it is purely a re-export layer.
+-/

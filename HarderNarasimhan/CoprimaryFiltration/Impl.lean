@@ -20,10 +20,42 @@ import HarderNarasimhan.CoprimaryFiltration.AdmittedResults
 
 import HarderNarasimhan.CoprimaryFiltration.Defs
 
+/-!
+Implementation for coprimary filtrations.
+
+This file develops the commutative-algebraic input needed to apply the general
+Harder–Narasimhan filtration theory to the slope `μ R M` built from associated
+primes.
+
+High-level structure:
+
+* Show `_μ R M I` is nonempty and behaves monotonically under enlarging the right
+  endpoint of an interval.
+* Derive basic slope properties (`μmax_eq_μ`) and prove convexity of `μ R M`.
+* Compute `μA (μ R M) I` explicitly as the singleton containing the minimal
+  associated prime of the relevant quotient.
+* Prove well-foundedness of the submodule lattice and a descending chain condition
+  for `μA`, enabling the general HN filtration construction.
+* Relate semistability of restricted slopes to semistability on quotient modules,
+  and use this to build coprimary filtrations.
+
+Some classical results are still assumed via `HarderNarasimhan.AdmittedResults`.
+
+API note: most downstream files should import `HarderNarasimhan.CoprimaryFiltration.Results`
+instead of this implementation file. This module is large and contains commutative-algebraic
+infrastructure.
+-/
+
 namespace HarderNarasimhan
 
 namespace impl
 
+/-
+Nonemptiness of the finset of associated primes for any strict interval.
+
+For a strict inclusion `N₁ < N₂`, the quotient `N₂ / N₁` is nontrivial, hence it has
+at least one associated prime; this yields a nonempty finset `_μ R M I`.
+-/
 lemma μ_nonempty {R : Type*} [CommRing R] [IsNoetherianRing R]
 {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] :
 ∀ I : {z: (ℒ R M) × (ℒ R M) // z.1 < z.2}, (_μ R M I).toFinset.Nonempty := by
@@ -38,6 +70,16 @@ lemma μ_nonempty {R : Type*} [CommRing R] [IsNoetherianRing R]
   refine ⟨{ asIdeal := q, isPrime := hq.out.1 },Set.mem_setOf.mpr ?_⟩
   use q, hq
 
+/-
+Lift an annihilator description along an inclusion of submodules.
+
+This technical lemma is used to transport “associated prime given as annihilator of
+a cyclic submodule” between quotients.
+
+Given `m` in the quotient `u / N₁` whose annihilator is `p`, and assuming the chosen
+representative lies in `N₃`, we produce a corresponding element in `N₃ / N₁` with the
+same annihilator.
+-/
 lemma annihilator_lift {R : Type*} [CommRing R] [IsNoetherianRing R]
 {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]
 {N₁ u N₃ : Submodule R M} (p : Ideal R)
@@ -79,6 +121,13 @@ lemma annihilator_lift {R : Type*} [CommRing R] [IsNoetherianRing R]
     rw [← Quotient.out_eq (y • m), this]
     exact (Submodule.Quotient.mk_eq_zero _).2 hy
 
+  /-
+  Monotonicity of `_μ` in the right endpoint.
+
+  If `N₁ < u ≤ N₃`, then every associated prime of `u / N₁` is also an associated
+  prime of `N₃ / N₁` (after translating into the `LinearExtension` wrapper). This is
+  the key subset relation used to show monotonicity of the slope value.
+  -/
 lemma _μ_mono_right {R : Type*} [CommRing R] [IsNoetherianRing R]
 {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]
 {N₁ u N₃ : Submodule R M}
@@ -114,6 +163,12 @@ _μ R M ⟨(N₁, u), h₁⟩ ⊆ _μ R M ⟨(N₁, N₃), lt_of_lt_of_le h₁ h
   exact Iff.symm (Submodule.mem_annihilator_span_singleton P z)
 
 
+/-
+For the associated-prime slope, `μmax` is definitionally redundant.
+
+The definition of `μ R M` already yields an element that is greatest among the
+subinterval values, so the `μmax` operation returns the same value.
+-/
 lemma μmax_eq_μ {R : Type*} [CommRing R] [IsNoetherianRing R]
 {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] :
 ∀ I : {z: (ℒ R M) × (ℒ R M) // z.1 < z.2}, μmax (μ R M) I = (μ R M) I := by
@@ -136,6 +191,13 @@ lemma μmax_eq_μ {R : Type*} [CommRing R] [IsNoetherianRing R]
     apply S₀_order.1
     exact Set.toFinset_subset_toFinset.mpr <| _μ_mono_right (lt_of_le_of_ne hu1.1.1 hu1.2) hu1.1.2
 
+/-
+Proposition 3.11 (internal form): convexity of `μ R M` on the total interval.
+
+We prove `ConvexI TotIntvl (μ R M)` first, and later export it as global `Convex`.
+The key step is that subset inclusion between associated-prime sets implies `≤` in
+the chosen `S₀ R` order.
+-/
 instance prop3d11 {R : Type*} [CommRing R] [IsNoetherianRing R]
 {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] :
 ConvexI TotIntvl (μ R M) := by
@@ -170,6 +232,15 @@ ConvexI TotIntvl (μ R M) := by
     rw [Submodule.bot_colon', Submodule.mem_annihilator_span_singleton, this] at *
     exact (LinearEquiv.map_eq_zero_iff (LinearMap.quotientInfEquivSupQuotient x y)).mp h
 
+/-
+Membership in module support from an associated prime.
+
+Any associated prime of `M` is, by definition, the annihilator of some element; this
+implies the corresponding prime lies in `Module.support R M`.
+
+This is a small bridge lemma used when comparing minimality in `associatedPrimes`
+versus minimality in `support`.
+-/
 lemma mem_support_of_mem_associatedPrimes {R : Type*} [CommRing R]
 {M : Type*} [AddCommGroup M] [Module R M] {x : Ideal R} :
 (hx : x ∈ associatedPrimes R M) →  {asIdeal := x, isPrime := hx.out.1} ∈  Module.support R M := by
@@ -182,6 +253,12 @@ lemma mem_support_of_mem_associatedPrimes {R : Type*} [CommRing R]
   rw [Submodule.bot_colon']
   exact hz
 
+/-
+Monotonicity of support under enlarging the submodule being quotiented out.
+
+If `N₁ ≤ N₂`, then the support of `N₃ / N₂` is contained in the support of
+`N₃ / N₁`. This is a standard “support shrinks under quotients” statement.
+-/
 lemma support_quotient_mono {R : Type*} [CommRing R]
 {M : Type*} [AddCommGroup M] [Module R M]
 (N₁ N₂ N₃ : Submodule R M) (h : N₁ ≤ N₂) :
@@ -210,6 +287,15 @@ lemma support_quotient_mono {R : Type*} [CommRing R]
     exact (Submodule.sub_mem_iff_right (N₂.submoduleOf N₃) (h this)).mp this'
   exact hm this
 
+/-
+Existence of a minimal prime in the support below a given supported prime.
+
+For a finite module over a Noetherian ring, any prime in the support is above a
+minimal element of the support.
+
+This is used to compare arbitrary associated primes to the minimum element selected
+by `Finset.min'`.
+-/
 lemma exists_minimal_prime_contained_supp {R : Type*} [CommRing R] [IsNoetherianRing R]
 {M : Type*} [AddCommGroup M] [Module R M] [Module.Finite R M] :
 ∀ q : PrimeSpectrum R, q ∈ Module.support R M →
@@ -221,6 +307,15 @@ lemma exists_minimal_prime_contained_supp {R : Type*} [CommRing R] [IsNoetherian
   simp only [Module.mem_support_iff_of_finite]
   exact ⟨hr.1.out.1.2, fun y hy1 hy2 ↦ hr.1.out.2 ⟨y.isPrime,hy1⟩ hy2⟩
 
+/-
+Lower bound property of the minimal associated prime.
+
+Given an intermediate submodule `N''` in an interval `I`, any associated prime of
+`I.val.2 / N''` is ≥ the minimal element of `_μ R M I`.
+
+This uses the admitted equivalence between minimal associated primes and minimal
+support, plus the existence of minimal primes in the support.
+-/
 lemma prop3d12p1 {R : Type*} [CommRing R] [IsNoetherianRing R]
 {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]
 (I : {z: (ℒ R M) × (ℒ R M) // z.1 < z.2})
@@ -238,6 +333,13 @@ lemma prop3d12p1 {R : Type*} [CommRing R] [IsNoetherianRing R]
   use r.asIdeal, hr.1
 
 
+/-
+Singleton lower bound for `μA`: the chosen minimal prime is ≤ every tail `_μ`.
+
+Specializing the previous lemma to the minimal element of a smaller interval, we
+obtain the order relation needed to show that the singleton `{min}` is the infimum
+in the definition of `μA`.
+-/
 lemma prop3d12p2 {R : Type*} [CommRing R] [IsNoetherianRing R]
 {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]
 (I : {z: (ℒ R M) × (ℒ R M) // z.1 < z.2})
@@ -262,6 +364,12 @@ lemma prop3d12p2 {R : Type*} [CommRing R] [IsNoetherianRing R]
   exact Set.mem_toFinset.mp <|
     (_μ R M ⟨(N'', I.val.2), lt_of_le_of_ne ha1.2 ha2⟩).toFinset.min'_mem <| μ_nonempty _
 
+/-
+Auxiliary localization map used in the `μA` computation.
+
+`CP.f1 I` is the canonical map into the localization of the quotient module
+`I.val.2 / I.val.1`, localized away from the (chosen) minimal associated prime.
+-/
 noncomputable abbrev CP.f1 {R : Type*} [CommRing R] [IsNoetherianRing R]
 {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]
 (I : {z: (ℒ R M) × (ℒ R M) // z.1 < z.2}) :=
@@ -269,6 +377,11 @@ noncomputable abbrev CP.f1 {R : Type*} [CommRing R] [IsNoetherianRing R]
     ((_μ R M) I).toFinset.min' (μ_nonempty I)).asIdeal.primeCompl
     (I.val.2⧸I.val.1.submoduleOf I.val.2)
 
+  /-
+  Quotient map used in the `μA` computation.
+
+  `CP.f2 I` is the linear map `I.val.2 → I.val.2 / I.val.1`.
+  -/
 abbrev CP.f2 {R : Type*} [CommRing R] [IsNoetherianRing R]
 {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]
 (I : {z: (ℒ R M) × (ℒ R M) // z.1 < z.2}) :
@@ -277,12 +390,25 @@ I.val.2 →ₗ[R] (I.val.2⧸I.val.1.submoduleOf I.val.2) where
   map_add' := fun _ _ => rfl
   map_smul' := fun _ _ => rfl
 
+/-
+Kernel lifted back to a submodule of `M`.
+
+We consider the kernel of the composition `CP.f1 I ∘ CP.f2 I` on `I.val.2` and map it
+back into `M`. This submodule serves as the intermediate `N''` that realizes the
+infimum in the definition of `μA`.
+-/
 noncomputable abbrev ker_of_quot_comp_localization {R : Type*} [CommRing R] [IsNoetherianRing R]
 {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]
 (I : {z: (ℒ R M) × (ℒ R M) // z.1 < z.2})
 : ℒ R M :=
 Submodule.map I.val.2.subtype (LinearMap.ker ((CP.f1 I) ∘ₗ (CP.f2 I)))
 
+/-
+Mapping a submodule of `N` to a submodule of `M` and restricting back.
+
+This is a small bookkeeping lemma about `Submodule.map`/`submoduleOf` used to simplify
+some of the quotient arguments below.
+-/
 lemma submoduleOf_map_subtype {R : Type*} [CommRing R]
 {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M]
 (N : Submodule R M) (N' : Submodule R ↥N) : N' = (Submodule.map (N.subtype) N').submoduleOf N := by
@@ -296,6 +422,19 @@ lemma submoduleOf_map_subtype {R : Type*} [CommRing R]
     simp only [Submodule.subtype_apply, SetLike.coe_eq_coe] at hy2
     exact hy2 ▸ hy1
 
+  /-
+  An isomorphism rewriting a quotient by `ker_of_quot_comp_localization`.
+
+  This lemma constructs a `LinearEquiv` identifying
+
+  `I.val.2 / ker_of_quot_comp_localization I`
+
+  with a quotient of `I.val.2 / I.val.1` by the kernel of the localization map
+  `CP.f1 I`.
+
+  It is a technical step toward computing the associated primes of the intermediate
+  quotient used in the proof of `prop3d12`.
+  -/
 lemma koqcl_iso {R : Type*} [CommRing R] [IsNoetherianRing R]
 {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]
 (I : {z: (ℒ R M) × (ℒ R M) // z.1 < z.2}) :
@@ -349,6 +488,13 @@ lemma koqcl_iso {R : Type*} [CommRing R] [IsNoetherianRing R]
           rw [Quotient.out_eq]
   use t ▸ this
 
+/-
+Associated primes of the intermediate quotient are a singleton.
+
+After localizing away from the minimal associated prime, the admitted Bourbaki-style
+statement implies that the only associated prime that remains is exactly that
+minimal one. This yields the singleton formula used in `prop3d12`.
+-/
 lemma associated_primes_quot_koqcl {R : Type*} [CommRing R] [IsNoetherianRing R]
 {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]
 (I : {z: (ℒ R M) × (ℒ R M) // z.1 < z.2}) :
@@ -383,6 +529,18 @@ associatedPrimes R (I.val.2⧸(ker_of_quot_comp_localization I).submoduleOf I.va
       simp only [Submodule.carrier_eq_coe, Submonoid.coe_set_mk, Subsemigroup.coe_set_mk,
         Set.inter_compl_self]
 
+/-
+Proposition 3.12 (internal): explicit computation of `μA (μ R M)`.
+
+For any strict interval `I : N₁ < N₂`, the auxiliary function `μA` evaluates to the
+singleton finset containing the minimal element of `_μ R M I` (in the `S₀ R` order).
+
+Proof idea:
+
+* Show that the intermediate submodule `ker_of_quot_comp_localization I` realizes an
+  element of the defining set for the `inf` in `μA`.
+* Use `prop3d12p2` to show it is a lower bound, hence an infimum.
+-/
 lemma prop3d12 {R : Type*} [CommRing R] [IsNoetherianRing R]
 {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] :
 ∀ I : {z: (ℒ R M) × (ℒ R M) // z.1 < z.2}, μA (μ R M) I =
@@ -467,10 +625,24 @@ lemma prop3d12 {R : Type*} [CommRing R] [IsNoetherianRing R]
     OrderEmbedding.le_iff_le]
   exact prop3d12p2 I a ha1.1 ha1.2
 
+/--
+Proposition 3.13 (part 1): the strict order on `ℒ R M` is well-founded.
+
+This provides the `WellFoundedGT` instance needed for the general Harder–Narasimhan
+filtration machinery.
+-/
 instance prop3d13₁ {R : Type*} [CommRing R] [IsNoetherianRing R]
 {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] :
 WellFoundedGT (ℒ R M) := wellFoundedGT
 
+/--
+Proposition 3.13 (part 2): the associated-prime slope satisfies the `μA` descending
+chain condition.
+
+Concretely, any strict chain of submodules would produce infinitely many distinct
+associated primes of a fixed finitely generated module, contradicting finiteness of
+`associatedPrimes` over a Noetherian ring.
+-/
 instance prop3d13₂ {R : Type*} [CommRing R] [IsNoetherianRing R]
 {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] :
 μA_DescendingChainCondition (μ R M) where
@@ -535,6 +707,15 @@ instance prop3d13₂ {R : Type*} [CommRing R] [IsNoetherianRing R]
         exact (lt_self_iff_false _).1 this
     exact this <| associatedPrimes.finite R ((↥(x 0) ⧸ Submodule.submoduleOf N (x 0)))
 
+/-
+First characterization of semistability for the associated-prime slope.
+
+Semistability of `μ R M` is equivalent to the statement that the `μA` value of every
+nontrivial submodule `N` equals the constant singleton corresponding to the minimal
+associated prime of `M`.
+
+This is the main algebraic input behind Remark 3.14 in the public results.
+-/
 lemma rmk4d14₁ {R : Type*} [CommRing R] [IsNoetherianRing R]
 {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] :
 Semistable (μ R M) ↔ ∀ N : (ℒ R M), (hN : ⊥ < N) → μA (μ R M) ⟨(⊥,N),hN⟩ =
@@ -568,7 +749,13 @@ Semistable (μ R M) ↔ ∀ N : (ℒ R M), (hN : ⊥ < N) → μA (μ R M) ⟨(�
     rw [h]
 
 set_option maxHeartbeats 60000 in
--- Why? Because we do need it......
+  /- Increased heartbeat limit: this proof is large and uses heavy algebraic rewriting. -/
+  /-
+  Second characterization of semistability: semistable iff unique associated prime.
+
+  Combining `rmk4d14₁` with the explicit formula for `μA`, we show that `Semistable (μ R M)`
+  is equivalent to the classical condition `∃! p, p ∈ associatedPrimes R M`.
+  -/
 lemma rmk4d14₂ {R : Type*} [CommRing R] [IsNoetherianRing R]
 {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] :
 Semistable (μ R M) ↔ ∃! p, p ∈ associatedPrimes R M := by
@@ -781,17 +968,38 @@ Semistable (μ R M) ↔ ∃! p, p ∈ associatedPrimes R M := by
     simp only [← hp2, h.unique hp1 hp1']
     rfl
 
+/-
+Admissibility of the slope `μ R M`.
+
+For the coprimary filtration application we only need the “totality” branch of
+`μ_Admissible`: the codomain order is linear, hence total.
+-/
 instance {R : Type*} [CommRing R] [IsNoetherianRing R]
 {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] :
 μ_Admissible (μ R M) where
   μ_adm := Or.inl inferInstance
 
+/-
+Lift a submodule of a quotient back to a submodule of the ambient module.
+
+Given `x ≤ N₂ / N₁`, we define `lift_quot N₁ N₂ x` as the preimage of `x` under the
+quotient map `N₂ → N₂ / N₁`, mapped into `M` via the subtype inclusion `N₂ ↪ M`.
+
+This is used to relate semistability of a restricted slope (on an interval) to
+semistability of the induced slope on the quotient lattice.
+-/
 open Classical in
 def lift_quot {R : Type*} [CommRing R] [IsNoetherianRing R]
 {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] (N₁ N₂ : Submodule R M)
 (x : Submodule R (N₂ ⧸ (N₁.submoduleOf N₂))) : Submodule R M :=
   Submodule.map N₂.subtype (Submodule.comap (N₁.submoduleOf N₂).mkQ x)
 
+/-
+Basic bounds for `lift_quot`.
+
+If `N₁ ≤ N₂`, then `N₁ ≤ lift_quot N₁ N₂ x ≤ N₂` for any submodule `x` of the
+quotient `N₂ / N₁`.
+-/
 lemma lift_quot_middle {R : Type*} [CommRing R] [IsNoetherianRing R]
 {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]
 (N₁ N₂ : Submodule R M) (hN : N₁ ≤ N₂)
@@ -811,6 +1019,12 @@ N₁ ≤ lift_quot N₁ N₂ x ∧ lift_quot N₁ N₂ x ≤ N₂ := by
       Subtype.exists, exists_and_right, exists_eq_right] at hx
     exact hx.choose
 
+  /-
+  Nontriviality is preserved by `lift_quot`.
+
+  If `x ≠ ⊥` as a submodule of the quotient `N₂ / N₁`, then the lifted submodule
+  `lift_quot N₁ N₂ x` is not equal to `N₁`.
+  -/
 lemma lift_quot_not_bot {R : Type*} [CommRing R] [IsNoetherianRing R]
 {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]
 (N₁ N₂ : Submodule R M)
@@ -830,6 +1044,11 @@ lemma lift_quot_not_bot {R : Type*} [CommRing R] [IsNoetherianRing R]
   apply (Submodule.Quotient.mk_eq_zero (N₁.submoduleOf N₂)).2
   exact this
 
+/-
+Nontriviality of the quotient module for a strict inclusion.
+
+If `N₁ < N₂`, then the quotient `N₂ / N₁` is nontrivial.
+-/
 lemma quot_ntl {R : Type*} [CommRing R] [IsNoetherianRing R]
 {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]
 {N₁ N₂ : ℒ R M} (hN : N₁ < N₂) : Nontrivial (↥N₂ ⧸ N₁.submoduleOf N₂) := by
@@ -842,6 +1061,12 @@ lemma quot_ntl {R : Type*} [CommRing R] [IsNoetherianRing R]
     exact this
   exact (not_lt_of_ge h') <| hN
 
+/-
+Nontriviality of the induced submodule lattice on the quotient.
+
+This is the corresponding `Nontrivial` instance for the submodule lattice
+`ℒ R (N₂ / N₁)`.
+-/
 lemma quot_ntl' {R : Type*} [CommRing R] [IsNoetherianRing R]
 {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]
 {N₁ N₂ : ℒ R M} (hN : N₁ < N₂) :
@@ -850,6 +1075,12 @@ Nontrivial (@ℒ R _ _ (↥N₂ ⧸ Submodule.submoduleOf N₁ N₂) (@quot_ntl 
 
 
 
+/-
+Membership transfer for mapped submodules.
+
+If `x ∈ Submodule.map N.subtype N'`, then the corresponding element of `N` lies in
+`N'`. This is a small helper for arguments involving `Submodule.map`.
+-/
 lemma Submodule.mem_map_subtype_iff {R : Type*} [CommRing R]
 {M : Type*} [AddCommGroup M] [Module R M]
 (N : Submodule R M) (N' : Submodule R ↥N)
@@ -861,7 +1092,19 @@ lemma Submodule.mem_map_subtype_iff {R : Type*} [CommRing R]
   exact b
 
 set_option maxHeartbeats 700000 in
--- Why? Because we do need it......
+/- Increased heartbeat limit: this proof transports semistability across quotients. -/
+/-
+Semistability of a restriction vs. semistability on the quotient lattice.
+
+This lemma is the key “translation” step for coprimary filtrations:
+
+* restricting the slope `μ R M` to an interval `(N₁, N₂)` corresponds to
+* the induced slope on the submodule lattice of the quotient module `N₂ / N₁`.
+
+The statement is phrased as an equivalence between `Semistable (Resμ ...)` and a
+`Semistable` predicate on the quotient lattice, with all required `Nontrivial`
+instances provided by `quot_ntl`/`quot_ntl'`.
+-/
 open Classical in
 lemma semistable_res_iff_semistable_quot {R : Type*} [CommRing R] [IsNoetherianRing R]
 {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]
@@ -1333,6 +1576,13 @@ Semistable (Resμ ⟨(N₁, N₂), hN⟩ (μ R M)) ↔
 
 
 open Classical in
+/--
+Successive quotients in a Harder–Narasimhan filtration are coprimary.
+
+The proof transports semistability of each graded piece to semistability of the
+associated-prime slope on that quotient, then applies the characterization of
+semistability as having a unique associated prime.
+-/
 lemma piecewise_coprimary {R : Type*} [CommRing R] [IsNoetherianRing R]
 {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]
 (HNFil : HarderNarasimhanFiltration (μ R M)) :
@@ -1358,6 +1608,12 @@ lemma piecewise_coprimary {R : Type*} [CommRing R] [IsNoetherianRing R]
   exact { coprimary := rmk4d14₂.mp ttt }
 
 
+/--
+Existence of a coprimary filtration.
+
+We build a `CoprimaryFiltration R M` from the canonical Harder–Narasimhan filtration
+for the slope `μ R M`, using `piecewise_coprimary` to certify coprimary graded pieces.
+-/
 noncomputable instance {R : Type*} [CommRing R] [IsNoetherianRing R]
 {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] :
 Inhabited (CoprimaryFiltration R M) := by
@@ -1398,6 +1654,13 @@ instance {R : Type*} [CommRing R] [IsNoetherianRing R]
 {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] :
 Nonempty (CoprimaryFiltration R M) := inferInstance
 
+/--
+Any coprimary filtration underlies a Harder–Narasimhan filtration.
+
+We reuse the same filtration function and verify the Harder–Narasimhan axioms:
+piecewise semistability (via `rmk4d14₂` and `semistable_res_iff_semistable_quot`) and
+strict decrease of the minimal associated primes.
+-/
 lemma CoprimaryFiltration.toHarderNarasimhanFiltration {R : Type*} [CommRing R] [IsNoetherianRing R]
 {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]
 (a : CoprimaryFiltration R M) :
@@ -1443,6 +1706,11 @@ lemma CoprimaryFiltration.toHarderNarasimhanFiltration {R : Type*} [CommRing R] 
             ((a.piecewise_coprimary i (Nat.lt_of_succ_lt hi)).coprimary.exists.choose_spec) hp1]
   use ahn
 
+/--
+All coprimary filtrations have the same underlying filtration.
+
+This follows from uniqueness of the Harder–Narasimhan filtration for `μ R M`.
+-/
 lemma CoprimaryFiltration.filtration_eq_harderNarasimhan_filtration
 {R : Type*} [CommRing R] [IsNoetherianRing R]
 {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] :
@@ -1454,6 +1722,12 @@ lemma CoprimaryFiltration.filtration_eq_harderNarasimhan_filtration
     (S R) inferInstance (μ R M) (@prop3d13₂ R _ _ M _ _ _ _) _
   rw [hfil,this.uniq HNFil, this.uniq (@default (HarderNarasimhanFiltration (μ R M)) inferInstance)]
 
+/--
+Uniqueness of coprimary filtrations.
+
+Since the underlying filtration is uniquely determined, two coprimary filtrations
+must coincide.
+-/
 noncomputable instance {R : Type*} [CommRing R] [IsNoetherianRing R]
 {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] :
 Unique (CoprimaryFiltration R M) where
