@@ -1091,6 +1091,8 @@ lemma Submodule.mem_map_subtype_iff {R : Type*} [CommRing R]
   rcases hx2 with ⟨a,b⟩
   exact b
 
+set_option synthInstance.maxHeartbeats 700000 in
+/- Increased synthInstance.maxHeartbeats. This is not needed in 4.27.0 but needed in 4.28.0 -/
 set_option maxHeartbeats 700000 in
 /- Increased heartbeat limit: this proof transports semistability across quotients. -/
 open Classical in
