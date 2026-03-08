@@ -751,8 +751,6 @@ Semistable (μ R M) ↔ ∀ N : (ℒ R M), (hN : ⊥ < N) → μA (μ R M) ⟨(�
     apply (S₀_order.2 _ _).1
     rw [h]
 
-set_option maxHeartbeats 60000 in
-  /- Increased heartbeat limit: this proof is large and uses heavy algebraic rewriting. -/
 /-- Second characterization of semistability: semistable iff unique associated prime.
 
   Combining `rmk4d14₁` with the explicit formula for `μA`, we show that `Semistable (μ R M)`
@@ -762,213 +760,92 @@ lemma rmk4d14₂ {R : Type*} [CommRing R] [IsNoetherianRing R]
 {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] :
 Semistable (μ R M) ↔ ∃! p, p ∈ associatedPrimes R M := by
   rw [rmk4d14₁]
+  let p0 := ((_μ R M ⟨(⊥, ⊤), bot_lt_top⟩).toFinset.min' (μ_nonempty _))
+  have hbot (N : ℒ R M) : Submodule.submoduleOf (⊥ : ℒ R M) N = ⊥ := by
+    ext x
+    simp [Submodule.submoduleOf]
+  let eTop :
+      (↥(⊤ : ℒ R M) ⧸ Submodule.submoduleOf (⊥ : ℒ R M) ⊤) ≃ₗ[R] M :=
+    (Submodule.quotEquivOfEqBot _ (hbot ⊤)).trans Submodule.topEquiv
+  have hp0 : p0.asIdeal ∈ associatedPrimes R M := by
+    have hp := ((_μ R M ⟨(⊥, ⊤), bot_lt_top⟩).toFinset.min'_mem (μ_nonempty _))
+    simp only [Set.mem_toFinset, Set.mem_setOf_eq] at hp
+    rcases hp with ⟨q, hq, hq'⟩
+    have hqM : q ∈ associatedPrimes R M := by
+      simpa [LinearEquiv.AssociatedPrimes.eq eTop] using hq
+    have hp0_eq : p0.asIdeal = q := by
+      rw [show p0 = { asIdeal := q, isPrime := hq.out.1 } by simpa [p0] using hq'.symm]
+    rwa [hp0_eq]
+  have h_ext : ∀ A B : LinearExtension (PrimeSpectrum R), A.asIdeal = B.asIdeal → A = B :=
+    fun A B h ↦ id <| PrimeSpectrum.ext <| Ideal.ext fun x ↦
+        Eq.to_iff (congrFun (congrArg Membership.mem h) x)
   constructor
-  · intro h
-    have := prop3d12 (⟨((⊥ : ℒ R M), ⊤), bot_lt_top⟩)
-    use ((_μ R M ⟨(⊥, ⊤), bot_lt_top⟩).toFinset.min' <| μ_nonempty _).asIdeal
-    constructor
-    · simp only
-      have := (_μ R M ⟨(⊥, ⊤), bot_lt_top⟩).toFinset.min'_mem <| μ_nonempty _
-      simp only [Set.mem_toFinset, Set.mem_setOf_eq] at this
-      rcases this with ⟨p,⟨hp1,hp2⟩⟩
-      rw [← hp2]
-      convert hp1
-      refine LinearEquiv.AssociatedPrimes.eq <| LinearEquiv.symm ?_
-      have t1 := Submodule.quotEquivOfEqBot (Submodule.submoduleOf (⊥: Submodule R M)
-        (⊤: Submodule R M)) (id (of_eq_true (Eq.trans (congrArg (fun x ↦ x = ⊥)
-        (Submodule.ker_subtype ⊤)) (eq_self ⊥))))
-      exact LinearEquiv.trans t1 Submodule.topEquiv
-    · intro J hJ
-      by_contra hc
-      replace := (_μ R M ⟨(⊥, ⊤), bot_lt_top⟩).toFinset.min'_le ⟨J,hJ.out.1⟩ (by
-        simp only [Set.mem_toFinset, Set.mem_setOf_eq]
-        use J
-        simp only [exists_prop, and_true]
-        convert hJ
-        refine LinearEquiv.AssociatedPrimes.eq <| ?_
-        have t1 := Submodule.quotEquivOfEqBot (Submodule.submoduleOf (⊥: Submodule R M)
-          (⊤: Submodule R M)) (id (of_eq_true (Eq.trans (congrArg (fun x ↦ x = ⊥)
-          (Submodule.ker_subtype ⊤)) (eq_self ⊥))))
-        exact LinearEquiv.trans t1 Submodule.topEquiv
-        )
-      simp only at this
-      unfold associatedPrimes IsAssociatedPrime at hJ
-      simp only [Set.mem_setOf_eq] at hJ
-      rcases hJ.2 with ⟨t,ht⟩
-      let N := Submodule.span R {t}
-      have hN : ⊥ < N := by
-        by_contra hc
-        simp only [not_bot_lt_iff] at hc
-        rw [Submodule.span_singleton_eq_bot.mp hc] at ht
-        exact Ideal.IsPrime.ne_top (ht ▸ hJ).1 Submodule.colon_singleton_zero
-      specialize h N hN
-      rw [prop3d12 ⟨(⊥, N), hN⟩] at h
-      simp only [Function.Embedding.toFun_eq_coe, RelEmbedding.coe_toEmbedding,
-        EmbeddingLike.apply_eq_iff_eq, Finset.singleton_inj] at h
-      rw [← h] at hc
-      replace : (_μ R M ⟨(⊥, N), hN⟩) = {⟨J,hJ.1⟩} := by
-        unfold _μ
-        simp only
-        ext s
-        constructor
-        · intro hs
-          simp only [Set.mem_setOf_eq] at hs
-          simp only [Set.mem_singleton_iff]
-          rcases hs with ⟨p,⟨hp1,hp2⟩⟩
-          have : p = J := by
-            unfold associatedPrimes IsAssociatedPrime at hp1
-            simp only [Set.mem_setOf_eq] at hp1
-            replace hp1 := hp1.2
-            rcases hp1 with ⟨s,hs⟩
-            rw [hs, ht]
-            apply Eq.symm
-            refine Submodule.ext ?_
-            intro g
-            constructor
-            · intro hg
-              simp only at *
-              let s' : M:= N.subtype s.out
-              have hs' : s' ∈ N := by
-                unfold s'
-                simp only [Submodule.subtype_apply, SetLike.coe_mem]
-              rcases (@Submodule.mem_span_singleton R M _ _ _ s' t).1 hs' with ⟨r₀,hr₀⟩
-              have hfinal : g • s' = 0 := by
-                rw [← hr₀,← smul_assoc]
-                nth_rw 1 [smul_eq_mul]
-                rw [CommRing.mul_comm,← smul_eq_mul,smul_assoc]
-                simp only [Submodule.mem_colon_singleton, Submodule.mem_bot] at hg
-                simp only [hg, smul_zero]
-              unfold s' at hfinal
-              simp only [Submodule.subtype_apply] at hfinal
-              have hfinal' : (g • ↑(Quotient.out s) : M) = ↑(g • Quotient.out s) := rfl
-              replace hfinal : g • Quotient.out s = 0 :=
-                Submodule.coe_eq_zero.mp <| hfinal' ▸ hfinal
-              have : (⟦g • Quotient.out s⟧ : ↥N ⧸ Submodule.submoduleOf ⊥ N) =
-                g • (Submodule.Quotient.mk (Quotient.out s)) := by rfl
-              rw [hfinal] at this
-              unfold Submodule.Quotient.mk Quotient.mk'' at this
-              rw [Quotient.out_eq] at this
-              simp only [Submodule.mem_colon_singleton, ← this, Submodule.mem_bot]
-              rfl
-            · intro hg
-              simp only at *
-              let s' : M := N.subtype s.out
-              have s'_ne0 : s' ≠ 0 := by
-                by_contra hc
-                unfold s' at hc
-                simp only [Submodule.subtype_apply, ZeroMemClass.coe_eq_zero] at hc
-                have : s = 0 := by
-                  have := hc ▸ Quotient.out_eq s
-                  exact id (Eq.symm this)
-                rw [this, Submodule.bot_colon'] at hs
-                simp only [Submodule.span_zero_singleton, Submodule.annihilator_bot] at hs
-                exact (Ideal.IsPrime.ne_top hp1.1) hs
-              have hs' : g • s' = 0 := by
-                unfold s'
-                simp only [Submodule.subtype_apply]
-                rw [((by rfl) : g • (↑(Quotient.out s) : M) = ↑(g • Quotient.out s))]
-                refine ZeroMemClass.coe_eq_zero.mpr ?_
-                have : (⟦g • Quotient.out s⟧ : ↥N ⧸ Submodule.submoduleOf ⊥ N) =
-                  g • (Submodule.Quotient.mk (Quotient.out s)) := rfl
-                unfold Submodule.Quotient.mk Quotient.mk'' at this
-                simp only [Submodule.mem_colon_singleton, Submodule.mem_bot] at hg
-                rw [Quotient.out_eq, hg] at this
-                have this' : (Submodule.Quotient.mk (g • Quotient.out s) :
-                  ↥N ⧸ Submodule.submoduleOf ⊥ N) = ⟦g • Quotient.out s⟧ := by rfl
-                exact Submodule.coe_eq_zero.mp <|
-                  (Submodule.Quotient.mk_eq_zero _).1 <| this' ▸ this
-              have hst : s' ∈ Submodule.span R {t} := by
-                unfold s'
-                simp only [Submodule.subtype_apply, SetLike.coe_mem]
-              rcases (@Submodule.mem_span_singleton R M _ _ _ s' t).1 hst with ⟨r₀,hr₀⟩
-              rw [← hr₀,← smul_assoc] at hs'
-              have : (g • r₀) ∈ J := by
-                rw [ht]
-                simp only [smul_eq_mul, Submodule.mem_colon_singleton, Submodule.mem_bot]
-                rw [← smul_eq_mul,hs']
-              rw [smul_eq_mul] at this
-              rcases hJ.1.mul_mem_iff_mem_or_mem.1 this with this | this
-              · rw [ht] at this
-                simpa only [LinearMap.mem_ker, LinearMap.toSpanSingleton_apply] using this
-              · rw [ht] at this
-                simp only [Submodule.mem_colon_singleton, Submodule.mem_bot] at this
-                rw [hr₀] at this
-                exact False.elim <| s'_ne0 this
-          simp only [← hp2, this]
-        · intro hs
-          simp only [Set.mem_singleton_iff] at hs
-          simp only [Set.mem_setOf_eq]
-          use s.asIdeal
-          simp only [hs, exists_prop, and_true]
-          unfold associatedPrimes IsAssociatedPrime
-          simp only [Set.mem_setOf_eq]
-          refine ⟨IsAssociatedPrime.isPrime hJ,?_⟩
-          use Submodule.Quotient.mk ⟨t,Submodule.mem_span_singleton_self t⟩
-          rw [ht]
-          refine Submodule.ext ?_
-          intro g
-          constructor
-          · intro hg
-            simp only at *
-            have : ((g • Submodule.Quotient.mk (⟨t, Submodule.mem_span_singleton_self t⟩: ↥N)) :
-              ↥N ⧸ Submodule.submoduleOf ⊥ N) = Submodule.Quotient.mk
-              (g • ⟨t, Submodule.mem_span_singleton_self t⟩ : ↥N) := rfl
-            simp only [Submodule.mem_colon_singleton, Submodule.mem_bot] at hg
-            simp only [Submodule.mem_colon_singleton, this, SetLike.mk_smul_mk, hg,
-              Submodule.mem_bot, Submodule.Quotient.mk_eq_zero]
-            subst ht hs
-            simp_all only [SetLike.mk_smul_mk, N]
-            obtain ⟨left, right⟩ := hJ
-            obtain ⟨w, h_1⟩ := right
-            simp_all only
-            rfl
-          · intro hg
-            simp only [Submodule.mem_colon_singleton, Submodule.mem_bot] at *
-            have : ((g • Submodule.Quotient.mk (⟨t, Submodule.mem_span_singleton_self t⟩: ↥N)) :
-              ↥N ⧸ Submodule.submoduleOf ⊥ N) = Submodule.Quotient.mk
-              (g • ⟨t, Submodule.mem_span_singleton_self t⟩ : ↥N) := rfl
-            rw [hg] at this
-            have this' : (g • ⟨t, Submodule.mem_span_singleton_self t⟩ : ↥N) =
-              ( ⟨g • t,  Submodule.smul_mem N g <| Submodule.mem_span_singleton_self t⟩ : ↥N) := rfl
-            simp only [this'] at this
-            exact (Submodule.Quotient.mk_eq_zero _).1 this.symm
-      simp only [this, Set.toFinset_singleton, Finset.min'_singleton, not_true_eq_false] at hc
-  · intro h N hN
-    rw [prop3d12 (⟨(⊥, N), hN⟩)]
+  · refine fun hs => ⟨p0.asIdeal, hp0, fun J hJ => ?_⟩
+    simp only [associatedPrimes, IsAssociatedPrime, Set.mem_setOf_eq] at hJ
+    rcases hJ with ⟨hJp, t, ht⟩
+    let N : ℒ R M := Submodule.span R {t}
+    let eN : (↥N ⧸ Submodule.submoduleOf (⊥ : ℒ R M) N) ≃ₗ[R] ↥N :=
+      Submodule.quotEquivOfEqBot _ (hbot N)
+    have hN : ⊥ < N := by
+      refine bot_lt_iff_ne_bot.mpr <| fun ht0 => ?_
+      have : t = 0 := Submodule.span_singleton_eq_bot.mp ht0
+      exact hJp.ne_top <| by rw [ht, this, Submodule.colon_singleton_zero]
+    have hJN : ⟨J, hJp⟩ ∈ _μ R M ⟨(⊥, N), hN⟩ := by
+      simp only [_μ, Set.mem_setOf_eq]
+      refine ⟨J, ?_, rfl⟩
+      simpa [LinearEquiv.AssociatedPrimes.eq eN] using
+        (show J ∈ associatedPrimes R ↥N from by
+          refine ⟨hJp, ⟨t, Submodule.mem_span_singleton_self t⟩, ?_⟩
+          ext r
+          rw [ht, Submodule.bot_colon', Submodule.bot_colon',
+            Submodule.mem_annihilator_span_singleton, Submodule.mem_annihilator_span_singleton]
+          change r • t = 0 ↔ r • (⟨t, Submodule.mem_span_singleton_self t⟩ : N) = 0
+          exact ⟨fun hr => Subtype.ext hr, fun hr => congrArg Subtype.val hr⟩)
+    have hJ_le : ∀ q ∈ _μ R M ⟨(⊥, N), hN⟩, ⟨J, hJp⟩ ≤ q := by
+      intro q hq
+      simp only [Set.mem_setOf_eq] at hq
+      rcases hq with ⟨I, hI, rfl⟩
+      have hI' : I ∈ associatedPrimes R ↥N := by
+        simpa [LinearEquiv.AssociatedPrimes.eq eN] using hI
+      have hI_supp := mem_support_of_mem_associatedPrimes hI'
+      have hAnn : N.annihilator = J := by
+        ext r
+        rw [show N = Submodule.span R {t} by rfl, ht, Submodule.mem_annihilator_span_singleton,
+          Submodule.bot_colon', Submodule.mem_annihilator_span_singleton]
+      refine toLinearExtension.monotone' ?_
+      simpa only [← hAnn] using (Module.mem_support_iff_of_finite (R := R) (M := ↥N)).1 hI_supp
+    have hmin : ((_μ R M ⟨(⊥, N), hN⟩).toFinset.min' (μ_nonempty _)) = ⟨J, hJp⟩ := by
+      refine le_antisymm ((_μ R M ⟨(⊥, N), hN⟩).toFinset.min'_le _ <| Set.mem_toFinset.mpr hJN) ?_
+      exact hJ_le _ <| Set.mem_toFinset.mp <|
+        ((_μ R M ⟨(⊥, N), hN⟩).toFinset.min'_mem (μ_nonempty _))
+    have hs' := hs N hN
+    rw [prop3d12 ⟨(⊥, N), hN⟩] at hs'
+    simp only [Function.Embedding.toFun_eq_coe, RelEmbedding.coe_toEmbedding,
+      EmbeddingLike.apply_eq_iff_eq, Finset.singleton_inj] at hs'
+    have hEq : ({ asIdeal := J, isPrime := hJp } : LinearExtension (PrimeSpectrum R)) = p0 :=
+      hmin.symm.trans hs'
+    rw [← hEq]
+  · rintro ⟨p, hp, hp_unique⟩ N hN
+    rw [prop3d12 ⟨(⊥, N), hN⟩]
     simp only [Function.Embedding.toFun_eq_coe, RelEmbedding.coe_toEmbedding,
       EmbeddingLike.apply_eq_iff_eq, Finset.singleton_inj]
-    have : (_μ R M ⟨(⊥, N), hN⟩).toFinset.min' (μ_nonempty _) ∈ _μ R M ⟨(⊥, ⊤), bot_lt_top⟩ := by
-      refine (_μ_mono_right hN le_top) ?_
-      simp only [Set.mem_setOf_eq]
-      have := (_μ R M ⟨(⊥, N), hN⟩).toFinset.min'_mem (μ_nonempty _)
-      simp only [Set.mem_toFinset, Set.mem_setOf_eq] at this
-      rcases this with ⟨t1,_⟩
-      use t1
-    simp only [Set.mem_setOf_eq] at this
-    rcases this with ⟨p,⟨hp1,hp2⟩⟩
-    replace hp1 : p ∈ associatedPrimes R M := by
-      convert hp1
-      refine LinearEquiv.AssociatedPrimes.eq <| LinearEquiv.symm ?_
-      have t1 := @Submodule.quotEquivOfEqBot R ↥(⊤ : Submodule R M) _ _ _ (Submodule.submoduleOf
-        (⊥: Submodule R M) (⊤: Submodule R M)) (id
-        (of_eq_true (Eq.trans (congrArg (fun x ↦ x = ⊥) (Submodule.ker_subtype ⊤)) (eq_self ⊥)))
-        )
-      exact LinearEquiv.trans t1 Submodule.topEquiv
-    have hp1' : ((_μ R M ⟨(⊥, ⊤), bot_lt_top⟩).toFinset.min' (μ_nonempty _)).asIdeal ∈
+    have hq_top := _μ_mono_right hN le_top <| Set.mem_toFinset.mp <|
+        ((_μ R M ⟨(⊥, N), hN⟩).toFinset.min'_mem (μ_nonempty _))
+    have hq : (((_μ R M ⟨(⊥, N), hN⟩).toFinset.min' (μ_nonempty _)).asIdeal) ∈
       associatedPrimes R M := by
-      have := (_μ R M ⟨(⊥, ⊤), bot_lt_top⟩).toFinset.min'_mem (μ_nonempty _)
-      simp only [Set.mem_toFinset, Set.mem_setOf_eq] at this
-      rcases this with ⟨p,⟨hp1,hp2⟩⟩
-      rw [← hp2]
-      convert hp1
-      refine LinearEquiv.AssociatedPrimes.eq <| LinearEquiv.symm ?_
-      have t1 := @Submodule.quotEquivOfEqBot R ↥(⊤ : Submodule R M) _ _ _
-        (Submodule.submoduleOf (⊥: Submodule R M) (⊤: Submodule R M)) (id
-        (of_eq_true (Eq.trans (congrArg (fun x ↦ x = ⊥) (Submodule.ker_subtype ⊤)) (eq_self ⊥)))
-        )
-      exact LinearEquiv.trans t1 Submodule.topEquiv
-    simp only [← hp2, h.unique hp1 hp1']
-    rfl
+      simp only [Set.mem_setOf_eq] at hq_top
+      rcases hq_top with ⟨I, hI, hI'⟩
+      have hIM : I ∈ associatedPrimes R M := by
+        simpa [LinearEquiv.AssociatedPrimes.eq eTop] using hI
+      have hq_eq :
+          (((_μ R M ⟨(⊥, N), hN⟩).toFinset.min' (μ_nonempty _)).asIdeal) = I := by
+        rw [show ((_μ R M ⟨(⊥, N), hN⟩).toFinset.min' (μ_nonempty _)) =
+            { asIdeal := I, isPrime := hI.out.1 } by simpa using hI'.symm]
+      rwa [hq_eq]
+    have hp0_eq : p0.asIdeal = p := hp_unique _ hp0
+    have hq_eq :
+        (((_μ R M ⟨(⊥, N), hN⟩).toFinset.min' (μ_nonempty _)).asIdeal) = p := hp_unique _ hq
+    exact h_ext _ _ <| by rw [hq_eq, hp0_eq]
 
 /--
 Admissibility of the slope `μ R M`.
