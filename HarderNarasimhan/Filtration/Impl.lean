@@ -425,33 +425,22 @@ lemma hHFil_of_hNSeries {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrd
   let filtration1 := fun n ↦ if n ≤ F1.length then F1.toFun n else ⊤
   have hstrange : ∃ n, (if n ≤ F1.length then F1.toFun ↑n else ⊤) = ⊤ := by
     use F1.length
-    simp only [le_refl, Fin.natCast_eq_last]
-    exact h1.2.1
+    simpa only [le_refl, Fin.natCast_eq_last] using h1.2.1
   have Fmono : ∀ i j : ℕ, i < j → j ≤ F1.length → F1.toFun ↑i < F1.toFun ↑j := by
     intro i
-    apply Nat.le_induction
-    · intro h
-      convert (F1.step ⟨i,h⟩).choose
-      · refine Fin.eq_mk_iff_val_eq.mpr ?_
-        refine Fin.val_cast_of_lt ?_
-        exact Nat.lt_add_right 1 h
-      · refine Fin.eq_mk_iff_val_eq.mpr ?_
-        refine Fin.val_cast_of_lt ?_
-        exact Nat.add_lt_add_right h 1
-    · intro n hn hind h
-      refine lt_trans (hind (Nat.le_of_succ_le h)) ?_
+    refine Nat.le_induction (fun h => ?_) (fun n hn hind h => ?_)
+    · convert (F1.step ⟨i,h⟩).choose
+      · exact Fin.eq_mk_iff_val_eq.mpr <| Fin.val_cast_of_lt <| Nat.lt_add_right 1 h
+      · exact Fin.eq_mk_iff_val_eq.mpr <| Fin.val_cast_of_lt <| Nat.add_lt_add_right h 1
+    · refine lt_trans (hind (Nat.le_of_succ_le h)) ?_
       have := (F1.step ⟨n , h⟩).choose
       simp only [Fin.castSucc_mk, Fin.succ_mk] at this
       convert this
-      · refine Fin.val_cast_of_lt ?_
-        exact Nat.lt_add_right 1 h
-      · refine Fin.val_cast_of_lt ?_
-        exact Nat.add_lt_add_right h 1
+      · exact Fin.val_cast_of_lt <| Nat.lt_add_right 1 h
+      · exact Fin.val_cast_of_lt <| Nat.add_lt_add_right h 1
   have hslen : Nat.find hstrange  = F1.length := by
       have := Nat.find_min' hstrange ((by
-        unfold filtration1
-        simp only [le_refl, ↓reduceIte, Fin.natCast_eq_last]
-        exact h1.2.1
+        simpa only [filtration1, le_refl, ↓reduceIte, Fin.natCast_eq_last] using  h1.2.1
         ) : filtration1 F1.length = ⊤)
       refine le_antisymm this ?_
       by_contra hc
@@ -464,21 +453,16 @@ lemma hHFil_of_hNSeries {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrd
   let HN1 : HarderNarasimhanFiltration μ := {
       filtration := filtration1,
       monotone := by
-        refine monotone_nat_of_le_succ ?_
-        intro n
+        refine monotone_nat_of_le_succ <| fun n => ?_
         if hn : n ≤ F1.length then
           simp only [filtration1,hn, ↓reduceIte]
           if hn' : n + 1 ≤ F1.length then
             simp only [hn', ↓reduceIte]
             convert le_of_lt (F1.step ⟨n,hn'⟩).choose
             · simp only [Fin.castSucc_mk]
-              refine Fin.eq_mk_iff_val_eq.mpr ?_
-              refine Fin.val_cast_of_lt ?_
-              exact Nat.lt_add_right 1 hn'
+              exact Fin.eq_mk_iff_val_eq.mpr <| Fin.val_cast_of_lt <| Nat.lt_add_right 1 hn'
             · simp only [Fin.succ_mk]
-              refine Fin.eq_mk_iff_val_eq.mpr ?_
-              refine Fin.val_cast_of_lt ?_
-              exact Nat.add_lt_add_right hn' 1
+              exact Fin.eq_mk_iff_val_eq.mpr <| Fin.val_cast_of_lt <| Nat.add_lt_add_right hn' 1
           else
           simp only [hn', ↓reduceIte, le_top]
         else
@@ -487,12 +471,10 @@ lemma hHFil_of_hNSeries {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrd
         exfalso
         linarith,
       first_eq_bot := by
-        simp only [filtration1,zero_le, ↓reduceIte]
-        exact h1.1,
+        simpa only [filtration1,zero_le, ↓reduceIte] using h1.1,
       fin_len := by
         use F1.length
-        simp only [filtration1,le_refl, ↓reduceIte, Fin.natCast_eq_last]
-        exact h1.2.1,
+        simpa only [filtration1,le_refl, ↓reduceIte, Fin.natCast_eq_last] using h1.2.1,
       strict_mono := by
         intro i j hij hj
         rw [hslen] at hj
@@ -502,59 +484,38 @@ lemma hHFil_of_hNSeries {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrd
         intro i hi
         unfold filtration1
         rw [hslen] at hi
+        have this': i + 1 ≤ F1.length := by linarith
         convert (F1.step ⟨i,hslen ▸ hi⟩).choose_spec
         · simp only [le_of_lt hi, ↓reduceIte, Fin.castSucc_mk]
           congr
-          refine Fin.eq_mk_iff_val_eq.mpr ?_
-          refine Fin.val_cast_of_lt ?_
-          exact Nat.lt_add_right 1 hi
-        · have this': i + 1 ≤ F1.length := by linarith
-          simp only [this', ↓reduceIte, Fin.succ_mk]
+          exact Fin.eq_mk_iff_val_eq.mpr <| Fin.val_cast_of_lt <| Nat.lt_add_right 1 hi
+        · simp only [this', ↓reduceIte, Fin.succ_mk]
           congr
-          refine Fin.eq_mk_iff_val_eq.mpr ?_
-          refine Fin.val_cast_of_lt ?_
-          exact Nat.add_lt_add_right hi 1
+          exact Fin.eq_mk_iff_val_eq.mpr <| Fin.val_cast_of_lt <| Nat.add_lt_add_right hi 1
         · simp only [le_of_lt hi, ↓reduceIte, Fin.castSucc_mk]
           congr
-          refine Fin.eq_mk_iff_val_eq.mpr ?_
-          refine Fin.val_cast_of_lt ?_
-          exact Nat.lt_add_right 1 hi
-        · have this' : i + 1 ≤ F1.length := by linarith
-          simp only [this', ↓reduceIte, Fin.succ_mk]
+          exact Fin.eq_mk_iff_val_eq.mpr <| Fin.val_cast_of_lt <| Nat.lt_add_right 1 hi
+        · simp only [this', ↓reduceIte, Fin.succ_mk]
           congr
-          refine Fin.eq_mk_iff_val_eq.mpr ?_
-          refine Fin.val_cast_of_lt ?_
-          exact Nat.add_lt_add_right hi 1
+          exact Fin.eq_mk_iff_val_eq.mpr <| Fin.val_cast_of_lt <| Nat.add_lt_add_right hi 1
         · simp only [le_of_lt hi, ↓reduceIte, Fin.castSucc_mk]
           congr
-          refine Fin.eq_mk_iff_val_eq.mpr ?_
-          refine Fin.val_cast_of_lt ?_
-          exact Nat.lt_add_right 1 hi
-        · have this' : i + 1 ≤ F1.length := by linarith
-          simp only [this', ↓reduceIte, Fin.succ_mk]
+          exact Fin.eq_mk_iff_val_eq.mpr <| Fin.val_cast_of_lt <| Nat.lt_add_right 1 hi
+        · simp only [this', ↓reduceIte, Fin.succ_mk]
           congr
-          refine Fin.eq_mk_iff_val_eq.mpr ?_
-          refine Fin.val_cast_of_lt ?_
-          exact Nat.add_lt_add_right hi 1
+          exact Fin.eq_mk_iff_val_eq.mpr <| Fin.val_cast_of_lt <| Nat.add_lt_add_right hi 1
         · simp only [le_of_lt hi, ↓reduceIte, Fin.castSucc_mk]
           congr
-          refine Fin.eq_mk_iff_val_eq.mpr ?_
-          refine Fin.val_cast_of_lt ?_
-          exact Nat.lt_add_right 1 hi
-        · have this' : i + 1 ≤ F1.length := by linarith
-          simp only [this', ↓reduceIte, Fin.succ_mk]
+          exact Fin.eq_mk_iff_val_eq.mpr <| Fin.val_cast_of_lt <| Nat.lt_add_right 1 hi
+        · simp only [this', ↓reduceIte, Fin.succ_mk]
           congr
-          refine Fin.eq_mk_iff_val_eq.mpr ?_
-          refine Fin.val_cast_of_lt ?_
-          exact Nat.add_lt_add_right hi 1,
+          exact Fin.eq_mk_iff_val_eq.mpr <| Fin.val_cast_of_lt <| Nat.add_lt_add_right hi 1,
       μA_pseudo_strict_anti := by
         intro i hi
-        have := h1.2.2 i (hslen ▸ hi)
         unfold filtration1
         rw [hslen] at hi
-        convert this
-        · have this' : i ≤ F1.length := by linarith
-          simp only [this', ↓reduceIte]
+        convert h1.2.2 i (hslen ▸ hi)
+        · simp only [(by linarith : i ≤ F1.length), ↓reduceIte]
         · simp only [le_of_lt hi, ↓reduceIte]
         · simp only [le_of_lt hi, ↓reduceIte]
         · have : i + 2 ≤ F1.length := hi
