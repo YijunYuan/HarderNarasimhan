@@ -112,12 +112,10 @@ theorem exists_JordanHolderSeries
   let JH : RelSeries (JordanHolderRel μ) := {
     length := Nat.find this.fin_len,
     toFun := fun n ↦ this.filtration n.toNat,
-    step := by
-      intro n
-      use this.strict_anti n n.succ (Nat.lt_add_one ↑n) (Fin.is_le n.succ)
-      exact ⟨this.step_cond₁ n n.isLt,this.step_cond₂ n n.isLt⟩
+    step := fun n ↦ ⟨this.strict_anti n n.succ (Nat.lt_add_one ↑n) (Fin.is_le n.succ),
+      this.step_cond₁ n n.isLt, this.step_cond₂ n n.isLt⟩
   }
-  exact ⟨JH, ⟨this.first_eq_top, Nat.find_spec this.fin_len⟩⟩
+  exact ⟨JH, this.first_eq_top, Nat.find_spec this.fin_len⟩
 
 open Classical in
 /--
@@ -140,11 +138,10 @@ theorem piecewise_stable_iff
     ∀ z : ℒ, (h' : filtration (i+1) < z) → (h'' : z < filtration i) →
     μ ⟨(filtration (i+1), z), h'⟩ <
     μ ⟨(filtration (i+1), filtration i), strict_anti i (i+1) (lt_add_one i) hi⟩)
-:= by
-  constructor
-  · exact fun a i hi z h' h'' ↦
-    impl.step_cond₂_of_stable μ filtration fin_len strict_anti a i hi z h' h''
-  · exact fun a i hi ↦ impl.stable_of_step_cond₂ μ filtration fin_len strict_anti a i hi
+:=
+  ⟨fun a i hi z h' h'' ↦
+    impl.step_cond₂_of_stable μ filtration fin_len strict_anti a i hi z h' h'',
+  fun a i hi ↦ impl.stable_of_step_cond₂ μ filtration fin_len strict_anti a i hi⟩
 
 open Classical in
 /--

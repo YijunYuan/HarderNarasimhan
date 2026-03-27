@@ -148,10 +148,7 @@ API note: we provide `Std.Total` for `≤`, which is then used to build a `Linea
 -/
 instance {α : Type*} [LinearOrder α] :
 @Std.Total (DedekindMacNeilleCompletion α) instCompleteLatticeDedekindMacNeilleCompletion.le := by
-  refine { total := ?_ }
-  intro a b
-  rcases a with ⟨A, hA⟩
-  rcases b with ⟨B, hB⟩
+  refine { total := fun ⟨A, hA⟩ ⟨B, hB⟩ ↦ ?_ }
   simp only [Subtype.mk_le_mk, Set.le_eq_subset]
   apply or_iff_not_imp_left.2
   intro h1

@@ -43,12 +43,9 @@ lemma ConvexI_TotIntvl_iff_Convex {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) : ConvexI TotIntvl μ ↔
 Convex μ := by
   constructor
-  · intro h
-    refine {convex := ?_ }
-    exact fun x y hxy ↦ h.convex x y (in_TotIntvl _) (in_TotIntvl _) hxy
-  · intro h
-    refine { convex := ?_ }
-    exact fun x y a a h_4 ↦ Convex.convex x y h_4
+  · exact fun h ↦ ⟨fun x y hxy ↦
+      h.convex x y (in_TotIntvl _) (in_TotIntvl _) hxy⟩
+  · exact fun h ↦ ⟨fun x y _ _ h_4 ↦ Convex.convex x y h_4⟩
 
 /--
 Interval-local convexity is equivalent to global convexity of the restricted measure `Resμ I μ`.
@@ -65,15 +62,12 @@ lemma ConvexI_iff_Convex_Res {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [Bound
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) : ConvexI I μ ↔ Convex (Resμ I μ) := by
   constructor
   · intro h
-    refine {convex := ?_ }
-    intro x y hxy
+    refine {convex := fun x y hxy ↦ ?_ }
     unfold Resμ
     simp only
     exact h.convex x.val y.val x.prop y.prop hxy
-  · intro h
-    refine {convex := ?_ }
-    intro x y hxI hyI hxy
-    exact h.convex ⟨x,hxI⟩ ⟨y,hyI⟩ hxy
+  · exact fun h ↦ ⟨fun x y hxI hyI hxy ↦
+      h.convex ⟨x,hxI⟩ ⟨y,hyI⟩ hxy⟩
 
 /--
 Typeclass instance: a globally convex `μ` induces interval-local convexity on the total interval.
@@ -83,9 +77,8 @@ expected.
 -/
 instance {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S] {μ : {p :ℒ × ℒ // p.1 < p.2} → S} [Convex μ] :
-ConvexI TotIntvl μ := by
-  simp only [ConvexI_TotIntvl_iff_Convex]
-  infer_instance
+ConvexI TotIntvl μ :=
+  (ConvexI_TotIntvl_iff_Convex μ).mpr inferInstance
 
 /--
 Typeclass instance: interval-local convexity on the total interval implies global convexity.
@@ -94,9 +87,8 @@ This is the reverse direction of the previous instance.
 -/
 instance {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S] {μ : {p :ℒ × ℒ // p.1 < p.2} → S} [ConvexI TotIntvl μ] :
-Convex μ := by
-  simp only [← ConvexI_TotIntvl_iff_Convex]
-  infer_instance
+Convex μ :=
+  (ConvexI_TotIntvl_iff_Convex μ).mp inferInstance
 
 
 section
@@ -371,12 +363,9 @@ lemma comparable_iff {L : Type*} [PartialOrder L]
 (x : L) (y : L)
 (h : IsComparable x y) :
 x < y ∨ y ≤ x := by
-  simp only [IsComparable] at h
-  rw [le_iff_eq_or_lt, le_iff_eq_or_lt] at h
-  nth_rw 2 [or_comm] at h
-  rw [or_assoc] at h
-  nth_rw 2 [←or_assoc, eq_comm] at h
-  rwa [or_self, eq_comm, ← le_iff_eq_or_lt] at h
+  rcases h with h | h
+  · exact (lt_or_eq_of_le h).elim Or.inl fun e ↦ Or.inr (le_of_eq e.symm)
+  · exact Or.inr h
 
 
 /--

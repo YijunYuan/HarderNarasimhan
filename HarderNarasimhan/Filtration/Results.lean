@@ -155,10 +155,8 @@ theorem exists_relSeries_isIntervalSemistable
   let HNseq : RelSeries (IntervalSemistableRel μ) := {
     toFun := fun n ↦ HNfil.filtration n,
     length := Nat.find HNfil.fin_len
-    step := by
-      intro i
-      use HNfil.strict_mono i.val (i.succ).val (Nat.lt_add_one i.val) <| Fin.is_le i.succ
-      exact HNfil.piecewise_semistable i.val i.prop
+    step := fun i ↦ ⟨HNfil.strict_mono i.val (i.succ).val (Nat.lt_add_one i.val) <|
+      Fin.is_le i.succ, HNfil.piecewise_semistable i.val i.prop⟩
   }
   use HNseq
   refine ⟨rfl,Nat.find_spec HNfil.fin_len,?_⟩

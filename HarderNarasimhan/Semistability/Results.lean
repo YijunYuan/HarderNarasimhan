@@ -125,10 +125,9 @@ lemma proposition_3_7 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder
 ------------
   := by
     rw [← impl.ConvexI_TotIntvl_iff_Convex] at hμcvx
-    constructor
-    · apply (semistableI_iff μ ⟨(⊥, x), lt_of_le_of_ne bot_le hxSt.out.choose_spec.choose⟩).1 <|
-        impl.prop3d7₁ μ TotIntvl x hxSt
-    · exact fun y hy ↦ impl.prop3d7₂ μ TotIntvl hμcvx x hxSt y (in_TotIntvl y) hy
+    exact ⟨(semistableI_iff μ ⟨(⊥, x), lt_of_le_of_ne bot_le hxSt.out.choose_spec.choose⟩).1 <|
+        impl.prop3d7₁ μ TotIntvl x hxSt,
+      fun y hy ↦ impl.prop3d7₂ μ TotIntvl hμcvx x hxSt y (in_TotIntvl y) hy⟩
 
 
 /--

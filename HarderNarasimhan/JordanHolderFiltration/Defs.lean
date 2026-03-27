@@ -115,11 +115,7 @@ instance {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 {μ : {p : ℒ × ℒ // p.1 < p.2} → S} [h : StrongDescendingChainCondition' μ] :
 StrongDescendingChainCondition μ where
-  wdcc := by
-    intro f saf
-    rcases h.wdcc' f saf with ⟨N, hN⟩
-    use N
-    exact hN ▸ le_top
+  wdcc := fun f saf ↦ let ⟨N, hN⟩ := h.wdcc' f saf; ⟨N, hN ▸ le_top⟩
 
 
 /--
@@ -184,15 +180,14 @@ FiniteTotalPayoff (Resμ ⟨(⊥, x), hx⟩ μ) := by
   refine { fin_tot_payoff := ?_ }
   simp only [Resμ]
   by_contra h
-  have : Semistable μ → μmax μ TotIntvl = μ TotIntvl := by
-    exact fun a ↦ (List.TFAE.out (impl.thm4d21 μ hsl inferInstance inferInstance).1 0 3).2
+  have : Semistable μ → μmax μ TotIntvl = μ TotIntvl :=
+    fun a ↦ (List.TFAE.out (impl.thm4d21 μ hsl inferInstance inferInstance).1 0 3).2
       ((impl.thm4d21 μ hsl inferInstance inferInstance).2.1 a)
   have := this hst
   simp only [μmax, TotIntvl, ne_eq] at this
   have this_q: μ ⟨(⊥, x), hx⟩ ≤ μ ⟨(⊥, ⊤), bot_lt_top⟩ := by
     rw [← this]
-    apply le_sSup
-    use x, ⟨in_TotIntvl x, Ne.symm <| bot_lt_iff_ne_bot.1 hx⟩
+    exact le_sSup ⟨x, ⟨in_TotIntvl x, Ne.symm <| bot_lt_iff_ne_bot.1 hx⟩, rfl⟩
   exact (not_le_of_gt <| h ▸ lt_top_iff_ne_top.2 hftp.fin_tot_payoff) this_q
 
 

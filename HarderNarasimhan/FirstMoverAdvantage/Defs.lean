@@ -107,11 +107,9 @@ This instance extracts the relevant disjunction by applying the `SlopeLike` axio
 instance {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLinearOrder S]
 {μ : {p :ℒ × ℒ // p.1 < p.2} → S} [hμ : SlopeLike μ] :
-WeakSlopeLike₁ μ := by
-  refine { wsl₁ := fun z hz ↦ ?_ }
-  rcases (hμ.slopelike z.val.1 z.val.2 ⊤ ⟨z.prop,hz⟩).1 with this | this
-  · exact Or.inl this
-  · exact Or.inr <| le_of_lt this
+WeakSlopeLike₁ μ :=
+  { wsl₁ := fun z hz ↦
+    (hμ.slopelike z.val.1 z.val.2 ⊤ ⟨z.prop,hz⟩).1.imp id le_of_lt }
 
 /--
 `SlopeLike` implies `WeakSlopeLike₂` when the codomain is linearly ordered.
@@ -121,11 +119,9 @@ This instance extracts the relevant disjunction by applying the `SlopeLike` axio
 instance {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLinearOrder S]
 {μ : {p :ℒ × ℒ // p.1 < p.2} → S} [hμ : SlopeLike μ] :
-WeakSlopeLike₂ μ := by
-  refine { wsl₂ := fun z hz ↦ ?_ }
-  rcases (hμ.slopelike ⊥ z.val.1 z.val.2 ⟨hz,z.prop⟩).2.2.1 with this | this
-  · exact Or.inr <| le_of_lt this
-  · exact Or.inl this
+WeakSlopeLike₂ μ :=
+  { wsl₂ := fun z hz ↦
+    (hμ.slopelike ⊥ z.val.1 z.val.2 ⟨hz,z.prop⟩).2.2.1.elim (Or.inr ∘ le_of_lt) Or.inl }
 
 
 end HarderNarasimhan

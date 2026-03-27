@@ -250,19 +250,13 @@ OrderDual.ofDual <| μAstar (fun (p : {p : ℒᵒᵈ × ℒᵒᵈ // p.1 < p.2})
   · rintro ⟨a, ha, ha'⟩
     use a, ⟨in_TotIntvl a,Ne.symm ha.2⟩
     refine ha' ▸ (congrArg sInf <| Set.ext fun r ↦ ?_)
-    constructor
-    · rintro ⟨b, hb, hb'⟩
-      exact ⟨b, ⟨⟨hb.1.2,hb.1.1⟩,Ne.symm hb.2⟩, hb'.symm ▸ rfl⟩
-    · rintro ⟨b, hb, hb'⟩
-      exact ⟨b, ⟨⟨hb.1.2,hb.1.1⟩,Ne.symm hb.2⟩, hb'.symm ▸ rfl⟩
+    exact ⟨fun ⟨b, hb, hb'⟩ ↦ ⟨b, ⟨⟨hb.1.2,hb.1.1⟩,Ne.symm hb.2⟩, hb'.symm ▸ rfl⟩,
+      fun ⟨b, hb, hb'⟩ ↦ ⟨b, ⟨⟨hb.1.2,hb.1.1⟩,Ne.symm hb.2⟩, hb'.symm ▸ rfl⟩⟩
   · rintro ⟨a, ha, ha'⟩
     use a, ⟨in_TotIntvl (OrderDual.toDual a),Ne.symm ha.2⟩
     refine ha' ▸ (congrArg sSup <| Set.ext fun r ↦ ?_)
-    constructor
-    · rintro ⟨b, hb, hb'⟩
-      exact ⟨b, ⟨⟨hb.1.2,hb.1.1⟩,Ne.symm hb.2⟩, hb'.symm ▸ rfl⟩
-    · rintro ⟨b, hb, hb'⟩
-      exact ⟨b, ⟨⟨hb.1.2,hb.1.1⟩,Ne.symm hb.2⟩, hb'.symm ▸ rfl⟩
+    exact ⟨fun ⟨b, hb, hb'⟩ ↦ ⟨b, ⟨⟨hb.1.2,hb.1.1⟩,Ne.symm hb.2⟩, hb'.symm ▸ rfl⟩,
+      fun ⟨b, hb, hb'⟩ ↦ ⟨b, ⟨⟨hb.1.2,hb.1.1⟩,Ne.symm hb.2⟩, hb'.symm ▸ rfl⟩⟩
 
 
 
@@ -280,19 +274,13 @@ OrderDual.ofDual <| μBstar (fun (p : {p : ℒᵒᵈ × ℒᵒᵈ // p.1 < p.2})
   · rintro ⟨a, ha, ha'⟩
     use a, ⟨in_TotIntvl a,Ne.symm ha.2⟩
     refine ha' ▸ (congrArg sSup <| Set.ext fun r ↦ ?_)
-    constructor
-    · rintro ⟨b, hb, hb'⟩
-      exact ⟨b, ⟨⟨hb.1.2,hb.1.1⟩,Ne.symm hb.2⟩, hb'.symm ▸ rfl⟩
-    · rintro ⟨b, hb, hb'⟩
-      exact ⟨b, ⟨⟨hb.1.2,hb.1.1⟩,Ne.symm hb.2⟩, hb'.symm ▸ rfl⟩
+    exact ⟨fun ⟨b, hb, hb'⟩ ↦ ⟨b, ⟨⟨hb.1.2,hb.1.1⟩,Ne.symm hb.2⟩, hb'.symm ▸ rfl⟩,
+      fun ⟨b, hb, hb'⟩ ↦ ⟨b, ⟨⟨hb.1.2,hb.1.1⟩,Ne.symm hb.2⟩, hb'.symm ▸ rfl⟩⟩
   · rintro ⟨a, ha, ha'⟩
     use a, ⟨in_TotIntvl (OrderDual.toDual a),Ne.symm ha.2⟩
     refine ha'.symm ▸ (congrArg sInf <| Set.ext fun r ↦ ?_)
-    constructor
-    · rintro ⟨b, hb, hb'⟩
-      exact ⟨b, ⟨⟨hb.1.2,hb.1.1⟩,Ne.symm hb.2⟩, hb'.symm ▸ rfl⟩
-    · rintro ⟨b, hb, hb'⟩
-      exact ⟨b, ⟨⟨hb.1.2,hb.1.1⟩,Ne.symm hb.2⟩, hb'.symm ▸ rfl⟩
+    exact ⟨fun ⟨b, hb, hb'⟩ ↦ ⟨b, ⟨⟨hb.1.2,hb.1.1⟩,Ne.symm hb.2⟩, hb'.symm ▸ rfl⟩,
+      fun ⟨b, hb, hb'⟩ ↦ ⟨b, ⟨⟨hb.1.2,hb.1.1⟩,Ne.symm hb.2⟩, hb'.symm ▸ rfl⟩⟩
 
 
 
@@ -336,11 +324,7 @@ lemma prop4d3₁ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder
   simp only [OrderDual.exists] at this
   rw [← dualμAstar_eq_μBstar, this]
   refine congrArg sSup <| Set.ext fun r ↦ ?_
-  constructor
-  · rintro ⟨a, ha, ha'⟩
-    use a, ha, ha'
-  · rintro ⟨a, ha, ha'⟩
-    use a, ha, ha'
+  exact ⟨fun ⟨a, ha, ha'⟩ ↦ ⟨a, ha, ha'⟩, fun ⟨a, ha, ha'⟩ ↦ ⟨a, ha, ha'⟩⟩
 
 
 

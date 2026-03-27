@@ -50,10 +50,8 @@ API note: we exhibit two distinct elements by using the embedded endpoints `x` a
 -/
 instance {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {z : {p : ℒ × ℒ // p.1 < p.2}} : Nontrivial (Interval z) where
-    exists_pair_ne := by
-        rcases z with ⟨⟨x, y⟩, hxy⟩
-        use ⟨x,⟨le_rfl,le_of_lt hxy⟩⟩, ⟨y,⟨le_of_lt hxy,le_rfl⟩⟩
-        exact Subtype.coe_ne_coe.mp <| ne_of_lt hxy
+    exists_pair_ne := ⟨⟨z.val.1, le_rfl, le_of_lt z.prop⟩,
+      ⟨z.val.2, le_of_lt z.prop, le_rfl⟩, Subtype.coe_ne_coe.mp <| ne_of_lt z.prop⟩
 
 
 /--
@@ -64,9 +62,8 @@ API note: this is the standard subtype order; antisymmetry uses `Subtype.ext`.
 instance {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {z : {p : ℒ × ℒ // p.1 < p.2}} : PartialOrder (Interval z) where
   le := fun a b => a.val ≤ b.val
-  le_refl := by (expose_names; exact fun a ↦ Preorder.le_refl a.val)
-  le_trans := by
-    (expose_names; exact fun a b c a_1 a_2 ↦ Preorder.le_trans a.val b.val c.val a_1 a_2)
+  le_refl a := le_refl a.val
+  le_trans _ _ _ h1 h2 := le_trans h1 h2
   le_antisymm := fun a b h1 h2 ↦ Subtype.ext <| le_antisymm h1 h2
 
 
@@ -130,9 +127,8 @@ This is used to turn a strict pair in `Interval z` into a strict pair in the amb
 -/
 lemma lt_lt {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {z : {p : ℒ × ℒ // p.1 < p.2}} {p : {p :(Interval z) × (Interval z) // p.1 < p.2}} :
-(p.val.1.val, p.val.2.val).1 < (p.val.1.val, p.val.2.val).2 := by
-  refine Subtype.coe_lt_coe.mpr ?_
-  refine Subtype.mk_lt_mk.2 (lt_iff_le_not_ge.mpr p.prop)
+(p.val.1.val, p.val.2.val).1 < (p.val.1.val, p.val.2.val).2 :=
+  Subtype.coe_lt_coe.mpr (Subtype.mk_lt_mk.2 (lt_iff_le_not_ge.mpr p.prop))
 
 
 /--
@@ -217,12 +213,10 @@ lemma μmax_res_intvl {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [Bounded
   congr
   ext x
   constructor
-  · intro hx
-    rcases hx with ⟨u,hu1,hu2⟩
+  · rintro ⟨u,hu1,hu2⟩
     use u.val
     use ⟨hu1.1,fun hc ↦ hu1.right (Subtype.coe_inj.1 hc)⟩
-  · intro hx
-    rcases hx with ⟨u,hu1,hu2⟩
+  · rintro ⟨u,hu1,hu2⟩
     use ⟨u,le_trans ((J.val).1.prop.1) hu1.1.1
       ,le_trans hu1.1.2 ((J.val).2.prop.2)⟩
     rw [← hu2]
@@ -248,12 +242,10 @@ lemma μmin_res_intvl {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [Bounded
   congr
   ext x
   constructor
-  · intro hx
-    rcases hx with ⟨u,hu1,hu2⟩
+  · rintro ⟨u,hu1,hu2⟩
     use u.val
     use ⟨hu1.1,fun hc ↦ hu1.right (Subtype.coe_inj.1 hc)⟩
-  · intro hx
-    rcases hx with ⟨u,hu1,hu2⟩
+  · rintro ⟨u,hu1,hu2⟩
     use ⟨u,le_trans ((J.val).1.prop.1) hu1.1.1
       ,le_trans hu1.1.2 ((J.val).2.prop.2)⟩
     rw [← hu2]
@@ -279,12 +271,10 @@ lemma μA_res_intvl {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOr
   congr
   ext x
   constructor
-  · intro hx
-    rcases hx with ⟨u,hu1,hu2⟩
+  · rintro ⟨u,hu1,hu2⟩
     use u.val
     use ⟨hu1.1,fun hc ↦ hu1.right (Subtype.coe_inj.1 hc)⟩
-  · intro hx
-    rcases hx with ⟨u,hu1,hu2⟩
+  · rintro ⟨u,hu1,hu2⟩
     use ⟨u,le_trans ((J.val).1.prop.1) hu1.1.1
       ,le_trans hu1.1.2 ((J.val).2.prop.2)⟩
     rw [← hu2]
@@ -310,12 +300,10 @@ lemma μB_res_intvl {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOr
   congr
   ext x
   constructor
-  · intro hx
-    rcases hx with ⟨u,hu1,hu2⟩
+  · rintro ⟨u,hu1,hu2⟩
     use u.val
     use ⟨hu1.1,fun hc ↦ hu1.right (Subtype.coe_inj.1 hc)⟩
-  · intro hx
-    rcases hx with ⟨u,hu1,hu2⟩
+  · rintro ⟨u,hu1,hu2⟩
     use ⟨u,le_trans ((J.val).1.prop.1) hu1.1.1
       ,le_trans hu1.1.2 ((J.val).2.prop.2)⟩
     rw [← hu2]

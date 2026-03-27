@@ -421,8 +421,7 @@ lemma submoduleOf_map_subtype {R : Type*} [CommRing R]
   · intro hz
     use z
     simpa only [SetLike.mem_coe, Submodule.subtype_apply, and_true]
-  · intro hz
-    rcases hz with ⟨y,hy1,hy2⟩
+  · rintro ⟨y,hy1,hy2⟩
     simp only [Submodule.subtype_apply, SetLike.coe_eq_coe] at hy2
     exact hy2 ▸ hy1
 
@@ -463,8 +462,7 @@ lemma koqcl_iso {R : Type*} [CommRing R] [IsNoetherianRing R]
       ext z
       simp only [Submodule.mem_map, Submodule.mkQ_apply, Subtype.exists, LinearMap.mem_ker]
       constructor
-      · intro hz
-        rcases hz with ⟨y,hy1,hy2,hy3⟩
+      · rintro ⟨y,hy1,hy2,hy3⟩
         have hy2 : y ∈ Submodule.map (Submodule.subtype I.val.2)
           (LinearMap.ker (CP.f1 I ∘ₗ CP.f2 I)) := hy2
         simp only [Submodule.mem_map, LinearMap.mem_ker] at hy2
@@ -621,8 +619,7 @@ lemma prop3d12 {R : Type*} [CommRing R] [IsNoetherianRing R]
   apply IsLeast.csInf_eq
   refine ⟨res1,?_⟩
   apply mem_lowerBounds.2
-  intro N hN
-  rcases hN with ⟨a,ha1,ha2⟩
+  rintro N ⟨a,ha1,ha2⟩
   rw [← ha2]
   simp only [Function.Embedding.toFun_eq_coe, RelEmbedding.coe_toEmbedding,
     OrderEmbedding.le_iff_le]
@@ -992,8 +989,7 @@ noncomputable def quotEquivMapComap {R : Type*} [CommRing R] [IsNoetherianRing R
     · rintro ⟨w, -, rfl⟩
       exact Submodule.mem_map_of_mem <| show i w ∈ Submodule.comap N₂.subtype W by
         simp [i]
-    · intro hx
-      rcases hx with ⟨y, hy, rfl⟩
+    · rintro ⟨y, hy, rfl⟩
       exact ⟨⟨y, hy⟩, rfl⟩
   exact
     (Submodule.quotEquivOfEq (N₁.submoduleOf W) (LinearMap.ker f) hker.symm).trans

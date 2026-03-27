@@ -106,11 +106,9 @@ API note: this is kept `private` and the file exposes `Lex'Order_prop` as a stab
 private def Lex'LinearOrder {α : Type*} [LinearOrder α] : LinearOrder (Finset α) where
   le := LexLE.le
   le_antisymm := le_antisymm
-  le_refl := by
-    intro A
+  le_refl A := by
     unfold LE.le LexLE
-    simp only [lt_self_iff_false, le_refl]
-    tauto
+    exact Or.inr ⟨rfl, le_refl _⟩
   le_trans := by
     intro A B C hAB hBC
     have t1 := le_card A B hAB
@@ -126,11 +124,7 @@ private def Lex'LinearOrder {α : Type*} [LinearOrder α] : LinearOrder (Finset 
       · unfold LE.le LexLE
         exact Or.inl <| Nat.lt_of_le_of_lt t1 h2
       · unfold LE.le LexLE
-        simp only
-        right
-        constructor
-        · linarith
-        · exact le_trans h1.2.2 h2.2.2
+        exact Or.inr ⟨by linarith, le_trans h1.2.2 h2.2.2⟩
   lt_iff_le_not_ge := by
     intro A B
     constructor
@@ -142,18 +136,11 @@ private def Lex'LinearOrder {α : Type*} [LinearOrder α] : LinearOrder (Finset 
       unfold LT.lt LexLT
       simp only [ne_eq]
       exact ⟨h.1,fun this ↦ (and_not_self_iff (B ≤ B)).mp <| this ▸ h⟩
-  toDecidableLE := by
-    unfold DecidableLE LE.le LexLE DecidableRel
-    intro A BaseIO
-    exact inferInstance
+  toDecidableLE := fun _ _ ↦ inferInstance
   min := fun A B ↦ if A ≤ B then A else B
-  min_def := by
-    intro A B
-    simp only
+  min_def _ _ := by simp only
   max := fun A B ↦ if A ≤ B then B else A
-  max_def := by
-    intro A B
-    simp only
+  max_def _ _ := by simp only
   le_total := by
     intro A B
     refine Decidable.or_iff_not_imp_left.mpr ?_
@@ -162,19 +149,12 @@ private def Lex'LinearOrder {α : Type*} [LinearOrder α] : LinearOrder (Finset 
     simp only at h
     have h : ¬(A.card < B.card) ∧ (¬ (A.card = B.card) ∨
       ¬ (Finset.sort A LE.le ≤ Finset.sort B LE.le)) := by tauto
-    have h1 := h.1
-    have h2 := h.2
     unfold LE.le LexLE
     simp only
-    rcases helper.1 h2 with h2 | h2
-    · left
-      apply le_of_not_gt at h1
-      apply lt_of_le_of_ne h1 <| Ne.symm h2
-    · right
-      simp only [Decidable.not_not, not_le] at h2
-      refine ⟨?_,le_of_lt h2.2⟩
-      simp only [not_lt] at h1
-      exact h2.1.symm
+    rcases helper.1 h.2 with h2 | h2
+    · exact Or.inl <| lt_of_le_of_ne (le_of_not_gt h.1) (Ne.symm h2)
+    · simp only [Decidable.not_not, not_le] at h2
+      exact Or.inr ⟨h2.1.symm, le_of_lt h2.2⟩
 
 /-- Existence theorem packaging the lexicographic construction.
 

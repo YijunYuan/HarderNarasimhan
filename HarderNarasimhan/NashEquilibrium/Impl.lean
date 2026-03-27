@@ -38,11 +38,8 @@ lemma rmk4d10₀ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) :
 ∀ I : {p :ℒ × ℒ // p.1 < p.2}, μmin μ I ≤ μ I ∧ μ I ≤ μmax μ I := by
   intro I
-  constructor
-  · apply sInf_le
-    use I.val.1, ⟨⟨le_rfl,le_of_lt I.prop⟩,ne_of_lt I.prop⟩
-  · apply le_sSup
-    use I.val.2, ⟨⟨le_of_lt I.prop,le_rfl⟩,ne_of_lt I.prop⟩
+  exact ⟨sInf_le ⟨I.val.1, ⟨⟨le_rfl, le_of_lt I.prop⟩, ne_of_lt I.prop⟩, rfl⟩,
+    le_sSup ⟨I.val.2, ⟨⟨le_of_lt I.prop, le_rfl⟩, ne_of_lt I.prop⟩, rfl⟩⟩
 
 
 
@@ -93,15 +90,13 @@ NashEquilibrium μ ↔
     rw [impl.prop4d1₁ ℒ S μ h₁.wacc h₂.wsl₁] at h
     simp only [TotIntvl, μBstar, μB, ne_eq] at h
     rw [h]
-    apply le_sSup
-    use y, ⟨in_TotIntvl y,Ne.symm hy⟩
+    exact le_sSup ⟨y, ⟨in_TotIntvl y, Ne.symm hy⟩, rfl⟩
   · intro h
     refine {nash_eq := ?_}
     rw [impl.prop4d1₁ ℒ S μ h₁.wacc h₂.wsl₁]
     simp only [μBstar, μB, ne_eq]
     apply eq_of_le_of_ge
-    · apply le_sSup
-      use ⊤, ⟨in_TotIntvl ⊤, bot_ne_top⟩
+    · exact le_sSup ⟨⊤, ⟨in_TotIntvl ⊤, bot_ne_top⟩, rfl⟩
     · apply sSup_le
       rintro b ⟨h1,⟨h2,h3⟩⟩
       exact h3 ▸ (h h1 <| Ne.symm h2.2)
@@ -127,15 +122,13 @@ NashEquilibrium μ ↔
     simp only [TotIntvl] at h
     rw [← h]
     unfold μAstar μA
-    apply sInf_le
-    use y, ⟨in_TotIntvl y,hy⟩
+    exact sInf_le ⟨y, ⟨in_TotIntvl y, hy⟩, rfl⟩
   · intro h
     refine {nash_eq := ?_}
     rw [impl.prop4d3₁ μ h₁.wdcc h₂.wsl₂]
     simp only [μAstar, μA, ne_eq]
     apply eq_of_le_of_ge
-    · apply sInf_le
-      use ⊥, ⟨in_TotIntvl ⊥, bot_ne_top⟩
+    · exact sInf_le ⟨⊥, ⟨in_TotIntvl ⊥, bot_ne_top⟩, rfl⟩
     · apply le_sInf
       rintro b ⟨h1,⟨h2,h3⟩⟩
       exact h3 ▸ (h h1 h2.2)
@@ -153,15 +146,15 @@ lemma prop4d11₁ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrde
     unfold μBstar μB μmax TotIntvl
     apply sSup_le
     rintro b ⟨hb1,⟨hb2,hb3⟩⟩
-    refine hb3 ▸
-      le_trans (rmk4d10₀ μ ⟨(⊥,hb1), bot_lt_iff_ne_bot.2 <| Ne.symm hb2.2⟩).1 <| le_sSup ?_
-    use hb1, ⟨in_TotIntvl hb1, hb2.2⟩
+    exact hb3 ▸ le_trans
+      (rmk4d10₀ μ ⟨(⊥,hb1), bot_lt_iff_ne_bot.2 <| Ne.symm hb2.2⟩).1 <|
+      le_sSup ⟨hb1, ⟨in_TotIntvl hb1, hb2.2⟩, rfl⟩
   have h₂ : μmin μ TotIntvl ≤ μAstar μ := by
     unfold μAstar μA μmin TotIntvl
     apply le_sInf
     rintro b ⟨hb1,⟨hb2,hb3⟩⟩
-    refine hb3 ▸ le_trans (sInf_le ?_) (rmk4d10₀ μ ⟨(hb1,⊤), lt_top_iff_ne_top.2 <| hb2.2⟩).2
-    use hb1, ⟨in_TotIntvl hb1, hb2.2⟩
+    exact hb3 ▸ le_trans (sInf_le ⟨hb1, ⟨in_TotIntvl hb1, hb2.2⟩, rfl⟩)
+      (rmk4d10₀ μ ⟨(hb1,⊤), lt_top_iff_ne_top.2 <| hb2.2⟩).2
   exact fun h ↦ le_trans h₁ (h ▸ h₂)
 
 

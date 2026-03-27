@@ -263,8 +263,8 @@ lemma JHFil_prop₂ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
   simp only [μmax, TotIntvl, ne_eq] at this_new
   have this_q: μ ⟨(⊥, z), lt_of_le_of_lt bot_le h'⟩ ≤ μ ⟨(⊥, ⊤), bot_lt_top⟩ := by
     rw [← this_new]
-    apply le_sSup
-    use z, ⟨in_TotIntvl z, Ne.symm <| bot_lt_iff_ne_bot.1 <| lt_of_le_of_lt bot_le h'⟩
+    exact le_sSup ⟨z, ⟨in_TotIntvl z,
+      Ne.symm <| bot_lt_iff_ne_bot.1 <| lt_of_le_of_lt bot_le h'⟩, rfl⟩
   by_cases hfp1bot : JHFil μ hμ hμsl hst hdc (k + 1) = ⊥
   · simp only [hfp1bot]
     have : ¬ {p | ∃ (h : ⊥ < p), p < JHFil μ hμ hμsl hst hdc k ∧ μ ⟨(⊥, p), h⟩ =
@@ -1021,8 +1021,7 @@ Semistable (Resμ ⟨(JH.filtration (Nat.find JH.fin_len - 1),⊤),h⟩ μ) := b
   apply eq_of_le_of_ge ?_ ?_
   · apply sInf_le
     simp only [ne_eq, Set.mem_setOf_eq]
-    use JH.filtration (Nat.find JH.fin_len - 1), ⟨⟨le_rfl,le_top⟩,lt_top_iff_ne_top.1 h⟩
-    rfl
+    exact ⟨JH.filtration (Nat.find JH.fin_len - 1), ⟨⟨le_rfl,le_top⟩,lt_top_iff_ne_top.1 h⟩, rfl⟩
   · apply le_sInf
     intro z hz
     simp only [ne_eq, Set.mem_setOf_eq] at hz
@@ -1032,8 +1031,7 @@ Semistable (Resμ ⟨(JH.filtration (Nat.find JH.fin_len - 1),⊤),h⟩ μ) := b
     replace := (List.TFAE.out (thm4d21 μ inferInstance inferInstance inferInstance).1 1 3).2 this
     have this' : μ ⟨(u,⊤),lt_top_iff_ne_top.2 hu1.2⟩ ≥ μ ⟨(⊥,⊤),bot_lt_top⟩ := by
       rw [← this]
-      apply sInf_le
-      use u, ⟨in_TotIntvl _,hu1.2⟩
+      exact sInf_le ⟨u, ⟨in_TotIntvl _,hu1.2⟩, rfl⟩
     replace := μ_bot_JH_eq_μ_tot JH (Nat.find JH.fin_len - 1) (Nat.sub_one_lt <| JH_pos_len JH)
     rwa [((seesaw' μ inferInstance ⊥ (JH.filtration (Nat.find JH.fin_len - 1)) ⊤ ⟨by
       by_contra hc

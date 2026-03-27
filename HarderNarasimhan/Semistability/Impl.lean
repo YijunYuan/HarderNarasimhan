@@ -74,11 +74,10 @@ lemma cor3d3 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 (h : ∀ f : ℕ → ℒ, (h : StrictAnti f) →  ∃N : ℕ, μA μ ⟨(f <| N + 1, f N),h (lt_add_one N)⟩ = ⊤)
 : μA_DescendingChainCondition μ := by
   refine { μ_dcc := fun a f h₁ h₂ ↦ ?_ }
-  rcases (h f h₂) with ⟨N, hN⟩
-  use N
-  have := prop3d2 TotIntvl μ hμcvx (f <| N + 1) (in_TotIntvl <| f <| N + 1) (f N)
-    (in_TotIntvl <| f N) (h₂ (lt_add_one N)) hN a (in_TotIntvl <| a) (h₁ <| N + 1)
-  exact not_lt_of_ge this
+  obtain ⟨N, hN⟩ := h f h₂
+  exact ⟨N, not_lt_of_ge <| prop3d2 TotIntvl μ hμcvx (f <| N + 1)
+    (in_TotIntvl <| f <| N + 1) (f N) (in_TotIntvl <| f N)
+    (h₂ (lt_add_one N)) hN a (in_TotIntvl <| a) (h₁ <| N + 1)⟩
 
 
 /--
@@ -269,10 +268,8 @@ lemma prop3d4₀func_fin_len
 ∃ i : ℕ, (prop3d4₀func μ I i).val = I.val.1 := by
   by_contra!
   let func := fun m : ℕ => (prop3d4₀func μ I m).val
-  have h₀ : ∀ i : ℕ, func i > I.val.1 := by
-    intro i
-    rw [gt_iff_lt]
-    exact Ne.lt_of_le (this i).symm  (prop3d4₀func μ I i).prop.1
+  have h₀ : ∀ i : ℕ, func i > I.val.1 :=
+    fun i ↦ Ne.lt_of_le (this i).symm (prop3d4₀func μ I i).prop.1
   have h₂ := fun t ↦ prop3d4₀func_defprop1 μ I t (this (t + 1)).symm
   have ttt := fun t ↦ prop3d4₀func_strict_decreasing μ I t (this t).symm
   rcases (hμDCC.μ_dcc I.val.1 func h₀ (strictAnti_nat_of_succ_lt ttt)) with ⟨N, hN⟩
@@ -671,9 +668,7 @@ theorem semistable_iff {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrde
   simp only [semistableI, StI, S₁I, TotIntvl, ne_eq, gt_iff_lt, S₂I, Set.mem_setOf_eq, le_top,
     implies_true, and_true, bot_ne_top, not_false_eq_true, exists_true_left]
   constructor
-  · intro h
-    use in_TotIntvl _
-    exact fun y hyI hy ↦ h.semistable y <| Ne.symm hy
+  · exact fun h ↦ ⟨in_TotIntvl _, fun y hyI hy ↦ h.semistable y <| Ne.symm hy⟩
   · exact fun h ↦ {semistable := fun y hyI hy ↦ (h.choose_spec y (in_TotIntvl _) (Ne.symm hyI)) hy}
 
 
