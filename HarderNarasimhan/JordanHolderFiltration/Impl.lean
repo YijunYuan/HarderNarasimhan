@@ -585,10 +585,8 @@ lemma μA_eq_μmin {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
 [SlopeLike μ] (I : {p : ℒ × ℒ // p.1 < p.2}) :
 μmin μ I = μA μ I := by
   convert Eq.symm <| (proposition_4_1 (Resμ I μ) inferInstance inferInstance).1
-  · simp only [μmin_res_intvl]
-    rfl
-  · simp only [μAstar, μA_res_intvl]
-    rfl
+  · simpa only [μmin_res_intvl] using by rfl
+  · simpa only [μAstar, μA_res_intvl] using by rfl
 
 open Classical in
 /-- `μ_bot_JH_eq_μ_tot` is an invariance statement along a Jordan–Hölder filtration.
@@ -762,8 +760,7 @@ lemma stable_of_step_cond₂
         by_contra hc
         refine hx ?_
         apply Subtype.coe_inj.1
-        rw [← hc]
-        rfl
+        simpa [← hc] using by rfl
       refine lt_of_le_of_lt hμmin_le ?_
       exact (h i hi) x.val hx_left <| lt_iff_le_not_ge.mpr (lt_top_iff_ne_top.2 hx')
 
@@ -834,10 +831,7 @@ lemma step_cond₂_of_stable {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [Bound
   have hsSup_step_bak := hsSup_step
   have hsSup_mid := hsSup_step (Resμ ⟨(filtration (i + 1), filtration i), gt_trans hz' hz⟩
     μ ⟨(⊥, midI), bot_lt_iff_ne_bot.2 hmid_ne_bot⟩)
-    midI ⟨in_TotIntvl _, by
-      intro hc
-      exact hmid_ne_bot hc.symm
-    ⟩ rfl
+    midI ⟨in_TotIntvl _, fun hc => hmid_ne_bot hc.symm⟩ rfl
   have hsSup_mid' : μ ⟨(filtration (i + 1), z), hz⟩ ≤ μ ⟨(filtration (i + 1), filtration i),
       strict_anti i (i + 1) (lt_add_one i) hi⟩ := by
     simpa only [stepI, μ_res_intvl] using hsSup_mid
