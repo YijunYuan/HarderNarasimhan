@@ -157,12 +157,11 @@ theorem length_eq_of_JordanHolderFiltration
 [FiniteTotalPayoff μ] [SlopeLike μ] [Semistable μ]
 [StrongDescendingChainCondition' μ] [Affine μ] :
 ∀ JH1 JH2 : JordanHolderFiltration μ, Nat.find JH1.fin_len = Nat.find JH2.fin_len
-:= fun JH1 JH2 ↦ eq_of_le_of_ge (impl.induction_on_length_of_JordanHolderFiltration
-  (Nat.find JH2.fin_len) ℒ _ _ _ inferInstance inferInstance _ _ μ inferInstance inferInstance
-  inferInstance inferInstance inferInstance ⟨JH2,rfl.le⟩ JH1) <|
-  impl.induction_on_length_of_JordanHolderFiltration (Nat.find JH1.fin_len) ℒ _ _ _ inferInstance
-  inferInstance _ _ _ inferInstance inferInstance inferInstance inferInstance inferInstance
-  ⟨JH1,rfl.le⟩ JH2
+:= fun JH1 JH2 ↦ eq_of_le_of_ge
+  (impl.induction_on_length_of_JordanHolderFiltration (μ := μ)
+    (Nat.find JH2.fin_len) ⟨JH2, rfl.le⟩ JH1) <|
+  impl.induction_on_length_of_JordanHolderFiltration (μ := μ)
+    (Nat.find JH1.fin_len) ⟨JH1, rfl.le⟩ JH2
 
 
 end HarderNarasimhan

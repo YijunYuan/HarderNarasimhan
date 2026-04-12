@@ -1029,15 +1029,15 @@ open Classical in
   This is proved by induction on `n`, using restriction to a final interval and modularity to
   compare lengths.
 -/
-lemma induction_on_length_of_JordanHolderFiltration : ∀ n : ℕ, ∀ ℒ : Type*, ∀ _: Nontrivial ℒ,
-   ∀ _ : Lattice ℒ, ∀ _ : BoundedOrder ℒ, ∀ _ : WellFoundedGT ℒ,
-∀ _ : IsModularLattice ℒ,
-∀ S : Type*, ∀ _ : CompleteLinearOrder S, ∀ μ : {p : ℒ × ℒ // p.1 < p.2} → S,
-∀ _ : FiniteTotalPayoff μ, ∀ _ : SlopeLike μ,
-∀ _ : Semistable μ, ∀ _ : StrongDescendingChainCondition' μ, ∀ _ :
-Affine μ, (∃ JH : JordanHolderFiltration μ, Nat.find JH.fin_len ≤ n) →
-  (∀ JH' : JordanHolderFiltration μ, Nat.find JH'.fin_len ≤ n) := by
-  intro n
+lemma induction_on_length_of_JordanHolderFiltration (n : ℕ) :
+    ∀ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+      [WellFoundedGT ℒ] [IsModularLattice ℒ]
+      {S : Type*} [CompleteLinearOrder S]
+      {μ : {p : ℒ × ℒ // p.1 < p.2} → S}
+      [FiniteTotalPayoff μ] [SlopeLike μ] [Semistable μ]
+      [StrongDescendingChainCondition' μ] [Affine μ],
+      (∃ JH : JordanHolderFiltration μ, Nat.find JH.fin_len ≤ n) →
+      ∀ JH' : JordanHolderFiltration μ, Nat.find JH'.fin_len ≤ n := by
   induction n with
   | zero =>
     intro ℒ ntl l bo wacc hmod S clo μ hftp hsl hst hwdcc' affine ⟨JH,hJH⟩ JH'
@@ -1064,7 +1064,7 @@ Affine μ, (∃ JH : JordanHolderFiltration μ, Nat.find JH.fin_len ≤ n) →
       simp only [lenx, Nat.sub_one_add_one <| JH_pos_len JHx,
         Nat.find_spec JHx.fin_len] at hlast_step
       exact ((seesaw' μ hsl ⊥ x0 ⊤ ⟨hx0_bot, nt⟩).2.2.1 hlast_step).2.symm
-    have ftpLres : FiniteTotalPayoff (Resμ Ires μ) :=
+    letI : FiniteTotalPayoff (Resμ Ires μ) :=
       { fin_tot_payoff := by simpa only [Resμ] using hstepx0.symm ▸ hftp.fin_tot_payoff }
     let JH_raw : ℕ → (Interval Ires) := fun n ↦ ⟨x0 ⊔ JHy.filtration n, ⟨le_sup_left, le_top⟩⟩
     have JH_raw_antitone : Antitone JH_raw := by
@@ -1080,9 +1080,9 @@ Affine μ, (∃ JH : JordanHolderFiltration μ, Nat.find JH.fin_len ≤ n) →
     let atRaw : ∃ k, JH_raw k = ⊥ := ⟨leny, JH_raw_fin_len⟩
     let JHfinal := subseq JH_raw atRaw
     have JHfinal_first_top : JHfinal 0 = ⊤ := by simp only [JHfinal, subseq]
-    have hthm4d21_tot := impl.thm4d21 μ hsl inferInstance inferInstance
     have hμmax : μmax μ TotIntvl = μ TotIntvl := by
-      exact (List.TFAE.out hthm4d21_tot.1 0 3).2 (hthm4d21_tot.2.1 hst)
+      exact (List.TFAE.out (impl.thm4d21 μ hsl inferInstance inferInstance).1 0 3).2
+        ((impl.thm4d21 μ hsl inferInstance inferInstance).2.1 hst)
     have hμA_eq_tot : ∀ (JH : JordanHolderFiltration μ) (k : ℕ), (hk : k < Nat.find JH.fin_len) →
       μ TotIntvl = μA μ ⟨(⊥, JH.filtration k), by
         rw [← Nat.find_spec JH.fin_len]
@@ -1113,14 +1113,11 @@ Affine μ, (∃ JH : JordanHolderFiltration μ, Nat.find JH.fin_len ≤ n) →
             simp only [ne_eq, Set.mem_setOf_eq]
             use u, ⟨in_TotIntvl _, Ne.symm hubot⟩
           exact (not_le_of_gt hc hμu).elim
-      · apply sInf_le
-        simp only [ne_eq, Set.mem_setOf_eq]
-        use ⊥
-        have hkbot : ¬ ⊥ = JH.filtration k := by
-          by_contra hc
-          replace := (Nat.find_spec JH.fin_len) ▸ JH.strict_anti k (Nat.find JH.fin_len) hk le_rfl
-          exact lt_irrefl _ <| hc.symm ▸ this
-        simpa only [exists_prop, and_true] using ⟨⟨le_rfl, bot_le⟩, hkbot⟩
+      · simpa [μmin, hess] using
+          (rmk4d10₀ μ ⟨(⊥, JH.filtration k), by
+            rw [← Nat.find_spec JH.fin_len]
+            exact JH.strict_anti k (Nat.find JH.fin_len) hk le_rfl
+          ⟩).1
     have hcond1 : ∀ i < Nat.find atRaw, ∀ hfi : JH_raw (i + 1) < JH_raw i,
       (fun z ↦ Resμ Ires μ z = Resμ Ires μ ⟨(⊥, ⊤), bot_lt_top⟩)
               ⟨(JH_raw (i + 1), JH_raw i), hfi⟩ := by
@@ -1134,15 +1131,8 @@ Affine μ, (∃ JH : JordanHolderFiltration μ, Nat.find JH.fin_len ≤ n) →
           simp only [ne_eq, Set.mem_setOf_eq]
           use x0 ⊔ JHy.filtration j, ⟨in_TotIntvl _, Ne.symm <|
             bot_lt_iff_ne_bot.1 <| lt_of_lt_of_le hx0_bot le_sup_left⟩
-        · have : μmin μ ⟨(⊥, x0 ⊔ JHy.filtration j),
-            lt_of_lt_of_le hx0_bot le_sup_left⟩ ≤
-            μ ⟨(⊥, x0 ⊔ JHy.filtration j),
-              lt_of_lt_of_le hx0_bot le_sup_left⟩ := by
-            apply sInf_le
-            simp only [ne_eq, Set.mem_setOf_eq]
-            use ⊥, ⟨⟨le_rfl, le_of_lt <| lt_of_lt_of_le hx0_bot le_sup_left⟩,
-              Ne.symm <| bot_lt_iff_ne_bot.1 <| lt_of_lt_of_le hx0_bot le_sup_left⟩
-          refine le_trans ?_ this
+        · refine le_trans ?_ (rmk4d10₀ μ ⟨(⊥, x0 ⊔ JHy.filtration j),
+            lt_of_lt_of_le hx0_bot le_sup_left⟩).1
           rw [μA_eq_μmin μ ⟨(⊥, x0 ⊔ JHy.filtration j),
             lt_of_lt_of_le hx0_bot le_sup_left⟩]
           if hjbot : ⊥ = JHy.filtration j  then
@@ -1381,10 +1371,9 @@ Affine μ, (∃ JH : JordanHolderFiltration μ, Nat.find JH.fin_len ≤ n) →
         simp only [JHfun]; simp only [Eq.mpr (id (congrArg (fun _a ↦ i + 1 ≤ _a) hhard.symm)) hi,
           ↓reduceDIte, le_of_lt <| hhard ▸ hi, gt_iff_lt]
         exact JHx.step_cond₂ i (Nat.lt_of_lt_pred <| hhard ▸ hi) z htemp htemp2
-    exact Nat.le_add_of_sub_le <| hhard ▸ hn (Interval Ires) inferInstance inferInstance
-      inferInstance inferInstance inferInstance S clo (Resμ Ires μ) ftpLres inferInstance
-      (semistable_resμ_of_jordanHolderFiltration _ _) inferInstance inferInstance
-      ⟨JH_FINAL,Nat.le_of_lt_succ <| Nat.lt_of_lt_of_le ha hJHy⟩ JHres
+    letI : Semistable (Resμ Ires μ) := semistable_resμ_of_jordanHolderFiltration _ _
+    exact Nat.le_add_of_sub_le <| hhard ▸ hn (μ := Resμ Ires μ)
+      ⟨JH_FINAL, Nat.le_of_lt_succ <| Nat.lt_of_lt_of_le ha hJHy⟩ JHres
 
 
 end impl
