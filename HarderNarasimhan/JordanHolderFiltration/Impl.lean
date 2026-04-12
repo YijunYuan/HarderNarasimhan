@@ -672,9 +672,7 @@ lemma semistable_of_step_cond₂
     use ⊥
     simp only [bot_ne_top, not_false_eq_true, and_true, exists_prop,in_TotIntvl]
   · apply le_sInf
-    intro b hb
-    simp only [ne_eq, Set.mem_setOf_eq] at hb
-    rcases hb with ⟨u,hu1,hu2⟩
+    rintro b ⟨u,hu1,hu2⟩
     rw [← hu2]
     simp only [μ_res_intvl]
     if hu : u = ⊥ then
@@ -682,21 +680,15 @@ lemma semistable_of_step_cond₂
     else
     have h := h i hi u.val (lt_of_le_of_ne u.prop.1 (by
       by_contra hc
-      refine hu <| Subtype.coe_inj.1 ?_
-      exact id (Eq.symm hc)
-          )) (lt_of_le_of_ne u.prop.2 (by
-            by_contra hc
-            exact hu1.2 <| Subtype.coe_inj.1 <| hc
-            ))
+      exact hu <| Subtype.coe_inj.1 <| id (Eq.symm hc))) (lt_of_le_of_ne u.prop.2 (by
+        by_contra hc
+        exact hu1.2 <| Subtype.coe_inj.1 <| hc))
     have := ((seesaw' μ inferInstance (filtration (i + 1)) u.val (filtration i)
       ⟨(lt_of_le_of_ne u.prop.1 (by
       by_contra hc
-      refine hu <| Subtype.coe_inj.1 ?_
-      exact id (Eq.symm hc)
-          )),(lt_of_le_of_ne u.prop.2 (by
-            by_contra hc
-            exact hu1.2 <| Subtype.coe_inj.1 <| hc
-            ))⟩).1.1 h).2
+      exact hu <| Subtype.coe_inj.1 <| id (Eq.symm hc))), (lt_of_le_of_ne u.prop.2 (by
+        by_contra hc
+        exact hu1.2 <| Subtype.coe_inj.1 <| hc))⟩).1.1 h).2
     apply le_of_lt this
 
 open Classical in
@@ -732,9 +724,7 @@ lemma stable_of_step_cond₂
       have hAstar_step := (proposition_4_1 (Resμ stepI μ) inferInstance inferInstance).1
       have hAstar_x := (proposition_4_1 (Resμ ⟨(filtration (i + 1), x.val), hx_left⟩ μ)
         inferInstance inferInstance).1
-      unfold μAstar at hAstar_step
-      unfold μAstar at hAstar_x
-      simp only [μA_res_intvl,μmin_res_intvl] at *
+      simp only [μAstar, μA_res_intvl,μmin_res_intvl] at *
       rw [hAstar_step]
       simp only [strip_bot <| strict_anti i (i + 1) (lt_add_one i) hi,
         strip_top hx_left, strip_bot hx_left] at *
@@ -957,8 +947,7 @@ lemma induction_on_length_of_JordanHolderFiltration (n : ℕ) :
     else
     have hlenx_ne_zero : lenx ≠ 0 := by
       simpa [lenx] using JH_pos_len JHx
-    have hlenx : 0 < lenx - 1 := by
-      omega
+    have hlenx : 0 < lenx - 1 := by omega
     let Ires : {p : ℒ × ℒ // p.1 < p.2} :=
       ⟨(x0, ⊤), (JHx.first_eq_top) ▸ JHx.strict_anti 0 (lenx - 1) hlenx (Nat.sub_le lenx 1)⟩
     have hx0_bot : ⊥ < x0 := by
@@ -977,12 +966,10 @@ lemma induction_on_length_of_JordanHolderFiltration (n : ℕ) :
       intro n1 n2 hn
       apply sup_le_sup_left <| JHy.antitone hn
     have JH_raw_first_top : JH_raw 0 = ⊤ := by
-      simp only [JH_raw, JHy.first_eq_top, le_top, sup_of_le_right, JH_raw]
-      rfl
+      simpa only [JH_raw, JHy.first_eq_top, le_top, sup_of_le_right, JH_raw] using by rfl
     have hJHy_last : JHy.filtration leny = ⊥ := Nat.find_spec JHy.fin_len
     have JH_raw_fin_len : JH_raw leny = ⊥ := by
-      simp only [JH_raw, leny, hJHy_last, bot_le, sup_of_le_left, JH_raw]
-      rfl
+      simpa only [JH_raw, leny, hJHy_last, bot_le, sup_of_le_left, JH_raw] using by rfl
     let atRaw : ∃ k, JH_raw k = ⊥ := ⟨leny, JH_raw_fin_len⟩
     let JHfinal := fun n ↦ JH_raw (subseqIdx JH_raw atRaw JH_raw_antitone n)
     have JHfinal_first_top : JHfinal 0 = ⊤ := by
@@ -1002,9 +989,7 @@ lemma induction_on_length_of_JordanHolderFiltration (n : ℕ) :
       unfold μmin
       refine eq_of_le_of_ge ?_ ?_
       · apply le_sInf
-        intro h hb
-        simp only [ne_eq, Set.mem_setOf_eq] at hb
-        rcases hb with ⟨u, hu1, hu2⟩
+        rintro h ⟨u, hu1, hu2⟩
         rw [← hu2]
         if hubot : u = ⊥ then simp only [hubot, le_refl]
         else
@@ -1047,8 +1032,7 @@ lemma induction_on_length_of_JordanHolderFiltration (n : ℕ) :
             rw [← μA_eq_μmin μ, ← JHx.step_cond₁ (lenx - 1) (by omega)]
             unfold μmin
             apply le_sInf
-            intro b hb
-            rcases hb with ⟨u,hu1,hu2⟩
+            rintro b ⟨u,hu1,hu2⟩
             rw [← hu2]
             replace := JHx.step_cond₂ (lenx - 1) (by omega) u
             simp only [lenx, Nat.sub_one_add_one <| JH_pos_len JHx, Nat.find_spec JHx.fin_len] at *
@@ -1062,12 +1046,11 @@ lemma induction_on_length_of_JordanHolderFiltration (n : ℕ) :
           replace := (proposition_2_8 μ inferInstance x0 (JHy.filtration j) ⊥
             ⟨hx0_bot, bot_lt_iff_ne_bot.2 fun a ↦ hjbot (id (Eq.symm a))⟩).1
           convert this.le
-          have t1 := hμA_eq_tot JHx (lenx - 1) (by omega)
           have t2 := hμA_eq_tot JHy j <| by
             refine lt_of_le_of_ne hj ?_
             by_contra hc
             exact hjbot (hc ▸ Nat.find_spec JHy.fin_len).symm
-          rw [← t1,← t2]
+          rw [← (hμA_eq_tot JHx (lenx - 1) (by omega)), ← t2]
           exact Eq.symm (min_self (μ TotIntvl))
       have tj1 := hj' j (le_of_lt <| lt_of_lt_of_le hj <| Nat.find_min' atRaw JH_raw_fin_len)
       have := tj1 ▸ ((seesaw' μ hsl ⊥ (x0 ⊔ JHy.filtration (j + 1))
@@ -1197,8 +1180,7 @@ lemma induction_on_length_of_JordanHolderFiltration (n : ℕ) :
                 if hw : i0 + 1 ≤ leny - 1 then
                   exact @Nat.findGreatest_is_greatest (i0+1) (fun n ↦ x0 ≤ JHy.filtration n)
                     inferInstance (leny - 1) (lt_add_one _) hw <| right_eq_sup.1 hcon
-                else
-                  exact hi0_imp <| right_eq_sup.1 hcon
+                else exact hi0_imp <| right_eq_sup.1 hcon
             have otherwise := JHy.step_cond₂ i0 ((Nat.le_sub_one_iff_lt <| zero_lt_iff.2 <|
               JH_pos_len JHy).1 this) ↑(JH_raw (i0 + 1)) hsmall hc
             rw [JHy.step_cond₁ i0 <| lt_of_le_of_lt this <| Nat.sub_one_lt <| JH_pos_len JHy ]
@@ -1238,22 +1220,19 @@ lemma induction_on_length_of_JordanHolderFiltration (n : ℕ) :
     have JHfun_antitone : Antitone JHfun := by
         intro n1 n2 hn
         by_cases h3 : n2 ≤ Nat.find JHx.fin_len - 1
-        · simp only [JHfun,le_trans hn h3, h3, ↓reduceDIte]
-          exact JHx.antitone hn
+        · simpa only [JHfun,le_trans hn h3, h3, ↓reduceDIte] using JHx.antitone hn
         · simp only [h3, ↓reduceDIte, bot_le, JHfun]
     have hhard : Nat.find JHfun_fin_len = Nat.find JHx.fin_len - 1 := by
       have hgreat : Nat.find JHfun_fin_len ≤ Nat.find JHx.fin_len - 1 := by
         refine Nat.find_min' JHfun_fin_len ?_
-        simp only [JHfun, le_refl, ↓reduceDIte]
-        rfl
+        simpa only [JHfun, le_refl, ↓reduceDIte] using by rfl
       refine eq_of_le_of_not_lt hgreat fun hv ↦ ?_
       have hweired : JHx.filtration (Nat.find JHfun_fin_len) =
         JHx.filtration (Nat.find JHx.fin_len - 1) := by
         have this' := Nat.find_spec JHfun_fin_len
         unfold JHfun at this'
         rw [dif_pos hgreat] at this'
-        apply Subtype.coe_inj.2 at this'
-        exact this'
+        exact Subtype.coe_inj.2 this'
       exact (lt_self_iff_false (JHx.filtration (Nat.find JHx.fin_len - 1))).1 <|
         hweired ▸ JHx.strict_anti (Nat.find JHfun_fin_len) (Nat.find JHx.fin_len - 1) hv <|
         Nat.sub_le (Nat.find JHx.fin_len) 1
@@ -1267,8 +1246,7 @@ lemma induction_on_length_of_JordanHolderFiltration (n : ℕ) :
         apply Subtype.coe_inj.2 at hu
         simp only at hu
         exact (lt_self_iff_false (JHx.filtration i)).mp <| hu ▸ this
-      · simp only [JHfun, zero_le, ↓reduceDIte, JHx.first_eq_top]
-        rfl
+      · simpa only [JHfun, zero_le, ↓reduceDIte, JHx.first_eq_top] using by rfl
       · intro k1 hk1
         simp only [Resμ, JHfun]
         replace hk1 := hhard ▸ hk1
