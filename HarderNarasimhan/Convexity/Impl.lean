@@ -138,8 +138,8 @@ lemma lem2d4₂I
   (hxwt : x ⊔ w ≤ t) :
   μmax μ ⟨(x ⊓ w, x), inf_lt_left.2 hxw⟩ ≤
     μmax μ ⟨(w, t), lt_of_le_of_lt' hxwt <| right_lt_sup.2 hxw⟩ := by
-    have h : ∀ b : ℒ, (h' : x ⊓ w < b ∧ b ≤ x) →
-        μ ⟨(x ⊓ w, b), h'.1⟩ ≤ μmax μ ⟨(w, t), lt_of_le_of_lt' hxwt <| right_lt_sup.2 hxw⟩ := by
+    let target := μmax μ ⟨(w, t), lt_of_le_of_lt' hxwt <| right_lt_sup.2 hxw⟩
+    have h : ∀ b : ℒ, (h' : x ⊓ w < b ∧ b ≤ x) → μ ⟨(x ⊓ w, b), h'.1⟩ ≤ target := by
       intro b hb
       have hh : x ⊓ w = b ⊓ w := by
         refine le_antisymm ?_ <| inf_le_inf_right w hb.2
@@ -148,8 +148,7 @@ lemma lem2d4₂I
       simp only [hh, ge_iff_le]
       have hbnlew : ¬ b ≤ w := inf_lt_left.mp
         ((congrArg (fun _a ↦ _a < b) (hh.symm)) ▸ hb.1)
-      have hfinal : μ ⟨(w, b ⊔ w), right_lt_sup.mpr hbnlew⟩ ≤
-        μmax μ ⟨(w, t), lt_of_le_of_lt' hxwt (right_lt_sup.2 hxw)⟩ := by
+      have hfinal : μ ⟨(w, b ⊔ w), right_lt_sup.mpr hbnlew⟩ ≤ target := by
         apply le_sSup
         use b ⊔ w, ⟨⟨le_sup_right, le_trans (sup_le_sup_right hb.2 w) hxwt⟩,
           (mt right_eq_sup.1) <| inf_lt_left.1 <| hh.symm ▸ hb.1⟩
