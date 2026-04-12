@@ -25,11 +25,11 @@ import Mathlib.Order.ModularLattice
 
   The core object is the recursively defined chain `JHFil μ ... : ℕ → ℒ`, built by
   repeatedly choosing a minimal element in a suitable set of candidates with constant
-  total payoff. The lemmas `JHFil_prop₁` and `JHFil_prop₂` establish the defining step
-  conditions of a `JordanHolderFiltration`.
+  total payoff. The lemmas `JHFil_step_payoff_eq_tot` and `JHFil_refine_lt_step_payoff`
+  establish the defining step conditions of a `JordanHolderFiltration`.
 
-  The middle part of the file develops a generic subsequence construction (`subseq`) for
-  turning a chain that eventually hits `⊥` into a normalised chain starting at `⊤` and
+  The middle part of the file develops a greedy subsequence-index construction (`subseqIdx`)
+  for turning a chain that eventually hits `⊥` into a normalised chain starting at `⊤` and
   with strictly decreasing steps. The later lemmas connect the step conditions to
   semistability/stability of restricted slopes.
 
@@ -102,12 +102,13 @@ lemma JHFil_anti_mono
   · simpa only [h]
 
 open Classical in
-/-- `JHFil_prop₁` proves the first step condition for the chain `JHFil`.
+/-- `JHFil_step_payoff_eq_tot` proves the first step condition for the chain `JHFil`.
 
   For each index `k` with `JHFil ... k > ⊥`, the payoff of the step
   `(JHFil ... (k+1), JHFil ... k)` is equal to the total payoff `μ (⊥, ⊤)`.
 -/
-lemma JHFil_prop₁ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [hacc : WellFoundedGT ℒ]
+lemma JHFil_step_payoff_eq_tot
+{ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [hacc : WellFoundedGT ℒ]
 {S : Type*} [CompleteLinearOrder S]
 (μ : {p : ℒ × ℒ // p.1 < p.2} → S)
 (hμ : μ ⟨(⊥, ⊤), bot_lt_top⟩ ≠ ⊤)
@@ -224,7 +225,7 @@ lemma JHFil_prop₁ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
 
   The proof uses the strengthened descending-chain condition `hdc` applied to the chain
   itself: if `⊥` were never reached, `hdc` would force a step payoff to be `⊤`, contradicting
-  the finite-total-payoff assumption together with `JHFil_prop₁`.
+  the finite-total-payoff assumption together with `JHFil_step_payoff_eq_tot`.
 -/
 lemma JHFil_fin_len {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [hacc : WellFoundedGT ℒ]
 {S : Type*} [CompleteLinearOrder S]
@@ -237,16 +238,18 @@ lemma JHFil_fin_len {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
   simp only [not_exists] at hc
   rcases hdc (fun n => JHFil μ hμ hμsl hst hdc n) <| strictAnti_of_add_one_lt <|
     fun n _ ↦ JHFil_anti_mono μ hμ hμsl hst hdc n (bot_lt_iff_ne_bot.2 <| hc n) with ⟨N, hN⟩
-  exact hμ.symm <| hN ▸ JHFil_prop₁ μ hμ hμsl hst hdc N (bot_lt_iff_ne_bot.2 <| hc N)
+  exact hμ.symm <| hN ▸
+    JHFil_step_payoff_eq_tot μ hμ hμsl hst hdc N (bot_lt_iff_ne_bot.2 <| hc N)
 
 open Classical in
-/-- `JHFil_prop₂` proves the stability step condition for the chain `JHFil`.
+/-- `JHFil_refine_lt_step_payoff` proves the stability step condition for the chain `JHFil`.
 
   For each `k` with `JHFil ... k > ⊥` and any strict intermediate `z` between
   `JHFil ... (k+1)` and `JHFil ... k`, the payoff strictly decreases when refining the step
   through `z`.
 -/
-lemma JHFil_prop₂ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [hacc : WellFoundedGT ℒ]
+lemma JHFil_refine_lt_step_payoff
+{ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [hacc : WellFoundedGT ℒ]
 {S : Type*} [CompleteLinearOrder S]
 (μ : {p : ℒ × ℒ // p.1 < p.2} → S) [hwdcc' : StrongDescendingChainCondition' μ]
 (hμ : μ ⟨(⊥, ⊤), bot_lt_top⟩ ≠ ⊤)
@@ -325,7 +328,7 @@ lemma JHFil_prop₂ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
         exact this.symm
       · simp only [JHFil,hne] at hfp1bot
         simp only [↓reduceDIte, not_true_eq_false] at hfp1bot
-    exact (JHFil_prop₁ μ hμ hμsl hst hdc k hk ).symm ▸ lt_trans ((Or.resolve_right <|
+    exact (JHFil_step_payoff_eq_tot μ hμ hμsl hst hdc k hk).symm ▸ lt_trans ((Or.resolve_right <|
       (Or.resolve_left <| (impl.prop4d6 μ).1 hμsl ⊥ (JHFil μ hμ hμsl hst hdc (k + 1)) z
       ⟨bot_lt_iff_ne_bot.2 hfp1bot,h'⟩) (not_and_iff_not_or_not.2 <| Or.inl <| not_lt_of_gt <|
       h'''' ▸ h''')) (not_and_iff_not_or_not.2 <| Or.inl <| ne_of_gt <| h'''' ▸ h''')).2 h'''
@@ -342,243 +345,180 @@ lemma JH_pos_len {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   simp only [Nat.find_eq_zero, JH.first_eq_top, top_ne_bot] at h
 
 open Classical in
-/-- `subseq f atf` is a normalised subsequence extracted from a chain `f : ℕ → ℒ` that
-  eventually hits `⊥`.
+/-/ `subseqIdx f atf hf` is the greedy index sequence underlying the normalised subsequence.
 
-  The construction starts at `⊤`, then repeatedly jumps forward to the first index where
-  `f` falls strictly below the previous value; once `⊥` is reached, it stays constant.
+It records which indices of the original chain are kept. At each step, if the current selected
+value is already `⊥`, we advance the index by one to keep a genuine subsequence map `ℕ → ℕ`; if
+not, we jump to the first later index where the value drops strictly.
 -/
-noncomputable def subseq {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-  (f : ℕ → ℒ) (atf : ∃ k, f k = ⊥) : ℕ → ℒ := fun n ↦
-  match n with
-  | 0 => ⊤
+noncomputable def subseqIdx {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+  (f : ℕ → ℒ) (atf : ∃ k, f k = ⊥) (hf : Antitone f) : ℕ → ℕ
+  | 0 => 0
   | t + 1 =>
-    if hcond : subseq f atf t = ⊥ then
-      ⊥
-    else
-      f <| Nat.find (⟨atf.choose,atf.choose_spec.symm ▸ bot_lt_iff_ne_bot.2 hcond⟩ :
-        ∃ k : ℕ, f k < subseq f atf t)
+      if hcond : f (subseqIdx f atf hf t) = ⊥ then
+        subseqIdx f atf hf t + 1
+      else
+        Nat.find (show ∃ k : ℕ, subseqIdx f atf hf t < k ∧ f k < f (subseqIdx f atf hf t) from by
+          let m := max (subseqIdx f atf hf t + 1) atf.choose
+          refine Exists.intro m ?_
+          refine And.intro (lt_of_lt_of_le (Nat.lt_succ_self _) (le_max_left _ _)) ?_
+          have hm : f m = ⊥ := by
+            apply le_bot_iff.mp
+            exact atf.choose_spec ▸ hf (le_max_right _ _)
+          rw [hm]
+          exact bot_lt_iff_ne_bot.2 hcond)
+termination_by n => n
 
-/-- `subseq.pf2` packages the witness that, as long as `subseq f atf t ≠ ⊥`, there exists an
-  index where `f` is strictly below the current subsequence value.
-  This is used to justify the `Nat.find` step in the definition of `subseq`.
+/-/ `subseqIdx.next_exists` packages the witness that, as long as the current selected value is
+not `⊥`, there is a later index where `f` drops strictly.
 -/
-private lemma subseq.pf2 {ℒ : Type u_1} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] (f : ℕ → ℒ)
-  (atf : ∃ k, f k = ⊥) (t : ℕ) (hcond : ¬subseq f atf t = ⊥) : ∃ k, f k < subseq f atf t :=
-  ⟨atf.choose,atf.choose_spec.symm ▸ bot_lt_iff_ne_bot.2 hcond⟩
+private lemma subseqIdx.next_exists {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+  (f : ℕ → ℒ) (atf : ∃ k, f k = ⊥) (hf : Antitone f) (t : ℕ)
+  (hcond : f (subseqIdx f atf hf t) ≠ ⊥) :
+  ∃ k : ℕ, subseqIdx f atf hf t < k ∧ f k < f (subseqIdx f atf hf t) := by
+  let m := max (subseqIdx f atf hf t + 1) atf.choose
+  refine ⟨m, lt_of_lt_of_le (Nat.lt_succ_self _) (le_max_left _ _), ?_⟩
+  have hm : f m = ⊥ := le_bot_iff.mp <| atf.choose_spec ▸ hf (le_max_right _ _)
+  simpa [hm] using bot_lt_iff_ne_bot.2 hcond
 
 open Classical in
-/-- `subseq_prop0` states that every value of the original chain `f` appears somewhere in
-  the extracted subsequence.
-
-  This is the basic surjectivity property needed to compare the two chains.
--/
-lemma subseq_prop0 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-  (f : ℕ → ℒ) (atf : ∃ k, f k = ⊥) (hf : Antitone f) (hf0 : f 0 = ⊤) :
-  ∀ i : ℕ, ∃ j : ℕ, f i = subseq f atf j := by
-  intro i
-  induction i with
-  | zero => exact ⟨0,hf0⟩
-  | succ i hi =>
-    rcases hi with ⟨j,hj⟩
-    if h : f i = ⊥ then
-      use j
-      rw [← hj,h]
-      exact le_bot_iff.1 <| h ▸ hf (Nat.le_succ i)
-    else
-    if h' : f i = f (i+1) then
-      exact ⟨j,h' ▸ hj⟩
-    else
-      use j+1
-      simp only [subseq,hj ▸ h, ↓reduceDIte]
-      have hq := subseq.pf2 f atf j (Eq.mpr_not (eq_false (hj ▸ h))
-        (of_eq_false (Eq.refl False)))
-      have : i + 1 = Nat.find hq := by
-        apply eq_of_le_of_ge
-        · have : Nat.find hq > i := by
-            by_contra hu
-            apply le_of_not_gt at hu
-            have hg := hj ▸ lt_of_le_of_lt (hf hu) (Nat.find_spec hq)
-            exact (lt_self_iff_false (subseq f atf j)).mp hg
-          exact this
-        · by_contra!
-          exact (hj ▸ Nat.find_min hq this) <| lt_of_le_of_ne (hf <| Nat.le_succ i) <| Ne.symm h'
-      exact congrArg f this
+private lemma subseqIdx.succ_eq_find {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+  (f : ℕ → ℒ) (atf : ∃ k, f k = ⊥) (hf : Antitone f) (t : ℕ)
+  (hcond : f (subseqIdx f atf hf t) ≠ ⊥) :
+  subseqIdx f atf hf (t + 1) = Nat.find (subseqIdx.next_exists f atf hf t hcond) := by
+  have hproof :
+      (by
+        let m := max (subseqIdx f atf hf t + 1) atf.choose
+        refine ⟨m, lt_of_lt_of_le (Nat.lt_succ_self _) (le_max_left _ _), ?_⟩
+        have hm : f m = ⊥ := by
+          apply le_bot_iff.mp
+          exact atf.choose_spec ▸ hf (le_max_right _ _)
+        rw [hm]
+        exact bot_lt_iff_ne_bot.2 hcond :
+          ∃ k : ℕ, subseqIdx f atf hf t < k ∧ f k < f (subseqIdx f atf hf t)) =
+      subseqIdx.next_exists f atf hf t hcond := Subsingleton.elim _ _
+  simp [subseqIdx, hcond]
 
 open Classical in
-/-- `subseq_prop0'` is a monotone-index refinement of `subseq_prop0`.
+private lemma subseqIdx.lt_succ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+  (f : ℕ → ℒ) (atf : ∃ k, f k = ⊥) (hf : Antitone f) (t : ℕ) :
+  subseqIdx f atf hf t < subseqIdx f atf hf (t + 1) := by
+  by_cases hcond : f (subseqIdx f atf hf t) = ⊥
+  · simp [subseqIdx, hcond]
+  · rw [subseqIdx.succ_eq_find f atf hf t hcond]
+    exact (Nat.find_spec (subseqIdx.next_exists f atf hf t hcond)).1
 
-  It produces an index `j ≥ i` such that `subseq f atf i = f j`.
--/
-lemma subseq_prop0' {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-(f : ℕ → ℒ) (atf : ∃ k, f k = ⊥) (hf : Antitone f) (hf0 : f 0 = ⊤) :
-∀ i : ℕ, ∃ j : ℕ, j ≥ i ∧ subseq f atf i = f j:= by
-  intro i
-  induction i with
-  | zero =>
-    use 0
-    simp only [subseq, ge_iff_le, le_refl, and_self, hf0]
-  | succ i hi =>
-    simp only [subseq]
-    if hcond : subseq f atf i = ⊥ then
-      simp only [ge_iff_le, hcond, ↓reduceDIte]
-      rcases hi with ⟨t,ht⟩
-      rw [hcond] at ht
-      use t + 1
-      simp only [add_le_add_iff_right, true_and, ht]
-      exact ht.2 ▸ (Eq.symm <| le_bot_iff.1 <| ht.2 ▸ hf (Nat.le_succ t))
-    else
-    simp only [ge_iff_le, hcond, ↓reduceDIte]
-    have hq := subseq.pf2 f atf i (of_eq_false (eq_false hcond))
-    rcases hi with ⟨t,ht⟩
-    rw [ht.2] at hq
-    use Nat.find hq
-    constructor
-    · have : Nat.find hq > t := by
-        by_contra d
-        apply le_of_not_gt at d
-        if hy: Nat.find hq = t then
-          exact (lt_self_iff_false (f t)).mp (Eq.mp (congrArg (fun _a ↦ f _a < f t) hy) <|
-            Nat.find_spec hq)
-        else
-        exact (lt_self_iff_false (f <| Nat.find hq)).1 <| lt_of_lt_of_le (Nat.find_spec hq) <|
-          hf <| le_of_lt <| lt_of_le_of_ne d hy
-      linarith
-    simp only [ht]
-
-/-- `subseq_prop1` shows that the normalised subsequence `subseq f atf` eventually reaches `⊥`.
-
-  Concretely, it produces an index `N` with `subseq f atf N = ⊥`, using the witness from `atf` and
-  the basic property `subseq_prop0`.
--/
-lemma subseq_prop1 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] (f : ℕ → ℒ)
-  (atf : ∃ k, f k = ⊥) (hf : Antitone f) (hf0 : f 0 = ⊤) : ∃ N : ℕ, subseq f atf N = ⊥ := by
-  rcases (subseq_prop0 f atf hf hf0 atf.choose) with ⟨N,hN⟩
-  exact ⟨N, hN ▸ atf.choose_spec⟩
+private lemma subseqIdx.ge_self {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+  (f : ℕ → ℒ) (atf : ∃ k, f k = ⊥) (hf : Antitone f) :
+  ∀ n : ℕ, n ≤ subseqIdx f atf hf n := by
+  intro n
+  induction n with
+  | zero => simp
+  | succ n ih =>
+    exact Nat.succ_le_of_lt <| lt_of_le_of_lt ih (subseqIdx.lt_succ f atf hf n)
 
 open Classical in
-/-- `subseq_prop2` records that the subsequence construction preserves antitonicity.
+private lemma subseqIdx.const_between {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+  (f : ℕ → ℒ) (atf : ∃ k, f k = ⊥) (hf : Antitone f) (i m : ℕ)
+  (hleft : subseqIdx f atf hf i ≤ m) (hright : m < subseqIdx f atf hf (i + 1)) :
+  f m = f (subseqIdx f atf hf i) := by
+  by_cases hbot : f (subseqIdx f atf hf i) = ⊥
+  · have hs : subseqIdx f atf hf (i + 1) = subseqIdx f atf hf i + 1 := by
+      simp [subseqIdx, hbot]
+    have hm : m = subseqIdx f atf hf i := by omega
+    simp [hm]
+  · have hs := subseqIdx.succ_eq_find f atf hf i hbot
+    have hle : f m ≤ f (subseqIdx f atf hf i) := hf hleft
+    apply eq_of_le_of_not_lt hle
+    intro hlt
+    by_cases hm : m = subseqIdx f atf hf i
+    · simp [hm] at hlt
+    · have hm' : subseqIdx f atf hf i < m := lt_of_le_of_ne hleft fun hm' => hm hm'.symm
+      have hfind := Nat.find_min' (subseqIdx.next_exists f atf hf i hbot) ⟨hm', hlt⟩
+      omega
 
-  Even though indices are changed by a greedy choice, the values `subseq f atf i` form an antitone
-  chain in `ℒ`.
+/-- `subseqIdx_hits_bot` shows that the values selected by `subseqIdx f atf` eventually reach `⊥`.
+
+  Concretely, it produces an index `N` with `f (subseqIdx f atf hf N) = ⊥`.
 -/
-lemma subseq_prop2 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] (f : ℕ → ℒ)
-  (atf : ∃ k, f k = ⊥) : Antitone (subseq f atf) := by
-  intro i j
-  apply Nat.le_induction
-  · exact le_rfl
-  · refine fun n hn hn' ↦ le_trans ?_ hn'
-    if hnzero : n = 0 then
-      exact hnzero ▸ le_top
-    else
-    simp only [subseq]
-    if hcond : subseq f atf n = ⊥ then
-      simp only [hcond, ↓reduceDIte, le_refl]
-    else
-    simpa only [hcond, ↓reduceDIte] using le_of_lt <| Nat.find_spec <|
-      subseq.pf2 f atf n (of_eq_false (eq_false hcond))
-
-
-/-- `subseq_prop3` compares the subsequence with the original chain pointwise.
-
-  It proves `subseq f atf k ≤ f k` for all `k`, i.e. the normalised chain does not sit above the
-  original chain at the same index.
--/
-lemma subseq_prop3 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-  (f : ℕ → ℒ) (hf0 : f 0 = ⊤) (atf : ∃ k, f k = ⊥) (hfat : Antitone f) :
-  ∀ k : ℕ, subseq f atf k ≤ f k := by
-  intro k
-  induction k with
-  | zero => simp only [subseq, hf0, le_refl]
-  | succ k ih =>
-    simp only [subseq]
-    if hcond : subseq f atf k = ⊥ then
-      simp only [hcond, ↓reduceDIte, bot_le]
-    else
-    simp only [hcond, ↓reduceDIte]
-    rcases subseq_prop0' f atf hfat hf0 (k+1) with ⟨jtilde,hjtilde⟩
-    simp only [subseq, ge_iff_le, hcond, ↓reduceDIte] at hjtilde
-    if hjt : jtilde = k+1 then
-      exact le_of_eq <| hjt ▸ hjtilde.2
-    else
-    exact hjtilde.2 ▸ (hfat <| le_of_lt <| lt_of_le_of_ne hjtilde.1 <| Ne.symm hjt)
+lemma subseqIdx_hits_bot {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] (f : ℕ → ℒ)
+  (atf : ∃ k, f k = ⊥) (hf : Antitone f) (_hf0 : f 0 = ⊤) :
+  ∃ N : ℕ, f (subseqIdx f atf hf N) = ⊥ := by
+  refine ⟨atf.choose, ?_⟩
+  have hbot : f (subseqIdx f atf hf atf.choose) = ⊥ := by
+    have hle := hf (subseqIdx.ge_self f atf hf atf.choose)
+    rw [atf.choose_spec] at hle
+    apply le_bot_iff.mp hle
+  exact hbot
 
 open Classical in
-/-- `subseq_prop5` is the strict-decrease property for the normalised subsequence.
+/-- `subseqIdx_strictAnti` is the strict-decrease property for the values selected by `subseqIdx`.
 
-  Up to the index where `subseq f atf` first hits `⊥`, consecutive values are strictly decreasing.
-  This is the key fact used later to turn antitonicity into a `StrictAnti` chain.
+  Up to the index where `f (subseqIdx f atf ..)` first hits `⊥`, consecutive selected values are
+  strictly decreasing. This is the key fact used later to turn antitonicity into a `StrictAnti`
+  chain.
 -/
-lemma subseq_prop5 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+lemma subseqIdx_strictAnti {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 (f : ℕ → ℒ) (hf0 : f 0 = ⊤) (atf : ∃ k, f k = ⊥) (hfat : Antitone f) :
-∀ (i j : ℕ), i < j → j ≤ Nat.find (subseq_prop1 f atf hfat hf0) →
-  subseq f atf j < subseq f atf i := by
+∀ (i j : ℕ), i < j → j ≤ Nat.find (subseqIdx_hits_bot f atf hfat hf0) →
+  f (subseqIdx f atf hfat j) < f (subseqIdx f atf hfat i) := by
   intro i
-  have : ∀ j : ℕ, i+1 ≤ j → j ≤ Nat.find (subseq_prop1 f atf hfat hf0) →
-    subseq f atf j < subseq f atf i := by
+  let A := Nat.find (subseqIdx_hits_bot f atf hfat hf0)
+  have step_lt : ∀ i : ℕ, i < A →
+      f (subseqIdx f atf hfat (i + 1)) < f (subseqIdx f atf hfat i) := by
+    intro i hi
+    have hbot : f (subseqIdx f atf hfat i) ≠ ⊥ := by
+      intro h
+      exact (Nat.find_min (subseqIdx_hits_bot f atf hfat hf0) hi) h
+    rw [subseqIdx.succ_eq_find f atf hfat i hbot]
+    exact (Nat.find_spec (subseqIdx.next_exists f atf hfat i hbot)).2
+  have haux : ∀ j : ℕ, i + 1 ≤ j → j ≤ A →
+      f (subseqIdx f atf hfat j) < f (subseqIdx f atf hfat i) := by
     apply Nat.le_induction
-    · intro h
-      simp only [subseq]
-      if hcond : subseq f atf i = ⊥ then
-        simp only [hcond, ↓reduceDIte, lt_self_iff_false]
-        exact (Nat.find_min (subseq_prop1 f atf hfat hf0) (Nat.lt_of_add_one_le h)) hcond
-      else
-      simp only [hcond, ↓reduceDIte]
-      exact Nat.find_spec (subseq.pf2 f atf i (of_eq_false (eq_false hcond)))
+    · intro hj
+      simpa [A] using step_lt i (Nat.lt_of_succ_le hj)
     · intro j hij hind hj
-      simp only [subseq]
-      if hcond : subseq f atf j = ⊥ then
-        simp only [hcond, ↓reduceDIte]
-        apply bot_lt_iff_ne_bot.2
-        by_contra!
-        replace := le_trans hj <| Nat.find_min' (subseq_prop1 f atf hfat hf0) this
-        linarith
-      else
-      simp only [hcond, ↓reduceDIte]
-      if hcond' : j ≤ Nat.find (subseq_prop1 f atf hfat hf0) then
-        exact lt_trans (Nat.find_spec (subseq.pf2 f atf j
-          (of_eq_false (eq_false hcond)))) <| hind hcond'
-      else
-      by_contra!
-      exact hcond <| le_bot_iff.1 <| (Nat.find_spec (subseq_prop1 f atf hfat hf0)) ▸
-        subseq_prop2 f atf (le_of_lt <| lt_of_not_ge hcond')
-  exact fun j hij hle ↦ this j hij hle
+      exact lt_trans (step_lt j (lt_of_lt_of_le (Nat.lt_succ_self j) hj)) <|
+        hind (le_trans (Nat.le_succ j) hj)
+  exact fun j hij hj => haux j (Nat.succ_le_of_lt hij) hj
 
 open Classical in
-/-- `subseq_prop4` is a technical combinatorial lemma about the index where `subseq f atf` hits `⊥`.
+/-- `subseqIdx_find_ne_of_plateau` is a technical combinatorial lemma about the index where
+`f (subseqIdx ...)` hits `⊥`.
 
   It shows that this index cannot coincide with a specified `k` under a mild “plateau” hypothesis
   (`∃ N, N+1 ≤ k ∧ f N = f (N+1)`). The proof uses a finite-cardinality argument on the image set
   `{f t | t ≤ k}`.
 -/
-lemma subseq_prop4 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+lemma subseqIdx_find_ne_of_plateau {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 (f : ℕ → ℒ) (hf0 : f 0 = ⊤) (atf : ∃ k, f k = ⊥) (hfat : Antitone f) (k : ℕ) (hk : f k = ⊥)
-(htech : ∃ N : ℕ, N + 1 ≤ k ∧ f N = f (N + 1)) : (Nat.find <| subseq_prop1 f atf hfat hf0) ≠ k := by
-  let A := Nat.find <| subseq_prop1 f atf hfat hf0
+(htech : ∃ N : ℕ, N + 1 ≤ k ∧ f N = f (N + 1)) :
+  (Nat.find <| subseqIdx_hits_bot f atf hfat hf0) ≠ k := by
+  let A := Nat.find <| subseqIdx_hits_bot f atf hfat hf0
   let 𝒮 := {f t | (t ≤ k)}
-  have helper : ∀ t : ℕ, ∃ l : ℕ, l ≤ k ∧ subseq f atf t = f l := by
+  have helper : ∀ t : ℕ, ∃ l : ℕ, l ≤ k ∧ f (subseqIdx f atf hfat t) = f l := by
     intro t
-    if hcond : subseq f atf t = ⊥ then
-      exact ⟨k,⟨le_rfl,hcond ▸ hk.symm⟩⟩
+    if hcond : f (subseqIdx f atf hfat t) = ⊥ then exact ⟨k,⟨le_rfl,hcond ▸ hk.symm⟩⟩
     else
-    rcases subseq_prop0' f atf hfat hf0 t with ⟨l,hl1,hl2⟩
-    exact ⟨l,⟨byContradiction fun this ↦ hcond (le_bot_iff.mp
-      (hk ▸ hfat (le_of_lt (not_le.1 this))) ▸ hl2),hl2⟩⟩
-  let Φ : Fin (A+1) → 𝒮 := fun d ↦ ⟨f (Nat.find (helper d)),
-    Set.mem_setOf.mpr ⟨Nat.find (helper d),⟨(Nat.find_spec (helper d)).1,rfl⟩⟩⟩
+      refine ⟨subseqIdx f atf hfat t, ?_, rfl⟩
+      by_contra hlt
+      exact hcond <| le_bot_iff.mp <| hk ▸ hfat (le_of_lt (lt_of_not_ge hlt))
+  let Φ : Fin (A+1) → 𝒮 := fun d ↦
+    let l := (helper d).choose
+    let hl := (helper d).choose_spec
+    ⟨f (subseqIdx f atf hfat d), Set.mem_setOf.mpr ⟨l, ⟨hl.1, hl.2.symm⟩⟩⟩
   have hΦ : Function.Injective Φ := by
     intro d1 d2 h
-    simp only [Subtype.mk.injEq, Φ, 𝒮] at h
-    have := (Nat.find_spec (helper d2)).2.symm ▸ (Nat.find_spec (helper d1)).2.symm ▸ h
+    have this : f (subseqIdx f atf hfat d1) = f (subseqIdx f atf hfat d2) := by
+      exact congrArg Subtype.val h
     if hd : d1 < d2 then
-      exact False.elim <| (lt_self_iff_false (subseq f atf ↑d2)).mp <| this ▸
-        subseq_prop5 f hf0 atf hfat d1 d2 hd (Fin.is_le d2)
+      have hlt' := subseqIdx_strictAnti f hf0 atf hfat d1 d2 hd (Fin.is_le d2)
+      simp [this] at hlt'
     else
       if hd' : d2 < d1 then
-        exact False.elim <| (lt_self_iff_false (subseq f atf ↑d2)).mp <| this ▸
-          subseq_prop5 f hf0 atf hfat d2 d1 hd' (Fin.is_le d1)
-      else
-      exact Fin.le_antisymm (le_of_not_gt hd') (le_of_not_gt hd)
+        have hlt' := subseqIdx_strictAnti f hf0 atf hfat d2 d1 hd' (Fin.is_le d1)
+        simp [this] at hlt'
+      else exact Fin.le_antisymm (le_of_not_gt hd') (le_of_not_gt hd)
   let fS : Fin (k+1) → 𝒮 := fun n ↦ ⟨f n,Set.mem_setOf.mpr ⟨n,⟨Fin.is_le n,rfl⟩⟩⟩
   have fSsuj : Function.Surjective fS := by
     intro y
@@ -593,66 +533,51 @@ lemma subseq_prop4 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
   exact ne_of_lt <| Nat.succ_lt_succ_iff.mp <| lt_of_le_of_lt ineq1 ineq2
 
 open Classical in
-/-- `subseq_prop6` transports a stepwise predicate from the original chain to the subsequence.
+/-- `subseqIdx_inherit_step_predicate` transports a stepwise predicate from the original chain to
+the values selected by `subseqIdx`.
 
   Given a predicate `P` on strict steps of `f` (assumed for each `i < Nat.find atf`), the lemma
-  produces the corresponding fact for each strict step of `subseq f atf` before it reaches `⊥`.
+  produces the corresponding fact for each strict step of the selected values before they reach
+  `⊥`.
 -/
-lemma subseq_prop6 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+lemma subseqIdx_inherit_step_predicate {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 (f : ℕ → ℒ) (hf0 : f 0 = ⊤) (atf : ∃ k, f k = ⊥) (hfat : Antitone f)
 (P : {z : ℒ × ℒ // z.1 < z.2} → Prop)
 (ho : ∀ i : ℕ, i < Nat.find atf → (hfi :f (i + 1) < f i) → P ⟨(f (i+1), f i),hfi⟩) :
-∀ i : ℕ, (hi : i < Nat.find (subseq_prop1 f atf hfat hf0)) →
-  P ⟨(subseq f atf (i + 1),subseq f atf i), subseq_prop5 f hf0 atf hfat i (i+1)
-  (Nat.lt_succ_self i) (Nat.succ_le_iff.2 hi)⟩ := by
+∀ i : ℕ, (hi : i < Nat.find (subseqIdx_hits_bot f atf hfat hf0)) →
+  P ⟨(f (subseqIdx f atf hfat (i + 1)), f (subseqIdx f atf hfat i)),
+    subseqIdx_strictAnti f hf0 atf hfat i (i + 1) (Nat.lt_succ_self i) (Nat.succ_le_iff.2 hi)⟩ := by
   intro i hi
-  simp only [subseq]
-  have hcond : subseq f atf i ≠ ⊥ := by
-    by_contra!
-    replace := Nat.find_min' (subseq_prop1 f atf hfat hf0) this
-    linarith
-  simp only [hcond, ↓reduceDIte]
-  rcases subseq_prop0' f atf hfat hf0 i with ⟨j,⟨_,hj⟩⟩
-  simp only [hj]
-  rw [hj] at hcond
-  have hcondnew : ∃ l : ℕ, f l < f j := by
-    rcases atf with ⟨k,hk⟩
-    use k
-    rw [hk]
-    (expose_names; exact Ne.bot_lt' (id (Ne.symm hcond_1)))
-  let jtilde := Nat.find hcondnew
-  expose_names
-  have heq : Nat.find ((funext fun k ↦ congrArg (LT.lt (f k)) hj) ▸ subseq.pf2 f atf i
-    (of_eq_false (eq_false hcond_1))) = (jtilde -1) +1:= by
-    refine (Nat.sub_eq_iff_eq_add ?_).mp rfl
-    by_contra!
-    simp only [Nat.lt_one_iff, Nat.find_eq_zero] at this
-    exact (not_lt_of_ge le_top) <| hf0 ▸ this
-  have ha : f j = f (jtilde -1) := by
-    have : ∀ j' : ℕ, j ≤ j' → j' < jtilde → f j' = f j := by
-      apply Nat.le_induction
-      · exact fun _ ↦ rfl
-      · intro n hn hn' hn''
-        by_contra!
-        have := lt_of_le_of_lt (Nat.find_min' hcondnew <| lt_of_le_of_ne
-          (hfat (Nat.le_add_right_of_le hn)) this) hn''
-        linarith
-    refine Eq.symm <| this (jtilde -1) ?_ (by linarith)
-    by_contra!
-    exact (lt_self_iff_false (f j)).mp <| lt_of_le_of_lt (hfat (Nat.le_of_pred_lt this))
-      (Nat.find_spec hcondnew)
-  conv =>
-    arg 1; arg 1; arg 2;
-    rw [ha]
-  have yah : f jtilde < f (jtilde -1)  := lt_of_lt_of_eq (Nat.find_spec hcondnew) ha
-  have : f (jtilde - 1 + 1) < f (jtilde - 1) := by
-    conv_lhs =>
-      arg 1;
-      apply Nat.sub_one_add_one <| fun this ↦ (lt_self_iff_false ⊤).mp <| hf0 ▸
-        lt_of_lt_of_le (this ▸ yah) le_top
-    exact yah
-  simpa only [← heq] using ho (jtilde -1) (byContradiction fun this' ↦
-    not_le_of_gt (lt_of_le_of_lt bot_le yah) (Nat.find_spec atf ▸ hfat (le_of_not_gt this'))) this
+  have hbot : f (subseqIdx f atf hfat i) ≠ ⊥ := by
+    intro h
+    exact (Nat.find_min (subseqIdx_hits_bot f atf hfat hf0) hi) h
+  let n := subseqIdx f atf hfat (i + 1)
+  have hn : subseqIdx f atf hfat i < n := by
+    dsimp [n]
+    rw [subseqIdx.succ_eq_find f atf hfat i hbot]
+    exact (Nat.find_spec (subseqIdx.next_exists f atf hfat i hbot)).1
+  have hstep : f n < f (subseqIdx f atf hfat i) := by
+    dsimp [n]
+    rw [subseqIdx.succ_eq_find f atf hfat i hbot]
+    exact (Nat.find_spec (subseqIdx.next_exists f atf hfat i hbot)).2
+  have hpred_eq : f (n - 1) = f (subseqIdx f atf hfat i) := by
+    apply subseqIdx.const_between f atf hfat i (n - 1)
+    repeat omega
+  have hpred_lt : f n < f (n - 1) := by rwa [hpred_eq]
+  have hpred_bd : n - 1 < Nat.find atf := by
+    by_contra hge
+    have hbot_pred : f (n - 1) = ⊥ := le_bot_iff.mp <| (Nat.find_spec atf) ▸ hfat (le_of_not_gt hge)
+    have hbot_n : f n = ⊥ := by
+      apply le_bot_iff.mp
+      exact (Nat.find_spec atf) ▸ hfat (le_trans (le_of_not_gt hge) (Nat.sub_le n 1))
+    exact (lt_self_iff_false ⊥).mp (hbot_n ▸ hbot_pred ▸ hpred_lt)
+  have hn_pos : 0 < n := by
+    exact lt_of_lt_of_le (Nat.zero_lt_succ i) <|
+      by simpa [n] using subseqIdx.ge_self f atf hfat (i + 1)
+  have hpred_lt' : f ((n - 1) + 1) < f (n - 1) := by
+    simpa [Nat.sub_add_cancel (Nat.succ_le_of_lt hn_pos)] using hpred_lt
+  convert ho (n - 1) hpred_bd hpred_lt' using 1
+  simp [n, hpred_eq, Nat.sub_add_cancel (Nat.succ_le_of_lt hn_pos)]
 
 /-- `μA_eq_μmin` is a small bridge lemma between two “minimal slope” constructions.
 
@@ -667,8 +592,7 @@ lemma μA_eq_μmin {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
   convert Eq.symm <| (proposition_4_1 (Resμ I μ) inferInstance inferInstance).1
   · simp only [μmin_res_intvl]
     rfl
-  · unfold μAstar
-    simp only [μA_res_intvl]
+  · simp only [μAstar, μA_res_intvl]
     rfl
 
 open Classical in
@@ -745,7 +669,6 @@ lemma semistable_of_step_cond₂
   strict_anti i (i+1) (lt_add_one i) hi⟩ μ)
 ) := by
   intro h i hi
-  have h := h i hi
   apply (impl.thm4d21 (Resμ ⟨(filtration (i+1), filtration i), strict_anti i (i+1)
     (lt_add_one i) hi⟩ μ) inferInstance inferInstance inferInstance).2.2 (fun _ _ ↦ inferInstance)
   apply (List.TFAE.out (impl.thm4d21 (Resμ ⟨(filtration (i+1), filtration i), strict_anti i (i+1)
@@ -764,28 +687,22 @@ lemma semistable_of_step_cond₂
     if hu : u = ⊥ then
       simp only [hu, le_refl]
     else
-    have h := h u.val (lt_of_le_of_ne u.prop.1 (by
+    have h := h i hi u.val (lt_of_le_of_ne u.prop.1 (by
       by_contra hc
-      refine hu ?_
-      apply Subtype.coe_inj.1
+      refine hu <| Subtype.coe_inj.1 ?_
       exact id (Eq.symm hc)
           )) (lt_of_le_of_ne u.prop.2 (by
             by_contra hc
-            refine hu1.2 ?_
-            apply Subtype.coe_inj.1
-            exact hc
+            exact hu1.2 <| Subtype.coe_inj.1 <| hc
             ))
     have := ((seesaw' μ inferInstance (filtration (i + 1)) u.val (filtration i)
       ⟨(lt_of_le_of_ne u.prop.1 (by
       by_contra hc
-      refine hu ?_
-      apply Subtype.coe_inj.1
+      refine hu <| Subtype.coe_inj.1 ?_
       exact id (Eq.symm hc)
           )),(lt_of_le_of_ne u.prop.2 (by
             by_contra hc
-            refine hu1.2 ?_
-            apply Subtype.coe_inj.1
-            exact hc
+            exact hu1.2 <| Subtype.coe_inj.1 <| hc
             ))⟩).1.1 h).2
     apply le_of_lt this
 
@@ -1078,8 +995,9 @@ lemma induction_on_length_of_JordanHolderFiltration (n : ℕ) :
       simp only [JH_raw, leny, hJHy_last, bot_le, sup_of_le_left, JH_raw]
       rfl
     let atRaw : ∃ k, JH_raw k = ⊥ := ⟨leny, JH_raw_fin_len⟩
-    let JHfinal := subseq JH_raw atRaw
-    have JHfinal_first_top : JHfinal 0 = ⊤ := by simp only [JHfinal, subseq]
+    let JHfinal := fun n ↦ JH_raw (subseqIdx JH_raw atRaw JH_raw_antitone n)
+    have JHfinal_first_top : JHfinal 0 = ⊤ := by
+      simpa [JHfinal, subseqIdx] using JH_raw_first_top
     have hμmax : μmax μ TotIntvl = μ TotIntvl := by
       exact (List.TFAE.out (impl.thm4d21 μ hsl inferInstance inferInstance).1 0 3).2
         ((impl.thm4d21 μ hsl inferInstance inferInstance).2.1 hst)
@@ -1169,13 +1087,21 @@ lemma induction_on_length_of_JordanHolderFiltration (n : ℕ) :
         tj1 ▸ hj' (j + 1) (lt_of_lt_of_le hj <| Nat.find_min' atRaw JH_raw_fin_len)).2
       simpa only [← this] using hstepx0.symm
     let JH_FINAL : JordanHolderFiltration (Resμ Ires μ) := by
-      refine JordanHolderFiltration.mk JHfinal (subseq_prop2 JH_raw atRaw)
-        (subseq_prop1 JH_raw atRaw JH_raw_antitone JH_raw_first_top)
-        (fun i j hij hj ↦ subseq_prop5 JH_raw JH_raw_first_top atRaw JH_raw_antitone i j hij hj)
+      refine JordanHolderFiltration.mk JHfinal (by
+        intro i j hij
+        change JH_raw (subseqIdx JH_raw atRaw JH_raw_antitone j) ≤
+          JH_raw (subseqIdx JH_raw atRaw JH_raw_antitone i)
+        exact JH_raw_antitone <|
+          (strictMono_nat_of_lt_succ (subseqIdx.lt_succ JH_raw atRaw JH_raw_antitone)).monotone hij)
+        (subseqIdx_hits_bot JH_raw atRaw JH_raw_antitone JH_raw_first_top)
+        (fun i j hij hj ↦
+          subseqIdx_strictAnti JH_raw JH_raw_first_top atRaw JH_raw_antitone i j hij hj)
         (by simp only [JHfinal_first_top])
-        (fun k1 hk1 ↦ subseq_prop6 JH_raw JH_raw_first_top atRaw JH_raw_antitone
-          (fun z ↦ (Resμ Ires μ) z = (Resμ Ires μ) ⟨(⊥,⊤),bot_lt_top⟩) hcond1 k1 hk1) ?_
-      · refine fun i hi ↦ subseq_prop6 JH_raw JH_raw_first_top atRaw JH_raw_antitone
+        (fun k1 hk1 ↦
+          subseqIdx_inherit_step_predicate JH_raw JH_raw_first_top atRaw JH_raw_antitone
+            (fun z ↦ (Resμ Ires μ) z = (Resμ Ires μ) ⟨(⊥,⊤),bot_lt_top⟩) hcond1 k1 hk1) ?_
+      · refine fun i hi ↦
+          subseqIdx_inherit_step_predicate JH_raw JH_raw_first_top atRaw JH_raw_antitone
           (fun w ↦ ∀ z : Interval Ires, (hw : w.val.1 < z) → z < w.val.2 →
             (Resμ Ires μ) ⟨(w.val.1, z), hw⟩ < (Resμ Ires μ) w)
           (fun j hj hfj w hw1 hw2 ↦ ((seesaw' μ hsl ↑(JH_raw (j + 1)) w ↑(JH_raw j)
@@ -1250,11 +1176,13 @@ lemma induction_on_length_of_JordanHolderFiltration (n : ℕ) :
         have : JH_raw leny = ⊥ := by
           simp only [JH_raw, leny, Nat.find_spec JHy.fin_len, bot_le, sup_of_le_left, JH_raw]
           rfl
-        exact eq_bot_iff.2 <| this ▸ subseq_prop3 JH_raw JH_raw_first_top atRaw JH_raw_antitone leny
+        exact eq_bot_iff.2 <| this ▸ by
+          exact JH_raw_antitone (subseqIdx.ge_self JH_raw atRaw JH_raw_antitone leny)
       refine lt_of_le_of_ne (Nat.find_min' JH_FINAL.fin_len this) ?_
       · let i0 := Nat.findGreatest (fun n ↦ JHx.filtration (Nat.find JHx.fin_len -1) ≤
           JHy.filtration n) (leny - 1)
-        refine subseq_prop4 JH_raw JH_raw_first_top atRaw JH_raw_antitone leny JH_raw_fin_len
+        refine subseqIdx_find_ne_of_plateau
+          JH_raw JH_raw_first_top atRaw JH_raw_antitone leny JH_raw_fin_len
           ⟨i0,⟨Nat.add_le_of_le_sub (Nat.one_le_iff_ne_zero.mpr <| JH_pos_len JHy) <|
             Nat.findGreatest_le (leny - 1),?_⟩⟩
         · replace := @Nat.findGreatest_spec 0 (fun n ↦ x0 ≤ JHy.filtration n)

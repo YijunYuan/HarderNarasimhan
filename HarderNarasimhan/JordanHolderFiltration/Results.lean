@@ -84,11 +84,11 @@ Nonempty (JordanHolderFiltration μ)
     ) y hxy hx',
   first_eq_top := of_eq_true (eq_self ⊤),
   step_cond₁ := fun k hk ↦
-    impl.JHFil_prop₁ μ hftp.fin_tot_payoff hsl hst hwdcc'.wdcc' k <|
+    impl.JHFil_step_payoff_eq_tot μ hftp.fin_tot_payoff hsl hst hwdcc'.wdcc' k <|
       bot_lt_iff_ne_bot.2 <|
         (Nat.find_min <| impl.JHFil_fin_len μ hftp.fin_tot_payoff hsl hst hwdcc'.wdcc') hk,
   step_cond₂ := fun i hi z h' h'' ↦
-    impl.JHFil_prop₂ μ hftp.fin_tot_payoff hsl hst hwdcc'.wdcc' i
+    impl.JHFil_refine_lt_step_payoff μ hftp.fin_tot_payoff hsl hst hwdcc'.wdcc' i
       (bot_lt_iff_ne_bot.2 <| Nat.find_min
         (impl.JHFil_fin_len μ hftp.fin_tot_payoff hsl hst hwdcc'.wdcc') hi) z h' h''
 }
