@@ -355,19 +355,14 @@ noncomputable def subseqIdx {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [Bounde
   (f : ℕ → ℒ) (atf : ∃ k, f k = ⊥) (hf : Antitone f) : ℕ → ℕ
   | 0 => 0
   | t + 1 =>
-      if hcond : f (subseqIdx f atf hf t) = ⊥ then
-        subseqIdx f atf hf t + 1
+      if hcond : f (subseqIdx f atf hf t) = ⊥ then subseqIdx f atf hf t + 1
       else
         Nat.find (show ∃ k : ℕ, subseqIdx f atf hf t < k ∧ f k < f (subseqIdx f atf hf t) from by
           let m := max (subseqIdx f atf hf t + 1) atf.choose
           refine Exists.intro m ?_
           refine And.intro (lt_of_lt_of_le (Nat.lt_succ_self _) (le_max_left _ _)) ?_
-          have hm : f m = ⊥ := by
-            apply le_bot_iff.mp
-            exact atf.choose_spec ▸ hf (le_max_right _ _)
-          rw [hm]
-          exact bot_lt_iff_ne_bot.2 hcond)
-termination_by n => n
+          have hm : f m = ⊥ := le_bot_iff.mp <| atf.choose_spec ▸ hf (le_max_right _ _)
+          simpa [hm] using bot_lt_iff_ne_bot.2 hcond)
 
 /-/ `subseqIdx.next_exists` packages the witness that, as long as the current selected value is
 not `⊥`, there is a later index where `f` drops strictly.
