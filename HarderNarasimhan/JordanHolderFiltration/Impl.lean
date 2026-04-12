@@ -11,7 +11,7 @@ import HarderNarasimhan.NashEquilibrium.Impl
 import Mathlib.Data.List.TFAE
 import Mathlib.Order.OrderIsoNat
 import HarderNarasimhan.JordanHolderFiltration.Defs
-import HarderNarasimhan.SlopeLike.Result
+import HarderNarasimhan.SlopeLike.Results
 import HarderNarasimhan.FirstMoverAdvantage.Results
 import HarderNarasimhan.Convexity.Results
 import Mathlib.Data.Finite.Card

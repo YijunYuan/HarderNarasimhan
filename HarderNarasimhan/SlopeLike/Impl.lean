@@ -17,7 +17,7 @@ It has two main roles:
   `r` and `d` and a positivity condition when `r = 0`.
 
 As an `Impl.lean` file, these lemmas are intended to support the public results in
-`SlopeLike/Result.lean`.
+`SlopeLike/Results.lean`.
 -/
 
 namespace HarderNarasimhan

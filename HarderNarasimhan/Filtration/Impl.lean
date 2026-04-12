@@ -367,7 +367,7 @@ This extracts the `<` witness from the step relation, rewriting indices so it ca
 used with `toFun` and standard arithmetic on `ℕ`.
 -/
 @[simp]
-lemma balabala1 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+lemma relSeries_step_lt {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 {μ : {p :ℒ × ℒ // p.1 < p.2} → S}
 (s : RelSeries (IntervalSemistableRel μ))
@@ -382,11 +382,11 @@ lemma balabala1 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 /--
 Helper lemma: the “next” consecutive inequality, shifted by one.
 
-Together with `balabala1`, this is used to express the slope comparison condition in
+Together with `relSeries_step_lt`, this is used to express the slope comparison condition in
 terms of `toFun` indices `i`, `i+1`, `i+2`.
 -/
 @[simp]
-lemma balabala2 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+lemma relSeries_succ_step_lt {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 {μ : {p :ℒ × ℒ // p.1 < p.2} → S}
 (s : RelSeries (IntervalSemistableRel μ))
@@ -404,7 +404,7 @@ open Classical in
 Construct a `HarderNarasimhanFiltration` from a `RelSeries`.
 
 Assuming `F1` starts at `⊥`, ends at `⊤`, and satisfies the strict slope decrease
-condition expressed using `balabala1`/`balabala2`, we build a
+condition expressed using `relSeries_step_lt`/`relSeries_succ_step_lt`, we build a
 `HarderNarasimhanFiltration μ` whose underlying function agrees with `F1.toFun` up
 to `F1.length`.
 
@@ -417,8 +417,8 @@ lemma hHFil_of_hNSeries {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrd
 (F1 : RelSeries (IntervalSemistableRel μ))
 (h1 : F1.head = ⊥ ∧ F1.last = ⊤ ∧
   ∀ i : ℕ, (hi : i + 1 < F1.length) →
-    ¬   μA μ ⟨(F1.toFun i, F1.toFun ↑(i+1)), balabala1 F1 hi⟩
-      ≤ μA μ ⟨(F1.toFun ↑(i+1), F1.toFun ↑(i+2)), balabala2 F1 hi⟩) :
+    ¬   μA μ ⟨(F1.toFun i, F1.toFun ↑(i+1)), relSeries_step_lt F1 hi⟩
+      ≤ μA μ ⟨(F1.toFun ↑(i+1), F1.toFun ↑(i+2)), relSeries_succ_step_lt F1 hi⟩) :
 ∃ HN1 : HarderNarasimhanFiltration μ,
   HN1.filtration = (fun n ↦ if n ≤ F1.length then F1.toFun n else ⊤) ∧
                    (Nat.find HN1.fin_len = F1.length) := by

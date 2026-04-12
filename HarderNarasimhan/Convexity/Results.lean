@@ -15,6 +15,8 @@ they package the implementation lemmas into clean theorems that closely match th
 structure in the accompanying paper.
 
 Main results:
+- `ConvexI_TotIntvl_iff_Convex`: transport between interval-local convexity on `TotIntvl` and the
+  global predicate `Convex`.
 - `lemma_2_4`: the fundamental inequality chain derived from convexity.
 - `remark_2_5`: closure and idempotence properties of `μmax`, and invariance of `μA`.
 - `proposition_2_6` and `proposition_2_8`: structural consequences of convexity for `μA`.
@@ -24,6 +26,17 @@ Main results:
 -/
 
 namespace HarderNarasimhan
+
+/--
+Public transport theorem between interval-local convexity on `TotIntvl` and global convexity.
+
+This is the standard bridge used by downstream public modules when converting a `Convex μ`
+hypothesis into the interval-local form expected by implementation lemmas.
+-/
+theorem ConvexI_TotIntvl_iff_Convex {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+{S : Type*} [CompleteLattice S]
+(μ : {p :ℒ × ℒ // p.1 < p.2} → S) : ConvexI TotIntvl μ ↔ Convex μ :=
+  impl.ConvexI_TotIntvl_iff_Convex μ
 
 /--
 Lemma 2.4 (paper-facing form).
@@ -52,7 +65,7 @@ lemma lemma_2_4 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   μA μ ⟨(u, x), lt_of_le_of_lt huxw (inf_lt_left.2 hxw)⟩ ≤ μA μ ⟨(w, x ⊔ w), right_lt_sup.2 hxw⟩
 ------------
   := by
-    apply (impl.ConvexI_TotIntvl_iff_Convex _).2 at hμcvx
+    apply (ConvexI_TotIntvl_iff_Convex _).2 at hμcvx
     exact ⟨⟨impl.lem2d4₁ μ x w hxw u huxw,impl.lem2d4₂I TotIntvl μ hμcvx x (in_TotIntvl x) w
       (in_TotIntvl w) hxw t hxwt⟩,impl.lem2d4₃I TotIntvl μ hμcvx x
       (in_TotIntvl x) w (in_TotIntvl w) hxw u huxw⟩
@@ -77,8 +90,8 @@ lemma remark_2_5 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
     μmax μ I = μmax (μmax μ) I ∧ μA μ I = μA (μmax μ) I
 ------------
   := by
-    apply (impl.ConvexI_TotIntvl_iff_Convex _).2 at hμcvx
-    rw [← impl.ConvexI_TotIntvl_iff_Convex]
+    apply (ConvexI_TotIntvl_iff_Convex _).2 at hμcvx
+    rw [← ConvexI_TotIntvl_iff_Convex]
     exact ⟨impl.rmk2d5₁ TotIntvl μ hμcvx,fun I ↦ ⟨impl.rmk2d5₂ I μ
       (Convex_of_Convex_large TotIntvl I ⟨bot_le,le_top⟩ μ hμcvx),
       impl.rmk2d5₃ I μ (Convex_of_Convex_large TotIntvl I ⟨bot_le,le_top⟩ μ hμcvx)⟩⟩
@@ -127,7 +140,7 @@ lemma proposition_2_6 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder
   )
 ------------
 := by
-  rw [← impl.ConvexI_TotIntvl_iff_Convex]
+  rw [← ConvexI_TotIntvl_iff_Convex]
   exact ⟨impl.prop2d6₀ μ x y z h, fun hμcvx ↦ ⟨impl.prop2d6₁I TotIntvl μ hμcvx x (in_TotIntvl x)
     y (in_TotIntvl y) z (in_TotIntvl z) h,⟨⟨impl.prop2d6₂I₁ TotIntvl μ hμcvx x (in_TotIntvl x) y
     (in_TotIntvl y) z (in_TotIntvl z) h,impl.prop2d6₂I₂ TotIntvl μ hμcvx x (in_TotIntvl x) y
@@ -152,7 +165,7 @@ lemma remark_2_7 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   μA μ ⟨(x, ⊤), h.2⟩ = μA μ TotIntvl
 ------------
 := by
-  rw [← impl.ConvexI_TotIntvl_iff_Convex] at hμcvx
+  rw [← ConvexI_TotIntvl_iff_Convex] at hμcvx
   exact impl.rmk2d7 μ hμcvx x h h'
 
 
@@ -180,7 +193,7 @@ lemma proposition_2_8 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder
   )
 ------------
 := by
-  apply (impl.ConvexI_TotIntvl_iff_Convex _).2 at hμcvx
+  apply (ConvexI_TotIntvl_iff_Convex _).2 at hμcvx
   exact ⟨impl.prop2d8₁I TotIntvl μ hμcvx x (in_TotIntvl x) y (in_TotIntvl y) u (in_TotIntvl u) h,
   impl.prop2d8₂I TotIntvl μ hμcvx x (in_TotIntvl x) y (in_TotIntvl y) u (in_TotIntvl u) h⟩
 
@@ -195,7 +208,7 @@ theorem ConvexI_iff_Convex_res {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [Bou
 {S : Type*} [CompleteLattice S]
 (I : {p : ℒ × ℒ // p.1 < p.2}) (μ : {p :ℒ × ℒ // p.1 < p.2} → S) :
 ConvexI I μ ↔ Convex (Resμ I μ) := by
-  rw [← impl.ConvexI_TotIntvl_iff_Convex]
+  rw [← ConvexI_TotIntvl_iff_Convex]
   constructor
   · exact fun h ↦ { convex := fun x y hx hy hxy ↦ h.convex x y x.prop y.prop hxy }
   · exact fun h ↦

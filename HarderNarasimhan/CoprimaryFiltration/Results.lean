@@ -3,6 +3,7 @@ Copyright (c) 2025-2026 Yijun Yuan. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yijun Yuan
 -/
+import HarderNarasimhan.Convexity.Results
 import HarderNarasimhan.CoprimaryFiltration.Impl
 
 /-!
@@ -60,7 +61,7 @@ instance proposition_3_11 {R : Type*} [CommRing R] [IsNoetherianRing R]
 Convex (μ R M)
 ------------
 := by
-  apply (impl.ConvexI_TotIntvl_iff_Convex _).1
+  apply (ConvexI_TotIntvl_iff_Convex _).1
   infer_instance
 
 

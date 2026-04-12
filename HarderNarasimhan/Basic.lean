@@ -65,7 +65,7 @@ Every element lies in the total interval.
 
 This lemma is the canonical source of `InIntvl TotIntvl x`.
 -/
-lemma in_TotIntvl {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ] (x : ℒ) :
+@[simp] lemma in_TotIntvl {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ] (x : ℒ) :
 InIntvl TotIntvl x := ⟨bot_le,le_top⟩
 
 
@@ -119,6 +119,10 @@ def μAstar {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) : S :=
 μA μ ⟨(⊥,⊤) , bot_lt_top⟩
 
+@[simp] theorem μAstar_eq_μA_TotIntvl {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
+{S : Type*} [CompleteLattice S]
+(μ : {p :ℒ × ℒ // p.1 < p.2} → S) : μAstar μ = μA μ TotIntvl := rfl
+
 
 /--
 `μmin μ I` is the infimum of `μ (u, I.right)` as `u` ranges over points in `I` distinct from the
@@ -155,6 +159,10 @@ def μBstar {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) : S :=
 μB μ ⟨(⊥,⊤) , bot_lt_top⟩
+
+@[simp] theorem μBstar_eq_μB_TotIntvl {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
+{S : Type*} [CompleteLattice S]
+(μ : {p :ℒ × ℒ // p.1 < p.2} → S) : μBstar μ = μB μ TotIntvl := rfl
 
 
 /--

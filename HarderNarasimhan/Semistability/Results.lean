@@ -3,6 +3,7 @@ Copyright (c) 2025-2026 Yijun Yuan. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yijun Yuan
 -/
+import HarderNarasimhan.Convexity.Results
 import HarderNarasimhan.Semistability.Impl
 import HarderNarasimhan.Semistability.Translation
 
@@ -48,7 +49,7 @@ lemma proposition_3_2 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder
   μA μ ⟨(a , x) , hax⟩ ≤ μA μ ⟨(a , z) , lt_trans hax h⟩
 ------------
   := by
-    rw [← impl.ConvexI_TotIntvl_iff_Convex] at hμcvx
+    rw [← ConvexI_TotIntvl_iff_Convex] at hμcvx
     exact impl.prop3d2 TotIntvl μ hμcvx x (in_TotIntvl x) z
       (in_TotIntvl z) h h' a (in_TotIntvl a) hax
 
@@ -77,7 +78,7 @@ lemma proposition_3_4 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder
   (St μ).Nonempty
 ------------
   := by
-    rw [← impl.ConvexI_TotIntvl_iff_Convex] at hμcvx
+    rw [← ConvexI_TotIntvl_iff_Convex] at hμcvx
     exact impl.prop3d4 μ hμDCC TotIntvl hμcvx
 
 
@@ -124,7 +125,7 @@ lemma proposition_3_7 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder
       μA μ ⟨(x, y), hy⟩
 ------------
   := by
-    rw [← impl.ConvexI_TotIntvl_iff_Convex] at hμcvx
+    rw [← ConvexI_TotIntvl_iff_Convex] at hμcvx
     exact ⟨(semistableI_iff μ ⟨(⊥, x), lt_of_le_of_ne bot_le hxSt.out.choose_spec.choose⟩).1 <|
         impl.prop3d7₁ μ TotIntvl x hxSt,
       fun y hy ↦ impl.prop3d7₂ μ TotIntvl hμcvx x hxSt y (in_TotIntvl y) hy⟩
@@ -160,7 +161,7 @@ lemma proposition_3_8 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder
     μA μ ⟨(⊥ , y), lt_of_le_of_lt hxSt.out.choose.1 hxy⟩ = μA μ ⟨(x , y), hxy⟩)
 ------------
  := by
-  rw [← impl.ConvexI_TotIntvl_iff_Convex] at hμcvx
+  rw [← ConvexI_TotIntvl_iff_Convex] at hμcvx
   constructor
   · constructor
     · rcases h with c1 | c2

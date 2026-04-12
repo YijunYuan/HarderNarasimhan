@@ -21,6 +21,7 @@ import HarderNarasimhan.FirstMoverAdvantage.Results
 import HarderNarasimhan.OrderTheory.DedekindMacNeilleCompletion
 
 import HarderNarasimhan.SlopeLike.Defs
+import HarderNarasimhan.SlopeLike.Results
 
 import HarderNarasimhan.NashEquilibrium.Defs
 import HarderNarasimhan.NashEquilibrium.Results

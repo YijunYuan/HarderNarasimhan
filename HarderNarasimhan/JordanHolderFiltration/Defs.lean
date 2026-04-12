@@ -5,7 +5,8 @@ Authors: Yijun Yuan
 -/
 import HarderNarasimhan.NashEquilibrium.Impl
 import HarderNarasimhan.FirstMoverAdvantage.Results
-import HarderNarasimhan.SlopeLike.Result
+import HarderNarasimhan.SlopeLike.Results
+import HarderNarasimhan.Convexity.Results
 import Mathlib.Order.OrderIsoNat
 
 /-!
@@ -160,7 +161,7 @@ This instance packages the standard implication by reducing to the internal conv
 instance {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 {μ : {p : ℒ × ℒ // p.1 < p.2} → S} [haff : Affine μ] : Convex μ := by
-  rw [← impl.ConvexI_TotIntvl_iff_Convex]
+  rw [← ConvexI_TotIntvl_iff_Convex]
   refine { convex := ?_ }
   intro x y hx hy hxy
   rw [haff.affine x y hxy]

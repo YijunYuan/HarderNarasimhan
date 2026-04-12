@@ -3,6 +3,7 @@ Copyright (c) 2025-2026 Yijun Yuan. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yijun Yuan
 -/
+import HarderNarasimhan.Convexity.Results
 import HarderNarasimhan.Filtration.Defs
 import HarderNarasimhan.Filtration.Impl
 
@@ -110,7 +111,7 @@ Unique (HarderNarasimhanFiltration μ)
 ------------
 where
   uniq := by
-    rw [← impl.ConvexI_TotIntvl_iff_Convex] at hμcvx
+    rw [← ConvexI_TotIntvl_iff_Convex] at hμcvx
     exact fun a ↦ HarderNarasimhanFiltration.ext (funext fun n ↦ congrFun
       (impl.theorem3d10 μ hμ hμcvx a.filtration a.first_eq_bot a.fin_len a.strict_mono
       (Nat.le_induction (Nat.find_spec a.fin_len) fun n _ hn' ↦ eq_top_iff.2 <| hn' ▸ a.monotone
@@ -147,8 +148,8 @@ theorem exists_relSeries_isIntervalSemistable
 ∃ s : RelSeries (IntervalSemistableRel μ),
   s.head = ⊥ ∧ s.last = ⊤ ∧
   ∀ i : ℕ, (hi : i + 1 < s.length) →
-    ¬   μA μ ⟨(s.toFun i, s.toFun ↑(i+1)), impl.balabala1 s hi⟩
-      ≤ μA μ ⟨(s.toFun ↑(i+1), s.toFun ↑(i+2)), impl.balabala2 s hi⟩
+    ¬   μA μ ⟨(s.toFun i, s.toFun ↑(i+1)), impl.relSeries_step_lt s hi⟩
+      ≤ μA μ ⟨(s.toFun ↑(i+1), s.toFun ↑(i+2)), impl.relSeries_succ_step_lt s hi⟩
 ------------
  := by
   let HNfil : HarderNarasimhanFiltration μ := default
@@ -186,8 +187,8 @@ theorem exists_unique_relSeries_isIntervalSemistable_of_completeLinearOrder
 ∃! s : RelSeries (IntervalSemistableRel μ),
   s.head = ⊥ ∧ s.last = ⊤ ∧
   ∀ i : ℕ, (hi : i + 1 < s.length) →
-    ¬   μA μ ⟨(s.toFun i, s.toFun ↑(i+1)), impl.balabala1 s hi⟩
-      ≤ μA μ ⟨(s.toFun ↑(i+1), s.toFun ↑(i+2)), impl.balabala2 s hi⟩
+    ¬   μA μ ⟨(s.toFun i, s.toFun ↑(i+1)), impl.relSeries_step_lt s hi⟩
+      ≤ μA μ ⟨(s.toFun ↑(i+1), s.toFun ↑(i+2)), impl.relSeries_succ_step_lt s hi⟩
 ------------
 := by
   apply existsUnique_of_exists_of_unique
