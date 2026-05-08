@@ -76,25 +76,30 @@ CompleteLattice (ClosureOperator.Closeds T) where
     refine fun S hS hSb ↦ (ClosureOperator.IsClosed.closure_eq hS) ▸ T.monotone (fun x hx ↦ ?_) hx
     simp only [Set.mem_iInter, Subtype.forall] at hx
     exact hx S hS hSb
-  le_sInf 𝒮 A hA := by
-    intro x h
-    simp only [Subtype.forall, Set.mem_iInter] at *
-    exact fun S hS hSb ↦ hA S hS hSb h
-  sInf_le 𝒮 A:= by
-    intro hA x hx
-    simp only [Set.mem_iInter, Subtype.forall] at *
-    exact hx A.val A.prop hA
+  isGLB_sInf 𝒮 := by
+    refine ⟨?_, ?_⟩
+    · intro A hA x hx
+      simp only [Set.mem_iInter, Subtype.forall] at hx
+      exact hx A.val A.property hA
+    · intro B hB x hx
+      simp only [Set.mem_iInter, Subtype.forall]
+      intro S hS memS
+      exact (hB memS) hx
   sSup 𝒮 := ⟨T (⋃ a ∈ 𝒮, a.val),ClosureOperator.isClosed_closure T (⋃ a ∈ 𝒮, a.val)⟩
-  le_sSup 𝒮 A hA:= fun x hx ↦ ClosureOperator.monotone T (Set.subset_biUnion_of_mem hA) <|
-    (ClosureOperator.IsClosed.closure_eq A.property).symm ▸ hx
-  sSup_le 𝒮 A hA := by
-    intro x hx
-    simp only
-    refine (ClosureOperator.IsClosed.closure_eq A.property) ▸
-      ClosureOperator.monotone T (fun y hy ↦ ?_) hx
-    simp only [Set.mem_iUnion, exists_prop, Subtype.exists, exists_and_right] at hy
-    exact Exists.casesOn hy
-      fun S h ↦ And.casesOn h fun left hSb ↦ Exists.casesOn left fun hS hP ↦ hA ⟨S, hS⟩ hP hSb
+  isLUB_sSup 𝒮 := by
+    refine ⟨?_, ?_⟩
+    · intro A hA x hx
+      exact ClosureOperator.monotone T (Set.subset_biUnion_of_mem hA)
+        ((ClosureOperator.IsClosed.closure_eq A.property).symm ▸ hx)
+    · intro B hB x hx
+      have hsub : (⋃ a ∈ 𝒮, a.val) ⊆ B.val := by
+        intro y hy
+        rw [Set.mem_iUnion₂] at hy
+        rcases hy with ⟨S, hS_mem, hy_mem⟩
+        exact (hB hS_mem) hy_mem
+      have hclosed : T (⋃ a ∈ 𝒮, a.val) ⊆ B.val :=
+        (ClosureOperator.IsClosed.closure_eq B.property) ▸ ClosureOperator.monotone T hsub
+      exact hclosed hx
 
 
 section DedekindMacNeille

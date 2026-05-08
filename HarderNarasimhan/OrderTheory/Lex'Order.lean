@@ -103,6 +103,7 @@ antisymmetry and totality.
 
 API note: this is kept `private` and the file exposes `Lex'Order_prop` as a stable interface.
 -/
+@[reducible]
 private def Lex'LinearOrder {α : Type*} [LinearOrder α] : LinearOrder (Finset α) where
   le := LexLE.le
   le_antisymm := le_antisymm

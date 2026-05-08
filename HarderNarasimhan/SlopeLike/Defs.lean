@@ -83,6 +83,19 @@ instance so downstream proofs can use existing rewriting lemmas about monotone a
 instance {V : Type*} [TotallyOrderedRealVectorSpace V] : AddLeftMono V where
   elim := fun x _ _ h ↦ TotallyOrderedRealVectorSpace.elim_AddLeftMono x h
 
+/-- `PosSMulStrictMono` for `NNReal` derived from the `ℝ` version. -/
+instance {V : Type*} [TotallyOrderedRealVectorSpace V] : PosSMulStrictMono NNReal V where
+  smul_lt_smul_of_pos_left c hc b₁ b₂ hb := by
+    have hc' : (0 : ℝ) < (c : ℝ) := NNReal.coe_pos.mpr hc
+    simpa [NNReal.smul_def] using smul_lt_smul_of_pos_left hb hc'
+
+/-- `PosSMulReflectLT` for `NNReal` derived from the `ℝ` version. -/
+instance {V : Type*} [TotallyOrderedRealVectorSpace V] : PosSMulReflectLT NNReal V where
+  lt_of_smul_lt_smul_left a ha b₁ b₂ hb := by
+    have ha' : (0 : ℝ) ≤ (a : ℝ) := by exact_mod_cast ha
+    have hb' : (a : ℝ) • b₁ < (a : ℝ) • b₂ := by simpa [NNReal.smul_def] using hb
+    exact lt_of_smul_lt_smul_left (h := hb') (ha := ha')
+
 
 /--
 Construct a “quotient slope” from a nonnegative real-valued rank `r` and a vector-valued degree `d`.

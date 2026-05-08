@@ -1135,7 +1135,7 @@ lemma induction_on_length_of_JordanHolderFiltration (n : ℕ) :
           replace this' := Nat.find_min atRaw hj
           unfold JH_raw at this'
           by_contra hcontra
-          push_neg at hcontra
+          push Not at hcontra
           replace : JHy.filtration j = ⊥ :=
             le_bot_iff.mp <| (Nat.find_spec JHy.fin_len) ▸ JHy.antitone hcontra
           rw [this] at this'

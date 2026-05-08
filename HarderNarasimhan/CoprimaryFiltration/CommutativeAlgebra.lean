@@ -51,7 +51,10 @@ lemma associatedPrimes_ker_mkLinearMap_subset
     have hrx' : r • x = 0 := Subtype.ext (by simpa using hrx)
     have hrp : r ∈ p := by
       rw [hx]
-      simp only [Submodule.mem_colon_singleton, hrx', zero_mem]
+      rw [Ideal.mem_radical_iff]
+      refine ⟨1, ?_⟩
+      rw [pow_one, Submodule.mem_colon_singleton]
+      simpa using hrx'
     have hnonempty : (p.carrier ∩ S).Nonempty := ⟨r, hrp, hrS⟩
     exact hnonempty.ne_empty hpempty.2
 
@@ -63,12 +66,12 @@ This is the “meets `S`” direction used to identify associated primes of
 `ker (mkLinearMap S M)` with the associated primes of `M` that are *not* disjoint from `S`.
 -/
 lemma mem_associatedPrimes_ker_mkLinearMap_of_mem_associatedPrimes_of_inter_nonempty
-{R : Type*} [CommRing R]
+{R : Type*} [CommRing R] [IsNoetherianRing R]
 {M : Type*} [AddCommGroup M] [Module R M]
 (S : Submonoid R) {p : Ideal R}
 (hp : p ∈ associatedPrimes R M) (hinter : (p.carrier ∩ S).Nonempty) :
   p ∈ associatedPrimes R (LinearMap.ker (LocalizedModule.mkLinearMap S M)) := by
-  rcases hp with ⟨hpPrime, y, hy⟩
+  rcases ((isAssociatedPrime_iff (R := R) (M := M)).mp hp) with ⟨hpPrime, y, hy⟩
   rcases hinter with ⟨r, hrp, hrS⟩
   have hry : r • y = 0 := by
     rw [hy] at hrp
@@ -76,7 +79,8 @@ lemma mem_associatedPrimes_ker_mkLinearMap_of_mem_associatedPrimes_of_inter_none
   have hyker : y ∈ LinearMap.ker (LocalizedModule.mkLinearMap S M) := by
     rw [LinearMap.mem_ker]
     exact (LocalizedModule.mem_ker_mkLinearMap_iff (S := S) (m := y)).2 ⟨r, hrS, hry⟩
-  refine ⟨hpPrime, ⟨y, hyker⟩, ?_⟩
+  refine ((isAssociatedPrime_iff (R := R) (M := LinearMap.ker (LocalizedModule.mkLinearMap S M))).2
+    ⟨hpPrime, ⟨y, hyker⟩, ?_⟩)
   ext z
   constructor
   · intro hz
@@ -98,7 +102,7 @@ This lemma is used as the “kernel part” in the classical splitting of associ
 localization.
 -/
 lemma associatedPrimes_ker_mkLinearMap_eq
-{R : Type*} [CommRing R]
+{R : Type*} [CommRing R] [IsNoetherianRing R]
 {M : Type*} [AddCommGroup M] [Module R M]
 (S : Submonoid R) :
   associatedPrimes R (LinearMap.ker (LocalizedModule.mkLinearMap S M)) =
@@ -162,18 +166,26 @@ lemma associatedPrimes_localizedModule_subset_disjoint
   apply Set.not_nonempty_iff_eq_empty.mp
   intro hne
   rcases hne with ⟨r, hrp, hrS⟩
-  have hrxR : (r : R) • x = 0 := by
-    rw [hx] at hrp
-    simpa [Submodule.mem_colon_singleton] using hrp
-  have hrxS : (⟨r, hrS⟩ : S) • x = 0 := by simpa [Submonoid.smul_def] using hrxR
+  have hrxR_mem : r ∈ (Submodule.colon (⊥ : Submodule R (LocalizedModule S M)) {x}).radical :=
+    hx ▸ hrp
+  rcases Ideal.mem_radical_iff.mp hrxR_mem with ⟨n, hn⟩
+  have hrxn_smul : r ^ n • x = 0 := by
+    rw [Submodule.mem_colon_singleton, Submodule.mem_bot] at hn
+    exact hn
+  have hrnS : r ^ n ∈ S := Submonoid.pow_mem S hrS n
+  have hrxS : (⟨r ^ n, hrnS⟩ : S) • x = 0 := by
+    simpa [Submonoid.smul_def] using hrxn_smul
   have hx0 : x = 0 := by
-    apply (IsLocalizedModule.smul_injective (f := LocalizedModule.mkLinearMap S M) ⟨r, hrS⟩)
+    apply (IsLocalizedModule.smul_injective (f := LocalizedModule.mkLinearMap S M) ⟨r ^ n, hrnS⟩)
     simpa using hrxS
   have hpTop : p = ⊤ := by
     apply top_unique
     intro a ha
     rw [hx]
-    simp [Submodule.mem_colon_singleton, hx0]
+    rw [Ideal.mem_radical_iff]
+    refine ⟨1, ?_⟩
+    rw [Submodule.mem_colon_singleton, Submodule.mem_bot, hx0]
+    simp
   exact hpPrime.ne_top hpTop
 
 /--
@@ -406,7 +418,10 @@ lemma bourbaki_elements_math_alg_comm_chIV_sec1_no2_prop6
           _ = 0 := by simp [hsxq]
       have hsP : s ∈ p := by
         rw [hy]
-        simpa [Submodule.mem_colon_singleton] using hsy
+        rw [Ideal.mem_radical_iff]
+        refine ⟨1, ?_⟩
+        rw [Submodule.mem_colon_singleton]
+        simpa using hsy
       exact Set.notMem_empty s (hpDisj ▸ ⟨hsP, hsS⟩)
     simpa [K] using le_antisymm hNleK hKleN
   · intro hN

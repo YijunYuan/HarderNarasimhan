@@ -158,6 +158,12 @@ lemma prop4d8 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder �
   d ⟨(y, z), h.2⟩ ∧ r ⟨(x, z), lt_trans h.1 h.2⟩ = r ⟨(x, y), h.1⟩ + r ⟨(y, z), h.2⟩)
 (h₂ : ∀ (x y : ℒ), (h : x < y) → r ⟨(x, y), h⟩ = 0 → d ⟨(x, y), h⟩ > 0)
 : SlopeLike (μQuotient r d) := by
+  have smul_lt_smul_iff_pos {c : NNReal} (hc : c > 0) (b₁ b₂ : V) :
+      c • b₁ < c • b₂ ↔ b₁ < b₂ := by
+    have hc' : (0 : ℝ) < (c : ℝ) := NNReal.coe_pos.mpr hc
+    simpa [NNReal.smul_def] using smul_lt_smul_iff_of_pos_left hc'
+  have smul_lt_smul_pos {c : NNReal} {b₁ b₂ : V} (hb : b₁ < b₂) (hc : c > 0) : c • b₁ < c • b₂ :=
+    (smul_lt_smul_iff_pos hc b₁ b₂).2 hb
   let μ := μQuotient r d
   refine (prop4d6 μ).2 fun x y z h ↦ ?_
   rcases eq_zero_or_pos (r ⟨(x, z), lt_trans h.1 h.2⟩) with h' | h'
@@ -183,18 +189,26 @@ lemma prop4d8 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder �
       simp only [hxy₁, hxz₁, OrderEmbedding.lt_iff_lt, hyz₁, gt_iff_lt,
         EmbeddingLike.apply_eq_iff_eq, μ]
       by_cases hs : μxy < μxz
-      · exact Or.inl ⟨hs,(smul_lt_smul_iff_of_pos_left h''.2).1 <|
+      · exact Or.inl ⟨hs,(smul_lt_smul_iff_pos h''.2 _ _).1 <|
           (add_lt_add_iff_left <| r ⟨(x, y), h.1⟩ • μxy).1 <| lt_sub_iff_add_lt.1 <|
-          (eq_sub_of_add_eq this) ▸ (smul_lt_smul_iff_of_pos_left h''.1).2 hs⟩
+          (eq_sub_of_add_eq this) ▸ (smul_lt_smul_iff_pos h''.1 _ _).2 hs⟩
       · by_cases hs' : μxy = μxz
         · refine Or.inr <| Or.inr <| ⟨hs',?_⟩
-          simp only [hs', add_right_inj] at this
-          exact smul_right_injective V (ne_of_lt h''.2).symm this
+          rw [hs'] at this
+          have h_eq : r ⟨(y, z), h.2⟩ • μxz = r ⟨(y, z), h.2⟩ • μyz :=
+            (add_right_inj (r ⟨(x, y), h.1⟩ • μxz)).mp this
+          have hμ_eq : μxz = μyz := by
+            by_contra! hne
+            have hlt : μxz < μyz ∨ μyz < μxz := lt_or_gt_of_ne hne
+            rcases hlt with (hlt | hlt)
+            · exact (smul_lt_smul_pos hlt h''.2).ne h_eq
+            · exact (smul_lt_smul_pos hlt h''.2).ne h_eq.symm
+          exact hμ_eq
         · have hs' : μxz < μxy := lt_of_not_ge (Eq.mpr (id (congrArg (fun _a ↦ ¬_a)
             (propext le_iff_eq_or_lt))) (not_or.mpr ⟨hs', hs⟩))
-          exact Or.inr <| Or.inl <| ⟨hs',(smul_lt_smul_iff_of_pos_left h''.2).1 <|
+          exact Or.inr <| Or.inl <| ⟨hs',(smul_lt_smul_iff_pos h''.2 _ _).1 <|
             (add_lt_add_iff_left <| r ⟨(x, y), h.1⟩ • μxy).1 <| sub_lt_iff_lt_add.1 <|
-            (eq_sub_of_add_eq this) ▸ (smul_lt_smul_iff_of_pos_left h''.1).2 hs'⟩
+            (eq_sub_of_add_eq this) ▸ (smul_lt_smul_iff_pos h''.1 _ _).2 hs'⟩
     · by_cases h''' : r ⟨(x, y), h.1⟩ = 0 ∧ r ⟨(y, z), h.2⟩ > 0
       · have h2 : μ ⟨(x, y), h.1⟩ = ⊤ := by simp only [μQuotient, h'''.1, gt_iff_lt,
         lt_self_iff_false, ↓reduceDIte, μ]
@@ -209,8 +223,8 @@ lemma prop4d8 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder �
           simp only [μQuotient, gt_iff_lt, Eq.mpr (id (congrArg (fun _a ↦ _a > 0) h4)) h'''.right,
             ↓reduceDIte, Function.Embedding.toFun_eq_coe, RelEmbedding.coe_toEmbedding, h'''.2,
             OrderEmbedding.lt_iff_lt, μ]
-          exact h4 ▸ ((smul_lt_smul_iff_of_pos_left <| Right.inv_pos.mpr h').2 <| (h₁ x y z h).1 ▸
-            lt_add_of_pos_left (d ⟨(y, z), h.right⟩) <| h₂ x y h.1 h'''.1)
+          exact h4 ▸ ((smul_lt_smul_iff_pos (by exact Right.inv_pos.mpr h') _ _).2 <|
+            (h₁ x y z h).1 ▸ lt_add_of_pos_left (d ⟨(y, z), h.right⟩) <| h₂ x y h.1 h'''.1)
       · apply not_and_or.1 at h''
         apply not_and_or.1 at h'''
         simp only [pos_iff_ne_zero.symm, gt_iff_lt, not_lt, nonpos_iff_eq_zero] at h'''
@@ -229,7 +243,7 @@ lemma prop4d8 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder �
           simp only [μQuotient, gt_iff_lt, this', ↓reduceDIte, Function.Embedding.toFun_eq_coe,
             RelEmbedding.coe_toEmbedding, Eq.mpr (id (congrArg (fun _a ↦ _a > 0) h4)),
             OrderEmbedding.lt_iff_lt, μ]
-          exact h4 ▸ ((smul_lt_smul_iff_of_pos_left <| Right.inv_pos.mpr h').2 <|
+          exact h4 ▸ ((smul_lt_smul_iff_pos (by exact Right.inv_pos.mpr h') _ _).2 <|
             (h₁ x y z h).1 ▸ lt_add_of_pos_right (d ⟨(x, y), h.1⟩) <| h₂ y z h.2 this)
 end impl
 

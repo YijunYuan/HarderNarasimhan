@@ -146,26 +146,14 @@ _μ R M ⟨(N₁, u), h₁⟩ ⊆ _μ R M ⟨(N₁, N₃), lt_of_lt_of_le h₁ h
   rw [← hp2]
   use p
   simp only [exists_prop, and_true]
-  unfold associatedPrimes at *
-  simp only [Set.mem_setOf_eq] at *
-  unfold IsAssociatedPrime at *
-  refine ⟨hp1.1,?_⟩
-  simp only [Set.mem_setOf_eq] at hp1
-  rcases hp1.2 with ⟨m,hm⟩
-  rw [Submodule.bot_colon'] at hm
-  simp only [Submodule.bot_colon']
+  rw [AssociatedPrimes.mem_iff] at hp1 ⊢
+  rcases (isAssociatedPrime_iff (R := R) (M := ↥u ⧸ N₁.submoduleOf u)).1 hp1 with ⟨hpPrime, m, hm⟩
+  refine (isAssociatedPrime_iff (R := R) (M := ↥N₃ ⧸ Submodule.submoduleOf N₁ N₃)).2 ⟨hpPrime, ?_⟩
   have hm : p = (LinearMap.toSpanSingleton R (↥u ⧸ N₁.submoduleOf u) m).ker := by
-    rw [hm]
-    ext z
-    simp only [LinearMap.mem_ker, LinearMap.toSpanSingleton_apply]
-    apply Submodule.mem_annihilator_span_singleton
+    simpa [Submodule.bot_colon', Submodule.annihilator_span_singleton] using hm
   rcases (annihilator_lift p m hm <| (Submodule.Quotient.mk_eq_zero N₃).mp
     (by rw [Submodule.Quotient.mk_eq_zero]; exact h₂ m.out.prop)) with ⟨P, hP⟩
-  use P
-  rw [hP]
-  ext z
-  simp only [LinearMap.mem_ker, LinearMap.toSpanSingleton_apply]
-  exact Iff.symm (Submodule.mem_annihilator_span_singleton P z)
+  exact ⟨P, by simpa [Submodule.bot_colon', Submodule.annihilator_span_singleton] using hP⟩
 
 
 /--
@@ -218,24 +206,30 @@ ConvexI TotIntvl (μ R M) := by
   rcases hw with ⟨p,⟨hp1,hp2⟩⟩
   use p
   simp only [hp2, exists_prop, and_true]
-  apply AssociatePrimes.mem_iff.2
-  apply AssociatePrimes.mem_iff.1 at hp1
-  refine ⟨hp1.1,?_⟩
-  rcases hp1.2 with ⟨m,hm⟩
-  use (LinearMap.quotientInfEquivSupQuotient _ _).toFun m
-  simp only [AddHom.toFun_eq_coe, LinearMap.coe_toAddHom, LinearEquiv.coe_coe]
+  rw [AssociatedPrimes.mem_iff] at hp1 ⊢
+  rcases (isAssociatedPrime_iff (R := R) (M := ↥x ⧸ Submodule.submoduleOf (x ⊓ y) x)).1 hp1 with
+    ⟨hpPrime, m, hm⟩
+  refine (isAssociatedPrime_iff (R := R) (M := ↥(x ⊔ y) ⧸ Submodule.submoduleOf y (x ⊔ y))).2 ?_
+  refine ⟨hpPrime, (LinearMap.quotientInfEquivSupQuotient x y).toFun m, ?_⟩
   rw [hm]
   ext r
-  have := Eq.symm (LinearEquiv.map_smul (LinearMap.quotientInfEquivSupQuotient x y) r m)
   constructor
   · intro h
-    simp only at *
-    rw [Submodule.bot_colon', Submodule.mem_annihilator_span_singleton, this] at *
-    simp only [h, map_zero]
+    simp only [Submodule.mem_colon_singleton, Submodule.mem_bot] at h ⊢
+    calc
+      r • (LinearMap.quotientInfEquivSupQuotient x y) m
+          = (LinearMap.quotientInfEquivSupQuotient x y) (r • m) :=
+            (LinearEquiv.map_smul (LinearMap.quotientInfEquivSupQuotient x y) r m).symm
+      _ = 0 := (LinearEquiv.map_eq_zero_iff (LinearMap.quotientInfEquivSupQuotient x y)).2 h
   · intro h
-    simp only at *
-    rw [Submodule.bot_colon', Submodule.mem_annihilator_span_singleton, this] at *
-    exact (LinearEquiv.map_eq_zero_iff (LinearMap.quotientInfEquivSupQuotient x y)).mp h
+    simp only [Submodule.mem_colon_singleton, Submodule.mem_bot] at h ⊢
+    have h' : (LinearMap.quotientInfEquivSupQuotient x y) (r • m) = 0 := by
+      calc
+        (LinearMap.quotientInfEquivSupQuotient x y) (r • m)
+            = r • (LinearMap.quotientInfEquivSupQuotient x y) m :=
+              LinearEquiv.map_smul (LinearMap.quotientInfEquivSupQuotient x y) r m
+        _ = 0 := h
+    exact (LinearEquiv.map_eq_zero_iff (LinearMap.quotientInfEquivSupQuotient x y)).mp h'
 
 /--
 Membership in module support from an associated prime.
@@ -251,12 +245,12 @@ lemma mem_support_of_mem_associatedPrimes {R : Type*} [CommRing R]
 (hx : x ∈ associatedPrimes R M) →  {asIdeal := x, isPrime := hx.out.1} ∈  Module.support R M := by
   intro hx
   apply Module.mem_support_iff_exists_annihilator.2
-  rcases hx with ⟨p,m,hpm⟩
+  have hx' : IsAssociatedPrime x M := (AssociatedPrimes.mem_iff (R := R) (M := M)).1 hx
+  rcases hx' with ⟨_, m, hpm⟩
   use m
-  simp only [hpm]
-  intro z hz
-  rw [Submodule.bot_colon']
-  exact hz
+  change (R ∙ m).annihilator ≤ x
+  rw [hpm]
+  simpa [Submodule.bot_colon'] using (Ideal.le_radical : (⊥ : Submodule R M).colon {m} ≤ _)
 
 /--
 Monotonicity of support under enlarging the submodule being quotiented out.
@@ -592,7 +586,7 @@ lemma prop3d12 {R : Type*} [CommRing R] [IsNoetherianRing R]
             (↥I.val.2 ⧸ Submodule.submoduleOf I.val.1 I.val.2))
         have : ∃ m : (↥I.val.2 ⧸ Submodule.submoduleOf I.val.1 I.val.2), (CP.f1 I) m ≠ 0 := by
           by_contra hc
-          push_neg at hc
+          push Not at hc
           have this' : LinearMap.ker (CP.f1 I) = ⊤ := Submodule.ext fun z ↦
             { mp := fun hz ↦ True.intro, mpr := fun hz ↦ hc z }
           exact this this'
@@ -662,14 +656,15 @@ instance prop3d13₂ {R : Type*} [CommRing R] [IsNoetherianRing R]
       simp only [Set.mem_toFinset, Set.mem_setOf_eq] at this
       rcases this with ⟨_,⟨_,hp2⟩⟩
       rwa [← hp2]
-    have s2 : ∀ i, associatedPrimes R (↥(x i) ⧸ Submodule.submoduleOf N (x i)) ⊆ associatedPrimes R
-      (↥(x 0) ⧸ Submodule.submoduleOf N (x 0)) := by
+    have s2 : ∀ i,
+      associatedPrimes R (↥(x i) ⧸ Submodule.submoduleOf N (x i)) ⊆
+      associatedPrimes R (↥(x 0) ⧸ Submodule.submoduleOf N (x 0)) := by
       intro i w hw'
-      unfold associatedPrimes at *
-      simp only [Set.mem_setOf_eq] at *
-      unfold IsAssociatedPrime at *
-      refine ⟨hw'.1,?_⟩
-      rcases hw'.2 with ⟨m,hm⟩
+      rw [AssociatedPrimes.mem_iff] at hw' ⊢
+      rcases (isAssociatedPrime_iff (R := R)
+        (M := ↥(x i) ⧸ Submodule.submoduleOf N (x i))).1 hw' with ⟨hwPrime, m, hm⟩
+      refine (isAssociatedPrime_iff (R := R) (M := ↥(x 0) ⧸ Submodule.submoduleOf N (x 0))).2
+        ⟨hwPrime, ?_⟩
       have : ↑(Quotient.out m) ∈ x 0 := by
         if hi : i = 0 then
           rw [← hi]
@@ -679,16 +674,9 @@ instance prop3d13₂ {R : Type*} [CommRing R] [IsNoetherianRing R]
         exact hx2 <| Submodule.coe_mem m.out
       have hm : w = (LinearMap.toSpanSingleton R (↥(x i) ⧸ Submodule.submoduleOf N (x i)) m).ker
       := by
-        rw [hm]
-        ext z
-        simp only [Submodule.mem_colon_singleton, Submodule.mem_bot, LinearMap.mem_ker,
-          LinearMap.toSpanSingleton_apply]
+        simpa [Submodule.bot_colon', Submodule.annihilator_span_singleton] using hm
       rcases (annihilator_lift w m hm this) with ⟨P, hP⟩
-      use P
-      rw [hP]
-      ext z
-      simp only [LinearMap.mem_ker, LinearMap.toSpanSingleton_apply, Submodule.mem_colon_singleton,
-        Submodule.mem_bot]
+      exact ⟨P, by simpa [Submodule.bot_colon', Submodule.annihilator_span_singleton] using hP⟩
     have : (associatedPrimes R (↥(x 0) ⧸ Submodule.submoduleOf N (x 0))).Infinite := by
       refine Set.infinite_of_injective_forall_mem ?_ <| fun i ↦ s2 i (s1 i)
       intro a b hab
@@ -778,8 +766,8 @@ Semistable (μ R M) ↔ ∃! p, p ∈ associatedPrimes R M := by
         Eq.to_iff (congrFun (congrArg Membership.mem h) x)
   constructor
   · refine fun hs => ⟨p0.asIdeal, hp0, fun J hJ => ?_⟩
-    simp only [associatedPrimes, IsAssociatedPrime, Set.mem_setOf_eq] at hJ
-    rcases hJ with ⟨hJp, t, ht⟩
+    have hJ' : IsAssociatedPrime J M := (AssociatedPrimes.mem_iff (R := R) (M := M)).1 hJ
+    rcases (isAssociatedPrime_iff (R := R) (M := M)).1 hJ' with ⟨hJp, t, ht⟩
     let N : ℒ R M := Submodule.span R {t}
     let eN : (↥N ⧸ Submodule.submoduleOf (⊥ : ℒ R M) N) ≃ₗ[R] ↥N :=
       Submodule.quotEquivOfEqBot _ (hbot N)
@@ -790,14 +778,19 @@ Semistable (μ R M) ↔ ∃! p, p ∈ associatedPrimes R M := by
     have hJN : ⟨J, hJp⟩ ∈ _μ R M ⟨(⊥, N), hN⟩ := by
       simp only [_μ, Set.mem_setOf_eq]
       refine ⟨J, ?_, rfl⟩
-      simpa [LinearEquiv.AssociatedPrimes.eq eN] using
-        (show J ∈ associatedPrimes R ↥N from by
-          refine ⟨hJp, ⟨t, Submodule.mem_span_singleton_self t⟩, ?_⟩
-          ext r
-          rw [ht, Submodule.bot_colon', Submodule.bot_colon',
-            Submodule.mem_annihilator_span_singleton, Submodule.mem_annihilator_span_singleton]
-          change r • t = 0 ↔ r • (⟨t, Submodule.mem_span_singleton_self t⟩ : N) = 0
-          exact ⟨fun hr => Subtype.ext hr, fun hr => congrArg Subtype.val hr⟩)
+      have hJN' : J ∈ associatedPrimes R ↥N := by
+        refine (AssociatedPrimes.mem_iff (R := R) (M := ↥N)).2 ?_
+        refine (isAssociatedPrime_iff (R := R) (M := ↥N)).2 ⟨hJp, ⟨⟨t,
+          Submodule.mem_span_singleton_self t⟩, ?_⟩⟩
+        ext r
+        rw [ht]
+        simp only [Submodule.mem_colon_singleton, Submodule.mem_bot]
+        constructor
+        · intro hr
+          exact Subtype.ext hr
+        · intro hr
+          exact congrArg Subtype.val hr
+      simpa [LinearEquiv.AssociatedPrimes.eq eN] using hJN'
     have hJ_le : ∀ q ∈ _μ R M ⟨(⊥, N), hN⟩, ⟨J, hJp⟩ ≤ q := by
       intro q hq
       simp only [Set.mem_setOf_eq] at hq
@@ -980,7 +973,9 @@ noncomputable def quotEquivMapComap {R : Type*} [CommRing R] [IsNoetherianRing R
     (N₁.submoduleOf N₂).mkQ.comp i
   have hker : LinearMap.ker f = N₁.submoduleOf W := by
     ext w
-    simp [f, i, Submodule.submoduleOf]
+    change ((Submodule.Quotient.mk (i w) : ↥N₂ ⧸ N₁.submoduleOf N₂) = 0) ↔ ↑w ∈ N₁
+    rw [Submodule.Quotient.mk_eq_zero]
+    simp [i, Submodule.submoduleOf]
   have hrange :
       LinearMap.range f =
         Submodule.map (N₁.submoduleOf N₂).mkQ (Submodule.comap N₂.subtype W) := by
