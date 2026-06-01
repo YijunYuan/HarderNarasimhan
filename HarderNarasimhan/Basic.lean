@@ -1,12 +1,10 @@
 /-
-Copyright (c) 2025-2026 Yijun Yuan. All rights reserved.
+Copyright (c) 2026 Yijun Yuan. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yijun Yuan
 -/
 import Mathlib.Order.CompleteLattice.Defs
 import Mathlib.Order.BoundedOrder.Basic
-
-namespace HarderNarasimhan
 
 /-!
 This file provides the basic interval language and the core “extremal value” constructions derived
@@ -36,6 +34,8 @@ All constructions are expressed using `sSup`/`sInf` over explicit set comprehens
 work
 uniformly for any `CompleteLattice S`.
 -/
+
+namespace HarderNarasimhan
 
 /--
 Membership predicate for a strict interval `I` in a partial order.

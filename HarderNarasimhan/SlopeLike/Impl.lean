@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2025-2026 Yijun Yuan. All rights reserved.
+Copyright (c) 2026 Yijun Yuan. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yijun Yuan
 -/
@@ -171,9 +171,9 @@ lemma prop4d8 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder �
     have : ¬ r ⟨(y, z), h.2⟩ > 0 ∧ ¬ r ⟨(x,y), h.1⟩ > 0 := by
       constructor
       · rw [this.2]
-        exact not_lt_zero'
+        exact not_lt_zero
       · rw [this.1]
-        exact not_lt_zero'
+        exact not_lt_zero
     have : μ ⟨(x, z), lt_trans h.1 h.2⟩ = ⊤ ∧ μ ⟨(x, y), h.1⟩ = ⊤ ∧ μ ⟨(y, z), h.2⟩ = ⊤ := by
       refine ⟨?_,⟨?_,?_⟩⟩
       · simp only [μQuotient, h', gt_iff_lt, lt_self_iff_false, ↓reduceDIte, μ]

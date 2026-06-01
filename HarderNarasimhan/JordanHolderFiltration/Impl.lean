@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2025-2026 Yijun Yuan. All rights reserved.
+Copyright (c) 2026 Yijun Yuan. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yijun Yuan
 -/
@@ -1158,7 +1158,7 @@ lemma induction_on_length_of_JordanHolderFiltration (n : ℕ) :
           ⟨i0,⟨Nat.add_le_of_le_sub (Nat.one_le_iff_ne_zero.mpr <| JH_pos_len JHy) <|
             Nat.findGreatest_le (leny - 1),?_⟩⟩
         · replace := @Nat.findGreatest_spec 0 (fun n ↦ x0 ≤ JHy.filtration n)
-            inferInstance (leny - 1) (zero_le _) (by simp only [JHy.first_eq_top, le_top])
+            inferInstance (leny - 1) (Nat.zero_le _) (by simp only [JHy.first_eq_top, le_top])
           have hi0_last : ¬ i0 + 1 ≤ leny - 1 → i0 + 1 = leny := by
             intro hw
             refine le_antisymm ?_ <| le_of_not_gt fun hlt ↦ hw <|

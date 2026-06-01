@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2025-2026 Yijun Yuan. All rights reserved.
+Copyright (c) 2026 Yijun Yuan. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yijun Yuan
 -/
@@ -263,7 +263,7 @@ lemma mem_associatedPrimes_of_mem_associatedPrimes_quot_ker_mkLinearMap_of_disjo
       (p := IsLocalRing.maximalIdeal (Localization.AtPrime p))
       hAtPrimeM
       ((isNoetherianRing_iff_ideal_fg R).mp ‹IsNoetherianRing R› _)
-  simpa [Localization.AtPrime.comap_maximalIdeal] using hComap
+  simpa [Localization.AtPrime.under_maximalIdeal] using hComap
 
 
 /--
@@ -356,7 +356,7 @@ lemma bourbaki_elements_math_alg_comm_chIV_sec1_no2_prop6
       have hqDisjSet :
           Disjoint (S : Set R) ((Ideal.comap (algebraMap R (Localization S)) q : Ideal R) : Set R)
           :=
-        (IsLocalization.disjoint_comap_iff S (Localization S) q).mpr hq.1.ne_top
+        (IsLocalization.disjoint_under_iff S (Localization S) q).mpr hq.1.ne_top
       have hqDisj : (Ideal.comap (algebraMap R (Localization S)) q).carrier ∩ S = ∅ :=
         by simpa [Set.inter_comm] using Set.disjoint_iff_inter_eq_empty.mp hqDisjSet
       exact False.elim ((hNoDisjAssN _ hqComap) hqDisj)
