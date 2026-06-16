@@ -113,9 +113,9 @@ right adjoint sends a set of upper bounds back to the set of lower bounds.
 This Galois connection is the standard starting point for defining the Dedekind–MacNeille closure.
 -/
 lemma DedekindMacNeilleConnection (α : Type*) [PartialOrder α] :
-GaloisConnection (fun A ↦ (OrderDual.toDual (upperBounds A)))
-(fun A : (Set α)ᵒᵈ ↦ lowerBounds A.ofDual) :=
-fun _ _ ↦ ⟨fun h _ ha ⦃_⦄ a_3 ↦ h a_3 ha, fun h _ ha ⦃_⦄ a_2 ↦ h a_2 ha⟩
+    GaloisConnection (fun A ↦ (OrderDual.toDual (upperBounds A)))
+      (fun A : (Set α)ᵒᵈ ↦ lowerBounds A.ofDual) :=
+  fun _ _ ↦ ⟨fun h _ ha ⦃_⦄ a_3 ↦ h a_3 ha, fun h _ ha ⦃_⦄ a_2 ↦ h a_2 ha⟩
 
 
 /--

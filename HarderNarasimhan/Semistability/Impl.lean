@@ -167,12 +167,12 @@ lemma prop3d4₀func_defprop1
 μA μ ⟨(I.val.1 , (prop3d4₀func μ I (i+1)).val) , lt_of_le_of_ne (prop3d4₀func μ I (i+1)).prop.1 hi⟩
   > μA μ ⟨(I.val.1 , (prop3d4₀func μ I i).val) , lt_of_le_of_ne ((prop3d4₀func μ I i)).prop.1 <|
   prop3d4₀func_helper μ I i hi⟩ := by
-  simp only [prop3d4₀func, prop3d4₀func_helper μ I i hi]
+  simp only [prop3d4₀func, prop3d4₀func_helper μ I i hi, ↓reduceDIte]
   have hne : (ℒₛ μ I (prop3d4₀func μ I i) <| prop3d4₀func_helper μ I i hi).Nonempty := by
     by_contra hcontra
     simp only [prop3d4₀func, prop3d4₀func_helper μ I i hi, hcontra] at hi
     simp only [↓reduceDIte, ne_eq, not_true_eq_false] at hi
-  simpa only [hne] using (inst_3.wf.has_min (ℒₛ μ I (prop3d4₀func μ I i) <|
+  simpa only [hne, ↓reduceDIte] using (inst_3.wf.has_min (ℒₛ μ I (prop3d4₀func μ I i) <|
     prop3d4₀func_helper μ I i hi) hne).choose_spec.1.out.choose_spec.choose_spec
 
 
@@ -242,12 +242,12 @@ lemma prop3d4₀func_strict_decreasing
         ).choose_spec.1.out.choose_spec.choose.1 h)
     · simp only [prop3d4₀func, hi, hne]
       exact lt_of_le_of_ne (prop3d4₀func μ I i).prop.1 hi
-  · simp only [prop3d4₀func, hi]
+  · simp only [prop3d4₀func, hi, ↓reduceDIte]
     have hne : (ℒₛ μ I (prop3d4₀func μ I i) <| prop3d4₀func_helper μ I i h).Nonempty := by
       by_contra hcontra
       simp only [prop3d4₀func, prop3d4₀func_helper μ I i h, hcontra,
         ↓reduceDIte, not_true_eq_false] at h
-    simpa only [hne] using (inst_3.wf.has_min (ℒₛ μ I (prop3d4₀func μ I i) hi) hne
+    simpa only [hne, ↓reduceDIte] using (inst_3.wf.has_min (ℒₛ μ I (prop3d4₀func μ I i) hi) hne
       ).choose_spec.1.out.choose_spec.choose.2
 
 
@@ -703,13 +703,13 @@ theorem semistableI_iff {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrd
   · rintro ⟨hI, hne, h₁, h₂⟩
     refine ⟨in_TotIntvl _, ne_of_lt bot_lt_top, ?_, ?_⟩
     · intro y hyI hy
-      simpa using h₁ y y.prop (fun h => hy <| Subtype.ext h)
+      exact h₁ y y.prop (fun h => hy <| Subtype.ext h)
     · intro y hyI hy hy'
       exact h₂ y y.prop (fun h => hy <| Subtype.ext h) hy'
   · rintro ⟨hI, hne, h₁, h₂⟩
     refine ⟨⟨le_of_lt I.prop, le_rfl⟩, ne_of_lt I.prop, ?_, ?_⟩
     · intro y hyI hy
-      simpa using h₁ ⟨y, hyI⟩ (in_TotIntvl _) (fun h => hy <| congrArg Subtype.val h)
+      exact h₁ ⟨y, hyI⟩ (in_TotIntvl _) (fun h => hy <| congrArg Subtype.val h)
     · intro y hyI hy hy'
       exact hyI.2
 

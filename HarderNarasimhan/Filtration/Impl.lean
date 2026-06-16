@@ -425,7 +425,8 @@ lemma hHFil_of_hNSeries {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrd
   let filtration1 := fun n ↦ if n ≤ F1.length then F1.toFun n else ⊤
   have hstrange : ∃ n, (if n ≤ F1.length then F1.toFun ↑n else ⊤) = ⊤ := by
     use F1.length
-    simpa only [le_refl, Fin.natCast_eq_last] using h1.2.1
+    simp only [le_refl, ↓reduceIte, Fin.natCast_eq_last]
+    exact h1.2.1
   have Fmono : ∀ i j : ℕ, i < j → j ≤ F1.length → F1.toFun ↑i < F1.toFun ↑j := by
     intro i
     refine Nat.le_induction (fun h => ?_) (fun n hn hind h => ?_)
@@ -440,7 +441,8 @@ lemma hHFil_of_hNSeries {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrd
       · exact Fin.val_cast_of_lt <| Nat.add_lt_add_right h 1
   have hslen : Nat.find hstrange  = F1.length := by
       have := Nat.find_min' hstrange ((by
-        simpa only [filtration1, le_refl, ↓reduceIte, Fin.natCast_eq_last] using  h1.2.1
+        simp only [filtration1, le_refl, ↓reduceIte, Fin.natCast_eq_last]
+        exact h1.2.1
         ) : filtration1 F1.length = ⊤)
       refine le_antisymm this ?_
       by_contra hc
@@ -471,10 +473,12 @@ lemma hHFil_of_hNSeries {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrd
         exfalso
         linarith,
       first_eq_bot := by
-        simpa only [filtration1,zero_le, ↓reduceIte] using h1.1,
+        simp only [filtration1,zero_le, ↓reduceIte]
+        exact h1.1,
       fin_len := by
         use F1.length
-        simpa only [filtration1,le_refl, ↓reduceIte, Fin.natCast_eq_last] using h1.2.1,
+        simp only [filtration1,le_refl, ↓reduceIte, Fin.natCast_eq_last]
+        exact h1.2.1,
       strict_mono := by
         intro i j hij hj
         rw [hslen] at hj

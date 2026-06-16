@@ -150,10 +150,13 @@ _μ R M ⟨(N₁, u), h₁⟩ ⊆ _μ R M ⟨(N₁, N₃), lt_of_lt_of_le h₁ h
   rcases (isAssociatedPrime_iff (R := R) (M := ↥u ⧸ N₁.submoduleOf u)).1 hp1 with ⟨hpPrime, m, hm⟩
   refine (isAssociatedPrime_iff (R := R) (M := ↥N₃ ⧸ Submodule.submoduleOf N₁ N₃)).2 ⟨hpPrime, ?_⟩
   have hm : p = (LinearMap.toSpanSingleton R (↥u ⧸ N₁.submoduleOf u) m).ker := by
-    simpa [Submodule.bot_colon', Submodule.annihilator_span_singleton] using hm
+    have := hm
+    simpa [Submodule.bot_colon', Submodule.annihilator_span_singleton, Ideal.torsionOf] using this
   rcases (annihilator_lift p m hm <| (Submodule.Quotient.mk_eq_zero N₃).mp
     (by rw [Submodule.Quotient.mk_eq_zero]; exact h₂ m.out.prop)) with ⟨P, hP⟩
-  exact ⟨P, by simpa [Submodule.bot_colon', Submodule.annihilator_span_singleton] using hP⟩
+  exact ⟨P, by
+    have := hP
+    simpa [Submodule.bot_colon', Submodule.annihilator_span_singleton, Ideal.torsionOf] using this⟩
 
 
 /--
@@ -510,7 +513,7 @@ associatedPrimes R (I.val.2⧸(ker_of_quot_comp_localization I).submoduleOf I.va
     replace := ((_μ R M) I).toFinset.min'_le {asIdeal := q, isPrime := hq.1.out.1} (by
       simp only [Set.mem_toFinset, Set.mem_setOf_eq]
       use q, hq.1)
-    simp only [eq_of_le_of_ge this <| toLinearExtension.monotone' <| Set.diff_eq_empty.mp hq.2]
+    simp only [eq_of_le_of_ge this <| toLinearExtension.monotone' <| Set.sdiff_eq_empty.mp hq.2]
   · intro hq
     simp only [Set.sdiff_sep_self, Set.mem_singleton_iff,
       Set.mem_setOf_eq] at *
@@ -674,9 +677,14 @@ instance prop3d13₂ {R : Type*} [CommRing R] [IsNoetherianRing R]
         exact hx2 <| Submodule.coe_mem m.out
       have hm : w = (LinearMap.toSpanSingleton R (↥(x i) ⧸ Submodule.submoduleOf N (x i)) m).ker
       := by
-        simpa [Submodule.bot_colon', Submodule.annihilator_span_singleton] using hm
+        have := hm
+        simpa [Submodule.bot_colon', Submodule.annihilator_span_singleton,
+          Ideal.torsionOf] using this
       rcases (annihilator_lift w m hm this) with ⟨P, hP⟩
-      exact ⟨P, by simpa [Submodule.bot_colon', Submodule.annihilator_span_singleton] using hP⟩
+      exact ⟨P, by
+        have := hP
+        simpa [Submodule.bot_colon', Submodule.annihilator_span_singleton,
+          Ideal.torsionOf] using this⟩
     have : (associatedPrimes R (↥(x 0) ⧸ Submodule.submoduleOf N (x 0))).Infinite := by
       refine Set.infinite_of_injective_forall_mem ?_ <| fun i ↦ s2 i (s1 i)
       intro a b hab
@@ -803,7 +811,10 @@ Semistable (μ R M) ↔ ∃! p, p ∈ associatedPrimes R M := by
         rw [show N = Submodule.span R {t} by rfl, ht, Submodule.mem_annihilator_span_singleton,
           Submodule.bot_colon', Submodule.mem_annihilator_span_singleton]
       refine toLinearExtension.monotone' ?_
-      simpa only [← hAnn] using (Module.mem_support_iff_of_finite (R := R) (M := ↥N)).1 hI_supp
+      have h := (Module.mem_support_iff_of_finite (R := R) (M := ↥N)).1 hI_supp
+      change J ≤ I
+      rw [← hAnn]
+      exact h
     have hmin : ((_μ R M ⟨(⊥, N), hN⟩).toFinset.min' (μ_nonempty _)) = ⟨J, hJp⟩ := by
       refine le_antisymm ((_μ R M ⟨(⊥, N), hN⟩).toFinset.min'_le _ <| Set.mem_toFinset.mpr hJN) ?_
       exact hJ_le _ <| Set.mem_toFinset.mp <|
@@ -908,6 +919,7 @@ lemma lift_quot_not_bot {R : Type*} [CommRing R] [IsNoetherianRing R]
     simp only [Submodule.subtype_apply, Submodule.mem_map, Submodule.mem_comap, Submodule.mkQ_apply,
       SetLike.coe_eq_coe, exists_eq_right]
     convert hr
+    exact hrtilde
   rw [← hrtilde]
   apply (Submodule.Quotient.mk_eq_zero (N₁.submoduleOf N₂)).2
   exact this
@@ -1098,7 +1110,9 @@ lemma semistable_res_iff_semistable_quot {R : Type*} [CommRing R] [IsNoetherianR
     have hres' :
         ¬ μA (μ R M) ⟨(N₁, lift_quot N₁ N₂ X), lt_of_le_of_ne hmid.1 hneq.symm⟩ >
           μA (μ R M) ⟨(N₁, N₂), hN⟩ := by
-      simpa [μA_res_intvl] using hres
+      have := hres
+      simp only [μA_res_intvl] at this
+      exact this
     rw [muA_eq_quot_muA hmid.1 hmid.2 hneq,
       muA_eq_quot_muA (le_of_lt hN) le_rfl hN.ne.symm] at hres'
     simpa [lift_quot, Submodule.comap_map_eq, Submodule.ker_subtype,
@@ -1120,7 +1134,13 @@ lemma semistable_res_iff_semistable_quot {R : Type*} [CommRing R] [IsNoetherianR
         muA_eq_quot_muA (N₁ := N₁) (N₂ := N₂) (W := N₂)
           (le_of_lt hN) le_rfl hN.ne.symm,
         Submodule.comap_top, Submodule.map_top, Submodule.range_mkQ] using hquot
-    simpa [μA_res_intvl] using hquot'
+    have hWne : (⊥ : Interval ⟨(N₁, N₂), hN⟩) ≠ W := fun hEq ↦
+      hW' (congrArg Subtype.val hEq).symm
+    have : ¬ μA (Resμ ⟨(N₁, N₂), hN⟩ (μ R M)) ⟨(⊥, W), lt_of_le_of_ne W.prop.1 hWne⟩ >
+        μA (Resμ ⟨(N₁, N₂), hN⟩ (μ R M)) ⟨(⊥, ⊤), bot_lt_top⟩ := by
+      simp only [μA_res_intvl]
+      exact hquot'
+    exact this
 
 
 open Classical in

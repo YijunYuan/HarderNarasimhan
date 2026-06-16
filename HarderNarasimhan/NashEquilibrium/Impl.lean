@@ -86,7 +86,6 @@ NashEquilibrium μ ↔
   constructor
   · intro h y hy
     replace h := h.nash_eq
-    unfold NashEquilibrium at h
     rw [impl.prop4d1₁ ℒ S μ h₁.wacc h₂.wsl₁] at h
     simp only [TotIntvl, μBstar, μB, ne_eq] at h
     rw [h]

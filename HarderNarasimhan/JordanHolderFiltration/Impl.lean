@@ -14,7 +14,7 @@ import HarderNarasimhan.JordanHolderFiltration.Defs
 import HarderNarasimhan.SlopeLike.Results
 import HarderNarasimhan.FirstMoverAdvantage.Results
 import HarderNarasimhan.Convexity.Results
-import Mathlib.Data.Finite.Card
+import Mathlib.SetTheory.Cardinal.NatCard
 import Mathlib.Order.ModularLattice
 
 /-!
@@ -207,7 +207,8 @@ lemma JHFil_step_payoff_eq_tot
             forall_exists_index] using (hacc.wf.has_min _ this).choose_spec.1.out.choose_spec.2
       simp only [← this']
       have : JHFil μ hμ hμsl hst hdc (k + 1) < JHFil μ hμ hμsl hst hdc k := by
-        simpa only [JHFil,jh_kp1_ntop] using min1.choose_spec.1.out.choose_spec.1
+        simpa only [JHFil, jh_kp1_ntop, ↓reduceDIte] using
+          min1.choose_spec.1.out.choose_spec.1
       have this'' :  μ ⟨(⊥, JHFil μ hμ hμsl hst hdc (k + 1)), hk'⟩ = μ ⟨(JHFil μ hμ hμsl hst hdc
         (k + 1), JHFil μ hμ hμsl hst hdc k), this⟩ := by
         rw [hk jh_kp1_ntop',← bot_jh_kp1_eq_ans]
@@ -823,8 +824,7 @@ lemma step_cond₂_of_stable {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [Bound
     μ ⟨(⊥, midI), bot_lt_iff_ne_bot.2 hmid_ne_bot⟩)
     midI ⟨in_TotIntvl _, fun hc => hmid_ne_bot hc.symm⟩ rfl
   have hsSup_mid' : μ ⟨(filtration (i + 1), z), hz⟩ ≤ μ ⟨(filtration (i + 1), filtration i),
-      strict_anti i (i + 1) (lt_add_one i) hi⟩ := by
-    simpa only [stepI, μ_res_intvl] using hsSup_mid
+      strict_anti i (i + 1) (lt_add_one i) hi⟩ := hsSup_mid
   refine lt_of_le_of_ne hsSup_mid' ?_
   by_contra hc
   simp only [strip_bot (gt_trans hz' hz), strip_top (gt_trans hz' hz)] at hst'
@@ -1057,7 +1057,8 @@ lemma induction_on_length_of_JordanHolderFiltration (n : ℕ) :
         (x0 ⊔ JHy.filtration j) ⟨lt_of_lt_of_le hx0_bot le_sup_left,
         lt_iff_le_not_ge.mpr hfj⟩).2.2.1 <|
         tj1 ▸ hj' (j + 1) (lt_of_lt_of_le hj <| Nat.find_min' atRaw JH_raw_fin_len)).2
-      simpa only [← this] using hstepx0.symm
+      rw [← this]
+      exact hstepx0.symm
     let JH_FINAL : JordanHolderFiltration (Resμ Ires μ) := by
       refine JordanHolderFiltration.mk JHfinal (by
         intro i j hij
@@ -1220,7 +1221,8 @@ lemma induction_on_length_of_JordanHolderFiltration (n : ℕ) :
     have JHfun_antitone : Antitone JHfun := by
         intro n1 n2 hn
         by_cases h3 : n2 ≤ Nat.find JHx.fin_len - 1
-        · simpa only [JHfun,le_trans hn h3, h3, ↓reduceDIte] using JHx.antitone hn
+        · simp only [JHfun, le_trans hn h3, h3, ↓reduceDIte]
+          exact JHx.antitone hn
         · simp only [h3, ↓reduceDIte, bot_le, JHfun]
     have hhard : Nat.find JHfun_fin_len = Nat.find JHx.fin_len - 1 := by
       have hgreat : Nat.find JHfun_fin_len ≤ Nat.find JHx.fin_len - 1 := by
@@ -1251,10 +1253,13 @@ lemma induction_on_length_of_JordanHolderFiltration (n : ℕ) :
         simp only [Resμ, JHfun]
         replace hk1 := hhard ▸ hk1
         have hk1' : k1 + 1 ≤ Nat.find JHx.fin_len - 1 := hk1
-        simp only [le_of_lt hk1, ↓reduceDIte]
+        simp only [le_of_lt hk1, ↓reduceDIte, hk1']
         have := JHx.step_cond₁ k1 <| Nat.lt_of_lt_pred hk1
-        simp only at this
-        simpa [Resμ, JHfun, x0, hk1', le_of_lt hk1] using this.trans hstepx0.symm
+        have hres : μ ⟨(JHx.filtration (k1 + 1), JHx.filtration k1),
+          JHx.strict_anti k1 (k1 + 1) (lt_add_one k1) (Nat.lt_of_lt_pred hk1)⟩ =
+          μ ⟨((⊥ : Interval Ires).val, (⊤ : Interval Ires).val), Ires.prop⟩ :=
+          this.trans hstepx0.symm
+        exact hres
       · intro i hi z hz hz'
         simp only [Resμ]
         have htemp : JHx.filtration (i + 1) < z.val := by
