@@ -14,6 +14,7 @@ import Mathlib.RingTheory.Ideal.AssociatedPrime.Finiteness
 import Mathlib.Algebra.Module.LocalizedModule.Submodule
 import Mathlib.Algebra.Module.LocalizedModule.AtPrime
 import Mathlib.RingTheory.Support
+import Mathlib.Algebra.Module.Torsion.Basic
 
 import HarderNarasimhan.Basic
 import HarderNarasimhan.Convexity.Results
@@ -68,64 +69,30 @@ lemma μ_nonempty {R : Type*} [CommRing R] [IsNoetherianRing R]
   intro I
   simp only [Set.toFinset_nonempty]
   haveI : Nontrivial (↥I.val.2 ⧸ Submodule.submoduleOf I.val.1 I.val.2) := by
-    rw [Submodule.Quotient.nontrivial_iff, ← lt_top_iff_ne_top]
-    have := Classical.byContradiction fun this ↦ (ne_of_lt <| lt_of_lt_of_le I.prop <|
-      Submodule.comap_subtype_eq_top.mp <| not_lt_top_iff.1 this) rfl
-    exact lt_top_of_lt this
+    rw [Submodule.Quotient.nontrivial_iff, ne_eq, Submodule.submoduleOf,
+      Submodule.comap_subtype_eq_top]
+    exact fun h => not_lt_of_ge h I.prop
   rcases associatedPrimes.nonempty R (I.val.2⧸(Submodule.submoduleOf I.val.1 I.val.2)) with ⟨q,hq⟩
   refine ⟨{ asIdeal := q, isPrime := hq.out.1 },Set.mem_setOf.mpr ?_⟩
   use q, hq
 
 /--
-Lift an annihilator description along an inclusion of submodules.
+Monotonicity of `associatedPrimes` along the canonical map `A/N ↪ B/N` when `A ≤ B`.
 
-This technical lemma is used to transport “associated prime given as annihilator of
-a cyclic submodule” between quotients.
-
-Given `m` in the quotient `u / N₁` whose annihilator is `p`, and assuming the chosen
-representative lies in `N₃`, we produce a corresponding element in `N₃ / N₁` with the
-same annihilator.
+If `N, A, B` are submodules with `A ≤ B`, the inclusion `A ↪ B` induces an injection
+`A / N.submoduleOf A → B / N.submoduleOf B`, and pushing associated primes along this
+injection yields the displayed inclusion.
 -/
-lemma annihilator_lift {R : Type*} [CommRing R] [IsNoetherianRing R]
-{M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]
-{N₁ u N₃ : Submodule R M} (p : Ideal R)
-(m : ↥u ⧸ Submodule.submoduleOf N₁ u)
-(hm : p = LinearMap.ker (LinearMap.toSpanSingleton R (↥u ⧸ Submodule.submoduleOf N₁ u) m))
-(this : ↑m.out ∈ N₃) :
-∃ x, p = LinearMap.ker (LinearMap.toSpanSingleton R (↥N₃ ⧸ Submodule.submoduleOf N₁ N₃) x) := by
-  use Submodule.Quotient.mk ⟨m.out, this⟩
-  ext y
-  constructor
-  · intro hy
-    rw [hm] at hy
-    simp only [LinearMap.mem_ker, LinearMap.toSpanSingleton_apply] at *
-    have this': y • (Submodule.Quotient.mk ⟨m.out, this⟩ : ↥N₃ ⧸ Submodule.submoduleOf N₁ N₃) =
-      Submodule.Quotient.mk (y • ⟨m.out, this⟩) := rfl
-    simp only [this', SetLike.mk_smul_mk, Submodule.Quotient.mk_eq_zero]
-    unfold Submodule.submoduleOf
-    simp only [Submodule.mem_comap, Submodule.subtype_apply]
-    replace : y • m.out ∈ N₁.submoduleOf u := by
-        apply (Submodule.Quotient.mk_eq_zero _).1
-        simp only [Submodule.Quotient.mk_smul]
-        unfold Submodule.Quotient.mk
-        simp only [Quotient.out_eq, hy]
-    exact this
-  · intro hy
-    rw [hm]
-    simp only [LinearMap.mem_ker, LinearMap.toSpanSingleton_apply] at *
-    apply (Submodule.Quotient.mk_eq_zero _).1 at hy
-    simp only [SetLike.mk_smul_mk] at hy
-    replace hy : Submodule.Quotient.mk ((y • Quotient.out m): ↥u) =
-      (0 : ↥u ⧸ Submodule.submoduleOf N₁ u) := by
-      apply (Submodule.Quotient.mk_eq_zero _).2
-      exact hy
-    apply (Submodule.Quotient.mk_eq_zero _).1 at hy
-    have : (⟦Quotient.out (y • m)⟧ : ↥u ⧸ Submodule.submoduleOf N₁ u) = ⟦y • Quotient.out m⟧ := by
-      simp only [Quotient.out_eq]
-      nth_rw 1 [← Quotient.out_eq m]
-      exact rfl
-    rw [← Quotient.out_eq (y • m), this]
-    exact (Submodule.Quotient.mk_eq_zero _).2 hy
+lemma associatedPrimes_subset_of_submoduleOf_le
+{R : Type*} [CommRing R]
+{M : Type*} [AddCommGroup M] [Module R M]
+(N A B : Submodule R M) (h : A ≤ B) :
+associatedPrimes R (↥A ⧸ N.submoduleOf A) ⊆ associatedPrimes R (↥B ⧸ N.submoduleOf B) := by
+  have hcomap : Submodule.comap (Submodule.inclusion h) (N.submoduleOf B) = N.submoduleOf A := rfl
+  refine associatedPrimes.subset_of_injective
+    (f := (N.submoduleOf A).mapQ (N.submoduleOf B) (Submodule.inclusion h) (le_of_eq hcomap.symm))
+    ?_
+  rw [← LinearMap.ker_eq_bot, Submodule.ker_mapQ, hcomap, Submodule.mkQ_map_self]
 
 /-- Monotonicity of `_μ` in the right endpoint.
 
@@ -139,24 +106,8 @@ lemma _μ_mono_right {R : Type*} [CommRing R] [IsNoetherianRing R]
 (h₁ : N₁ < u) (h₂ : u ≤ N₃)
 :
 _μ R M ⟨(N₁, u), h₁⟩ ⊆ _μ R M ⟨(N₁, N₃), lt_of_lt_of_le h₁ h₂⟩ := by
-  intro i w
-  unfold _μ at *
-  simp only [Set.mem_setOf_eq] at *
-  rcases w with ⟨p,⟨hp1,hp2⟩⟩
-  rw [← hp2]
-  use p
-  simp only [exists_prop, and_true]
-  rw [AssociatedPrimes.mem_iff] at hp1 ⊢
-  rcases (isAssociatedPrime_iff (R := R) (M := ↥u ⧸ N₁.submoduleOf u)).1 hp1 with ⟨hpPrime, m, hm⟩
-  refine (isAssociatedPrime_iff (R := R) (M := ↥N₃ ⧸ Submodule.submoduleOf N₁ N₃)).2 ⟨hpPrime, ?_⟩
-  have hm : p = (LinearMap.toSpanSingleton R (↥u ⧸ N₁.submoduleOf u) m).ker := by
-    have := hm
-    simpa [Submodule.bot_colon', Submodule.annihilator_span_singleton, Ideal.torsionOf] using this
-  rcases (annihilator_lift p m hm <| (Submodule.Quotient.mk_eq_zero N₃).mp
-    (by rw [Submodule.Quotient.mk_eq_zero]; exact h₂ m.out.prop)) with ⟨P, hP⟩
-  exact ⟨P, by
-    have := hP
-    simpa [Submodule.bot_colon', Submodule.annihilator_span_singleton, Ideal.torsionOf] using this⟩
+  rintro i ⟨p, hp1, hp2⟩
+  exact ⟨p, associatedPrimes_subset_of_submoduleOf_le N₁ u N₃ h₂ hp1, hp2⟩
 
 
 /--
@@ -412,15 +363,8 @@ some of the quotient arguments below.
 -/
 lemma submoduleOf_map_subtype {R : Type*} [CommRing R]
 {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M]
-(N : Submodule R M) (N' : Submodule R ↥N) : N' = (Submodule.map (N.subtype) N').submoduleOf N := by
-  ext z
-  constructor
-  · intro hz
-    use z
-    simpa only [SetLike.mem_coe, Submodule.subtype_apply, and_true]
-  · rintro ⟨y,hy1,hy2⟩
-    simp only [Submodule.subtype_apply, SetLike.coe_eq_coe] at hy2
-    exact hy2 ▸ hy1
+(N : Submodule R M) (N' : Submodule R ↥N) : N' = (Submodule.map (N.subtype) N').submoduleOf N :=
+  (Submodule.comap_map_eq_of_injective N.subtype_injective N').symm
 
 /-- An isomorphism rewriting a quotient by `ker_of_quot_comp_localization`.
 
@@ -440,51 +384,20 @@ lemma koqcl_iso {R : Type*} [CommRing R] [IsNoetherianRing R]
 ∃ _ : LinearEquiv (RingHom.id R) (I.val.2⧸((ker_of_quot_comp_localization I).submoduleOf I.val.2))
   ((I.val.2⧸(I.val.1.submoduleOf I.val.2))⧸ (LinearMap.ker (CP.f1 I))), True := by
   unfold ker_of_quot_comp_localization
-  have := (@Submodule.quotientQuotientEquivQuotient R  (I.val.2) _ _ _ (I.val.1.submoduleOf I.val.2)
-    ((Submodule.map (Submodule.subtype I.val.2)
-    (LinearMap.ker (CP.f1 I ∘ₗ CP.f2 I))).submoduleOf I.val.2) (by
-    intro z hz
-    rw [← submoduleOf_map_subtype I.val.2 (LinearMap.ker (CP.f1 I ∘ₗ CP.f2 I))]
-    rw [LinearMap.mem_ker]
-    have : (CP.f2 I) z = 0 := by
-      unfold CP.f2
-      simp only [Submodule.mkQ_apply, LinearMap.coe_mk, AddHom.coe_mk]
-      rwa [Submodule.Quotient.mk_eq_zero]
-    rw [LinearMap.comp_apply,this]
-    simp only [LocalizedModule.mkLinearMap_apply, OreLocalization.zero_oreDiv]
-    )).symm
-  have t : Submodule.map (Submodule.submoduleOf I.val.1 I.val.2).mkQ
-      ((Submodule.map (Submodule.subtype I.val.2)
-      (LinearMap.ker (CP.f1 I ∘ₗ CP.f2 I))).submoduleOf I.val.2) = LinearMap.ker (CP.f1 I) := by
-      ext z
-      simp only [Submodule.mem_map, Submodule.mkQ_apply, Subtype.exists, LinearMap.mem_ker]
-      constructor
-      · rintro ⟨y,hy1,hy2,hy3⟩
-        have hy2 : y ∈ Submodule.map (Submodule.subtype I.val.2)
-          (LinearMap.ker (CP.f1 I ∘ₗ CP.f2 I)) := hy2
-        simp only [Submodule.mem_map, LinearMap.mem_ker] at hy2
-        rcases hy2 with ⟨w,hw1,hw2⟩
-        have : Submodule.Quotient.mk ⟨y, hy1⟩ = (CP.f2 I) w := by
-          simp only [← hw2, Submodule.subtype_apply, Subtype.coe_eta, LinearMap.coe_mk,
-            Submodule.mkQ_apply, AddHom.coe_mk]
-        rwa [← hy3, this]
-      · intro hz
-        use z.out.val, Submodule.coe_mem z.out
-        simp only [Subtype.coe_eta]
-        constructor
-        · have : z.out ∈ LinearMap.ker (CP.f1 I ∘ₗ CP.f2 I) := by
-            simp only [LinearMap.mem_ker]
-            have : (CP.f2 I) z.out = z := by
-              unfold CP.f2
-              simp only [Submodule.mkQ_apply, LinearMap.coe_mk, AddHom.coe_mk]
-              unfold Submodule.Quotient.mk Quotient.mk''
-              rw [Quotient.out_eq]
-            rwa [← this] at hz
-          convert this
-          rw [← submoduleOf_map_subtype]
-        · unfold Submodule.Quotient.mk Quotient.mk''
-          rw [Quotient.out_eq]
-  use t ▸ this
+  let S : Submodule R I.val.2 := I.val.1.submoduleOf I.val.2
+  let T : Submodule R I.val.2 := LinearMap.ker (CP.f1 I ∘ₗ CP.f2 I)
+  have hT_eq : T = Submodule.comap S.mkQ (LinearMap.ker (CP.f1 I)) := by
+    change LinearMap.ker (CP.f1 I ∘ₗ CP.f2 I) = _
+    rw [LinearMap.ker_comp]
+    rfl
+  have hST : S ≤ T := hT_eq ▸ Submodule.le_comap_mkQ _ _
+  have hsubT : T = (Submodule.map I.val.2.subtype T).submoduleOf I.val.2 :=
+    submoduleOf_map_subtype I.val.2 T
+  have hST' : S ≤ (Submodule.map I.val.2.subtype T).submoduleOf I.val.2 := hsubT ▸ hST
+  have hmap : Submodule.map S.mkQ ((Submodule.map I.val.2.subtype T).submoduleOf I.val.2) =
+      LinearMap.ker (CP.f1 I) := by
+    rw [← hsubT, hT_eq, Submodule.map_comap_eq_self (by rw [Submodule.range_mkQ]; exact le_top)]
+  exact ⟨hmap ▸ (Submodule.quotientQuotientEquivQuotient S _ hST').symm, trivial⟩
 
 /--
 Associated primes of the intermediate quotient are a singleton.
@@ -662,29 +575,12 @@ instance prop3d13₂ {R : Type*} [CommRing R] [IsNoetherianRing R]
     have s2 : ∀ i,
       associatedPrimes R (↥(x i) ⧸ Submodule.submoduleOf N (x i)) ⊆
       associatedPrimes R (↥(x 0) ⧸ Submodule.submoduleOf N (x 0)) := by
-      intro i w hw'
-      rw [AssociatedPrimes.mem_iff] at hw' ⊢
-      rcases (isAssociatedPrime_iff (R := R)
-        (M := ↥(x i) ⧸ Submodule.submoduleOf N (x i))).1 hw' with ⟨hwPrime, m, hm⟩
-      refine (isAssociatedPrime_iff (R := R) (M := ↥(x 0) ⧸ Submodule.submoduleOf N (x 0))).2
-        ⟨hwPrime, ?_⟩
-      have : ↑(Quotient.out m) ∈ x 0 := by
-        if hi : i = 0 then
-          rw [← hi]
-          exact Submodule.coe_mem m.out
-        else
-        have hx2 := subset_of_ssubset <| (hx2 (Nat.zero_lt_of_ne_zero hi)).ssubset
-        exact hx2 <| Submodule.coe_mem m.out
-      have hm : w = (LinearMap.toSpanSingleton R (↥(x i) ⧸ Submodule.submoduleOf N (x i)) m).ker
-      := by
-        have := hm
-        simpa [Submodule.bot_colon', Submodule.annihilator_span_singleton,
-          Ideal.torsionOf] using this
-      rcases (annihilator_lift w m hm this) with ⟨P, hP⟩
-      exact ⟨P, by
-        have := hP
-        simpa [Submodule.bot_colon', Submodule.annihilator_span_singleton,
-          Ideal.torsionOf] using this⟩
+      intro i
+      refine associatedPrimes_subset_of_submoduleOf_le N (x i) (x 0) ?_
+      if hi : i = 0 then
+        rw [hi]
+      else
+        exact subset_of_ssubset (hx2 (Nat.zero_lt_of_ne_zero hi)).ssubset
     have : (associatedPrimes R (↥(x 0) ⧸ Submodule.submoduleOf N (x 0))).Infinite := by
       refine Set.infinite_of_injective_forall_mem ?_ <| fun i ↦ s2 i (s1 i)
       intro a b hab
@@ -885,19 +781,10 @@ lemma lift_quot_middle {R : Type*} [CommRing R] [IsNoetherianRing R]
 (N₁ N₂ : Submodule R M) (hN : N₁ ≤ N₂)
 (x : Submodule R (N₂ ⧸ (N₁.submoduleOf N₂))) :
 N₁ ≤ lift_quot N₁ N₂ x ∧ lift_quot N₁ N₂ x ≤ N₂ := by
-  constructor
-  · intro x' hx
-    unfold lift_quot
-    simp only [Submodule.mem_map, Submodule.mem_comap, Submodule.mkQ_apply, Submodule.subtype_apply,
-      Subtype.exists, exists_and_right, exists_eq_right]
-    use hN hx
-    convert Submodule.zero_mem x
-    simpa only [Submodule.Quotient.mk_eq_zero]
-  · unfold lift_quot
-    intro x' hx
-    simp only [Submodule.mem_map, Submodule.mem_comap, Submodule.mkQ_apply, Submodule.subtype_apply,
-      Subtype.exists, exists_and_right, exists_eq_right] at hx
-    exact hx.choose
+  refine ⟨?_, Submodule.map_subtype_le _ _⟩
+  refine le_trans ?_ (Submodule.map_mono (Submodule.le_comap_mkQ _ _))
+  change N₁ ≤ Submodule.map N₂.subtype (N₁.submoduleOf N₂)
+  rw [Submodule.submoduleOf, Submodule.map_comap_subtype, inf_eq_right.2 hN]
 
 /-- Nontriviality is preserved by `lift_quot`.
 
@@ -908,21 +795,16 @@ lemma lift_quot_not_bot {R : Type*} [CommRing R] [IsNoetherianRing R]
 {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]
 (N₁ N₂ : Submodule R M)
 (x : Submodule R (N₂ ⧸ (N₁.submoduleOf N₂))) (hx : x ≠ ⊥) : lift_quot N₁ N₂ x ≠ N₁:= by
-  by_contra hc
+  intro hc
   refine hx ?_
-  unfold lift_quot at hc
-  refine (Submodule.eq_bot_iff x).mpr ?_
-  intro r hr
-  rcases (Quotient.exists_rep r) with ⟨rtilde,hrtilde⟩
-  have : N₂.subtype rtilde ∈ N₁ := by
-    rw [← hc]
-    simp only [Submodule.subtype_apply, Submodule.mem_map, Submodule.mem_comap, Submodule.mkQ_apply,
-      SetLike.coe_eq_coe, exists_eq_right]
-    convert hr
-    exact hrtilde
-  rw [← hrtilde]
-  apply (Submodule.Quotient.mk_eq_zero (N₁.submoduleOf N₂)).2
-  exact this
+  have h_comap : Submodule.comap (N₁.submoduleOf N₂).mkQ x = N₁.submoduleOf N₂ := by
+    refine le_antisymm ?_ (Submodule.le_comap_mkQ _ _)
+    intro a ha
+    have ha' : a.val ∈ lift_quot N₁ N₂ x := ⟨a, ha, rfl⟩
+    rw [hc] at ha'
+    exact ha'
+  rw [← (Submodule.comapMkQRelIso (N₁.submoduleOf N₂)).injective.eq_iff]
+  exact Subtype.ext (h_comap.trans (Submodule.ker_mkQ _).symm)
 
 /--
 Nontriviality of the quotient module for a strict inclusion.
@@ -932,14 +814,9 @@ If `N₁ < N₂`, then the quotient `N₂ / N₁` is nontrivial.
 lemma quot_ntl {R : Type*} [CommRing R] [IsNoetherianRing R]
 {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]
 {N₁ N₂ : ℒ R M} (hN : N₁ < N₂) : Nontrivial (↥N₂ ⧸ N₁.submoduleOf N₂) := by
-  rw [Submodule.Quotient.nontrivial_iff]
-  by_contra hc
-  have h' : ∀ x ∈ N₂, x ∈ N₁ := by
-    intro x hx
-    have : ⟨x,hx⟩ ∈ Submodule.submoduleOf N₁ N₂ := hc ▸ Submodule.mem_top
-    simp only [Submodule.submoduleOf, Submodule.mem_comap, Submodule.subtype_apply] at this
-    exact this
-  exact (not_lt_of_ge h') <| hN
+  rw [Submodule.Quotient.nontrivial_iff, ne_eq, Submodule.submoduleOf,
+    Submodule.comap_subtype_eq_top]
+  exact fun h => not_lt_of_ge h hN
 
 /--
 Nontriviality of the induced submodule lattice on the quotient.
@@ -1008,17 +885,12 @@ lemma map_comap_ne_bot {R : Type*} [CommRing R] [IsNoetherianRing R]
 {N₁ N₂ W : ℒ R M} (h₁ : N₁ ≤ W) (h₂ : W ≤ N₂) (h₃ : W ≠ N₁) :
     Submodule.map (N₁.submoduleOf N₂).mkQ (Submodule.comap N₂.subtype W) ≠ ⊥ := by
   intro hbot
-  apply h₃
-  apply le_antisymm ?_ h₁
-  intro x hx
-  have hx' : (⟨x, h₂ hx⟩ : N₂) ∈ Submodule.comap N₂.subtype W := hx
-  have hle : Submodule.comap N₂.subtype W ≤ N₁.submoduleOf N₂ := by
-    intro y hy
-    have : y ∈ Submodule.comap (N₁.submoduleOf N₂).mkQ ⊥ := by
-      rw [← hbot]
-      exact Submodule.mem_comap.mpr <| Submodule.mem_map_of_mem hy
+  refine h₃ <| le_antisymm ?_ h₁
+  have hle : Submodule.comap N₂.subtype W ≤ N₁.submoduleOf N₂ := fun y hy => by
+    have : y ∈ Submodule.comap (N₁.submoduleOf N₂).mkQ ⊥ := hbot ▸ Submodule.mem_map_of_mem hy
     simpa [Submodule.comap_bot, Submodule.ker_mkQ] using this
-  exact hle hx'
+  intro x hx
+  exact hle (show (⟨x, h₂ hx⟩ : N₂) ∈ Submodule.comap N₂.subtype W from hx)
 
 /-- `_μ` agrees with the quotient version under the submodule correspondence. -/
 lemma _mu_eq_quot_mu {R : Type*} [CommRing R] [IsNoetherianRing R]

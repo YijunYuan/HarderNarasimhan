@@ -8,6 +8,7 @@ import HarderNarasimhan.FirstMoverAdvantage.Results
 import HarderNarasimhan.SlopeLike.Results
 import HarderNarasimhan.Convexity.Results
 import Mathlib.Order.OrderIsoNat
+import Mathlib.Data.Rel
 
 /-!
 # Jordan–Hölder filtrations: definitions

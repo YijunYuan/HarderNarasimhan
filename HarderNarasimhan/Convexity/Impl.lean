@@ -5,7 +5,7 @@ Authors: Yijun Yuan
 -/
 import HarderNarasimhan.Basic
 import HarderNarasimhan.Convexity.Defs
-import Mathlib.Tactic
+import Mathlib.Tactic.Common
 
 /-!
 This file contains implementation lemmas for the convexity module.

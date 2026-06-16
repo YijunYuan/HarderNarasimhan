@@ -101,6 +101,7 @@ def ℒₛ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [Well
   μA μ ⟨(I.val.1 , x.val) , lt_of_le_of_ne x.prop.1 hx⟩}
 
 
+open Classical in
 /--
 Core recursive construction used in Proposition 3.4.
 
@@ -120,7 +121,6 @@ noncomputable def prop3d4₀func
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
 (I : {p : ℒ × ℒ // p.1 < p.2})
 (k : ℕ) : {p : ℒ // InIntvl I p} :=
-  letI := Classical.propDecidable
   match k with
   | 0 => ⟨I.val.2, ⟨le_of_lt I.prop, le_rfl⟩⟩
   | n+1 =>
@@ -288,7 +288,7 @@ noncomputable def prop3d4₀func_len
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
 (I : {p : ℒ × ℒ // p.1 < p.2})
 (hμDCC : μA_DescendingChainCondition μ) : ℕ := by
-  letI := Classical.propDecidable
+  classical
   exact Nat.find (prop3d4₀func_fin_len μ I hμDCC)
 
 
@@ -304,7 +304,7 @@ lemma prop3d4₀func_len_nonzero
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
 (I : {p : ℒ × ℒ // p.1 < p.2}) (hμDCC : μA_DescendingChainCondition μ) :
 prop3d4₀func_len μ I hμDCC ≠ 0 := by
-  letI := Classical.propDecidable
+  classical
   by_contra hcontra
   have h : (prop3d4₀func μ I (prop3d4₀func_len μ I hμDCC)).val = I.val.1 :=
     Nat.find_spec (prop3d4₀func_fin_len μ I hμDCC)
@@ -324,7 +324,7 @@ lemma prop3d4₀func_defprop3₀
 (I : {p : ℒ × ℒ // p.1 < p.2}) (hμDCC : μA_DescendingChainCondition μ)
 (i : ℕ) (hi : i < (prop3d4₀func_len μ I hμDCC)) :
 I.val.1 < (prop3d4₀func μ I i).val := by
-  letI := Classical.propDecidable
+  classical
   exact ((Nat.find_min (prop3d4₀func_fin_len μ I hμDCC)) hi).decidable_imp_symm
     fun hcontra ↦ (eq_of_le_of_not_lt (prop3d4₀func μ I i).prop.1 hcontra).symm
 
@@ -348,7 +348,7 @@ lemma prop3d4₀func_defprop3
   μA μ ⟨(I.val.1 , (prop3d4₀func μ I <| (prop3d4₀func_len μ I hμDCC) - 1).val) ,
     prop3d4₀func_defprop3₀ μ I hμDCC ((prop3d4₀func_len μ I hμDCC) - 1) <| Nat.sub_one_lt <|
     prop3d4₀func_len_nonzero μ I hμDCC⟩ := by
-  letI := Classical.propDecidable
+  classical
   let len := prop3d4₀func_len μ I hμDCC
   by_contra hcontra
   by_cases hcases : y < (prop3d4₀func μ I (len - 1)).val
@@ -388,7 +388,7 @@ lemma prop3d4 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [W
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμDCC : μA_DescendingChainCondition μ)
 (I : {p : ℒ × ℒ // p.1 < p.2}) (hμcvx : ConvexI I μ)
 : (StI μ I).Nonempty := by
-  letI := Classical.propDecidable
+  classical
   let len := prop3d4₀func_len μ I hμDCC
   let func:= prop3d4₀func μ I
   by_cases h : len = 1
@@ -671,15 +671,6 @@ theorem semistable_iff {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrde
   · exact fun h ↦ ⟨in_TotIntvl _, fun y hyI hy ↦ h.semistable y <| Ne.symm hy⟩
   · exact fun h ↦ {semistable := fun y hyI hy ↦ (h.choose_spec y (in_TotIntvl _) (Ne.symm hyI)) hy}
 
-
-/--
-Small rewriting helper: chain three equalities.
-
-This is used to keep some long proofs readable when transporting equalities across definitional
-expansions.
--/
-lemma smart_helper {α : Type*} {a b c d : α} (h : a = b) (h' : b = c) (h'' : c = d) : a = d :=
-h ▸ h' ▸ h''
 
 /--
 Transport semistability along restriction.

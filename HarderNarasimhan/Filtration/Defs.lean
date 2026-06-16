@@ -5,6 +5,7 @@ Authors: Yijun Yuan
 -/
 import HarderNarasimhan.Semistability.Results
 import Mathlib.Order.RelSeries
+import Mathlib.Data.Rel
 
 /-!
 Definitions for Harder–Narasimhan filtrations.

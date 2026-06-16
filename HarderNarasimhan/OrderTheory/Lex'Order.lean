@@ -3,8 +3,11 @@ Copyright (c) 2026 Yijun Yuan. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yijun Yuan
 -/
-import Mathlib.Tactic
+import Mathlib.Tactic.Common
+import Mathlib.Tactic.Linarith
+import Mathlib.Tactic.Tauto
 import Mathlib.Data.Finset.Sort
+import Mathlib.Data.List.Lex
 
 /-!
 This file constructs a linear order on `Finset α` from a linear order on `α`.

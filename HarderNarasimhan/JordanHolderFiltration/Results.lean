@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yijun Yuan
 -/
 import HarderNarasimhan.JordanHolderFiltration.Impl
+import Mathlib.Order.RelSeries
 
 /-!
 # Jordan–Hölder filtrations: public results

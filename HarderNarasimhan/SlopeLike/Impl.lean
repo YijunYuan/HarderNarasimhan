@@ -4,7 +4,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yijun Yuan
 -/
 import HarderNarasimhan.SlopeLike.Defs
-import Mathlib.Tactic
+import Mathlib.Tactic.Common
+import Mathlib.Tactic.Tauto
 
 /-!
 This file contains implementation lemmas for the slope-like module.
