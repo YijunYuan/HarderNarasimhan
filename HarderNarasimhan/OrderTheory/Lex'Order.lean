@@ -168,9 +168,13 @@ private def Lex'LinearOrder {α : Type*} [LinearOrder α] : LinearOrder (Finset 
 
     API note: returning the order via `∃ lo` allows users to avoid a global instance and keep the
       order local.
+
+    Implementation note: `⊆` on `Finset` now elaborates to `LE.le` (mathlib's
+    `@[use_set_notation_for_order]`), so inside this namespace the scoped `LexLE` instance would
+    hijack it; the canonical subset order is therefore pinned explicitly.
 -/
 theorem Lex'Order_prop (α : Type*) [lo : LinearOrder α] : ∃ lo : LinearOrder (Finset α),
-(∀ A B : Finset α, A ⊆ B → lo.le A B) ∧
+(∀ A B : Finset α, @LE.le (Finset α) Finset.instPartialOrder.toLE A B → lo.le A B) ∧
 (∀ a b : α, a ≤ b ↔ lo.le {a} {b}) := by
   use Lex'LinearOrder
   constructor

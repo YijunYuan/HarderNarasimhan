@@ -229,7 +229,7 @@ lemma mem_associatedPrimes_of_mem_associatedPrimes_quot_ker_mkLinearMap_of_disjo
 (hp : p ∈ associatedPrimes R (M ⧸ LinearMap.ker (LocalizedModule.mkLinearMap S M)))
 (hpDisj : p.carrier ∩ S = ∅) :
   p ∈ associatedPrimes R M := by
-  haveI : p.IsPrime := hp.1
+  have : p.IsPrime := hp.1
   let K : Submodule R M := LinearMap.ker (LocalizedModule.mkLinearMap S M)
   have hKloc : K.localized (p := p.primeCompl) = ⊥ := by
     change Submodule.localized' (Localization p.primeCompl) p.primeCompl
@@ -362,7 +362,7 @@ lemma bourbaki_elements_math_alg_comm_chIV_sec1_no2_prop6
       exact False.elim ((hNoDisjAssN _ hqComap) hqDisj)
     have hSubLocN : Subsingleton (LocalizedModule S N) := by
       by_contra hns
-      haveI : Nontrivial (LocalizedModule S N) := not_subsingleton_iff_nontrivial.mp hns
+      have : Nontrivial (LocalizedModule S N) := not_subsingleton_iff_nontrivial.mp hns
       obtain ⟨q, hq⟩ := associatedPrimes.nonempty (Localization S) (LocalizedModule S N)
       exact Set.notMem_empty q (hLocAssEmpty ▸ hq)
     have hNleK : N ≤ K := by
@@ -389,7 +389,7 @@ lemma bourbaki_elements_math_alg_comm_chIV_sec1_no2_prop6
         apply hxq_ne <| Subtype.ext_iff.mp h
       have hxq_sub_ne' : (0 : C) ≠ ⟨xq, hxq_mem_C⟩ := by
         simpa [eq_comm] using hxq_sub_ne
-      haveI : Nontrivial C := ⟨⟨0, by simp [C]⟩, ⟨⟨xq, hxq_mem_C⟩, by
+      have : Nontrivial C := ⟨⟨0, by simp [C]⟩, ⟨⟨xq, hxq_mem_C⟩, by
         exact hxq_sub_ne'⟩⟩
       obtain ⟨p, hpC⟩ := associatedPrimes.nonempty R C
       have hpMN : p ∈ associatedPrimes R (M ⧸ N) :=

@@ -154,7 +154,7 @@ API note: we provide `Std.Total` for `≤`, which is then used to build a `Linea
 instance {α : Type*} [LinearOrder α] :
 @Std.Total (DedekindMacNeilleCompletion α) instCompleteLatticeDedekindMacNeilleCompletion.le := by
   refine { total := fun ⟨A, hA⟩ ⟨B, hB⟩ ↦ ?_ }
-  simp only [Subtype.mk_le_mk, Set.le_eq_subset]
+  simp only [Subtype.mk_le_mk]
   apply or_iff_not_imp_left.2
   intro h1
   rcases Set.not_subset_iff_exists_mem_notMem.1 h1 with ⟨a₀,ha₀⟩
@@ -165,7 +165,7 @@ instance {α : Type*} [LinearOrder α] :
   rw [← hA] at hc
   simp only [GaloisConnection.lowerAdjoint_toFun, OrderDual.ofDual_toDual] at hc
   unfold lowerBounds at hc
-  simp only [Set.mem_setOf_eq, not_forall,  not_le] at hc
+  simp only [Set.mem_ofPred_eq, not_forall,  not_le] at hc
   rcases hc with ⟨a',ha'1,ha'2⟩
   have hhb : b ∈ upperBounds A := upperBounds_mono (fun ⦃a⦄ a ↦ a) (le_of_lt ha'2) ha'1
   have hB : B = lowerBounds (upperBounds B) := by
@@ -220,14 +220,14 @@ API note: this is provided as an `OrderEmbedding` so that monotonicity is built 
 def coe' {α : Type*} [PartialOrder α] : α ↪o DedekindMacNeilleCompletion α := by
   have inj: ∀ x : α, (DedekindMacNeilleClosureOperator α).IsClosed (Set.Iic x) :=
     fun x ↦ Set.ext fun y ↦ ⟨fun hy ↦ hy (by simp only [upperBounds,
-    GaloisConnection.lowerAdjoint_toFun, Set.mem_Iic, OrderDual.ofDual_toDual, Set.mem_setOf_eq,
+    GaloisConnection.lowerAdjoint_toFun, Set.mem_Iic, OrderDual.ofDual_toDual, Set.mem_ofPred_eq,
     imp_self, implies_true]),fun hy x_1 ha ↦ ha hy⟩
   have : Function.Injective fun x ↦ (⟨Set.Iic x,inj x⟩ : DedekindMacNeilleCompletion α) := by
     intro a b hab
     simp only [Subtype.mk.injEq] at hab
     exact le_antisymm (hab ▸ Set.self_mem_Iic).out (hab.symm ▸ Set.self_mem_Iic).out
   use ⟨fun x ↦ ⟨Set.Iic x, inj x⟩,this⟩
-  simp only [Function.Embedding.coeFn_mk, Subtype.mk_le_mk, Set.le_eq_subset, Set.Iic_subset_Iic,
+  simp only [Function.Embedding.coeFn_mk, Subtype.mk_le_mk, Set.Iic_subset_Iic,
     implies_true]
 
 
@@ -266,7 +266,7 @@ theorem univ_prop_DedekindMacNeilleCompletion
       have h₂ : g B ≤ f (this.choose) := by
         refine sSup_le fun y hy ↦ hy ?_
         simp only [upperBounds, Set.mem_image, forall_exists_index, and_imp,
-          forall_apply_eq_imp_iff₂, Set.mem_setOf_eq, OrderEmbedding.le_iff_le]
+          forall_apply_eq_imp_iff₂, Set.mem_ofPred_eq, OrderEmbedding.le_iff_le]
         exact this.choose_spec.1.out
       exact le_trans h₁ <| le_trans h h₂
     · intro h
@@ -275,14 +275,13 @@ theorem univ_prop_DedekindMacNeilleCompletion
       exact fun y hy ↦ hy.out fun w hw ↦ le_sSup fun ⦃a⦄ a ↦ a w (h hw)
   refine ⟨⟨⟨g,fun x y h ↦ le_antisymm ((this x y).1 <| (le_antisymm_iff.1 h).1)
     ((this y x).1 <| (le_antisymm_iff.1 h).2)⟩,?_⟩,?_⟩
-  · simp only [Function.Embedding.coeFn_mk, Subtype.forall, Subtype.mk_le_mk, Set.le_eq_subset, g]
+  · simp only [Subtype.forall, Subtype.mk_le_mk, g]
     exact fun x hx y hy ↦ this ⟨x, hx⟩ ⟨y, hy⟩
   · refine funext fun x ↦ ?_
-    simp only [RelEmbedding.coe_mk, Function.Embedding.coeFn_mk, coe', Function.comp_apply, g]
+    simp only [RelEmbedding.coe_mk, coe', Function.comp_apply, g]
     refine le_antisymm (le_sSup fun a ha ↦ ha.out <|
       Set.mem_image_of_mem f Set.self_mem_Iic) <| sSup_le fun _ hb ↦ hb ?_
-    simp only [upperBounds, Set.mem_image, Set.mem_Iic, forall_exists_index, and_imp,
-      forall_apply_eq_imp_iff₂, Set.mem_setOf_eq, OrderEmbedding.le_iff_le, imp_self, implies_true]
+    exact fun b hb' ↦ Exists.elim hb' fun a ha ↦ ha.2 ▸ f.monotone ha.1
 
 --TODO: joint-dense, meet-dense
 end DedekindMacNeille

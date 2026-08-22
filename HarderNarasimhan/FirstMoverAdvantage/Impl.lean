@@ -54,9 +54,9 @@ noncomputable def prop4d1₁_seq {ℒ : Type*} [Nontrivial ℒ] [PartialOrder �
     have h''' := prop4d1₁_seqkp1.choose_spec.choose_spec
     have h' : prop4d1₁_seqkp1.choose < ⊤ := by
       by_contra! hcon
-      simp only [Set.mem_setOf_eq, not_lt_top_iff.mp hcon, le_refl, not_true_eq_false] at h'''
+      simp only [not_lt_top_iff.mp hcon, le_refl, not_true_eq_false] at h'''
     by_contra!
-    simp only [Set.mem_setOf_eq, not_exists, not_forall, not_not] at this
+    simp only [Set.mem_ofPred_eq, not_exists, not_forall, not_not] at this
     rcases this h' with ⟨xA,⟨hxA,hh⟩⟩
     have hhh : ∀ (xB : ℒ) (x_1 : xA < xB), μ ⟨(xA, xB), x_1⟩ ≤
       μ ⟨(prop4d1₁_seq μ h₁ h₂ h₃ k, ⊤), (prop4d1₁_seq μ h₁ h₂ h₃ k).prop.choose⟩ :=
@@ -121,7 +121,7 @@ lemma prop4d1₁ (ℒ : Type*) [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder
     rcases this yA hyA with ⟨xA, hxA, h'⟩
     replace : μmax μ ⟨(xA,⊤),hxA⟩ ∈ {μmax μ ⟨(a , ⊤),(lt_of_le_of_ne ha.1.2 ha.2)⟩ |
       (a : ℒ) (ha : InIntvl TotIntvl a ∧ a ≠ ⊤)} := by
-      refine Set.mem_setOf.mpr ?_
+      refine Set.mem_ofPred.mpr ?_
       use xA, ⟨in_TotIntvl xA,ne_top_of_lt hxA⟩
     refine h.symm ▸ (sInf_le_of_le this <| sSup_le ?_)
     rintro _ ⟨xB,⟨hxB,hxB'⟩⟩
@@ -130,9 +130,9 @@ lemma prop4d1₁ (ℒ : Type*) [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder
     rintro t ⟨x, hx, h⟩
     replace : μ ⟨(x,⊤),lt_top_iff_ne_top.2 hx.2⟩ ∈
       {x | ∃ x_1, ∃ (hx : x_1 < ⊤), μ ⟨(x_1, ⊤), hx⟩ = x} := by
-      refine Set.mem_setOf.mpr ?_
+      refine Set.mem_ofPred.mpr ?_
       use x, lt_top_iff_ne_top.2 hx.2
-    refine h.symm ▸ (sInf_le_of_le this <| Set.mem_setOf.mpr <| le_sSup ?_)
+    refine h.symm ▸ (sInf_le_of_le this <| Set.mem_ofPred.mpr <| le_sSup ?_)
     use ⊤, ⟨⟨le_top,le_top⟩,hx.2⟩
 
 
@@ -361,13 +361,13 @@ lemma rmk4d4 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ
   let W : Set (Set.range r) := {s : Set.range r | ∃ N : ℕ, s = r (x N)}
   have hW : W.Nonempty := by
     use ⟨(r (x 0)), Set.mem_range_self (x 0)⟩
-    refine Set.mem_setOf.mpr ?_
+    refine Set.mem_ofPred.mpr ?_
     use 0
   have : ∃ N : ℕ, r (x N) = r (x (N + 1)) := by
     let n := (hr₂.wf.has_min W hW).choose_spec.1.out.choose
     use n
     have : ⟨r (x (n + 1)),Set.mem_range_self (x (n + 1))⟩ ∈ W := by
-      refine Set.mem_setOf.mpr ?_
+      refine Set.mem_ofPred.mpr ?_
       use n + 1
     exact eq_of_le_of_not_lt' (hr₁ <| le_of_lt <| saf <| Nat.lt_add_one n) <|
       (hr₂.wf.has_min W hW).choose_spec.1.out.choose_spec ▸ (hr₂.wf.has_min W hW).choose_spec.2

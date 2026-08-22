@@ -665,7 +665,7 @@ theorem semistable_iff {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrde
 {S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) :
   Semistable μ ↔ semistableI μ TotIntvl := by
-  simp only [semistableI, StI, S₁I, TotIntvl, ne_eq, gt_iff_lt, S₂I, Set.mem_setOf_eq, le_top,
+  simp only [semistableI, StI, S₁I, TotIntvl, ne_eq, gt_iff_lt, S₂I, Set.mem_ofPred_eq, le_top,
     implies_true, and_true, bot_ne_top, not_false_eq_true, exists_true_left]
   constructor
   · exact fun h ↦ ⟨in_TotIntvl _, fun y hyI hy ↦ h.semistable y <| Ne.symm hy⟩
@@ -688,7 +688,7 @@ theorem semistableI_iff {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrd
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
 (I : {p : ℒ × ℒ // p.1 < p.2}) : semistableI μ I ↔ Semistable (Resμ I μ) := by
   rw [semistable_iff (μ := Resμ I μ)]
-  simp only [semistableI, StI, S₁I, S₂I, TotIntvl, Set.mem_setOf_eq, gt_iff_lt,
+  simp only [semistableI, StI, S₁I, S₂I, TotIntvl, Set.mem_ofPred_eq, gt_iff_lt,
     μA_res_intvl]
   constructor
   · rintro ⟨hI, hne, h₁, h₂⟩

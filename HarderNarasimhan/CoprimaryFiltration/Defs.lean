@@ -60,6 +60,13 @@ abbrev S₀ (R : Type*) [CommRing R] [IsNoetherianRing R]
 := Finset (LinearExtension (PrimeSpectrum R))
 
 /--
+`LinearExtension` is a plain type alias, and typeclass resolution does not unfold it, so
+primality of `p.asIdeal` must be restated for points of the linearly extended spectrum.
+-/
+instance {R : Type*} [CommRing R] (p : LinearExtension (PrimeSpectrum R)) :
+    p.asIdeal.IsPrime := PrimeSpectrum.isPrime p
+
+/--
 Linear order on `S₀ R` induced by `Lex'Order`.
 
 This is an intentionally “local” instance with an explicit priority, so we do not
@@ -108,7 +115,9 @@ These are used throughout the coprimary filtration construction.
 lemma S₀_order {R : Type*} [CommRing R] [IsNoetherianRing R] :
 ------------
 (
-  ∀ A B : S₀ R, A ⊆ B → A ≤ B
+  -- `⊆` on `Finset` now elaborates to `LE.le`, which the high-priority `S₀ R` order
+  -- instances above would capture; the canonical subset order is pinned explicitly.
+  ∀ A B : S₀ R, @LE.le (S₀ R) Finset.instPartialOrder.toLE A B → A ≤ B
 ) ∧
 ∀ a b : LinearExtension (PrimeSpectrum R), a ≤ b ↔ ({a} : (S₀ R)) ≤ ({b} : (S₀ R))
 ------------

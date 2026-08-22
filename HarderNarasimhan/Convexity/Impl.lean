@@ -238,7 +238,7 @@ lemma rmk2d5₂
   · apply le_sSup
     use I.val.2, ⟨⟨le_of_lt I.prop, le_refl I.val.2⟩, ne_of_lt I.prop⟩
   · apply sSup_le
-    simp only [ne_eq, Set.mem_setOf_eq, forall_exists_index]
+    simp only [ne_eq, Set.mem_ofPred_eq, forall_exists_index]
     intro b v hv res
     rw [← res]
     have h : μmax μ ⟨(v ⊓ I.val.1, v), inf_lt_left.2 (not_le_of_gt (lt_of_le_of_ne hv.1.1 hv.2))⟩ ≤
@@ -287,7 +287,7 @@ lemma prop2d6₀
   (h : x < y ∧ y < z) :
   μA μ ⟨(x, z), lt_trans h.1 h.2⟩ ≤ μA μ ⟨(y, z), h.2⟩  := by
   apply sInf_le_sInf
-  simp only [ne_eq, Set.setOf_subset_setOf, forall_exists_index]
+  simp only [ne_eq, Set.ofPred_subset_ofPred, forall_exists_index]
   intro u v hv hu
   rw [← hu]
   use v, ⟨⟨le_of_lt <| lt_of_lt_of_le h.1 hv.1.1, hv.1.2⟩, hv.2⟩

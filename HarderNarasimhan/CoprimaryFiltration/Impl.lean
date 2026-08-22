@@ -68,12 +68,12 @@ lemma μ_nonempty {R : Type*} [CommRing R] [IsNoetherianRing R]
 ∀ I : {z: (ℒ R M) × (ℒ R M) // z.1 < z.2}, (_μ R M I).toFinset.Nonempty := by
   intro I
   simp only [Set.toFinset_nonempty]
-  haveI : Nontrivial (↥I.val.2 ⧸ Submodule.submoduleOf I.val.1 I.val.2) := by
+  have : Nontrivial (↥I.val.2 ⧸ Submodule.submoduleOf I.val.1 I.val.2) := by
     rw [Submodule.Quotient.nontrivial_iff, ne_eq, Submodule.submoduleOf,
       Submodule.comap_subtype_eq_top]
     exact fun h => not_lt_of_ge h I.prop
   rcases associatedPrimes.nonempty R (I.val.2⧸(Submodule.submoduleOf I.val.1 I.val.2)) with ⟨q,hq⟩
-  refine ⟨{ asIdeal := q, isPrime := hq.out.1 },Set.mem_setOf.mpr ?_⟩
+  refine ⟨{ asIdeal := q, isPrime := hq.out.1 },Set.mem_ofPred.mpr ?_⟩
   use q, hq
 
 /--
@@ -124,12 +124,12 @@ lemma μmax_eq_μ {R : Type*} [CommRing R] [IsNoetherianRing R]
   apply IsGreatest.csSup_eq
   unfold IsGreatest
   constructor
-  · simp only [ne_eq, Set.mem_setOf_eq]
+  · simp only [ne_eq, Set.mem_ofPred_eq]
     use I.val.2
     use ⟨⟨le_of_lt I.prop,le_rfl⟩,ne_of_lt I.prop⟩
   · apply mem_upperBounds.2
     intro x hx
-    simp only [ne_eq, Set.mem_setOf_eq] at hx
+    simp only [ne_eq, Set.mem_ofPred_eq] at hx
     rcases hx with ⟨u,⟨hu1,hu2⟩⟩
     rw [← hu2]
     unfold μ
@@ -156,34 +156,12 @@ ConvexI TotIntvl (μ R M) := by
     (_μ R M ⟨(y, x ⊔ y), right_lt_sup.mpr hxy⟩).toFinset (Set.toFinset_subset_toFinset.mpr ?_)
   unfold _μ
   intro w hw
-  simp only [Set.mem_setOf_eq] at *
+  simp only [Set.mem_ofPred_eq] at *
   rcases hw with ⟨p,⟨hp1,hp2⟩⟩
   use p
   simp only [hp2, exists_prop, and_true]
   rw [AssociatedPrimes.mem_iff] at hp1 ⊢
-  rcases (isAssociatedPrime_iff (R := R) (M := ↥x ⧸ Submodule.submoduleOf (x ⊓ y) x)).1 hp1 with
-    ⟨hpPrime, m, hm⟩
-  refine (isAssociatedPrime_iff (R := R) (M := ↥(x ⊔ y) ⧸ Submodule.submoduleOf y (x ⊔ y))).2 ?_
-  refine ⟨hpPrime, (LinearMap.quotientInfEquivSupQuotient x y).toFun m, ?_⟩
-  rw [hm]
-  ext r
-  constructor
-  · intro h
-    simp only [Submodule.mem_colon_singleton, Submodule.mem_bot] at h ⊢
-    calc
-      r • (LinearMap.quotientInfEquivSupQuotient x y) m
-          = (LinearMap.quotientInfEquivSupQuotient x y) (r • m) :=
-            (LinearEquiv.map_smul (LinearMap.quotientInfEquivSupQuotient x y) r m).symm
-      _ = 0 := (LinearEquiv.map_eq_zero_iff (LinearMap.quotientInfEquivSupQuotient x y)).2 h
-  · intro h
-    simp only [Submodule.mem_colon_singleton, Submodule.mem_bot] at h ⊢
-    have h' : (LinearMap.quotientInfEquivSupQuotient x y) (r • m) = 0 := by
-      calc
-        (LinearMap.quotientInfEquivSupQuotient x y) (r • m)
-            = r • (LinearMap.quotientInfEquivSupQuotient x y) m :=
-              LinearEquiv.map_smul (LinearMap.quotientInfEquivSupQuotient x y) r m
-        _ = 0 := h
-    exact (LinearEquiv.map_eq_zero_iff (LinearMap.quotientInfEquivSupQuotient x y)).mp h'
+  exact (LinearEquiv.isAssociatedPrime_iff (LinearMap.quotientInfEquivSupQuotient x y)).1 hp1
 
 /--
 Membership in module support from an associated prime.
@@ -281,9 +259,9 @@ lemma prop3d12p1 {R : Type*} [CommRing R] [IsNoetherianRing R]
   obtain ⟨r,hr,hr'⟩ := exists_minimal_prime_contained_supp {asIdeal := q, isPrime := hq.out.1 } hq'
   rw [← CommutativeAlgebra.min_associated_prime_iff_min_supp] at hr
   refine le_trans ?_ <| toLinearExtension.monotone' hr'
-  refine (((_μ R M) I).toFinset.min'_le) r ?_
-  simp only [Set.mem_toFinset, Set.mem_setOf_eq]
-  use r.asIdeal, hr.1
+  refine (((_μ R M) I).toFinset.min'_le) (toLinearExtension r) ?_
+  simp only [Set.mem_toFinset, Set.mem_ofPred_eq]
+  exact ⟨r.asIdeal, hr.1, rfl⟩
 
 
 /--
@@ -306,7 +284,7 @@ lemma prop3d12p2 {R : Type*} [CommRing R] [IsNoetherianRing R]
       μ_nonempty _).asIdeal ∈ associatedPrimes R (↥I.val.2 ⧸ Submodule.submoduleOf N'' I.val.2):= by
       have := ((_μ R M ⟨(N'', I.val.2),
         lt_of_le_of_ne ha1.2 ha2⟩).toFinset.min'_mem <| μ_nonempty _).out
-      simp only [Finset.mem_val, Set.mem_toFinset, Set.mem_setOf_eq] at this
+      simp only [Finset.mem_val, Set.mem_toFinset, Set.mem_ofPred_eq] at this
       rcases this with ⟨p,⟨hp1,hp2⟩⟩
       rwa [← hp2]
     exact prop3d12p1 I N'' ha1 (((_μ R M ⟨(N'', I.val.2), lt_of_le_of_ne ha1.2 ha2⟩).toFinset.min'
@@ -421,19 +399,22 @@ associatedPrimes R (I.val.2⧸(ker_of_quot_comp_localization I).submoduleOf I.va
   ext q
   constructor
   · intro hq
-    simp only [Set.mem_setOf_eq] at hq
+    simp only [Set.mem_ofPred_eq] at hq
     simp only [Set.mem_singleton_iff]
-    replace := ((_μ R M) I).toFinset.min'_le {asIdeal := q, isPrime := hq.1.out.1} (by
-      simp only [Set.mem_toFinset, Set.mem_setOf_eq]
-      use q, hq.1)
-    simp only [eq_of_le_of_ge this <| toLinearExtension.monotone' <| Set.sdiff_eq_empty.mp hq.2]
+    replace := ((_μ R M) I).toFinset.min'_le (toLinearExtension ⟨q, hq.1.out.1⟩)
+      (Set.mem_toFinset.mpr ⟨q, hq.1, rfl⟩)
+    have hle : (⟨q, hq.1.out.1⟩ : PrimeSpectrum R) ≤ (_μ R M I).toFinset.min' (μ_nonempty I) :=
+      Set.sdiff_eq_empty.mp hq.2
+    have heq : toLinearExtension ⟨q, hq.1.out.1⟩ = (_μ R M I).toFinset.min' (μ_nonempty I) :=
+      eq_of_le_of_ge (toLinearExtension.monotone' hle) this
+    exact congrArg PrimeSpectrum.asIdeal heq
   · intro hq
     simp only [Set.sdiff_sep_self, Set.mem_singleton_iff,
-      Set.mem_setOf_eq] at *
+      Set.mem_ofPred_eq] at *
     rw [hq]
     constructor
     · replace := (((_μ R M) I).toFinset.min'_mem (μ_nonempty I))
-      simp only [Set.mem_toFinset, Set.mem_setOf_eq] at this
+      simp only [Set.mem_toFinset, Set.mem_ofPred_eq] at this
       rcases this with ⟨_,⟨hp1,hp2⟩⟩
       exact hp2 ▸ hp1
     · unfold Ideal.primeCompl
@@ -464,32 +445,35 @@ lemma prop3d12 {R : Type*} [CommRing R] [IsNoetherianRing R]
   have res1 : (OrderTheory.coe' {(_μ R M I).toFinset.min' (μ_nonempty I)} : S R) ∈
     {x | ∃ a, ∃ (h : InIntvl I a ∧ ¬a = I.val.2), OrderTheory.coe'
     (_μ R M ⟨(a, I.val.2), lt_of_le_of_ne h.1.2 h.2⟩).toFinset = x} := by
-    simp only [Set.mem_setOf_eq, EmbeddingLike.apply_eq_iff_eq]
+    simp only [Set.mem_ofPred_eq, EmbeddingLike.apply_eq_iff_eq]
     use ker_of_quot_comp_localization I
     constructor
-    · conv_lhs => unfold _μ
-      simp only [associated_primes_quot_koqcl I, Set.mem_singleton_iff, exists_prop_eq,
-        Set.setOf_eq_eq_singleton', Set.toFinset_singleton, Finset.singleton_inj]
-      rfl
+    · refine (Set.toFinset_congr ?_).trans (Set.toFinset_singleton _)
+      ext w
+      constructor
+      · rintro ⟨p, hp, rfl⟩
+        exact PrimeSpectrum.ext (Set.mem_singleton_iff.mp (associated_primes_quot_koqcl I ▸ hp))
+      · rintro rfl
+        exact ⟨((_μ R M I).toFinset.min' (μ_nonempty I)).asIdeal,
+          by rw [associated_primes_quot_koqcl I]; exact rfl, rfl⟩
     · constructor
       · constructor
         · unfold ker_of_quot_comp_localization
           intro z hz
-          simp only [Submodule.mem_map, LinearMap.mem_ker, LinearMap.coe_comp, LinearMap.coe_mk,
-            AddHom.coe_mk, Function.comp_apply, Submodule.subtype_apply, Subtype.exists,
+          simp only [Submodule.mem_map, LinearMap.mem_ker, LinearMap.coe_comp,
+            Function.comp_apply, Submodule.subtype_apply, Subtype.exists,
             exists_and_right, exists_eq_right]
           use (le_of_lt I.prop) hz
           have : Submodule.Quotient.mk ⟨z, (Iff.of_eq (Eq.refl (z ∈ I.val.2))).mpr
             (le_of_lt (Subtype.prop I) hz) ⟩ =
             (0 : ↥I.val.2 ⧸ Submodule.submoduleOf I.val.1 I.val.2)
             := by simpa only [Submodule.Quotient.mk_eq_zero]
-          simp only [Submodule.mkQ_apply, this, LocalizedModule.mkLinearMap_apply,
-            LocalizedModule.zero_mk]
+          exact (congrArg (LocalizedModule.mk · 1) this).trans (LocalizedModule.zero_mk 1)
         · unfold ker_of_quot_comp_localization
           simp only [Submodule.map_subtype_le]
       · by_contra hc
         have := (((_μ R M) I).toFinset.min'_mem (μ_nonempty I))
-        simp only [Set.mem_toFinset, Set.mem_setOf_eq] at this
+        simp only [Set.mem_toFinset, Set.mem_ofPred_eq] at this
         rcases this with ⟨p,⟨hp1,hp2⟩⟩
         apply mem_support_of_mem_associatedPrimes at hp1
         replace hp1 := hp1.out
@@ -516,8 +500,8 @@ lemma prop3d12 {R : Type*} [CommRing R] [IsNoetherianRing R]
               arg 1; simp only [← hc]
             exact this
           simp only [ne_eq, LinearMap.ker_eq_top, LocalizedModule.mkLinearMap_apply,
-            Submodule.mem_map, LinearMap.mem_ker, LinearMap.coe_comp, LinearMap.coe_mk,
-            Submodule.mkQ_apply, AddHom.coe_mk, Function.comp_apply, Submodule.subtype_apply,
+            Submodule.mem_map, LinearMap.mem_ker, LinearMap.coe_comp,
+            Function.comp_apply, Submodule.subtype_apply,
             SetLike.coe_eq_coe, exists_eq_right] at *
           exact this
         unfold CP.f2 at this'
@@ -569,7 +553,7 @@ instance prop3d13₂ {R : Type*} [CommRing R] [IsNoetherianRing R]
       associatedPrimes R ((x i)⧸(Submodule.submoduleOf N (x i))) := by
       intro i
       have := (_μ R M ⟨(N, x i), hx1 i⟩).toFinset.min'_mem (μ_nonempty _)
-      simp only [Set.mem_toFinset, Set.mem_setOf_eq] at this
+      simp only [Set.mem_toFinset, Set.mem_ofPred_eq] at this
       rcases this with ⟨_,⟨_,hp2⟩⟩
       rwa [← hp2]
     have s2 : ∀ i,
@@ -580,7 +564,7 @@ instance prop3d13₂ {R : Type*} [CommRing R] [IsNoetherianRing R]
       if hi : i = 0 then
         rw [hi]
       else
-        exact subset_of_ssubset (hx2 (Nat.zero_lt_of_ne_zero hi)).ssubset
+        exact le_of_lt (hx2 (Nat.zero_lt_of_ne_zero hi))
     have : (associatedPrimes R (↥(x 0) ⧸ Submodule.submoduleOf N (x 0))).Infinite := by
       refine Set.infinite_of_injective_forall_mem ?_ <| fun i ↦ s2 i (s1 i)
       intro a b hab
@@ -658,7 +642,7 @@ Semistable (μ R M) ↔ ∃! p, p ∈ associatedPrimes R M := by
     (Submodule.quotEquivOfEqBot _ (hbot ⊤)).trans Submodule.topEquiv
   have hp0 : p0.asIdeal ∈ associatedPrimes R M := by
     have hp := ((_μ R M ⟨(⊥, ⊤), bot_lt_top⟩).toFinset.min'_mem (μ_nonempty _))
-    simp only [Set.mem_toFinset, Set.mem_setOf_eq] at hp
+    simp only [Set.mem_toFinset, Set.mem_ofPred_eq] at hp
     rcases hp with ⟨q, hq, hq'⟩
     have hqM : q ∈ associatedPrimes R M := by
       simpa [LinearEquiv.AssociatedPrimes.eq eTop] using hq
@@ -680,7 +664,7 @@ Semistable (μ R M) ↔ ∃! p, p ∈ associatedPrimes R M := by
       have : t = 0 := Submodule.span_singleton_eq_bot.mp ht0
       exact hJp.ne_top <| by rw [ht, this, Submodule.colon_singleton_zero]
     have hJN : ⟨J, hJp⟩ ∈ _μ R M ⟨(⊥, N), hN⟩ := by
-      simp only [_μ, Set.mem_setOf_eq]
+      simp only [_μ]
       refine ⟨J, ?_, rfl⟩
       have hJN' : J ∈ associatedPrimes R ↥N := by
         refine (AssociatedPrimes.mem_iff (R := R) (M := ↥N)).2 ?_
@@ -697,7 +681,7 @@ Semistable (μ R M) ↔ ∃! p, p ∈ associatedPrimes R M := by
       simpa [LinearEquiv.AssociatedPrimes.eq eN] using hJN'
     have hJ_le : ∀ q ∈ _μ R M ⟨(⊥, N), hN⟩, ⟨J, hJp⟩ ≤ q := by
       intro q hq
-      simp only [Set.mem_setOf_eq] at hq
+      simp only [Set.mem_ofPred_eq] at hq
       rcases hq with ⟨I, hI, rfl⟩
       have hI' : I ∈ associatedPrimes R ↥N := by
         simpa [LinearEquiv.AssociatedPrimes.eq eN] using hI
@@ -730,7 +714,7 @@ Semistable (μ R M) ↔ ∃! p, p ∈ associatedPrimes R M := by
         ((_μ R M ⟨(⊥, N), hN⟩).toFinset.min'_mem (μ_nonempty _))
     have hq : (((_μ R M ⟨(⊥, N), hN⟩).toFinset.min' (μ_nonempty _)).asIdeal) ∈
       associatedPrimes R M := by
-      simp only [Set.mem_setOf_eq] at hq_top
+      simp only [Set.mem_ofPred_eq] at hq_top
       rcases hq_top with ⟨I, hI, hI'⟩
       have hIM : I ∈ associatedPrimes R M := by
         simpa [LinearEquiv.AssociatedPrimes.eq eTop] using hI
@@ -905,16 +889,15 @@ lemma _mu_eq_quot_mu {R : Type*} [CommRing R] [IsNoetherianRing R]
         ⟨(⊥,
           Submodule.map (N₁.submoduleOf N₂).mkQ (Submodule.comap N₂.subtype W)),
           bot_lt_iff_ne_bot.mpr <| map_comap_ne_bot h₁ h₂ h₃⟩ := by
-  letI : Nontrivial (↥N₂ ⧸ N₁.submoduleOf N₂) :=
+  let : Nontrivial (↥N₂ ⧸ N₁.submoduleOf N₂) :=
     quot_ntl (lt_of_lt_of_le (lt_of_le_of_ne h₁ (Ne.symm h₃)) h₂)
-  letI : Nontrivial (ℒ R (↥N₂ ⧸ N₁.submoduleOf N₂)) :=
+  let : Nontrivial (ℒ R (↥N₂ ⧸ N₁.submoduleOf N₂)) :=
     quot_ntl' (lt_of_lt_of_le (lt_of_le_of_ne h₁ (Ne.symm h₃)) h₂)
   let X := Submodule.map (N₁.submoduleOf N₂).mkQ (Submodule.comap N₂.subtype W)
-  have hX : Submodule.submoduleOf (⊥ : Submodule R (↥N₂ ⧸ N₁.submoduleOf N₂)) X = ⊥ := by
-    unfold Submodule.submoduleOf
-    simp only [Submodule.comap_bot, Submodule.ker_subtype]
+  have hX : Submodule.submoduleOf (⊥ : Submodule R (↥N₂ ⧸ N₁.submoduleOf N₂)) X = ⊥ :=
+    Submodule.ker_subtype X
   ext x
-  simp only [Set.mem_setOf_eq]
+  simp only [Set.mem_ofPred_eq]
   constructor <;> rintro ⟨p, hp, rfl⟩
   · exact ⟨p, by
       rw [LinearEquiv.AssociatedPrimes.eq
@@ -938,9 +921,9 @@ lemma muA_eq_quot_muA {R : Type*} [CommRing R] [IsNoetherianRing R]
         ⟨(⊥,
           Submodule.map (N₁.submoduleOf N₂).mkQ (Submodule.comap N₂.subtype W)),
           bot_lt_iff_ne_bot.mpr <| map_comap_ne_bot h₁ h₂ h₃⟩ := by
-  letI : Nontrivial (↥N₂ ⧸ N₁.submoduleOf N₂) :=
+  let : Nontrivial (↥N₂ ⧸ N₁.submoduleOf N₂) :=
     quot_ntl (lt_of_lt_of_le (lt_of_le_of_ne h₁ (Ne.symm h₃)) h₂)
-  letI : Nontrivial (ℒ R (↥N₂ ⧸ N₁.submoduleOf N₂)) :=
+  let : Nontrivial (ℒ R (↥N₂ ⧸ N₁.submoduleOf N₂)) :=
     quot_ntl' (lt_of_lt_of_le (lt_of_le_of_ne h₁ (Ne.symm h₃)) h₂)
   rw [prop3d12, prop3d12]
   simp only [Function.Embedding.toFun_eq_coe, RelEmbedding.coe_toEmbedding,
@@ -970,8 +953,8 @@ lemma semistable_res_iff_semistable_quot {R : Type*} [CommRing R] [IsNoetherianR
           (@quot_ntl R _ _ M _ _ _ _ N₁ N₂ hN) _ _ _) := by
   refine ⟨?_, ?_⟩
   · intro h
-    letI : Nontrivial (↥N₂ ⧸ N₁.submoduleOf N₂) := quot_ntl hN
-    letI : Nontrivial (ℒ R (↥N₂ ⧸ N₁.submoduleOf N₂)) := quot_ntl' hN
+    let : Nontrivial (↥N₂ ⧸ N₁.submoduleOf N₂) := quot_ntl hN
+    let : Nontrivial (ℒ R (↥N₂ ⧸ N₁.submoduleOf N₂)) := quot_ntl' hN
     refine { semistable := ?_ }
     intro X hX
     have hres := h.semistable
@@ -990,8 +973,8 @@ lemma semistable_res_iff_semistable_quot {R : Type*} [CommRing R] [IsNoetherianR
     simpa [lift_quot, Submodule.comap_map_eq, Submodule.ker_subtype,
       Submodule.map_comap_eq_self, Submodule.range_mkQ] using hres'
   · intro h
-    letI : Nontrivial (↥N₂ ⧸ N₁.submoduleOf N₂) := quot_ntl hN
-    letI : Nontrivial (ℒ R (↥N₂ ⧸ N₁.submoduleOf N₂)) := quot_ntl' hN
+    let : Nontrivial (↥N₂ ⧸ N₁.submoduleOf N₂) := quot_ntl hN
+    let : Nontrivial (ℒ R (↥N₂ ⧸ N₁.submoduleOf N₂)) := quot_ntl' hN
     refine { semistable := ?_ }
     intro W hW
     have hW' : W.val ≠ N₁ := fun hEq ↦ hW (Subtype.ext hEq)
@@ -1031,8 +1014,8 @@ lemma piecewise_coprimary {R : Type*} [CommRing R] [IsNoetherianRing R]
     Submodule.submoduleOf (HNFil.filtration n) (HNFil.filtration (n + 1))) := by
   intro n hn
   let hstep := HNFil.strict_mono n (n + 1) (Nat.lt_add_one n) hn
-  letI := quot_ntl hstep
-  letI := quot_ntl' hstep
+  let := quot_ntl hstep
+  let := quot_ntl' hstep
   exact {
     coprimary := rmk4d14₂.mp <|
       (semistable_res_iff_semistable_quot _ _ hstep).mp (HNFil.piecewise_semistable n hn)
@@ -1069,7 +1052,7 @@ Inhabited (CoprimaryFiltration R M) := by
     apply Set.mem_toFinset.mp at this
     rcases this.out with ⟨p,hp1,hp2⟩
     rw [← hp2]
-    simp only [pcnp1.unique pcnp1.exists.choose_spec hp1]
+    exact PrimeSpectrum.ext (pcnp1.unique pcnp1.exists.choose_spec hp1).symm
   have t'' : (_μ R M ⟨(HNFil.filtration n, HNFil.filtration (n + 1)), HNFil.strict_mono n (n+1)
     (Nat.lt_add_one n) (Nat.le_of_succ_le hn)⟩).toFinset.min' (μ_nonempty _) =
     {asIdeal := pcn.exists.choose, isPrime := pcn.exists.choose_spec.out.1} := by
@@ -1078,7 +1061,7 @@ Inhabited (CoprimaryFiltration R M) := by
     apply Set.mem_toFinset.mp at this
     rcases this.out with ⟨p,hp1,hp2⟩
     rw [← hp2]
-    simp only [pcn.unique pcn.exists.choose_spec hp1]
+    exact PrimeSpectrum.ext (pcn.unique pcn.exists.choose_spec hp1).symm
   exact t' ▸ t'' ▸ this
 
 instance {R : Type*} [CommRing R] [IsNoetherianRing R]
@@ -1101,9 +1084,9 @@ lemma CoprimaryFiltration.toHarderNarasimhanFiltration {R : Type*} [CommRing R] 
         a.first_eq_bot a.fin_len a.strict_mono ?_ ?_
       · intro i hi
         let hstep := a.strict_mono i (i + 1) (Nat.lt_add_one i) hi
-        letI : Nontrivial (↥(a.filtration (i + 1)) ⧸
+        let : Nontrivial (↥(a.filtration (i + 1)) ⧸
             Submodule.submoduleOf (a.filtration i) (a.filtration (i + 1))) := quot_ntl hstep
-        letI : Nontrivial (ℒ R (↥(a.filtration (i + 1)) ⧸
+        let : Nontrivial (ℒ R (↥(a.filtration (i + 1)) ⧸
             Submodule.submoduleOf (a.filtration i) (a.filtration (i + 1)))) := quot_ntl' hstep
         exact (semistable_res_iff_semistable_quot _ _ hstep).mpr <|
           rmk4d14₂.mpr (a.piecewise_coprimary i hi).coprimary
@@ -1113,21 +1096,32 @@ lemma CoprimaryFiltration.toHarderNarasimhanFiltration {R : Type*} [CommRing R] 
         simp only [Function.Embedding.toFun_eq_coe, RelEmbedding.coe_toEmbedding,
           OrderEmbedding.le_iff_le, not_le, gt_iff_lt]
         apply S₀_order'.1
-        convert a.strict_mono_associated_prime i hi
-        · replace := (_μ R M ⟨(a.filtration (i + 1), a.filtration (i + 2)), a.strict_mono (i+1)
+        have e1 : (_μ R M ⟨(a.filtration (i + 1), a.filtration (i + 2)), a.strict_mono (i+1)
+            (i+2) (Nat.lt_add_one (i + 1)) hi⟩).toFinset.min' (μ_nonempty _) =
+            {asIdeal := (a.piecewise_coprimary (i+1) hi).coprimary.exists.choose,
+              isPrime := (a.piecewise_coprimary (i+1) hi).coprimary.exists.choose_spec.out.1} := by
+          replace := (_μ R M ⟨(a.filtration (i + 1), a.filtration (i + 2)), a.strict_mono (i+1)
             (i+2) (Nat.lt_add_one (i + 1)) hi⟩).toFinset.min'_mem (μ_nonempty _)
           apply Set.mem_toFinset.mp at this
           rcases this.out with ⟨p,hp1,hp2⟩
           rw [← hp2]
-          simp only [(a.piecewise_coprimary (i+1) hi).coprimary.unique
-            ((a.piecewise_coprimary (i+1) hi).coprimary.exists.choose_spec) hp1]
-        · replace := (_μ R M ⟨(a.filtration i, a.filtration (i + 1)), a.strict_mono i
+          exact PrimeSpectrum.ext ((a.piecewise_coprimary (i+1) hi).coprimary.unique
+            ((a.piecewise_coprimary (i+1) hi).coprimary.exists.choose_spec) hp1).symm
+        have e2 : (_μ R M ⟨(a.filtration i, a.filtration (i + 1)), a.strict_mono i
+            (i+1) (Nat.lt_add_one i) (Nat.le_of_succ_le hi)⟩).toFinset.min' (μ_nonempty _) =
+            {asIdeal := (a.piecewise_coprimary i (Nat.lt_of_succ_lt hi)).coprimary.exists.choose,
+              isPrime := (a.piecewise_coprimary i
+                (Nat.lt_of_succ_lt hi)).coprimary.exists.choose_spec.out.1} := by
+          replace := (_μ R M ⟨(a.filtration i, a.filtration (i + 1)), a.strict_mono i
             (i+1) (Nat.lt_add_one i) (Nat.le_of_succ_le hi)⟩).toFinset.min'_mem (μ_nonempty _)
           apply Set.mem_toFinset.mp at this
           rcases this.out with ⟨p,hp1,hp2⟩
           rw [← hp2]
-          simp only [(a.piecewise_coprimary i (Nat.lt_of_succ_lt hi)).coprimary.unique
-            ((a.piecewise_coprimary i (Nat.lt_of_succ_lt hi)).coprimary.exists.choose_spec) hp1]
+          exact PrimeSpectrum.ext ((a.piecewise_coprimary i (Nat.lt_of_succ_lt hi)).coprimary.unique
+            ((a.piecewise_coprimary i (Nat.lt_of_succ_lt hi)).coprimary.exists.choose_spec)
+            hp1).symm
+        rw [e1, e2]
+        exact a.strict_mono_associated_prime i hi
   use ahn
 
 /--

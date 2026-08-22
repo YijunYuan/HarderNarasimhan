@@ -62,7 +62,7 @@ Nonempty (JordanHolderFiltration μ)
       (Nat.le_induction
         (Nat.find_spec (impl.JHFil_fin_len μ hftp.fin_tot_payoff hsl hst hwdcc'.wdcc'))
         fun i hi hi' ↦ by simp only [impl.JHFil, hi']; simp only [not_lt_bot, false_and,
-          exists_false, Set.setOf_false, Set.not_nonempty_empty, ↓reduceDIte]
+          exists_false, Set.ofPred_false, Set.not_nonempty_empty, ↓reduceDIte]
         : ∀ n : ℕ, Nat.find (impl.JHFil_fin_len μ hftp.fin_tot_payoff hsl hst hwdcc'.wdcc') ≤ n →
           impl.JHFil μ hftp.fin_tot_payoff hsl hst hwdcc'.wdcc' n = ⊥)
       y (le_of_lt <| lt_of_not_ge hy) ▸ bot_le,
