@@ -652,7 +652,7 @@ lemma piecewise_coprimary {R : Type*} [CommRing R] [IsNoetherianRing R]
   Coprimary R (↥(HNFil.filtration (n + 1)) ⧸
     Submodule.submoduleOf (HNFil.filtration n) (HNFil.filtration (n + 1))) := by
   intro n hn
-  let hstep := HNFil.strict_mono n (n + 1) (Nat.lt_add_one n) hn
+  let hstep := HNFil.strict_mono hn.le hn (Nat.lt_add_one n)
   let := quot_ntl hstep
   exact {
     coprimary := rmk4d14₂.mp <|
@@ -679,10 +679,10 @@ Inhabited (CoprimaryFiltration R M) := by
   rw [prop3d12, prop3d12, DedekindCut.principal_lt_principal] at this
   replace this := S₀_order'.2 this
   rw [toLinearExtension_eq_min' ⟨HNFil.filtration (n + 1), HNFil.filtration (n + 2),
-      HNFil.strict_mono (n+1) (n+2) (Nat.lt_add_one (n + 1)) hn⟩
+      HNFil.strict_mono hn.le hn (Nat.lt_add_one (n + 1))⟩
       (piecewise_coprimary HNFil (n+1) hn).coprimary hp,
     toLinearExtension_eq_min' ⟨HNFil.filtration n, HNFil.filtration (n + 1),
-      HNFil.strict_mono n (n+1) (Nat.lt_add_one n) (Nat.le_of_succ_le hn)⟩
+      HNFil.strict_mono (Nat.le_of_succ_le hn.le) (Nat.le_of_succ_le hn) (Nat.lt_add_one n)⟩
       (piecewise_coprimary HNFil n <| Nat.lt_of_succ_lt hn).coprimary hq]
   exact this
 
@@ -705,7 +705,7 @@ lemma CoprimaryFiltration.toHarderNarasimhanFiltration {R : Type*} [CommRing R] 
       refine HarderNarasimhanFiltration.mk a.filtration a.monotone
         a.first_eq_bot a.fin_len a.strict_mono ?_ ?_
       · intro i hi
-        let hstep := a.strict_mono i (i + 1) (Nat.lt_add_one i) hi
+        let hstep := a.strict_mono hi.le hi (Nat.lt_add_one i)
         let : Nontrivial (↥(a.filtration (i + 1)) ⧸
             Submodule.submoduleOf (a.filtration i) (a.filtration (i + 1))) := quot_ntl hstep
         exact (semistable_res_iff_semistable_quot _ _ hstep).mpr <|
@@ -715,10 +715,10 @@ lemma CoprimaryFiltration.toHarderNarasimhanFiltration {R : Type*} [CommRing R] 
         simp only [DedekindCut.principal_le_principal, not_le]
         apply S₀_order'.1
         exact a.strict_anti_associated_prime i hi _ _
-          (min'_asIdeal_mem ⟨a.filtration (i + 1), a.filtration (i + 2), a.strict_mono (i+1)
-            (i+2) (Nat.lt_add_one (i + 1)) hi⟩)
-          (min'_asIdeal_mem ⟨a.filtration i, a.filtration (i + 1), a.strict_mono i
-            (i+1) (Nat.lt_add_one i) (Nat.le_of_succ_le hi)⟩)
+          (min'_asIdeal_mem ⟨a.filtration (i + 1), a.filtration (i + 2),
+            a.strict_mono hi.le hi (Nat.lt_add_one (i + 1))⟩)
+          (min'_asIdeal_mem ⟨a.filtration i, a.filtration (i + 1),
+            a.strict_mono (Nat.le_of_succ_le hi.le) (Nat.le_of_succ_le hi) (Nat.lt_add_one i)⟩)
   use ahn
 
 /--

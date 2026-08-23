@@ -80,14 +80,14 @@ where
   filtration : ℕ → ℒ
   antitone : Antitone filtration
   fin_len : ∃ N : ℕ, filtration N =⊥
-  strict_anti : ∀ i j : ℕ, i < j → j ≤ Nat.find (fin_len) → filtration j < filtration i
+  strict_anti : StrictAntiOn filtration (Set.Iic (Nat.find fin_len))
   first_eq_top : filtration 0 = ⊤
   step_cond₁ : ∀ k : ℕ,  (hk : k < Nat.find (fin_len)) → μ ⟨filtration (k + 1), filtration k,
-    strict_anti k (k+1) (lt_add_one k) hk⟩ = μ ⟨⊥, ⊤,bot_lt_top⟩
+    strict_anti hk.le hk (lt_add_one k)⟩ = μ ⟨⊥, ⊤,bot_lt_top⟩
   step_cond₂ : ∀ i : ℕ, (hi : i < Nat.find fin_len) →
     ∀ z : ℒ, (h' : filtration (i+1) < z) → (h'' : z < filtration i) →
     μ ⟨filtration (i+1), z, h'⟩ <
-    μ ⟨filtration (i+1), filtration i, strict_anti i (i+1) (lt_add_one i) hi⟩
+    μ ⟨filtration (i+1), filtration i, strict_anti hi.le hi (lt_add_one i)⟩
 
 namespace JordanHolderFiltration
 

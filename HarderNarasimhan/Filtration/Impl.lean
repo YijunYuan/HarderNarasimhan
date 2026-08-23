@@ -156,12 +156,14 @@ lemma HNFil_is_strict_mono' {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [Bounde
 [WellFoundedGT ℒ] {S : Type*} [CompleteLattice S]
 (μ : Intvl ℒ → S) [hμ : μA_DescendingChainCondition μ] [hμcvx : ConvexI TotIntvl μ]
 [h : μ_Admissible μ] :
-∀ i : ℕ, ∀ j : ℕ, i < j → j ≤ HNlen μ → HNFil μ i < HNFil μ j := fun i ↦
-  Nat.le_induction
-    (fun hi ↦ HNFil_is_strict_mono μ i ((HNFil_ne_top_iff_lt_len μ i).2 hi))
-    fun k _ hk' hk'' ↦
-      lt_trans (hk' (le_trans (Nat.le_succ k) hk''))
-        (HNFil_is_strict_mono μ k ((HNFil_ne_top_iff_lt_len μ k).2 hk''))
+StrictMonoOn (HNFil μ) (Set.Iic (HNlen μ)) := by
+  have key : ∀ i j : ℕ, i < j → j ≤ HNlen μ → HNFil μ i < HNFil μ j := fun i ↦
+    Nat.le_induction
+      (fun hi ↦ HNFil_is_strict_mono μ i ((HNFil_ne_top_iff_lt_len μ i).2 hi))
+      fun k _ hk' hk'' ↦
+        lt_trans (hk' (le_trans (Nat.le_succ k) hk''))
+          (HNFil_is_strict_mono μ k ((HNFil_ne_top_iff_lt_len μ k).2 hk''))
+  exact fun i _ j hj hij ↦ key i j hij hj
 
 open Classical in
 /--
@@ -177,9 +179,9 @@ lemma HNFil_piecewise_semistable {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [B
 [hμ : μA_DescendingChainCondition μ] [hμcvx : ConvexI TotIntvl μ] [h : μ_Admissible μ] :
 ∀ i : ℕ, (h: i < Nat.find (HNFil_of_fin_len μ)) →
     Semistable (Resμ ⟨HNFil μ i, HNFil μ (i+1),
-      HNFil_is_strict_mono' μ i (i+1) (lt_add_one i) h⟩ μ) :=
+      HNFil_is_strict_mono' μ h.le h (lt_add_one i)⟩ μ) :=
   fun i hi ↦ (semistableI_iff μ ⟨HNFil μ i, HNFil μ (i+1),
-    HNFil_is_strict_mono' μ i (i+1) (lt_add_one i) hi⟩).1 <|
+    HNFil_is_strict_mono' μ hi.le hi (lt_add_one i)⟩).1 <|
     impl.prop3d7₁ μ ⟨HNFil μ i, ⊤, lt_top_iff_ne_top.2 <|
     Nat.find_min (HNFil_of_fin_len μ) hi⟩ (HNFil μ (i + 1))
     (HNFil_prop_of_def μ i (Nat.find_min (HNFil_of_fin_len μ) hi)).1
@@ -399,8 +401,8 @@ lemma hHFil_of_hNSeries {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrd
         exact h1.1,
       fin_len := hstrange,
       strict_mono := by
-        intro i j hij hj
-        rw [hslen] at hj
+        intro i _ j hj hij
+        rw [Set.mem_Iic, hslen] at hj
         simpa only [filtration1, (hij.trans_le hj).le, hj, ↓reduceIte] using Fmono i j hij hj,
       piecewise_semistable := by
         intro i hi

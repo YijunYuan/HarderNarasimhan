@@ -93,12 +93,13 @@ structure HarderNarasimhanFiltration
   monotone             : Monotone filtration
   first_eq_bot         : filtration 0 = ⊥
   fin_len              : ∃ n : ℕ, filtration n = ⊤
-  strict_mono          : ∀ i j : ℕ, i < j → j ≤ Nat.find (fin_len) → filtration i < filtration j
+  strict_mono          : StrictMonoOn filtration (Set.Iic (Nat.find fin_len))
   piecewise_semistable : ∀ i : ℕ, (h: i < Nat.find (fin_len)) →
-    Semistable (Resμ ⟨filtration i, filtration (i+1), strict_mono i (i+1) (lt_add_one i) h⟩ μ)
+    Semistable (Resμ ⟨filtration i, filtration (i+1), strict_mono h.le h (lt_add_one i)⟩ μ)
   μA_pseudo_strict_anti: ∀ i : ℕ, (hi : i + 1 < Nat.find fin_len) →
-    ¬ μA μ ⟨filtration i, filtration (i+1), strict_mono i (i+1) (lt_add_one i) <| le_of_lt hi⟩ ≤
-    μA μ ⟨filtration (i+1), filtration (i+2), strict_mono (i+1) (i+2) (Nat.lt_add_one (i + 1)) hi⟩
+    ¬ μA μ ⟨filtration i, filtration (i+1),
+        strict_mono (Nat.le_of_succ_le hi.le) hi.le (lt_add_one i)⟩ ≤
+    μA μ ⟨filtration (i+1), filtration (i+2), strict_mono hi.le hi (Nat.lt_add_one (i + 1))⟩
 
 
 namespace HarderNarasimhanFiltration

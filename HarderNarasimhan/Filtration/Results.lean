@@ -69,7 +69,8 @@ default :=
         Nat.le_induction (Nat.find_spec (impl.HNFil_of_fin_len μ))
         (fun n hn hn' ↦ (by simp only [impl.HNFil,hn']; simp))
       exact fun i j hij ↦ if h : i = j then (by rw [h]) else (if h' : j ≤ impl.HNlen μ then
-        (le_of_lt <| impl.HNFil_is_strict_mono' μ i j (lt_of_le_of_ne hij h) h') else
+        (le_of_lt <| impl.HNFil_is_strict_mono' μ ((lt_of_le_of_ne hij h).le.trans h') h'
+          (lt_of_le_of_ne hij h)) else
         ((this) j <| le_of_lt <| lt_of_not_ge h') ▸ le_top)
   }
 
@@ -98,13 +99,15 @@ where
   uniq := by
     rw [← ConvexI_TotIntvl_iff_Convex] at hμcvx
     exact fun a ↦ HarderNarasimhanFiltration.ext (funext fun n ↦ congrFun
-      (impl.theorem3d10 μ hμ hμcvx a.filtration a.first_eq_bot a.fin_len a.strict_mono
+      (impl.theorem3d10 μ hμ hμcvx a.filtration a.first_eq_bot a.fin_len
+      (fun i j hij hj ↦ a.strict_mono (hij.le.trans hj) hj hij)
       (Nat.le_induction (a.filtration_length) fun n _ hn' ↦ eq_top_iff.2 <| hn' ▸ a.monotone
       (Nat.le_succ n)) a.piecewise_semistable fun i  ↦ by
     have : ∀ (j : ℕ) (hij : i + 1 ≤ j) (hj : j < a.length),
-  μA μ ⟨a.filtration i, a.filtration (i + 1), a.strict_mono i (i + 1) (lt_add_one i)
-  (hij.trans hj.le)⟩ > μA μ ⟨a.filtration j, a.filtration
-    (j + 1), a.strict_mono j (j + 1) (lt_add_one j) hj⟩ := by
+  μA μ ⟨a.filtration i, a.filtration (i + 1),
+    a.strict_mono ((lt_add_one i).le.trans (hij.trans hj.le)) (hij.trans hj.le)
+      (lt_add_one i)⟩ > μA μ ⟨a.filtration j, a.filtration
+    (j + 1), a.strict_mono ((lt_add_one j).le.trans hj) hj (lt_add_one j)⟩ := by
       apply Nat.le_induction
       · exact fun hj ↦ lt_of_not_ge (a.μA_pseudo_strict_anti i hj)
       · refine fun j hij hind hj ↦ gt_trans (hind (Nat.lt_of_succ_lt hj)) ?_
@@ -141,8 +144,8 @@ theorem exists_relSeries_isIntervalSemistable
   let HNseq : RelSeries (IntervalSemistableRel μ) := {
     toFun := fun n ↦ HNfil.filtration n,
     length := HNfil.length
-    step := fun i ↦ ⟨HNfil.strict_mono i.val (i.succ).val (Nat.lt_add_one i.val) <|
-      Fin.is_le i.succ, HNfil.piecewise_semistable i.val i.prop⟩
+    step := fun i ↦ ⟨HNfil.strict_mono ((Nat.lt_add_one i.val).le.trans (Fin.is_le i.succ))
+      (Fin.is_le i.succ) (Nat.lt_add_one i.val), HNfil.piecewise_semistable i.val i.prop⟩
   }
   use HNseq
   refine ⟨rfl,HNfil.filtration_length,?_⟩

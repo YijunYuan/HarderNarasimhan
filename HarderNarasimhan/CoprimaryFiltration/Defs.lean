@@ -257,10 +257,7 @@ structure CoprimaryFiltration (R : Type*) [CommRing R] [IsNoetherianRing R]
   monotone            : Monotone filtration
   first_eq_bot        : filtration 0 = ⊥
   fin_len             : ∃ n : ℕ, filtration n = ⊤
-  strict_mono         :
-    ∀ i j : ℕ,
-      i < j → j ≤ Nat.find (fin_len) →
-        filtration i < filtration j
+  strict_mono         : StrictMonoOn filtration (Set.Iic (Nat.find fin_len))
   piecewise_coprimary :
     ∀ n : ℕ, n < Nat.find (fin_len) →
       Coprimary R (filtration (n+1)⧸ ((filtration n).submoduleOf (filtration (n+1))))

@@ -55,7 +55,7 @@ Nonempty (JordanHolderFiltration μ)
   filtration := impl.JHFil μ hftp.fin_tot_payoff hsl hst hwdcc'.wdcc',
   antitone := hanti,
   fin_len := impl.JHFil_fin_len μ hftp.fin_tot_payoff hsl hst hwdcc'.wdcc',
-  strict_anti := fun x y hxy hy ↦
+  strict_anti := fun x _ y hy hxy ↦
     lt_of_le_of_lt (hanti hxy) <|
       impl.JHFil_anti_mono μ hftp.fin_tot_payoff hsl hst hwdcc'.wdcc' x <|
         bot_lt_iff_ne_bot.2 <|
@@ -91,7 +91,8 @@ theorem exists_JordanHolderSeries
   let JH : RelSeries (JordanHolderRel μ) := {
     length := this.length,
     toFun := fun n ↦ this.filtration n.toNat,
-    step := fun n ↦ ⟨this.strict_anti n n.succ (Nat.lt_add_one ↑n) (Fin.is_le n.succ),
+    step := fun n ↦ ⟨this.strict_anti ((Nat.lt_add_one (n : ℕ)).le.trans (Fin.is_le n.succ))
+      (Fin.is_le n.succ) (Nat.lt_add_one ↑n),
       this.step_cond₁ n n.isLt, this.step_cond₂ n n.isLt⟩
   }
   exact ⟨JH, this.first_eq_top, this.filtration_length⟩
