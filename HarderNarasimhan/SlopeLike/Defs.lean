@@ -23,8 +23,6 @@ to build examples of slope-like functions by taking quotients `d/r` (encoded as 
 
 Main API:
 - `SlopeLike μ`: the slope-like condition as a typeclass `Prop`.
-- `TotallyOrderedRealVectorSpace`: a bundled ordered `ℝ`-vector space structure supporting
-  monotonicity.
 - `μQuotient r d`: a construction producing values in the Dedekind–MacNeille completion
   (`DedekindCut` from mathlib) to handle division by zero.
 - An instance showing slope-likeness is stable under restriction to an interval via `Resμ`.
@@ -60,21 +58,6 @@ class SlopeLike {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder 
 
 
 /--
-A bundled structure for a totally ordered real vector space.
-
-This extends `AddCommGroup` and `Module ℝ` with a linear order compatible with addition
-(`IsOrderedAddMonoid`) and a strict-mono scalar action.
-
-API note: this packaging makes it convenient to request exactly the properties used in
-`SlopeLike/Impl.lean`; mathlib derives the `NNReal`-scalar and `AddLeftMono`/`NoMaxOrder`
-consequences automatically from these parents.
--/
-class TotallyOrderedRealVectorSpace (V : Type*)
-  extends AddCommGroup V, Module ℝ V, LinearOrder V, IsOrderedAddMonoid V,
-    PosSMulStrictMono ℝ V
-
-
-/--
 Construct a “quotient slope” from a nonnegative real-valued rank `r` and a vector-valued degree `d`.
 
 The target is `DedekindCut V` (the Dedekind–MacNeille completion) to accommodate the case
@@ -87,7 +70,8 @@ in a complete lattice (the completion), which is compatible with `sSup`/`sInf`-b
 elsewhere.
 -/
 noncomputable def μQuotient {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
-{V : Type*} [TotallyOrderedRealVectorSpace V]
+{V : Type*} [AddCommGroup V] [Module ℝ V] [LinearOrder V] [IsOrderedAddMonoid V]
+[PosSMulStrictMono ℝ V]
 (r : {p :ℒ × ℒ // p.1 < p.2} → NNReal)
 (d : {p :ℒ × ℒ // p.1 < p.2} → V) :
 {p :ℒ × ℒ // p.1 < p.2} → DedekindCut V :=

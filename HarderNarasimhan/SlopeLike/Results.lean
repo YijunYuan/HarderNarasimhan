@@ -56,7 +56,8 @@ given additivity of rank `r` and degree `d` on composable intervals and a positi
 `r=0`, the induced `μQuotient r d` is slope-like.
 -/
 theorem SlopeLike_of_μQuotient {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
-{V : Type*} [TotallyOrderedRealVectorSpace V] [Nontrivial V]
+{V : Type*} [AddCommGroup V] [Module ℝ V] [LinearOrder V] [IsOrderedAddMonoid V]
+[PosSMulStrictMono ℝ V] [Nontrivial V]
 (r : {p :ℒ × ℒ // p.1 < p.2} → NNReal)
 (d : {p :ℒ × ℒ // p.1 < p.2} → V)
 (h₁ : ∀ (x y z : ℒ), (h : x < y ∧ y < z) →

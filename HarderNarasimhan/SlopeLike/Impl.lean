@@ -75,8 +75,8 @@ below `⊤` in the Dedekind–MacNeille completion.
 
 This lemma is used to derive contradictions when an equality forces a principal cut to be `⊤`.
 -/
-lemma not_top_of_Nontrivial_TotallyOrderedRealVectorSpace
-{V : Type*} [TotallyOrderedRealVectorSpace V] [Nontrivial V] :
+lemma principal_lt_top
+{V : Type*} [AddCommGroup V] [LinearOrder V] [IsOrderedAddMonoid V] [Nontrivial V] :
 ∀ v : V, DedekindCut.principal v < (⊤ : DedekindCut V) := fun v ↦
   (exists_gt v).elim fun w hw ↦ DedekindCut.principal_lt_iff.2 ⟨w, trivial, hw⟩
 
@@ -88,7 +88,8 @@ actual vector `μ : V`, and it satisfies `(r z) • μ = d z`.
 API note: this provides a convenient witness for rewriting inequalities in the “positive rank” case.
 -/
 lemma μQuotient_helper {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
-{V : Type*} [TotallyOrderedRealVectorSpace V]
+{V : Type*} [AddCommGroup V] [Module ℝ V] [LinearOrder V] [IsOrderedAddMonoid V]
+[PosSMulStrictMono ℝ V]
 (r : {p :ℒ × ℒ // p.1 < p.2} → NNReal)
 (d : {p :ℒ × ℒ // p.1 < p.2} → V) : ∀ z : {p :ℒ × ℒ // p.1 < p.2}, r z > 0 →
   ∃ (μ : V), (μQuotient r d) z = DedekindCut.principal μ ∧ (r z) • μ = (d z) :=
@@ -110,7 +111,8 @@ API note: the proof proceeds by splitting on whether the relevant ranks are zero
 the Dedekind–MacNeille completion to model “infinite slope” as `⊤`.
 -/
 lemma prop4d8 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
-{V : Type*} [TotallyOrderedRealVectorSpace V] [Nontrivial V]
+{V : Type*} [AddCommGroup V] [Module ℝ V] [LinearOrder V] [IsOrderedAddMonoid V]
+[PosSMulStrictMono ℝ V] [Nontrivial V]
 (r : {p :ℒ × ℒ // p.1 < p.2} → NNReal)
 (d : {p :ℒ × ℒ // p.1 < p.2} → V)
 (h₁ : ∀ (x y z : ℒ), (h : x < y ∧ y < z) → d ⟨(x, z), lt_trans h.1 h.2⟩ = d ⟨(x, y), h.1⟩ +
@@ -128,7 +130,7 @@ lemma prop4d8 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder �
       ⟨(etop _ hxy).trans (etop _ h').symm, (etop _ h').trans (etop _ hyz).symm⟩
   · obtain ⟨μxz, hxz₁, hxz₂⟩ := μQuotient_helper r d ⟨(x, z), lt_trans h.1 h.2⟩ h'
     have hlt : μQuotient r d ⟨(x, z), lt_trans h.1 h.2⟩ < ⊤ :=
-      hxz₁ ▸ not_top_of_Nontrivial_TotallyOrderedRealVectorSpace μxz
+      hxz₁ ▸ principal_lt_top μxz
     rcases eq_zero_or_pos (r ⟨(x, y), h.1⟩) with hxy | hxy
     · rcases eq_zero_or_pos (r ⟨(y, z), h.2⟩) with hyz | hyz
       · -- both short ranks zero would force `r (x,z) = 0`
