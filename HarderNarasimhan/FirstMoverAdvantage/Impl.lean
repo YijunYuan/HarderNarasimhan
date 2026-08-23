@@ -50,20 +50,14 @@ noncomputable def prop4d1₁_seq {ℒ : Type*} [Nontrivial ℒ] [PartialOrder �
   | k + 1 => by
     let prop4d1₁_seqkp1 := (prop4d1₁_seq μ h₁ h₂ h₃ k).prop.out.choose_spec
       (prop4d1₁_seq μ h₁ h₂ h₃ k) (prop4d1₁_seq μ h₁ h₂ h₃ k).prop.out.choose
-    use prop4d1₁_seqkp1.choose
     have h''' := prop4d1₁_seqkp1.choose_spec.choose_spec
-    have h' : prop4d1₁_seqkp1.choose < ⊤ := by
-      by_contra! hcon
-      simp only [not_lt_top_iff.mp hcon, le_refl, not_true_eq_false] at h'''
-    by_contra!
-    simp only [Set.mem_ofPred_eq, not_exists, not_forall, not_not] at this
-    rcases this h' with ⟨xA,⟨hxA,hh⟩⟩
-    have hhh : ∀ (xB : ℒ) (x_1 : xA < xB), μ ⟨(xA, xB), x_1⟩ ≤
-      μ ⟨(prop4d1₁_seq μ h₁ h₂ h₃ k, ⊤), (prop4d1₁_seq μ h₁ h₂ h₃ k).prop.choose⟩ :=
-        fun xB hAB ↦ le_trans (hh xB hAB) <| Or.resolve_left (h₂ ⟨(prop4d1₁_seq μ h₁ h₂ h₃ k,
-        prop4d1₁_seqkp1.choose), prop4d1₁_seqkp1.choose_spec.choose⟩ h') h'''
-    rcases (prop4d1₁_seq μ h₁ h₂ h₃ k).prop.out.choose_spec xA hxA with ⟨xB,⟨hAB,con⟩⟩
-    exact con (hhh xB hAB)
+    have h' : prop4d1₁_seqkp1.choose < ⊤ := lt_top_iff_ne_top.2 fun hcon ↦
+      h''' (le_of_eq <| congrArg μ <| Subtype.ext <| Prod.ext rfl hcon)
+    have hle := (h₂ ⟨(prop4d1₁_seq μ h₁ h₂ h₃ k, prop4d1₁_seqkp1.choose),
+      prop4d1₁_seqkp1.choose_spec.choose⟩ h').resolve_left h'''
+    refine ⟨prop4d1₁_seqkp1.choose, h', fun xA hxA ↦ ?_⟩
+    obtain ⟨xB, hAB, con⟩ := (prop4d1₁_seq μ h₁ h₂ h₃ k).prop.out.choose_spec xA hxA
+    exact ⟨xB, hAB, fun hcon ↦ con (hcon.trans hle)⟩
 
 
 
@@ -73,13 +67,10 @@ noncomputable def prop4d1₁_seq {ℒ : Type*} [Nontrivial ℒ] [PartialOrder �
 lemma prop4d1_helper {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) :
-sInf {x | ∃ x_1, ∃ (hx : x_1 < ⊤), μ ⟨(x_1, ⊤), hx⟩ = x} = μmin μ TotIntvl := by
-    refine congrArg sInf <| Set.ext fun x ↦ ?_
-    constructor
-    · rintro ⟨w, hw, hw'⟩
-      use w, ⟨in_TotIntvl w, ne_top_of_lt hw⟩
-    · rintro ⟨w,hw,hw'⟩
-      use w, lt_top_iff_ne_top.2 hw.2
+sInf {x | ∃ x_1, ∃ (hx : x_1 < ⊤), μ ⟨(x_1, ⊤), hx⟩ = x} = μmin μ TotIntvl :=
+  congrArg sInf <| Set.ext fun _ ↦
+    ⟨fun ⟨w, hw, hw'⟩ ↦ ⟨w, ⟨in_TotIntvl w, ne_top_of_lt hw⟩, hw'⟩,
+     fun ⟨w, hw, hw'⟩ ↦ ⟨w, lt_top_iff_ne_top.2 hw.2, hw'⟩⟩
 
 
 
@@ -102,38 +93,22 @@ lemma prop4d1₁ (ℒ : Type*) [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder
   have : ∀ yA : ℒ, (hyA : yA < ⊤) → ∃ xA : ℒ, xA < ⊤ ∧ (∀ xB : ℒ, (hAB : xA < xB) →
     μ ⟨(xA,xB), hAB⟩ ≤ μ ⟨(yA,⊤), hyA⟩) := by
     by_contra!
-    replace : {YA : ℒ | ∃ (h : YA < ⊤), ∀ xA < ⊤, ∃ xB, ∃ (hAB : xA < xB), ¬μ ⟨(xA, xB), hAB⟩
-      ≤ μ ⟨(YA, ⊤), h⟩}.Nonempty := this
-    have hsmf : StrictMono (fun n ↦ prop4d1₁_seq μ h₁ h₂ this n) :=
-      strictMono_nat_of_lt_succ <| fun n ↦ ((prop4d1₁_seq μ h₁ h₂ this n).prop.out.choose_spec
-      (prop4d1₁_seq μ h₁ h₂ this n) (prop4d1₁_seq μ h₁ h₂ this n).prop.out.choose
-      ).choose_spec.choose
-    have hfinal : ∀ n : ℕ, ¬ μ ⟨((prop4d1₁_seq μ h₁ h₂ this n),(prop4d1₁_seq μ h₁ h₂ this (n+1))),
-      hsmf (Nat.lt_add_one n)⟩ ≤ μ ⟨((prop4d1₁_seq μ h₁ h₂ this n),⊤),lt_of_lt_of_le
-      (hsmf (Nat.lt_add_one n)) le_top⟩ := fun n ↦ ((prop4d1₁_seq μ h₁ h₂ this n
-      ).prop.out.choose_spec (prop4d1₁_seq μ h₁ h₂ this n) (prop4d1₁_seq μ h₁ h₂ this n
-      ).prop.out.choose).choose_spec.choose_spec
-    rcases h₁ (fun n ↦ prop4d1₁_seq μ h₁ h₂ this n) hsmf with ⟨N,hN⟩
-    exact (hfinal N) hN
+    let Y := prop4d1₁_seq μ h₁ h₂ this
+    have hsmf : StrictMono (fun n ↦ Y n) := strictMono_nat_of_lt_succ fun n ↦
+      ((Y n).prop.out.choose_spec (Y n) (Y n).prop.out.choose).choose_spec.choose
+    have hfinal : ∀ n : ℕ, ¬ μ ⟨(Y n, Y (n+1)), hsmf (Nat.lt_add_one n)⟩ ≤
+        μ ⟨(Y n, ⊤), lt_of_lt_of_le (hsmf (Nat.lt_add_one n)) le_top⟩ := fun n ↦
+      ((Y n).prop.out.choose_spec (Y n) (Y n).prop.out.choose).choose_spec.choose_spec
+    obtain ⟨N, hN⟩ := h₁ (fun n ↦ Y n) hsmf
+    exact hfinal N hN
   refine le_antisymm ?_ ?_
-  · apply le_sInf
-    rintro y ⟨yA, hyA, h⟩
-    rcases this yA hyA with ⟨xA, hxA, h'⟩
-    replace : μmax μ ⟨(xA,⊤),hxA⟩ ∈ {μmax μ ⟨(a , ⊤),(lt_of_le_of_ne ha.1.2 ha.2)⟩ |
-      (a : ℒ) (ha : InIntvl TotIntvl a ∧ a ≠ ⊤)} := by
-      refine Set.mem_ofPred.mpr ?_
-      use xA, ⟨in_TotIntvl xA,ne_top_of_lt hxA⟩
-    refine h.symm ▸ (sInf_le_of_le this <| sSup_le ?_)
-    rintro _ ⟨xB,⟨hxB,hxB'⟩⟩
-    exact hxB' ▸ h' xB (lt_of_le_of_ne hxB.1.1 hxB.2)
-  · apply le_sInf
-    rintro t ⟨x, hx, h⟩
-    replace : μ ⟨(x,⊤),lt_top_iff_ne_top.2 hx.2⟩ ∈
-      {x | ∃ x_1, ∃ (hx : x_1 < ⊤), μ ⟨(x_1, ⊤), hx⟩ = x} := by
-      refine Set.mem_ofPred.mpr ?_
-      use x, lt_top_iff_ne_top.2 hx.2
-    refine h.symm ▸ (sInf_le_of_le this <| Set.mem_ofPred.mpr <| le_sSup ?_)
-    use ⊤, ⟨⟨le_top,le_top⟩,hx.2⟩
+  · refine le_sInf fun y ⟨yA, hyA, h⟩ ↦ ?_
+    obtain ⟨xA, hxA, h'⟩ := this yA hyA
+    exact h.symm ▸ sInf_le_of_le ⟨xA, ⟨in_TotIntvl xA, ne_top_of_lt hxA⟩, rfl⟩
+      (sSup_le fun _ ⟨xB, hxB, hxB'⟩ ↦ hxB' ▸ h' xB (lt_of_le_of_ne hxB.1.1 hxB.2))
+  · refine le_sInf fun t ⟨x, hx, h⟩ ↦ h.symm ▸
+      sInf_le_of_le ⟨x, lt_top_iff_ne_top.2 hx.2, rfl⟩
+      (le_sSup ⟨⊤, ⟨⟨le_top, le_top⟩, hx.2⟩, rfl⟩)
 
 
 
@@ -149,10 +124,8 @@ lemma prop4d1₂ (ℒ : Type*) [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder
     μ ⟨(x N,⊤), lt_of_lt_of_le (smf <| Nat.lt_add_one N) le_top⟩)
 (h₂ : ∀ z : {p :ℒ × ℒ // p.1 < p.2}, (hz :z.val.2 < ⊤) → μ z ≤
   μ ⟨(z.val.1,⊤),lt_trans z.prop hz⟩ ∨ μ ⟨(z.val.2,⊤),hz⟩ ≤ μ ⟨(z.val.1,⊤),lt_trans z.prop hz⟩) :
-μAstar μ ≤ μBstar μ := by
-  rw [prop4d1₁ ℒ S μ h₁ h₂]
-  apply le_sSup
-  use ⊤, ⟨⟨bot_le,le_rfl⟩,ne_of_lt bot_lt_top⟩
+μAstar μ ≤ μBstar μ :=
+  (prop4d1₁ ℒ S μ h₁ h₂).trans_le <| le_sSup ⟨⊤, ⟨⟨bot_le, le_rfl⟩, ne_of_lt bot_lt_top⟩, rfl⟩
 
 
 
@@ -183,15 +156,6 @@ Coe ({p :ℒ × ℒ // p.1 < p.2} → S) ({p :ℒᵒᵈ × ℒᵒᵈ // p.1 < p.
   coe f := fun p ↦ f p
 
 
-/-- `fine` is a small definitional lemma ensuring that the coercion-defined dual map
-  agrees with explicit endpoint swapping.
--/
-private lemma fine {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
-{S : Type*} [CompleteLattice S] (μ : {p :ℒ × ℒ // p.1 < p.2} → S) :
-∀ I : {p :ℒᵒᵈ × ℒᵒᵈ // p.1 < p.2}, μ ⟨(I.val.2.ofDual,I.val.1.ofDual),I.prop⟩ =
-  OrderDual.ofDual ((↑μ : {p :ℒᵒᵈ × ℒᵒᵈ // p.1 < p.2} → Sᵒᵈ) I) := fun _ ↦ rfl
-
-
 /-- `h₁_dual_of_h₁` transports the “descending-chain” hypothesis `h₁` on `ℒ` to the
   corresponding “ascending-chain” hypothesis on the order dual `ℒᵒᵈ`.
 -/
@@ -203,13 +167,8 @@ lemma h₁_dual_of_h₁ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [Bound
 (∀ x : ℕ → ℒᵒᵈ, (smf : StrictMono x) →
   ∃ N : ℕ, @LE.le Sᵒᵈ (OrderDual.instLE S) ((↑μ : {p :ℒᵒᵈ × ℒᵒᵈ // p.1 < p.2} → Sᵒᵈ)
   ⟨(x N, x (N+1)), smf <| Nat.lt_add_one N⟩)  ((↑μ : {p :ℒᵒᵈ × ℒᵒᵈ // p.1 < p.2} → Sᵒᵈ)
-  ⟨(x N,⊤), lt_of_lt_of_le (smf <| Nat.lt_add_one N) le_top⟩)) := by
-  intro xd smf
-  rcases (h₁ (fun n ↦ (xd n).ofDual) fun _ _ hab ↦ smf hab) with ⟨N, hN⟩
-  have := fine μ ⟨(xd N, ⊤), lt_of_lt_of_le (smf (Nat.lt_add_one N)) le_top⟩
-  simp only [OrderDual.ofDual_top] at this
-  rw [this,fine μ ⟨(xd N, xd (N + 1)), smf (Nat.lt_add_one N)⟩] at hN
-  use N, OrderDual.ofDual_le_ofDual.1 hN
+  ⟨(x N,⊤), lt_of_lt_of_le (smf <| Nat.lt_add_one N) le_top⟩)) :=
+  fun xd smf ↦ h₁ (fun n ↦ (xd n).ofDual) fun _ _ hab ↦ smf hab
 
 
 
@@ -226,9 +185,7 @@ lemma h₂_dual_of_h₂ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [Bound
     ((↑μ : {p :ℒᵒᵈ × ℒᵒᵈ // p.1 < p.2} → Sᵒᵈ) ⟨(z.val.1,⊤),lt_trans z.prop hz⟩) ∨
   @LE.le Sᵒᵈ (OrderDual.instLE S) ((↑μ : {p :ℒᵒᵈ × ℒᵒᵈ // p.1 < p.2} → Sᵒᵈ)
     ⟨(z.val.2,⊤),hz⟩) ((↑μ : {p :ℒᵒᵈ × ℒᵒᵈ // p.1 < p.2} → Sᵒᵈ)
-    ⟨(z.val.1,⊤),lt_trans z.prop hz⟩) := by
-  intro z hz
-  exact h₂ z hz
+    ⟨(z.val.1,⊤),lt_trans z.prop hz⟩) := fun z hz ↦ h₂ z hz
 
 
 
@@ -248,15 +205,14 @@ OrderDual.ofDual <| μAstar (fun (p : {p : ℒᵒᵈ × ℒᵒᵈ // p.1 < p.2})
   refine congrArg (@sSup S _) <| Set.ext fun x ↦ ?_
   constructor
   · rintro ⟨a, ha, ha'⟩
-    use a, ⟨in_TotIntvl a,Ne.symm ha.2⟩
-    refine ha' ▸ (congrArg sInf <| Set.ext fun r ↦ ?_)
-    exact ⟨fun ⟨b, hb, hb'⟩ ↦ ⟨b, ⟨⟨hb.1.2,hb.1.1⟩,Ne.symm hb.2⟩, hb'.symm ▸ rfl⟩,
-      fun ⟨b, hb, hb'⟩ ↦ ⟨b, ⟨⟨hb.1.2,hb.1.1⟩,Ne.symm hb.2⟩, hb'.symm ▸ rfl⟩⟩
+    refine ⟨a, ⟨in_TotIntvl a, Ne.symm ha.2⟩, ha' ▸ congrArg sInf (Set.ext fun r ↦ ?_)⟩
+    exact ⟨fun ⟨b, hb, hb'⟩ ↦ ⟨b, ⟨⟨hb.1.2, hb.1.1⟩, Ne.symm hb.2⟩, hb'⟩,
+      fun ⟨b, hb, hb'⟩ ↦ ⟨b, ⟨⟨hb.1.2, hb.1.1⟩, Ne.symm hb.2⟩, hb'⟩⟩
   · rintro ⟨a, ha, ha'⟩
-    use a, ⟨in_TotIntvl (OrderDual.toDual a),Ne.symm ha.2⟩
-    refine ha' ▸ (congrArg sSup <| Set.ext fun r ↦ ?_)
-    exact ⟨fun ⟨b, hb, hb'⟩ ↦ ⟨b, ⟨⟨hb.1.2,hb.1.1⟩,Ne.symm hb.2⟩, hb'.symm ▸ rfl⟩,
-      fun ⟨b, hb, hb'⟩ ↦ ⟨b, ⟨⟨hb.1.2,hb.1.1⟩,Ne.symm hb.2⟩, hb'.symm ▸ rfl⟩⟩
+    refine ⟨a, ⟨in_TotIntvl (OrderDual.toDual a), Ne.symm ha.2⟩,
+      ha' ▸ congrArg sSup (Set.ext fun r ↦ ?_)⟩
+    exact ⟨fun ⟨b, hb, hb'⟩ ↦ ⟨b, ⟨⟨hb.1.2, hb.1.1⟩, Ne.symm hb.2⟩, hb'⟩,
+      fun ⟨b, hb, hb'⟩ ↦ ⟨b, ⟨⟨hb.1.2, hb.1.1⟩, Ne.symm hb.2⟩, hb'⟩⟩
 
 
 
@@ -272,15 +228,14 @@ OrderDual.ofDual <| μBstar (fun (p : {p : ℒᵒᵈ × ℒᵒᵈ // p.1 < p.2})
   refine congrArg (@sInf S _) <| Set.ext fun x ↦ ?_
   constructor
   · rintro ⟨a, ha, ha'⟩
-    use a, ⟨in_TotIntvl a,Ne.symm ha.2⟩
-    refine ha' ▸ (congrArg sSup <| Set.ext fun r ↦ ?_)
-    exact ⟨fun ⟨b, hb, hb'⟩ ↦ ⟨b, ⟨⟨hb.1.2,hb.1.1⟩,Ne.symm hb.2⟩, hb'.symm ▸ rfl⟩,
-      fun ⟨b, hb, hb'⟩ ↦ ⟨b, ⟨⟨hb.1.2,hb.1.1⟩,Ne.symm hb.2⟩, hb'.symm ▸ rfl⟩⟩
+    refine ⟨a, ⟨in_TotIntvl a, Ne.symm ha.2⟩, ha' ▸ congrArg sSup (Set.ext fun r ↦ ?_)⟩
+    exact ⟨fun ⟨b, hb, hb'⟩ ↦ ⟨b, ⟨⟨hb.1.2, hb.1.1⟩, Ne.symm hb.2⟩, hb'⟩,
+      fun ⟨b, hb, hb'⟩ ↦ ⟨b, ⟨⟨hb.1.2, hb.1.1⟩, Ne.symm hb.2⟩, hb'⟩⟩
   · rintro ⟨a, ha, ha'⟩
-    use a, ⟨in_TotIntvl (OrderDual.toDual a),Ne.symm ha.2⟩
-    refine ha'.symm ▸ (congrArg sInf <| Set.ext fun r ↦ ?_)
-    exact ⟨fun ⟨b, hb, hb'⟩ ↦ ⟨b, ⟨⟨hb.1.2,hb.1.1⟩,Ne.symm hb.2⟩, hb'.symm ▸ rfl⟩,
-      fun ⟨b, hb, hb'⟩ ↦ ⟨b, ⟨⟨hb.1.2,hb.1.1⟩,Ne.symm hb.2⟩, hb'.symm ▸ rfl⟩⟩
+    refine ⟨a, ⟨in_TotIntvl (OrderDual.toDual a), Ne.symm ha.2⟩,
+      ha'.symm ▸ congrArg sInf (Set.ext fun r ↦ ?_)⟩
+    exact ⟨fun ⟨b, hb, hb'⟩ ↦ ⟨b, ⟨⟨hb.1.2, hb.1.1⟩, Ne.symm hb.2⟩, hb'⟩,
+      fun ⟨b, hb, hb'⟩ ↦ ⟨b, ⟨⟨hb.1.2, hb.1.1⟩, Ne.symm hb.2⟩, hb'⟩⟩
 
 
 
@@ -290,13 +245,10 @@ OrderDual.ofDual <| μBstar (fun (p : {p : ℒᵒᵈ × ℒᵒᵈ // p.1 < p.2})
 lemma prop4d3_helper {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) :
-sSup {μ ⟨(⊥, y),hy⟩ | (y : ℒ) (hy : ⊥ < y) } = μmax μ TotIntvl := by
-    refine congrArg sSup <| Set.ext fun x ↦ ?_
-    constructor
-    · rintro ⟨w, hw, hw'⟩
-      use w, ⟨in_TotIntvl w, ne_of_lt hw⟩
-    · rintro ⟨w,hw,hw'⟩
-      use w, bot_lt_iff_ne_bot.2 <| Ne.symm hw.2
+sSup {μ ⟨(⊥, y),hy⟩ | (y : ℒ) (hy : ⊥ < y) } = μmax μ TotIntvl :=
+  congrArg sSup <| Set.ext fun _ ↦
+    ⟨fun ⟨w, hw, hw'⟩ ↦ ⟨w, ⟨in_TotIntvl w, ne_of_lt hw⟩, hw'⟩,
+     fun ⟨w, hw, hw'⟩ ↦ ⟨w, bot_lt_iff_ne_bot.2 (Ne.symm hw.2), hw'⟩⟩
 
 
 
@@ -320,11 +272,8 @@ lemma prop4d3₁ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder
   have := prop4d1₁ ℒᵒᵈ Sᵒᵈ (fun (p : {p : ℒᵒᵈ × ℒᵒᵈ // p.1 < p.2}) ↦ OrderDual.toDual <|
     μ ⟨(p.val.2, p.val.1), p.prop⟩) (h₁_dual_of_h₁ h₁) (h₂_dual_of_h₂ h₂)
   rw [← prop4d1_helper] at this
-  rw [← prop4d3_helper]
-  simp only [OrderDual.exists] at this
-  rw [← dualμAstar_eq_μBstar, this]
-  refine congrArg sSup <| Set.ext fun r ↦ ?_
-  exact ⟨fun ⟨a, ha, ha'⟩ ↦ ⟨a, ha, ha'⟩, fun ⟨a, ha, ha'⟩ ↦ ⟨a, ha, ha'⟩⟩
+  rw [← prop4d3_helper, ← dualμAstar_eq_μBstar, this]
+  rfl
 
 
 
@@ -358,22 +307,13 @@ lemma rmk4d4 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ
 ∀ x : ℕ → ℒ, (saf : StrictAnti x) → ∃ N : ℕ, μ ⟨(⊥ , x N), lt_of_le_of_lt bot_le <| saf <|
   Nat.lt_add_one N⟩ ≤ μ ⟨(x (N+1), x N), saf <| Nat.lt_add_one N⟩ := by
   intro x saf
-  let W : Set (Set.range r) := {s : Set.range r | ∃ N : ℕ, s = r (x N)}
-  have hW : W.Nonempty := by
-    use ⟨(r (x 0)), Set.mem_range_self (x 0)⟩
-    refine Set.mem_ofPred.mpr ?_
-    use 0
-  have : ∃ N : ℕ, r (x N) = r (x (N + 1)) := by
-    let n := (hr₂.wf.has_min W hW).choose_spec.1.out.choose
-    use n
-    have : ⟨r (x (n + 1)),Set.mem_range_self (x (n + 1))⟩ ∈ W := by
-      refine Set.mem_ofPred.mpr ?_
-      use n + 1
-    exact eq_of_le_of_not_lt' (hr₁ <| le_of_lt <| saf <| Nat.lt_add_one n) <|
-      (hr₂.wf.has_min W hW).choose_spec.1.out.choose_spec ▸ (hr₂.wf.has_min W hW).choose_spec.2
-      ⟨r (x (n + 1)),Set.mem_range_self (x (n + 1))⟩ this
-  use this.choose, (h ⟨(x (this.choose+1), x this.choose), saf <| Nat.lt_add_one this.choose⟩
-    this.choose_spec.symm) ▸ le_top
+  obtain ⟨m, hmW, hmin⟩ := hr₂.wf.has_min {s : Set.range r | ∃ N : ℕ, s = r (x N)}
+    ⟨⟨r (x 0), Set.mem_range_self (x 0)⟩, 0, rfl⟩
+  obtain ⟨n, hn⟩ := hmW
+  have heq : r (x n) = r (x (n + 1)) :=
+    eq_of_le_of_not_lt' (hr₁ (saf (Nat.lt_add_one n)).le)
+      (hn ▸ hmin ⟨r (x (n + 1)), Set.mem_range_self (x (n + 1))⟩ ⟨n + 1, rfl⟩)
+  exact ⟨n, (h ⟨(x (n + 1), x n), saf (Nat.lt_add_one n)⟩ heq.symm) ▸ le_top⟩
 
 end impl
 

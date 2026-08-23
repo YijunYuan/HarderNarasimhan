@@ -36,9 +36,8 @@ namespace impl
 lemma rmk4d10₀ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) :
-∀ I : {p :ℒ × ℒ // p.1 < p.2}, μmin μ I ≤ μ I ∧ μ I ≤ μmax μ I := by
-  intro I
-  exact ⟨sInf_le ⟨I.val.1, ⟨⟨le_rfl, le_of_lt I.prop⟩, ne_of_lt I.prop⟩, rfl⟩,
+∀ I : {p :ℒ × ℒ // p.1 < p.2}, μmin μ I ≤ μ I ∧ μ I ≤ μmax μ I :=
+  fun I ↦ ⟨sInf_le ⟨I.val.1, ⟨⟨le_rfl, le_of_lt I.prop⟩, ne_of_lt I.prop⟩, rfl⟩,
     le_sSup ⟨I.val.2, ⟨⟨le_of_lt I.prop, le_rfl⟩, ne_of_lt I.prop⟩, rfl⟩⟩
 
 
@@ -56,12 +55,10 @@ lemma rmk4d10₁ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder
   constructor
   · intro h x hx y hy
     simp only [μBstar, μAstar] at h
-    unfold μA at h
-    unfold μB at h
+    unfold μA μB at h
     apply sSup_le_iff.1 at h
     simp only [ne_eq, Set.mem_ofPred_eq, le_sInf_iff, forall_exists_index] at h
-    refine (((fun (x : ℒ) (hx : ¬ ⊥ = x) ↦ h (μmin μ ⟨(⊥, x), bot_lt_iff_ne_bot.2 (by tauto)⟩) <| x)
-      y <| ne_of_lt hy) ⟨in_TotIntvl y,ne_of_lt hy⟩ <| rfl)
+    exact h (μmin μ ⟨(⊥, y), hy⟩) y ⟨in_TotIntvl y, ne_of_lt hy⟩ rfl
       (μmax μ ⟨(x, ⊤), lt_top_iff_ne_top.2 hx⟩) x ⟨in_TotIntvl x, hx⟩ rfl
   · refine fun h ↦ sSup_le_iff.2 ?_
     simp only [ne_eq, Set.mem_ofPred_eq, forall_exists_index]
@@ -94,11 +91,8 @@ NashEquilibrium μ ↔
     refine {nash_eq := ?_}
     rw [impl.prop4d1₁ ℒ S μ h₁.wacc h₂.wsl₁]
     simp only [μBstar, μB, ne_eq]
-    apply eq_of_le_of_ge
-    · exact le_sSup ⟨⊤, ⟨in_TotIntvl ⊤, bot_ne_top⟩, rfl⟩
-    · apply sSup_le
-      rintro b ⟨h1,⟨h2,h3⟩⟩
-      exact h3 ▸ (h h1 <| Ne.symm h2.2)
+    exact eq_of_le_of_ge (le_sSup ⟨⊤, ⟨in_TotIntvl ⊤, bot_ne_top⟩, rfl⟩)
+      (sSup_le fun b ⟨h1, h2, h3⟩ ↦ h3 ▸ (h h1 <| Ne.symm h2.2))
 
 
 
@@ -126,11 +120,8 @@ NashEquilibrium μ ↔
     refine {nash_eq := ?_}
     rw [impl.prop4d3₁ μ h₁.wdcc h₂.wsl₂]
     simp only [μAstar, μA, ne_eq]
-    apply eq_of_le_of_ge
-    · exact sInf_le ⟨⊥, ⟨in_TotIntvl ⊥, bot_ne_top⟩, rfl⟩
-    · apply le_sInf
-      rintro b ⟨h1,⟨h2,h3⟩⟩
-      exact h3 ▸ (h h1 h2.2)
+    exact eq_of_le_of_ge (sInf_le ⟨⊥, ⟨in_TotIntvl ⊥, bot_ne_top⟩, rfl⟩)
+      (le_sInf fun b ⟨h1, h2, h3⟩ ↦ h3 ▸ (h h1 h2.2))
 
 
 
@@ -143,18 +134,15 @@ lemma prop4d11₁ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrde
 μmin μ TotIntvl = μmax μ TotIntvl → μBstar μ ≤ μAstar μ := by
   have h₁ : μBstar μ ≤ μmax μ TotIntvl := by
     unfold μBstar μB μmax TotIntvl
-    apply sSup_le
-    rintro b ⟨hb1,⟨hb2,hb3⟩⟩
-    exact hb3 ▸ le_trans
+    exact sSup_le fun b ⟨hb1, hb2, hb3⟩ ↦ hb3 ▸ le_trans
       (rmk4d10₀ μ ⟨(⊥,hb1), bot_lt_iff_ne_bot.2 <| Ne.symm hb2.2⟩).1 <|
       le_sSup ⟨hb1, ⟨in_TotIntvl hb1, hb2.2⟩, rfl⟩
   have h₂ : μmin μ TotIntvl ≤ μAstar μ := by
     unfold μAstar μA μmin TotIntvl
-    apply le_sInf
-    rintro b ⟨hb1,⟨hb2,hb3⟩⟩
-    exact hb3 ▸ le_trans (sInf_le ⟨hb1, ⟨in_TotIntvl hb1, hb2.2⟩, rfl⟩)
+    exact le_sInf fun b ⟨hb1, hb2, hb3⟩ ↦ hb3 ▸ le_trans
+      (sInf_le ⟨hb1, ⟨in_TotIntvl hb1, hb2.2⟩, rfl⟩)
       (rmk4d10₀ μ ⟨(hb1,⊤), lt_top_iff_ne_top.2 <| hb2.2⟩).2
-  exact fun h ↦ le_trans h₁ (h ▸ h₂)
+  exact fun h ↦ h₁.trans (h ▸ h₂)
 
 
 
@@ -183,16 +171,12 @@ lemma prop4d12 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder �
 (h : ∀ x : ℒ, (hx : x ≠ ⊥ ∧ x ≠ ⊤) → ¬ μ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx.1⟩ ≤ μ TotIntvl ∨
   μ TotIntvl ≤ μ ⟨(x,⊤),lt_top_iff_ne_top.2 hx.2⟩) :
 μmax μ TotIntvl = μ TotIntvl → μmin μ TotIntvl = μmax μ TotIntvl := by
-  refine fun h' ↦ h' ▸ eq_of_le_of_ge (rmk4d10₀ μ TotIntvl).1 ?_
-  · apply le_sInf
-    rintro b ⟨hb1,⟨hb2,hb3⟩⟩
-    rw [← hb3]
-    by_cases hbot : hb1 = ⊥
-    · simp only [hbot, le_refl]
-    refine Or.resolve_left (h hb1 <| ⟨hbot,hb2.2⟩) ?_
-    rw [not_not]
-    refine h' ▸ (le_sSup ?_)
-    use hb1, ⟨in_TotIntvl hb1, Ne.symm hbot⟩
+  refine fun h' ↦ h' ▸ eq_of_le_of_ge (rmk4d10₀ μ TotIntvl).1
+    (le_sInf fun b ⟨hb1, hb2, hb3⟩ ↦ hb3 ▸ ?_)
+  by_cases hbot : hb1 = ⊥
+  · simp only [hbot, le_refl]
+  refine Or.resolve_left (h hb1 ⟨hbot, hb2.2⟩) (not_not.2 ?_)
+  exact h' ▸ le_sSup ⟨hb1, ⟨in_TotIntvl hb1, Ne.symm hbot⟩, rfl⟩
 
 
 
@@ -203,12 +187,9 @@ lemma rmk4d13 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder �
 {S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : SlopeLike μ) :
 ∀ x : ℒ, (hx : x ≠ ⊥ ∧ x ≠ ⊤) → ¬ μ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx.1⟩ ≤ μ TotIntvl ∨
-  μ TotIntvl ≤ μ ⟨(x,⊤),lt_top_iff_ne_top.2 hx.2⟩ := by
-  intro x hx
-  rcases (hμ.slopelike ⊥ x ⊤
-    ⟨bot_lt_iff_ne_bot.2 hx.1,lt_top_iff_ne_top.2 hx.2⟩).2.2.1 with this | this
-  · exact Or.inl <| not_le_of_gt this
-  · exact Or.inr this
+  μ TotIntvl ≤ μ ⟨(x,⊤),lt_top_iff_ne_top.2 hx.2⟩ :=
+  fun x hx ↦ ((hμ.slopelike ⊥ x ⊤
+    ⟨bot_lt_iff_ne_bot.2 hx.1,lt_top_iff_ne_top.2 hx.2⟩).2.2.1).imp_left not_le_of_gt
 
 
 
@@ -221,16 +202,12 @@ lemma prop4d14 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder �
 (h : ∀ x : ℒ, (hx : x ≠ ⊥ ∧ x ≠ ⊤) → μ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx.1⟩ ≤ μ TotIntvl ∨
   ¬ μ TotIntvl ≤ μ ⟨(x,⊤),lt_top_iff_ne_top.2 hx.2⟩) :
 μmin μ TotIntvl = μ TotIntvl → μmax μ TotIntvl = μmin μ TotIntvl := by
-  refine fun h' ↦ h' ▸ eq_of_le_of_ge ?_ (rmk4d10₀ μ TotIntvl).2
-  · apply sSup_le
-    rintro b ⟨hb1,⟨hb2,hb3⟩⟩
-    rw [← hb3]
-    by_cases htop : hb1 = ⊤
-    · simp only [htop, le_refl]
-    refine Or.resolve_right (h hb1 ⟨by tauto,htop⟩) ?_
-    rw [not_not]
-    refine h' ▸ (sInf_le ?_)
-    use hb1, ⟨in_TotIntvl hb1, htop⟩
+  refine fun h' ↦ h' ▸ eq_of_le_of_ge
+    (sSup_le fun b ⟨hb1, hb2, hb3⟩ ↦ hb3 ▸ ?_) (rmk4d10₀ μ TotIntvl).2
+  by_cases htop : hb1 = ⊤
+  · simp only [htop, le_refl]
+  refine Or.resolve_right (h hb1 ⟨Ne.symm hb2.2, htop⟩) (not_not.2 ?_)
+  exact h' ▸ sInf_le ⟨hb1, ⟨in_TotIntvl hb1, htop⟩, rfl⟩
 
 
 
@@ -241,11 +218,9 @@ lemma rmk4d15 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder �
 {S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : SlopeLike μ) :
 ∀ x : ℒ, (hx : x ≠ ⊥ ∧ x ≠ ⊤) → μ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx.1⟩ ≤ μ TotIntvl ∨
-  ¬ μ TotIntvl ≤ μ ⟨(x,⊤),lt_top_iff_ne_top.2 hx.2⟩ := by
-  intro x hx
-  rcases (hμ.slopelike ⊥ x ⊤ ⟨bot_lt_iff_ne_bot.2 hx.1,lt_top_iff_ne_top.2 hx.2⟩).1 with this | this
-  · exact Or.inl this
-  · exact Or.inr <| not_le_of_gt this
+  ¬ μ TotIntvl ≤ μ ⟨(x,⊤),lt_top_iff_ne_top.2 hx.2⟩ :=
+  fun x hx ↦ ((hμ.slopelike ⊥ x ⊤
+    ⟨bot_lt_iff_ne_bot.2 hx.1,lt_top_iff_ne_top.2 hx.2⟩).1).imp_right not_le_of_gt
 
 
 
@@ -263,14 +238,8 @@ List.TFAE [
   ] := by
   tfae_have 1 → 3 := prop4d12 μ (rmk4d13 μ hμ)
   tfae_have 2 → 3 := fun h ↦ (prop4d14 μ (rmk4d15 μ hμ) h).symm
-  tfae_have 3 → 1 := by
-    intro h
-    have := h ▸ rmk4d10₀ μ TotIntvl
-    exact eq_of_le_of_ge this.1 this.2
-  tfae_have 3 → 2 := by
-    intro h
-    have := h.symm ▸ rmk4d10₀ μ TotIntvl
-    exact eq_of_le_of_ge this.1 this.2
+  tfae_have 3 → 1 := fun h ↦ (h ▸ rmk4d10₀ μ TotIntvl).elim eq_of_le_of_ge
+  tfae_have 3 → 2 := fun h ↦ (h.symm ▸ rmk4d10₀ μ TotIntvl).elim eq_of_le_of_ge
   tfae_finish
 
 
@@ -288,16 +257,12 @@ lemma prop4d16₂ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrde
 μmin μ TotIntvl = μmax μ TotIntvl ↔ NashEquilibrium μ := by
   have : ∀ (z : { p : ℒ × ℒ // p.1 < p.2 }) (hz : z.val.2 < ⊤), μ z ≤
     μ ⟨(z.val.1, ⊤), lt_trans z.prop hz⟩ ∨
-    μ ⟨(z.val.2, ⊤), hz⟩ ≤ μ ⟨(z.val.1, ⊤), lt_trans z.prop hz⟩ := by
-    intro z hz
-    rcases (hμ.slopelike z.val.1 z.val.2 ⊤ ⟨z.prop, hz⟩).1 with this | this
-    · exact Or.inl this
-    · exact Or.inr <| le_of_lt this
-  refine ⟨fun h ↦ {nash_eq := eq_of_le_of_ge (impl.prop4d1₂ ℒ S μ h₁.wacc this) <| prop4d11₁ μ h},
-    fun h ↦ prop4d11₂ μ h₁ {wsl₁ := this} h₂ {wsl₂:=(fun z hz ↦ ?_)} h.nash_eq.symm.le⟩
-  rcases (hμ.slopelike ⊥ z.val.1 z.val.2 ⟨hz,z.prop⟩).2.2.1 with this | this
-  · exact Or.inr <| le_of_lt this
-  · exact Or.inl <| this
+    μ ⟨(z.val.2, ⊤), hz⟩ ≤ μ ⟨(z.val.1, ⊤), lt_trans z.prop hz⟩ :=
+    fun z hz ↦ (hμ.slopelike z.val.1 z.val.2 ⊤ ⟨z.prop, hz⟩).1.imp_right le_of_lt
+  exact ⟨fun h ↦ {nash_eq := eq_of_le_of_ge (impl.prop4d1₂ ℒ S μ h₁.wacc this) <| prop4d11₁ μ h},
+    fun h ↦ prop4d11₂ μ h₁ {wsl₁ := this} h₂ {wsl₂ := fun z hz ↦
+      ((hμ.slopelike ⊥ z.val.1 z.val.2 ⟨hz, z.prop⟩).2.2.1.imp_left le_of_lt).symm}
+      h.nash_eq.symm.le⟩
 
 
 
@@ -308,24 +273,16 @@ lemma prop4d18₁ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ
 {S : Type*} [CompleteLinearOrder S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : Semistable μ) : μBstar μ ≤ μAstar μ := by
   rw [semistable_iff] at hμ
-  have : sSup {μA μ ⟨(⊥,x),hx⟩ | (x : ℒ) (hx : ⊥ < x)} ≤ μAstar μ := by
-    apply sSup_le
-    rintro b ⟨hb1,⟨hb2,hb3⟩⟩
-    have := hb3 ▸ hμ.out.choose_spec.choose_spec.1 hb1 (in_TotIntvl hb1)
-      (Ne.symm <| bot_lt_iff_ne_bot.1 hb2)
-    exact le_of_not_gt this
+  have : sSup {μA μ ⟨(⊥,x),hx⟩ | (x : ℒ) (hx : ⊥ < x)} ≤ μAstar μ :=
+    sSup_le fun b ⟨hb1, hb2, hb3⟩ ↦ le_of_not_gt <| hb3 ▸
+      hμ.out.choose_spec.choose_spec.1 hb1 (in_TotIntvl hb1) (Ne.symm <| bot_lt_iff_ne_bot.1 hb2)
   refine le_trans (sSup_le_sSup_of_isCofinalFor ?_) this
   rintro x ⟨hx1,⟨hx2,hx3⟩⟩
-  use μA μ ⟨(⊥,hx1),bot_lt_iff_ne_bot.2 <| Ne.symm hx2.2⟩
-  rw [← hx3]
-  constructor
-  · use hx1, bot_lt_iff_ne_bot.2 <| Ne.symm hx2.2
-  · apply sInf_le_sInf_of_isCoinitialFor
-    rintro y ⟨hy1,⟨hy2,hy3⟩⟩
-    use μ ⟨(hy1,hx1) , lt_of_le_of_ne hy2.1.2 hy2.2⟩
-    constructor
-    · use hy1, hy2
-    · exact hy3 ▸ (rmk4d10₀ μ ⟨(hy1,hx1), lt_of_le_of_ne hy2.1.2 hy2.2⟩).2
+  refine ⟨μA μ ⟨(⊥,hx1), bot_lt_iff_ne_bot.2 <| Ne.symm hx2.2⟩,
+    ⟨hx1, bot_lt_iff_ne_bot.2 <| Ne.symm hx2.2, rfl⟩, hx3 ▸ sInf_le_sInf_of_isCoinitialFor ?_⟩
+  rintro y ⟨hy1,⟨hy2,hy3⟩⟩
+  exact ⟨μ ⟨(hy1,hx1), lt_of_le_of_ne hy2.1.2 hy2.2⟩, ⟨hy1, hy2, rfl⟩,
+    hy3 ▸ (rmk4d10₀ μ ⟨(hy1,hx1), lt_of_le_of_ne hy2.1.2 hy2.2⟩).2⟩
 
 
 
@@ -337,11 +294,11 @@ lemma prop4d18₂ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : Semistable μ)
 (h : (WeakAscendingChainCondition μ ∧ WeakSlopeLike₁ μ) ∨
   (StrongDescendingChainCondition μ ∧ WeakSlopeLike₂ μ)) :
-NashEquilibrium μ := by
-  refine {nash_eq := eq_of_le_of_ge ?_ (prop4d18₁ μ hμ)}
-  rcases h with h | h
-  · exact impl.prop4d1₂ ℒ S μ h.1.wacc h.2.wsl₁
-  · exact impl.prop4d3₂ μ h.1.wdcc h.2.wsl₂
+NashEquilibrium μ :=
+  {nash_eq := eq_of_le_of_ge
+    (h.elim (fun h ↦ impl.prop4d1₂ ℒ S μ h.1.wacc h.2.wsl₁)
+      (fun h ↦ impl.prop4d3₂ μ h.1.wdcc h.2.wsl₂))
+    (prop4d18₁ μ hμ)}
 
 
 
@@ -371,44 +328,30 @@ NashEquilibrium μ → Semistable μ := by
         congr 1; ext
         constructor
         · rintro ⟨ha1,⟨ha2,ha3⟩⟩
-          use ⟨ha1,ha2.1⟩, ⟨in_TotIntvl _,Subtype.coe_ne_coe.1 ha2.2⟩
-          rw [← ha3]
-          congr 1
+          exact ⟨⟨ha1,ha2.1⟩, ⟨in_TotIntvl _,Subtype.coe_ne_coe.1 ha2.2⟩, ha3⟩
         · rintro ⟨ha1,⟨ha2,ha3⟩⟩
-          use ha1, ⟨in_TotIntvl ha1,Subtype.coe_ne_coe.2 ha2.2⟩
-          rw [← ha3]
-          congr 1
+          exact ⟨ha1, ⟨in_TotIntvl ha1,Subtype.coe_ne_coe.2 ha2.2⟩, ha3⟩
       · simp only [μAstar, μA, ne_eq]
         congr 1; ext
         constructor
         · rintro ⟨ha1,⟨ha2,ha3⟩⟩
-          use ha1, ⟨in_TotIntvl ha1,Subtype.coe_ne_coe.2 ha2.2⟩
-          rw [← ha3]
+          refine ⟨ha1, ⟨in_TotIntvl ha1,Subtype.coe_ne_coe.2 ha2.2⟩, ha3 ▸ ?_⟩
           simp only [μmax, ne_eq]
           congr 1; ext
           constructor
           · rintro ⟨hb1,⟨hb2,hb3⟩⟩
-            use ⟨hb1, ⟨bot_le,hb2.1.2⟩⟩, ⟨hb2.1,Subtype.coe_ne_coe.1 hb2.2⟩
-            rw [← hb3]
-            congr 1
+            exact ⟨⟨hb1, ⟨bot_le,hb2.1.2⟩⟩, ⟨hb2.1,Subtype.coe_ne_coe.1 hb2.2⟩, hb3⟩
           · rintro ⟨hb1,⟨hb2,hb3⟩⟩
-            use hb1, ⟨hb2.1,Subtype.coe_ne_coe.2 hb2.2⟩
-            rw [← hb3]
-            congr 1
+            exact ⟨hb1, ⟨hb2.1,Subtype.coe_ne_coe.2 hb2.2⟩, hb3⟩
         · rintro ⟨ha1,⟨ha2,ha3⟩⟩
-          use ⟨ha1,ha2.1⟩, ⟨in_TotIntvl _,Subtype.coe_ne_coe.1 ha2.2⟩
-          rw [← ha3]
+          refine ⟨⟨ha1,ha2.1⟩, ⟨in_TotIntvl _,Subtype.coe_ne_coe.1 ha2.2⟩, ha3 ▸ ?_⟩
           simp only [μmax, ne_eq]
           congr 1; ext
           constructor
           · rintro ⟨hb1,⟨hb2,hb3⟩⟩
-            use hb1, ⟨hb2.1,Subtype.coe_ne_coe.2 hb2.2⟩
-            rw [← hb3]
-            simp only [Resμ]
+            exact ⟨hb1, ⟨hb2.1,Subtype.coe_ne_coe.2 hb2.2⟩, hb3⟩
           · rintro ⟨hb1,⟨hb2,hb3⟩⟩
-            use ⟨hb1,⟨bot_le,hb2.1.2⟩⟩, ⟨hb2.1,Subtype.coe_ne_coe.1 hb2.2⟩
-            rw [← hb3]
-            congr 1
+            exact ⟨⟨hb1,⟨bot_le,hb2.1.2⟩⟩, ⟨hb2.1,Subtype.coe_ne_coe.1 hb2.2⟩, hb3⟩
     · simp only [ne_eq, Set.mem_ofPred_eq, forall_exists_index]
       intro x hx hx'
       rw [← hx']
@@ -420,52 +363,37 @@ NashEquilibrium μ → Semistable μ := by
         congr 1; ext
         constructor
         · rintro ⟨ha1,⟨ha2,ha3⟩⟩
-          use ⟨ha1,ha2.1⟩, ⟨in_TotIntvl _,Subtype.coe_ne_coe.1 ha2.2⟩
-          rw [← ha3]
+          refine ⟨⟨ha1,ha2.1⟩, ⟨in_TotIntvl _,Subtype.coe_ne_coe.1 ha2.2⟩, ha3 ▸ ?_⟩
           simp only [μmax, ne_eq]
           congr 1; ext
           constructor
           · rintro ⟨hb1,⟨hb2,hb3⟩⟩
-            use hb1, ⟨hb2.1,Subtype.coe_ne_coe.2 hb2.2⟩
-            rw [← hb3]
-            simp only [Resμ]
+            exact ⟨hb1, ⟨hb2.1,Subtype.coe_ne_coe.2 hb2.2⟩, hb3⟩
           · rintro ⟨hb1,⟨hb2,hb3⟩⟩
-            use ⟨hb1,⟨bot_le,hb2.1.2⟩⟩, ⟨hb2.1,Subtype.coe_ne_coe.1 hb2.2⟩
-            rw [← hb3]
-            congr 1
+            exact ⟨⟨hb1,⟨bot_le,hb2.1.2⟩⟩, ⟨hb2.1,Subtype.coe_ne_coe.1 hb2.2⟩, hb3⟩
         · rintro ⟨ha1,⟨ha2,ha3⟩⟩
-          use ha1, ⟨in_TotIntvl ha1,Subtype.coe_ne_coe.2 ha2.2⟩
-          rw [← ha3]
+          refine ⟨ha1, ⟨in_TotIntvl ha1,Subtype.coe_ne_coe.2 ha2.2⟩, ha3 ▸ ?_⟩
           simp only [μmax, ne_eq]
           congr 1; ext
           constructor
           · rintro ⟨hb1,⟨hb2,hb3⟩⟩
-            use ⟨hb1, ⟨bot_le,hb2.1.2⟩⟩, ⟨hb2.1,Subtype.coe_ne_coe.1 hb2.2⟩
-            rw [← hb3]
-            congr 1
+            exact ⟨⟨hb1, ⟨bot_le,hb2.1.2⟩⟩, ⟨hb2.1,Subtype.coe_ne_coe.1 hb2.2⟩, hb3⟩
           · rintro ⟨hb1,⟨hb2,hb3⟩⟩
-            use hb1, ⟨hb2.1,Subtype.coe_ne_coe.2 hb2.2⟩
-            rw [← hb3]
-            congr 1
+            exact ⟨hb1, ⟨hb2.1,Subtype.coe_ne_coe.2 hb2.2⟩, hb3⟩
       · simp only [μmin, ne_eq]
         congr 1; ext
         constructor
         · rintro ⟨ha1,⟨ha2,ha3⟩⟩
-          use ha1, ⟨in_TotIntvl ha1,Subtype.coe_ne_coe.2 ha2.2⟩
-          rw [← ha3]
-          congr 1
+          exact ⟨ha1, ⟨in_TotIntvl ha1,Subtype.coe_ne_coe.2 ha2.2⟩, ha3⟩
         · rintro ⟨ha1,⟨ha2,ha3⟩⟩
-          use ⟨ha1,ha2.1⟩, ⟨in_TotIntvl _,Subtype.coe_ne_coe.1 ha2.2⟩
-          rw [← ha3]
-          congr 1
+          exact ⟨⟨ha1,ha2.1⟩, ⟨in_TotIntvl _,Subtype.coe_ne_coe.1 ha2.2⟩, ha3⟩
   replace : ∀ x : ℒ, (hx : x ≠ ⊥) → μA μ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx⟩ ≤ μA μ TotIntvl := by
     rw [← h] at this
     simp only [ne_eq, μAstar] at this
     intro x hx
     rw [← this]
-    apply le_sSup
-    use x, hx
-  exact {semistable := fun x hx ↦ LE.le.not_gt <| this x hx}
+    exact le_sSup ⟨x, hx, rfl⟩
+  exact {semistable := fun x hx ↦ (this x hx).not_gt}
 
 
 
@@ -492,26 +420,15 @@ List.TFAE [
   := by
   constructor
   · have h16 := prop4d16₁ μ hμ
-    tfae_have 1 ↔ 2 := (h16.out 0 1 (by norm_num) (by norm_num))
-    tfae_have 2 ↔ 3 := (h16.out 1 2 (by norm_num) (by norm_num))
+    tfae_have 1 ↔ 2 := h16.out 0 1
+    tfae_have 2 ↔ 3 := h16.out 1 2
     tfae_have 3 ↔ 4 := prop4d16₂ μ hμ h₁ h₂
     tfae_finish
   · constructor
-    · intro h
-      refine prop4d18₂ μ h (Or.inl <| ⟨h₁,?_⟩)
-      refine {wsl₁ := ?_}
-      intro a b
-      rcases (hμ.slopelike a.val.1 a.val.2 ⊤ ⟨a.prop,b⟩).1 with this | this
-      · exact Or.inl this
-      · exact Or.inr <| le_of_lt this
-    · intro h₁
-      refine prop4d20 μ h₁ ?_
-      intro x hx
-      refine {wsl₁ := ?_}
-      intro a b
-      rcases (hμ.slopelike a.val.1 a.val.2 x ⟨a.prop, b⟩).1 with this | this
-      · exact Or.inl this
-      · exact Or.inr <| le_of_lt this
+    · exact fun h ↦ prop4d18₂ μ h <| Or.inl ⟨h₁,
+        {wsl₁ := fun a b ↦ (hμ.slopelike a.val.1 a.val.2 ⊤ ⟨a.prop, b⟩).1.imp_right le_of_lt}⟩
+    · exact fun h₁ ↦ prop4d20 μ h₁ fun x hx ↦
+        {wsl₁ := fun a b ↦ (hμ.slopelike a.val.1 a.val.2 x ⟨a.prop, b⟩).1.imp_right le_of_lt}
 
 end impl
 

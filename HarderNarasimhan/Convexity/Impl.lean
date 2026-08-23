@@ -41,11 +41,9 @@ It is marked `[simp]` so that typeclass conversions can be reduced automatically
 lemma ConvexI_TotIntvl_iff_Convex {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : {p :ℒ × ℒ // p.1 < p.2} → S) : ConvexI TotIntvl μ ↔
-Convex μ := by
-  constructor
-  · exact fun h ↦ ⟨fun x y hxy ↦
-      h.convex x y (in_TotIntvl _) (in_TotIntvl _) hxy⟩
-  · exact fun h ↦ ⟨fun x y _ _ h_4 ↦ Convex.convex x y h_4⟩
+Convex μ :=
+  ⟨fun h ↦ ⟨fun x y hxy ↦ h.convex x y (in_TotIntvl _) (in_TotIntvl _) hxy⟩,
+    fun h ↦ ⟨fun x y _ _ hxy ↦ h.convex x y hxy⟩⟩
 
 /--
 Typeclass instance: a globally convex `μ` induces interval-local convexity on the total interval.
@@ -88,14 +86,12 @@ lemma lem2d4₁
   μA μ ⟨(u, x), lt_of_le_of_lt huxw (inf_lt_left.2 hxw)⟩
     ≤ μmax μ ⟨(x ⊓ w, x), inf_lt_left.2 hxw⟩ := by
   have h1 : μA μ ⟨(u, x), lt_of_le_of_lt huxw
-    (inf_lt_left.2 hxw)⟩ ≤ μA μ ⟨(x ⊓ w, x), inf_lt_left.2 hxw⟩ := by
-    refine sInf_le_sInf fun t ht ↦ ?_
-    rcases ht with ⟨a, ha, _⟩
-    use a, ⟨⟨le_trans huxw ha.1.1, ha.1.2⟩, ha.2⟩
-  have h2 : μA μ ⟨(x ⊓ w, x), inf_lt_left.2 hxw⟩ ≤ μmax μ ⟨(x ⊓ w, x), inf_lt_left.2 hxw⟩ := by
-    apply sInf_le
-    use x ⊓ w, ⟨⟨le_rfl, le_of_lt <| inf_lt_left.2 hxw⟩, ne_of_lt <| inf_lt_left.2 hxw⟩
-  exact le_trans h1 h2
+      (inf_lt_left.2 hxw)⟩ ≤ μA μ ⟨(x ⊓ w, x), inf_lt_left.2 hxw⟩ := by
+    apply sInf_le_sInf
+    rintro t ⟨a, ha, rfl⟩
+    exact ⟨a, ⟨⟨le_trans huxw ha.1.1, ha.1.2⟩, ha.2⟩, rfl⟩
+  exact le_trans h1 <| sInf_le ⟨x ⊓ w, ⟨⟨le_rfl, (inf_lt_left.2 hxw).le⟩,
+    (inf_lt_left.2 hxw).ne⟩, rfl⟩
 
 
 /--
@@ -121,18 +117,13 @@ lemma lem2d4₂I
       intro b hb
       have hh : x ⊓ w = b ⊓ w :=
         le_antisymm (le_inf hb.1.le inf_le_right) (inf_le_inf_right w hb.2)
-      simp only [hh, ge_iff_le]
-      have hbnlew : ¬ b ≤ w := inf_lt_left.mp
-        ((congrArg (fun _a ↦ _a < b) (hh.symm)) ▸ hb.1)
-      have hfinal : μ ⟨(w, b ⊔ w), right_lt_sup.mpr hbnlew⟩ ≤ target := by
-        apply le_sSup
-        use b ⊔ w, ⟨⟨le_sup_right, le_trans (sup_le_sup_right hb.2 w) hxwt⟩,
-          (mt right_eq_sup.1) <| inf_lt_left.1 <| hh.symm ▸ hb.1⟩
-      apply le_trans (hμcvx.convex b w ⟨le_of_lt (lt_of_le_of_lt (le_inf hxI.1 hwI.1) hb.1),
-         le_trans hb.2 hxI.2⟩ hwI hbnlew) hfinal
+      have hbnlew : ¬ b ≤ w := inf_lt_left.mp (hh ▸ hb.1)
+      simp only [hh]
+      exact le_trans (hμcvx.convex b w ⟨le_of_lt (lt_of_le_of_lt (le_inf hxI.1 hwI.1) hb.1),
+        le_trans hb.2 hxI.2⟩ hwI hbnlew) <| le_sSup ⟨b ⊔ w, ⟨⟨le_sup_right,
+        le_trans (sup_le_sup_right hb.2 w) hxwt⟩, mt right_eq_sup.1 hbnlew⟩, rfl⟩
     apply sSup_le
-    rintro b ⟨w_1, ⟨hf₁, hf₂⟩⟩
-    rw [hf₂.symm]
+    rintro b ⟨w_1, hf₁, rfl⟩
     exact h w_1 ⟨lt_of_le_of_ne hf₁.1.1 hf₁.2, hf₁.1.2⟩
 
 
@@ -152,12 +143,9 @@ lemma lem2d4₃I
   μA μ ⟨(u, x), lt_of_le_of_lt huxw <| inf_lt_left.2 hxw⟩ ≤
     μA μ ⟨(w, x ⊔ w), right_lt_sup.2 hxw⟩ := by
   apply le_sInf
-  rintro imy ⟨y, ⟨hy₁, hy₂⟩⟩
-  rw [← hy₂]
-  have h₁ : ¬ x ≤ y := by
-    by_contra h
-    exact lt_irrefl (x ⊔ w) <| lt_of_le_of_lt (sup_le_sup_right h w) <|
-      (sup_eq_left.2 hy₁.1.1).symm ▸ lt_of_le_of_ne hy₁.1.2 hy₁.2
+  rintro imy ⟨y, hy₁, rfl⟩
+  have h₁ : ¬ x ≤ y := fun h ↦ lt_irrefl (x ⊔ w) <| lt_of_le_of_lt (sup_le_sup_right h w) <|
+    (sup_eq_left.2 hy₁.1.1).symm ▸ lt_of_le_of_ne hy₁.1.2 hy₁.2
   exact le_trans (lem2d4₁ μ x y h₁ u <| le_trans huxw <| inf_le_inf_left x hy₁.1.1)
     <| lem2d4₂I I μ hμcvx x hxI y ⟨le_trans hwI.1 hy₁.1.1, le_trans hy₁.1.2 <| sup_le hxI.2 hwI.2⟩
       h₁ (x ⊔ w) <| sup_le le_sup_left hy₁.1.2
@@ -184,8 +172,8 @@ lemma lem2d4I
   μmax μ ⟨(x ⊓ w, x), inf_lt_left.2 hxw⟩ ≤
     μmax μ ⟨(w, t), lt_of_le_of_lt' hxwt <| right_lt_sup.2 hxw⟩ ∧
   μA μ ⟨(u, x), lt_of_le_of_lt huxw <| inf_lt_left.2 hxw⟩ ≤ μA μ ⟨(w, x ⊔ w), right_lt_sup.2 hxw⟩ :=
-  ⟨lem2d4₁ μ x w hxw u huxw,
-    ⟨lem2d4₂I I μ hμcvx x hxI w hwI hxw t hxwt, lem2d4₃I I μ hμcvx x hxI w hwI hxw u huxw⟩⟩
+  ⟨lem2d4₁ μ x w hxw u huxw, lem2d4₂I I μ hμcvx x hxI w hwI hxw t hxwt,
+    lem2d4₃I I μ hμcvx x hxI w hwI hxw u huxw⟩
 
 
 /--
@@ -197,7 +185,7 @@ lemma rmk2d5₁
   (I : {p : ℒ × ℒ // p.1 < p.2})
   (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : ConvexI I μ) :
   ConvexI I (μmax μ)  :=
-  {convex :=fun x y hxI hyI hxy ↦ lem2d4₂I I μ hμcvx x hxI y hyI hxy (x ⊔ y) le_rfl}
+  ⟨fun x y hxI hyI hxy ↦ lem2d4₂I I μ hμcvx x hxI y hyI hxy (x ⊔ y) le_rfl⟩
 
 
 /--
@@ -211,20 +199,12 @@ lemma rmk2d5₂
   (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : ConvexI I μ) :
   μmax μ I = μmax (μmax μ) I := by
   apply eq_of_le_of_ge
-  · apply le_sSup
-    use I.val.2, ⟨⟨le_of_lt I.prop, le_refl I.val.2⟩, ne_of_lt I.prop⟩
+  · exact le_sSup ⟨I.val.2, ⟨⟨le_of_lt I.prop, le_rfl⟩, ne_of_lt I.prop⟩, rfl⟩
   · apply sSup_le
-    simp only [ne_eq, Set.mem_ofPred_eq, forall_exists_index]
-    intro b v hv res
-    rw [← res]
-    have h : μmax μ ⟨(v ⊓ I.val.1, v), inf_lt_left.2 (not_le_of_gt (lt_of_le_of_ne hv.1.1 hv.2))⟩ ≤
-      μmax μ ⟨(I.val.1, I.val.2),
-        lt_of_le_of_lt' ((sup_eq_left.2 hv.1.1).symm ▸ hv.1.2)
-          <| right_lt_sup.2 <| not_le_of_gt <| lt_of_le_of_ne hv.1.1 hv.2⟩ :=
+    rintro b ⟨v, hv, rfl⟩
+    simpa only [inf_eq_right.2 hv.1.1] using
       lem2d4₂I I μ hμcvx v hv.1 I.val.1 ⟨le_rfl, le_of_lt I.prop⟩ (not_le_of_gt <|
         lt_of_le_of_ne hv.1.1 hv.2) I.val.2 <| (sup_eq_left.2 hv.1.1).symm ▸ hv.1.2
-    simp only [inf_eq_right.2 hv.1.1] at h
-    exact h
 
 
 /--
@@ -237,19 +217,17 @@ lemma rmk2d5₃
   (I : {p : ℒ × ℒ // p.1 < p.2})
   (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : ConvexI I μ) :
   μA μ I = μA (μmax μ) I := by
+  have key : ∀ a, I.val.1 ≤ a → ∀ h : a < I.val.2,
+      μmax μ ⟨(a, I.val.2), h⟩ = μmax (μmax μ) ⟨(a, I.val.2), h⟩ :=
+    fun a ha h ↦ rmk2d5₂ ⟨(a, I.val.2), h⟩ μ <|
+      Convex_of_Convex_large I ⟨(a, I.val.2), h⟩ ⟨ha, le_rfl⟩ μ hμcvx
   apply eq_of_le_of_ge
   · apply sInf_le_sInf
     rintro t ⟨a, ha, rfl⟩
-    use a, ha
-    apply rmk2d5₂ ⟨(a, I.val.2), lt_of_le_of_ne ha.1.2 ha.2⟩
-    exact Convex_of_Convex_large I
-      ⟨(a, I.val.2), lt_of_le_of_ne ha.1.2 ha.2⟩ ⟨ha.1.1, le_rfl⟩ μ hμcvx
+    exact ⟨a, ha, key a ha.1.1 _⟩
   · apply sInf_le_sInf
     rintro t ⟨a, ha, rfl⟩
-    use a, ha
-    rw [← rmk2d5₂ ⟨(a, I.val.2), lt_of_le_of_ne ha.1.2 ha.2⟩]
-    exact Convex_of_Convex_large I
-      ⟨(a, I.val.2), lt_of_le_of_ne ha.1.2 ha.2⟩ ⟨ha.1.1, le_rfl⟩ μ hμcvx
+    exact ⟨a, ha, (key a ha.1.1 _).symm⟩
 
 
 /--
@@ -263,10 +241,8 @@ lemma prop2d6₀
   (h : x < y ∧ y < z) :
   μA μ ⟨(x, z), lt_trans h.1 h.2⟩ ≤ μA μ ⟨(y, z), h.2⟩  := by
   apply sInf_le_sInf
-  simp only [ne_eq, Set.ofPred_subset_ofPred, forall_exists_index]
-  intro u v hv hu
-  rw [← hu]
-  use v, ⟨⟨le_of_lt <| lt_of_lt_of_le h.1 hv.1.1, hv.1.2⟩, hv.2⟩
+  rintro u ⟨v, hv, rfl⟩
+  exact ⟨v, ⟨⟨le_of_lt <| lt_of_lt_of_le h.1 hv.1.1, hv.1.2⟩, hv.2⟩, rfl⟩
 
 
 /--
@@ -282,11 +258,10 @@ lemma prop2d6₁I
   (z : ℒ) (hzI : InIntvl I z)
   (h : x < y ∧ y < z) :
   (μA μ ⟨(x, y), h.1⟩ ⊓ (μA μ ⟨(y, z), h.2⟩)) ≤ μA μ ⟨(x, z), lt_trans h.1 h.2⟩ := by
-  apply le_sInf_iff.2
+  apply le_sInf
   rintro d ⟨a, ha, rfl⟩
   by_cases hya : y ≤ a
-  · refine le_trans inf_le_right <| sInf_le ?_
-    use a, ⟨⟨hya, ha.1.2⟩, ha.2⟩
+  · exact le_trans inf_le_right <| sInf_le ⟨a, ⟨⟨hya, ha.1.2⟩, ha.2⟩, rfl⟩
   · exact le_trans inf_le_left <| le_trans (lem2d4₁ μ y a hya x <| le_inf (le_of_lt h.1) ha.1.1) <|
       lem2d4₂I I μ hμcvx y hyI a ⟨le_trans hxI.1 ha.1.1, le_trans ha.1.2 hzI.2⟩ hya z <|
       sup_le (le_of_lt h.2) ha.1.2
@@ -306,7 +281,7 @@ lemma prop2d6₂I₁
   (h : x < y ∧ y < z)
   (h' : μA μ ⟨(x, y), h.1⟩ ≥ μA μ ⟨(y, z), h.2⟩) :
   μA μ ⟨(y, z), h.2⟩ = μA μ ⟨(x, z), lt_trans h.1 h.2⟩
-  := le_antisymm ((inf_eq_right.2 h').symm ▸
+  := le_antisymm (le_trans (le_inf h' le_rfl) <|
     prop2d6₁I I μ hμcvx x hxI y hyI z hzI h) <| prop2d6₀ μ x y z h
 
 
@@ -325,20 +300,8 @@ lemma prop2d6₂I₂
   (h' : μA μ ⟨(x, y), h.1⟩ < μA μ ⟨(y, z), h.2⟩) :
   μA μ ⟨(x, y), h.1⟩ ≤ μA μ ⟨(x, z), lt_trans h.1 h.2⟩ ∧
   μA μ ⟨(x, z), lt_trans h.1 h.2⟩ ≤ μA μ ⟨(y, z), h.2⟩
-  := ⟨(inf_eq_left.2 <| le_of_lt h').symm ▸
+  := ⟨le_trans (le_inf le_rfl h'.le) <|
     prop2d6₁I I μ hμcvx x hxI y hyI z hzI h, prop2d6₀ μ x y z h⟩
-
-
-/--
-Helper lemma: unpack `IsComparable x y` into a useful disjunction for strict/weak comparisons.
-
-This is a small propositional normalization used in the proof of `prop2d6₃I`.
--/
-lemma comparable_iff {L : Type*} [PartialOrder L]
-(x : L) (y : L)
-(h : IsComparable x y) :
-x < y ∨ y ≤ x :=
-  h.elim (fun h' ↦ h'.lt_or_eq.imp id Eq.ge) Or.inr
 
 
 /--
@@ -361,27 +324,20 @@ lemma prop2d6₃I
   (μA μ ⟨(x, y), h.1⟩ ≤ μA μ ⟨(x, z), lt_trans h.1 h.2⟩ ∧
    μA μ ⟨(x, z), lt_trans h.1 h.2⟩ < μA μ ⟨(y, z), h.2⟩) := by
   rcases h' with h₁ | h₂
-  · apply comparable_iff (μA μ ⟨(x, y), h.1⟩) (μA μ ⟨(y, z), h.2⟩) at h₁
-    by_cases h₂ : μA μ ⟨(y, z), h.2⟩ = μA μ ⟨(x, z), lt_trans h.1 h.2⟩
+  · by_cases h₂ : μA μ ⟨(y, z), h.2⟩ = μA μ ⟨(x, z), lt_trans h.1 h.2⟩
     · exact Or.inl h₂
-    · have h₃ : μA μ ⟨(x, y), h.1⟩ < μA μ ⟨(y, z), h.2⟩ := Or.resolve_right h₁ (fun hcontra ↦
-      h₂ (prop2d6₂I₁ I μ hμcvx x hxI y hyI z hzI h hcontra))
-      have h₄ : μA μ ⟨(x, y), h.1⟩ ≤ μA μ ⟨(x, z), lt_trans h.1 h.2⟩ ∧
-        μA μ ⟨(x, z), lt_trans h.1 h.2⟩ ≤ μA μ ⟨(y, z), h.2⟩ :=
-          prop2d6₂I₂ I μ hμcvx x hxI y hyI z hzI h h₃
-      exact Or.inr ⟨h₄.1, lt_of_le_of_ne h₄.2 (Ne.symm h₂)⟩
-  · rcases h₂ with ⟨a, ⟨ha₁, ⟨ha₂, hres⟩⟩⟩
-    apply or_iff_not_imp_left.2
-    intro hnot
-    have h' : ¬ y ≤ a := by
-      by_contra hcontra
-      have h''' : μA μ ⟨(y, z), h.2⟩ ≤ μmax μ ⟨(a, z), lt_of_le_of_ne ha₁.2 ha₂⟩ := by
-          apply sInf_le
-          use a , ⟨⟨hcontra, ha₁.2⟩, ha₂⟩
-      exact hnot <| eq_of_le_of_ge (hres ▸ h''') <| prop2d6₀ μ x y z h
+    · have hne : ¬ μA μ ⟨(y, z), h.2⟩ ≤ μA μ ⟨(x, y), h.1⟩ :=
+        fun hc ↦ h₂ (prop2d6₂I₁ I μ hμcvx x hxI y hyI z hzI h hc)
+      obtain ⟨h₃, h₄⟩ := prop2d6₂I₂ I μ hμcvx x hxI y hyI z hzI h <|
+        lt_of_le_not_ge (h₁.resolve_right hne) hne
+      exact Or.inr ⟨h₃, lt_of_le_of_ne h₄ (Ne.symm h₂)⟩
+  · rcases h₂ with ⟨a, ha₁, ha₂, hres⟩
+    refine or_iff_not_imp_left.2 fun hnot ↦ ?_
+    have h' : ¬ y ≤ a := fun hcontra ↦ hnot <| eq_of_le_of_ge
+      (hres ▸ sInf_le ⟨a, ⟨⟨hcontra, ha₁.2⟩, ha₂⟩, rfl⟩) (prop2d6₀ μ x y z h)
     exact ⟨hres ▸ (le_trans (lem2d4₁ μ y a h' x (le_inf (le_of_lt h.1) ha₁.1)) <|
       lem2d4₂I I μ hμcvx y hyI a ⟨le_trans hxI.1 ha₁.1, le_trans ha₁.2 hzI.2⟩ h' z <|
-      sup_le (le_of_lt h.2) ha₁.2),lt_of_le_of_ne (prop2d6₀ μ x y z h) <| Ne.symm hnot⟩
+      sup_le (le_of_lt h.2) ha₁.2), lt_of_le_of_ne (prop2d6₀ μ x y z h) <| Ne.symm hnot⟩
 
 
 /--
@@ -395,16 +351,11 @@ lemma rmk2d7
   (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : ConvexI ⟨(⊥, ⊤), bot_lt_top⟩ μ)
   (x : ℒ) (h : ⊥ < x ∧ x < ⊤)
   (h' : μA μ ⟨(⊥, x), h.1⟩ > μA μ ⟨(⊥, ⊤), bot_lt_top⟩) :
-  μA μ ⟨(x, ⊤), h.2⟩ = μA μ ⟨(⊥, ⊤), bot_lt_top⟩ := by
-    have h₁ : μA μ ⟨(x, ⊤), h.2⟩ = μA μ ⟨(⊥, ⊤), bot_lt_top⟩ ∨
-      (μA μ ⟨(⊥, x), h.1⟩ ≤ μA μ ⟨(⊥, ⊤), bot_lt_top⟩ ∧
-      μA μ ⟨(⊥, ⊤), bot_lt_top⟩ < μA μ ⟨(x, ⊤), h.2⟩) := by
-      apply prop2d6₃I ⟨(⊥, ⊤), bot_lt_top⟩ μ hμcvx ⊥ ⟨le_rfl, le_of_lt bot_lt_top⟩
-        x ⟨le_of_lt h.1, le_top⟩ ⊤ ⟨le_of_lt bot_lt_top, le_rfl⟩ h
-      exact Or.inl <| le_total (μA μ ⟨(⊥, x), h.1⟩) (μA μ ⟨(x, ⊤), h.2⟩)
-    rcases h₁ with h₂ | h₃
-    · exact h₂
-    · exact Classical.byContradiction fun x_1 ↦ not_le_of_gt h' h₃.left
+  μA μ ⟨(x, ⊤), h.2⟩ = μA μ ⟨(⊥, ⊤), bot_lt_top⟩ :=
+  (prop2d6₃I ⟨(⊥, ⊤), bot_lt_top⟩ μ hμcvx ⊥ ⟨le_rfl, le_top⟩
+      x ⟨bot_le, le_top⟩ ⊤ ⟨bot_le, le_rfl⟩ h
+      (Or.inl <| le_total _ _)).resolve_right
+    fun h₃ ↦ not_le_of_gt h' h₃.1
 
 
 /--
@@ -422,11 +373,7 @@ lemma prop2d8₀I
   (hw : u ≤ w ∧ w < x ⊔ y) :
   μA μ ⟨(u, x), h.1⟩ ≤ μmax μ ⟨(w, x ⊔ y), hw.2⟩ ∨
   μA μ ⟨(u, y), h.2⟩ ≤ μmax μ ⟨(w, x ⊔ y), hw.2⟩ := by
-  have h' : ¬ x ≤ w ∨ ¬ y ≤ w := by
-    apply not_and_or.1
-    rw [← sup_le_iff]
-    apply not_le_of_gt hw.2
-  rcases h' with h₁ | h₂
+  rcases not_and_or.1 (fun hc ↦ not_le_of_gt hw.2 (sup_le hc.1 hc.2)) with h₁ | h₂
   · exact Or.inl <| le_trans (lem2d4₁ μ x w h₁ u <| le_inf (le_of_lt h.1) hw.1) <|
       lem2d4₂I I μ hμcvx x hxI w hwI h₁ (x ⊔ y) <| sup_le le_sup_left <| le_of_lt hw.2
   · exact Or.inr <| le_trans (lem2d4₁ μ y w h₂ u <| le_inf (le_of_lt h.2) hw.1) <|
@@ -446,15 +393,11 @@ lemma prop2d8₁I
   (u : ℒ) (huI : InIntvl I u)
   (h : u < x ∧ u < y) :
   μA μ ⟨(u, x), h.1⟩ ⊓ μA μ ⟨(u, y), h.2⟩ ≤ μA μ ⟨(u, x ⊔ y), lt_sup_of_lt_left h.1⟩ := by
-  apply le_sInf_iff.2
+  apply le_sInf
   rintro d ⟨w, hw, rfl⟩
-  have h' : μA μ ⟨(u, x), h.1⟩ ≤ μmax μ ⟨(w, x ⊔ y), lt_of_le_of_ne hw.1.2 hw.2⟩ ∨
-  μA μ ⟨(u, y), h.2⟩ ≤ μmax μ ⟨(w, x ⊔ y), lt_of_le_of_ne hw.1.2 hw.2⟩ :=
-    prop2d8₀I I μ hμcvx x hxI y hyI u h w ⟨le_trans huI.1 hw.1.1, le_trans hw.1.2 <|
-      sup_le hxI.2 hyI.2⟩ ⟨hw.1.1,lt_of_le_of_ne hw.1.2 hw.2⟩
-  rcases h' with h₁ | h₂
-  · exact le_trans inf_le_left h₁
-  · exact le_trans inf_le_right h₂
+  exact (prop2d8₀I I μ hμcvx x hxI y hyI u h w ⟨le_trans huI.1 hw.1.1, le_trans hw.1.2 <|
+      sup_le hxI.2 hyI.2⟩ ⟨hw.1.1, lt_of_le_of_ne hw.1.2 hw.2⟩).elim
+    (le_trans inf_le_left) (le_trans inf_le_right)
 
 
 /--
@@ -476,14 +419,11 @@ lemma prop2d8₂I
   μA μ ⟨(u, y), h.2⟩ ≤ μA μ ⟨(u, x ⊔ y), lt_sup_of_lt_left h.1⟩ := by
   rcases hcpb with h₁ | h₂
   · rcases h₁ with h₃ | h₄
-    · exact Or.inl <| (inf_eq_left.2 h₃).symm ▸ (prop2d8₁I I μ hμcvx x hxI y hyI u huI h)
-    · have h' : μA μ ⟨(u, x), h.1⟩ ⊓ μA μ ⟨(u, y), h.2⟩ ≤ μA μ ⟨(u, x ⊔ y), lt_sup_of_lt_left h.1⟩
-        := prop2d8₁I I μ hμcvx x hxI y hyI u huI h
-      rw [inf_comm] at h'
-      exact Or.inr <| (inf_eq_left.2 h₄).symm ▸ h'
-  · rcases h₂ with ⟨a, ha, ⟨ha',ha''⟩⟩
+    · exact Or.inl <| le_trans (le_inf le_rfl h₃) <| prop2d8₁I I μ hμcvx x hxI y hyI u huI h
+    · exact Or.inr <| le_trans (le_inf h₄ le_rfl) <| prop2d8₁I I μ hμcvx x hxI y hyI u huI h
+  · rcases h₂ with ⟨a, ha, ha', ha''⟩
     exact ha'' ▸ (prop2d8₀I I μ hμcvx x hxI y hyI u h a ⟨le_trans huI.1 ha.1, le_trans ha.2 <|
-      sup_le hxI.2 hyI.2⟩ ⟨ha.1,lt_of_le_of_ne ha.2 ha'⟩)
+      sup_le hxI.2 hyI.2⟩ ⟨ha.1, lt_of_le_of_ne ha.2 ha'⟩)
 
 end
 
