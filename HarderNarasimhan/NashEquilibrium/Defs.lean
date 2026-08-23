@@ -32,7 +32,7 @@ API note: this is the user-facing predicate capturing “the game has a value”
 -/
 class NashEquilibrium {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S) : Prop where
+(μ : Intvl ℒ → S) : Prop where
   nash_eq : μAstar μ = μBstar μ
 
 end HarderNarasimhan

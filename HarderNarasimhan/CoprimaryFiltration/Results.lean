@@ -31,7 +31,7 @@ associated primes.
 lemma μ_nonempty {R : Type*} [CommRing R] [IsNoetherianRing R]
 {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] :
 ------------
-∀ I : {z: (ℒ R M) × (ℒ R M) // z.1 < z.2}, (_μ R M I).toFinset.Nonempty
+∀ I : Intvl (ℒ R M), (_μ R M I).toFinset.Nonempty
 ------------
 := impl.μ_nonempty
 
@@ -44,7 +44,7 @@ construction, so `μmax (μ R M) I = μ R M I` for all intervals `I`.
 lemma μmax_eq_μ {R : Type*} [CommRing R] [IsNoetherianRing R]
 {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] :
 ------------
-∀ I : {z: (ℒ R M) × (ℒ R M) // z.1 < z.2},
+∀ I : Intvl (ℒ R M),
   μmax (μ R M) I = (μ R M) I
 ------------
 := impl.μmax_eq_μ
@@ -74,7 +74,7 @@ prime (in the `S₀ R` order) of the quotient corresponding to that interval.
 lemma proposition_3_12 {R : Type*} [CommRing R] [IsNoetherianRing R]
 {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] :
 ------------
-∀ I : {z: (ℒ R M) × (ℒ R M) // z.1 < z.2},
+∀ I : Intvl (ℒ R M),
   μA (μ R M) I = ({(((_μ R M) I).toFinset.min' (μ_nonempty I))} : S₀ R)
 ------------
 := impl.prop3d12
@@ -113,7 +113,7 @@ lemma remark_3_14 {R : Type*} [CommRing R] [IsNoetherianRing R]
 List.TFAE [
 Semistable (μ R M),
 ∀ N : (ℒ R M), (hN : ⊥ < N) →
-  μA (μ R M) ⟨(⊥,N),hN⟩ = ({(((_μ R M) ⟨(⊥,⊤),bot_lt_top⟩).toFinset.min' (μ_nonempty _))} : S₀ R),
+  μA (μ R M) ⟨⊥, N,hN⟩ = ({(((_μ R M) ⟨⊥, ⊤,bot_lt_top⟩).toFinset.min' (μ_nonempty _))} : S₀ R),
 ∃! p, p ∈ associatedPrimes R M
 ]
 ------------

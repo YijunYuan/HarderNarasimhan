@@ -52,7 +52,7 @@ greatest elements.
 -/
 noncomputable def HNFil {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S) [hμ : μA_DescendingChainCondition μ] [hμcvx : ConvexI TotIntvl μ]
+(μ : Intvl ℒ → S) [hμ : μA_DescendingChainCondition μ] [hμcvx : ConvexI TotIntvl μ]
 [h : μ_Admissible μ]
 (k : Nat) : ℒ :=
   match k with
@@ -62,10 +62,10 @@ noncomputable def HNFil {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrd
     if htop : prev_term = ⊤ then
       ⊤
     else
-      let I' := (⟨(prev_term , ⊤) , lt_top_iff_ne_top.2 htop⟩ : {p : ℒ × ℒ // p.1 < p.2})
+      let I' := (⟨prev_term, ⊤ , lt_top_iff_ne_top.2 htop⟩ : Intvl ℒ)
       (impl.prop3d8₁' μ hμ I' (Convex_of_Convex_large TotIntvl I' ⟨bot_le,le_top⟩ μ hμcvx)
       (Or.casesOn h.μ_adm (fun h ↦ Or.inl h) fun h ↦
-       Or.inr fun z hzI hz ↦ h ⟨(I'.val.1 , z) ,  lt_of_le_of_ne hzI.left hz⟩)).choose
+       Or.inr fun z hzI hz ↦ h ⟨I'.left, z ,  lt_of_le_of_ne hzI.left hz⟩)).choose
 
 
 /-- Specification lemma for the defining choice in `HNFil`.
@@ -78,16 +78,16 @@ noncomputable def HNFil {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrd
 -/
 lemma HNFil_prop_of_def {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S) [hμ : μA_DescendingChainCondition μ] [hμcvx : ConvexI TotIntvl μ]
+(μ : Intvl ℒ → S) [hμ : μA_DescendingChainCondition μ] [hμcvx : ConvexI TotIntvl μ]
 [h : μ_Admissible μ] :
 ∀ n : Nat, (h' : HNFil μ n ≠ ⊤) →
-IsGreatest (StI μ ⟨(HNFil μ n , ⊤), lt_top_iff_ne_top.2 h'⟩) (HNFil μ (n + 1)) := by
+IsGreatest (StI μ ⟨HNFil μ n, ⊤, lt_top_iff_ne_top.2 h'⟩) (HNFil μ (n + 1)) := by
   intro n h'
   simp only [HNFil, h']
-  exact (impl.prop3d8₁' μ hμ ⟨(HNFil μ n, ⊤), h'.lt_top⟩
+  exact (impl.prop3d8₁' μ hμ ⟨HNFil μ n, ⊤, h'.lt_top⟩
     (Convex_of_Convex_large TotIntvl _ ⟨bot_le,le_top⟩ μ hμcvx)
     (Or.casesOn h.μ_adm (fun h ↦ Or.inl h) fun h ↦
-     Or.inr fun z hzI hz ↦ h ⟨((HNFil μ n, ⊤).1 , z) ,  lt_of_le_of_ne hzI.left hz⟩)).choose_spec
+     Or.inr fun z hzI hz ↦ h ⟨HNFil μ n, z, lt_of_le_of_ne hzI.left hz⟩)).choose_spec
 
 
 /--
@@ -98,7 +98,7 @@ the “greatest element” property in `HNFil_prop_of_def`.
 -/
 lemma HNFil_is_strict_mono {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S) [hμ : μA_DescendingChainCondition μ] [hμcvx : ConvexI TotIntvl μ]
+(μ : Intvl ℒ → S) [hμ : μA_DescendingChainCondition μ] [hμcvx : ConvexI TotIntvl μ]
 [h : μ_Admissible μ] :
 ∀ n : Nat, HNFil μ n ≠ ⊤ → HNFil μ n < HNFil μ (n + 1) := fun
     n hn ↦ lt_of_le_of_ne (HNFil_prop_of_def μ n hn).1.1.1 (HNFil_prop_of_def μ n hn).1.2.1
@@ -112,7 +112,7 @@ descending chain in the `>` well-founded order, contradicting `WellFoundedGT ℒ
 -/
 lemma HNFil_of_fin_len {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 [inst_3 : WellFoundedGT ℒ] {S : Type*} [CompleteLattice S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S) [hμ : μA_DescendingChainCondition μ] [hμcvx : ConvexI TotIntvl μ]
+(μ : Intvl ℒ → S) [hμ : μA_DescendingChainCondition μ] [hμcvx : ConvexI TotIntvl μ]
 [h : μ_Admissible μ]
 : ∃ N : Nat, HNFil μ N = ⊤ := by
   by_contra!
@@ -126,7 +126,7 @@ open Classical in
 -/
 noncomputable def HNlen {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S) [hμ : μA_DescendingChainCondition μ] [hμcvx : ConvexI TotIntvl μ]
+(μ : Intvl ℒ → S) [hμ : μA_DescendingChainCondition μ] [hμcvx : ConvexI TotIntvl μ]
 [h : μ_Admissible μ] : Nat := Nat.find (HNFil_of_fin_len μ)
 
 open Classical in
@@ -137,7 +137,7 @@ open Classical in
   -/
 lemma HNFil_ne_top_iff_lt_len {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 [WellFoundedGT ℒ] {S : Type*} [CompleteLattice S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S) [hμ : μA_DescendingChainCondition μ] [hμcvx : ConvexI TotIntvl μ]
+(μ : Intvl ℒ → S) [hμ : μA_DescendingChainCondition μ] [hμcvx : ConvexI TotIntvl μ]
 [h : μ_Admissible μ] :
   ∀ n : Nat, HNFil μ n ≠ ⊤ ↔ n < HNlen μ := by
   intro n
@@ -154,7 +154,7 @@ If `i < j ≤ HNlen μ`, then `HNFil μ i < HNFil μ j`.
 -/
 lemma HNFil_is_strict_mono' {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 [WellFoundedGT ℒ] {S : Type*} [CompleteLattice S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S) [hμ : μA_DescendingChainCondition μ] [hμcvx : ConvexI TotIntvl μ]
+(μ : Intvl ℒ → S) [hμ : μA_DescendingChainCondition μ] [hμcvx : ConvexI TotIntvl μ]
 [h : μ_Admissible μ] :
 ∀ i : ℕ, ∀ j : ℕ, i < j → j ≤ HNlen μ → HNFil μ i < HNFil μ j := fun i ↦
   Nat.le_induction
@@ -173,14 +173,14 @@ translation lemma `semistableI_iff`.
 -/
 lemma HNFil_piecewise_semistable {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 [WellFoundedGT ℒ] {S : Type*} [CompleteLattice S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S)
+(μ : Intvl ℒ → S)
 [hμ : μA_DescendingChainCondition μ] [hμcvx : ConvexI TotIntvl μ] [h : μ_Admissible μ] :
 ∀ i : ℕ, (h: i < Nat.find (HNFil_of_fin_len μ)) →
-    Semistable (Resμ ⟨(HNFil μ i, HNFil μ (i+1)),
+    Semistable (Resμ ⟨HNFil μ i, HNFil μ (i+1),
       HNFil_is_strict_mono' μ i (i+1) (lt_add_one i) h⟩ μ) :=
-  fun i hi ↦ (semistableI_iff μ ⟨(HNFil μ i , HNFil μ (i+1)),
+  fun i hi ↦ (semistableI_iff μ ⟨HNFil μ i, HNFil μ (i+1),
     HNFil_is_strict_mono' μ i (i+1) (lt_add_one i) hi⟩).1 <|
-    impl.prop3d7₁ μ ⟨(HNFil μ i , ⊤), lt_top_iff_ne_top.2 <|
+    impl.prop3d7₁ μ ⟨HNFil μ i, ⊤, lt_top_iff_ne_top.2 <|
     Nat.find_min (HNFil_of_fin_len μ) hi⟩ (HNFil μ (i + 1))
     (HNFil_prop_of_def μ i (Nat.find_min (HNFil_of_fin_len μ) hi)).1
 
@@ -195,19 +195,19 @@ The proof is an application of the internal obstruction lemma `prop3d7₂`.
 -/
 lemma HNFil_μA_pseudo_strict_anti {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 [WellFoundedGT ℒ] {S : Type*} [CompleteLattice S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S)
+(μ : Intvl ℒ → S)
 [hμ : μA_DescendingChainCondition μ] [hμcvx : ConvexI TotIntvl μ] [h : μ_Admissible μ] :
 ∀ i : ℕ, (hi : i + 1 < Nat.find (HNFil_of_fin_len μ)) →
-  ¬ μA μ ⟨(HNFil μ i, HNFil μ (i+1)),
+  ¬ μA μ ⟨HNFil μ i, HNFil μ (i+1),
       HNFil_is_strict_mono μ i (Nat.find_min (HNFil_of_fin_len μ) (Nat.lt_of_succ_lt hi))⟩ ≤
-    μA μ ⟨(HNFil μ (i+1), HNFil μ (i+2)),
+    μA μ ⟨HNFil μ (i+1), HNFil μ (i+2),
       HNFil_is_strict_mono μ (i + 1) (Nat.find_min (HNFil_of_fin_len μ) hi)⟩ := by
   intro i hj
   have hi : HNFil μ i ≠ ⊤ := Nat.find_min (HNFil_of_fin_len μ) (lt_trans (lt_add_one i) hj)
   have hi' : HNFil μ (i + 1) < HNFil μ (i + 1 + 1) :=
     HNFil_is_strict_mono μ (i + 1) (Nat.find_min (HNFil_of_fin_len μ) hj)
-  exact impl.prop3d7₂ μ ⟨(HNFil μ i,⊤), lt_top_iff_ne_top.2 hi⟩
-    (Convex_of_Convex_large TotIntvl ⟨(HNFil μ i,⊤), lt_top_iff_ne_top.2 hi⟩ ⟨bot_le,le_top⟩ μ
+  exact impl.prop3d7₂ μ ⟨HNFil μ i, ⊤, lt_top_iff_ne_top.2 hi⟩
+    (Convex_of_Convex_large TotIntvl ⟨HNFil μ i, ⊤, lt_top_iff_ne_top.2 hi⟩ ⟨bot_le,le_top⟩ μ
       hμcvx)
     (HNFil μ (i + 1)) (HNFil_prop_of_def μ i hi).1 (HNFil μ (i + 1 + 1))
     ⟨le_of_lt <| lt_trans (HNFil_is_strict_mono μ i hi) hi', le_top⟩ hi'
@@ -230,18 +230,18 @@ the unique one satisfying the expected axioms.
 -/
 theorem theorem3d10 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLinearOrder S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : μA_DescendingChainCondition μ) (hμcvx : ConvexI TotIntvl μ)
+(μ : Intvl ℒ → S) (hμ : μA_DescendingChainCondition μ) (hμcvx : ConvexI TotIntvl μ)
 (f : ℕ → ℒ) (hf0 : f 0 = ⊥)
 (hffin : ∃ n : ℕ, f n = ⊤)
 (hfsi : ∀ i : ℕ, ∀ j : ℕ, i < j → j ≤ Nat.find hffin → f i < f j)
 (ffst : ∀ i : ℕ, i ≥ Nat.find hffin → f i = ⊤)
 (hss : ∀ j : ℕ, (hj : j < Nat.find hffin) →
-  Semistable (Resμ ⟨(f j, f (j+1)), hfsi j (j+1) (lt_add_one j) hj⟩ μ))
+  Semistable (Resμ ⟨f j, f (j+1), hfsi j (j+1) (lt_add_one j) hj⟩ μ))
 (hmua: ∀ i : ℕ, ∀ j : ℕ, (hij : i < j) → (hj : j < Nat.find hffin) →
-  μA μ ⟨(f i, f (i+1)), hfsi i (i+1) (lt_add_one i) <| (by omega)⟩ >
-  μA μ ⟨(f j, f (j+1)), hfsi j (j+1) (lt_add_one j) <| hj⟩)
+  μA μ ⟨f i, f (i+1), hfsi i (i+1) (lt_add_one i) <| (by omega)⟩ >
+  μA μ ⟨f j, f (j+1), hfsi j (j+1) (lt_add_one j) <| hj⟩)
 : f = HNFil μ := by
-  have hss := fun j hj ↦ (semistableI_iff μ ⟨(f j, f (j+1)), hfsi j (j+1) (lt_add_one j) hj⟩).2
+  have hss := fun j hj ↦ (semistableI_iff μ ⟨f j, f (j+1), hfsi j (j+1) (lt_add_one j) hj⟩).2
     <| hss j hj
   let HNFilt := HNFil μ
   funext k
@@ -275,7 +275,7 @@ theorem theorem3d10 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
       have h₆ := impl.lem2d4₃I TotIntvl μ hμcvx (HNFilt (n + 1)) (in_TotIntvl (HNFilt (n + 1)))
         (f (i - 1)) (in_TotIntvl (f (i - 1))) h₄ (HNFilt n) <| le_inf (le_of_lt h₃) h₁₃
       have h₇ : f (i-1) < f i := hfsi (i - 1) i (Nat.sub_one_lt h₉.ne') hile
-      have h₁₀ : μA μ ⟨(HNFilt n, HNFilt (n+1)), h₃⟩ ≤ μA μ ⟨(f (i-1),f i), h₇⟩ := by
+      have h₁₀ : μA μ ⟨HNFilt n, HNFilt (n+1), h₃⟩ ≤ μA μ ⟨f (i-1), f i, h₇⟩ := by
         have h₁₁ := hss (i-1) h₈
         simp only [Nat.sub_one_add_one h₉.ne'] at h₁₁
         exact le_trans h₆ <| le_of_not_gt (h₁₁.out.choose_spec.2.1 (HNFilt (n + 1) ⊔ f (i - 1))
@@ -315,7 +315,7 @@ strictly monotone, obtained by forgetting the semistability witnesses to get an 
 -/
 private lemma relSeries_strictMono {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-{μ : {p :ℒ × ℒ // p.1 < p.2} → S}
+{μ : Intvl ℒ → S}
 (s : RelSeries (IntervalSemistableRel μ)) : StrictMono s.toFun :=
   LTSeries.strictMono (s.map ⟨id, fun h ↦ h.choose⟩)
 
@@ -328,7 +328,7 @@ used with `toFun` and standard arithmetic on `ℕ`.
 @[simp]
 lemma relSeries_step_lt {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-{μ : {p :ℒ × ℒ // p.1 < p.2} → S}
+{μ : Intvl ℒ → S}
 (s : RelSeries (IntervalSemistableRel μ))
 {i : ℕ} (hi : i + 1 < s.length)
  : s.toFun ↑i < s.toFun ↑(i + 1) :=
@@ -343,7 +343,7 @@ terms of `toFun` indices `i`, `i+1`, `i+2`.
 @[simp]
 lemma relSeries_succ_step_lt {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-{μ : {p :ℒ × ℒ // p.1 < p.2} → S}
+{μ : Intvl ℒ → S}
 (s : RelSeries (IntervalSemistableRel μ))
 {i : ℕ} (hi : i + 1 < s.length)
  : s.toFun ↑(i + 1) < s.toFun ↑(i + 2) :=
@@ -363,12 +363,12 @@ presentations.
 -/
 lemma hHFil_of_hNSeries {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLinearOrder S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S)
+(μ : Intvl ℒ → S)
 (F1 : RelSeries (IntervalSemistableRel μ))
 (h1 : F1.head = ⊥ ∧ F1.last = ⊤ ∧
   ∀ i : ℕ, (hi : i + 1 < F1.length) →
-    ¬   μA μ ⟨(F1.toFun i, F1.toFun ↑(i+1)), relSeries_step_lt F1 hi⟩
-      ≤ μA μ ⟨(F1.toFun ↑(i+1), F1.toFun ↑(i+2)), relSeries_succ_step_lt F1 hi⟩) :
+    ¬   μA μ ⟨F1.toFun i, F1.toFun ↑(i+1), relSeries_step_lt F1 hi⟩
+      ≤ μA μ ⟨F1.toFun ↑(i+1), F1.toFun ↑(i+2), relSeries_succ_step_lt F1 hi⟩) :
 ∃ HN1 : HarderNarasimhanFiltration μ,
   HN1.filtration = (fun n ↦ if n ≤ F1.length then F1.toFun n else ⊤) ∧
                    (Nat.find HN1.fin_len = F1.length) := by
@@ -411,8 +411,10 @@ lemma hHFil_of_hNSeries {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrd
         have e₂ : filtration1 (i + 1) = F1.toFun (Fin.succ ⟨i, hi⟩) := by
           simp only [filtration1, show i + 1 ≤ F1.length from hi, ↓reduceIte, Fin.succ_mk,
             Fin.natCast_eq_mk (Nat.add_lt_add_right hi 1)]
-        convert (F1.step ⟨i, hi⟩).choose_spec using 2
-        all_goals exact Subtype.ext (Prod.ext e₁ e₂),
+        have hIJ : (⟨F1.toFun (Fin.castSucc ⟨i, hi⟩), F1.toFun (Fin.succ ⟨i, hi⟩),
+            (F1.step ⟨i, hi⟩).choose⟩ : Intvl ℒ) = ⟨filtration1 i, filtration1 (i + 1),
+            by rw [e₁, e₂]; exact (F1.step ⟨i, hi⟩).choose⟩ := Intvl.ext e₁.symm e₂.symm
+        exact hIJ ▸ (F1.step ⟨i, hi⟩).choose_spec,
       μA_pseudo_strict_anti := by
         intro i hi
         unfold filtration1

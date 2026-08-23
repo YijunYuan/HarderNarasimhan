@@ -20,7 +20,8 @@ The Dedekind–MacNeille completion (`DedekindCut`) and the colexicographic orde
 At a high level, the development is organized around a bounded poset / lattice `ℒ` and an
 interval-indexed invariant
 
-- `μ : {p : ℒ × ℒ // p.1 < p.2} → S`,
+- `μ : Intvl ℒ → S` (where `Intvl ℒ` is the type of strict intervals, i.e. ordered pairs
+  `left < right`),
 
 where `S` is typically a complete lattice (so that we can take `sSup`/`sInf`). One should think of `μ(a,b)`
 as measuring the strict interval `(a,b)`.
@@ -49,8 +50,9 @@ The library follows a consistent internal pattern: most conceptual modules are s
 - [HarderNarasimhan.lean](HarderNarasimhan.lean): main entry point that re-exports the library.
 - [HarderNarasimhan/Basic.lean](HarderNarasimhan/Basic.lean): strict-interval language and the extremal
 	constructions (`μmax`, `μmin`, `μA`, `μB`).
-- [HarderNarasimhan/Interval.lean](HarderNarasimhan/Interval.lean): the interval subtype `Interval z` and
-	the restriction adapter `Resμ`, allowing one to view a global `μ` as an interval-local invariant.
+- [HarderNarasimhan/Interval.lean](HarderNarasimhan/Interval.lean): the points type `↥I` of a strict
+	interval `I : Intvl ℒ` and the restriction adapter `Resμ`, allowing one to view a global `μ` as an
+	interval-local invariant.
 
 ### Main Mathematical Modules
 

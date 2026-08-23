@@ -38,7 +38,7 @@ API note: this instance is the main entry point for “there exists a JH filtrat
 -/
 instance {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLinearOrder S]
-{μ : {p : ℒ × ℒ // p.1 < p.2} → S} [hftp : FiniteTotalPayoff μ] [hsl : SlopeLike μ]
+{μ : Intvl ℒ → S} [hftp : FiniteTotalPayoff μ] [hsl : SlopeLike μ]
 [hst : Semistable μ] [hwdcc' : StrongDescendingChainCondition' μ] :
 Nonempty (JordanHolderFiltration μ)
 := Nonempty.intro <|
@@ -83,7 +83,7 @@ API note: this is the `RelSeries`-shaped entry point corresponding to the existe
 theorem exists_JordanHolderSeries
 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLinearOrder S]
-{μ : {p : ℒ × ℒ // p.1 < p.2} → S} [hftp : FiniteTotalPayoff μ] [hsl : SlopeLike μ]
+{μ : Intvl ℒ → S} [hftp : FiniteTotalPayoff μ] [hsl : SlopeLike μ]
 [hst : Semistable μ] [hwdcc' : StrongDescendingChainCondition' μ] :
 ∃ s : RelSeries (JordanHolderRel μ), s.head = ⊤ ∧ s.last = ⊥
 := by
@@ -106,17 +106,17 @@ for the restricted slope on each step.
 theorem piecewise_stable_iff
 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLinearOrder S]
-(μ : {p : ℒ × ℒ // p.1 < p.2} → S) [SlopeLike μ] [sdc : StrongDescendingChainCondition' μ]
+(μ : Intvl ℒ → S) [SlopeLike μ] [sdc : StrongDescendingChainCondition' μ]
 (filtration : ℕ → ℒ) (fin_len : ∃ N : ℕ, filtration N = ⊥)
 (strict_anti : ∀ i j : ℕ, i < j → j ≤ Nat.find (fin_len) → filtration j < filtration i) :
 (
 ∀ i : ℕ, (hi : i < Nat.find fin_len) →
-  Stable (Resμ ⟨(filtration (i+1), filtration i), strict_anti i (i+1) (lt_add_one i) hi⟩ μ)
+  Stable (Resμ ⟨filtration (i+1), filtration i, strict_anti i (i+1) (lt_add_one i) hi⟩ μ)
 )
 ↔ (∀ i : ℕ, (hi : i < Nat.find fin_len) →
     ∀ z : ℒ, (h' : filtration (i+1) < z) → (h'' : z < filtration i) →
-    μ ⟨(filtration (i+1), z), h'⟩ <
-    μ ⟨(filtration (i+1), filtration i), strict_anti i (i+1) (lt_add_one i) hi⟩)
+    μ ⟨filtration (i+1), z, h'⟩ <
+    μ ⟨filtration (i+1), filtration i, strict_anti i (i+1) (lt_add_one i) hi⟩)
 :=
   ⟨fun a i hi z h' h'' ↦
     impl.step_cond₂_of_stable μ filtration fin_len strict_anti a i hi z h' h'',
@@ -132,7 +132,7 @@ Jordan–Hölder filtrations for `μ` have the same finite length.
 theorem length_eq_of_JordanHolderFiltration
 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ] [IsModularLattice ℒ]
 {S : Type*} [CompleteLinearOrder S]
-{μ : {p : ℒ × ℒ // p.1 < p.2} → S}
+{μ : Intvl ℒ → S}
 [FiniteTotalPayoff μ] [SlopeLike μ] [Semistable μ]
 [StrongDescendingChainCondition' μ] [Affine μ] :
 ∀ JH1 JH2 : JordanHolderFiltration μ, Nat.find JH1.fin_len = Nat.find JH2.fin_len

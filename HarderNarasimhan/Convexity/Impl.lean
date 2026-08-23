@@ -40,7 +40,7 @@ It is marked `[simp]` so that typeclass conversions can be reduced automatically
 @[simp]
 lemma ConvexI_TotIntvl_iff_Convex {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S) : ConvexI TotIntvl μ ↔
+(μ : Intvl ℒ → S) : ConvexI TotIntvl μ ↔
 Convex μ :=
   ⟨fun h ↦ ⟨fun x y hxy ↦ h.convex x y (in_TotIntvl _) (in_TotIntvl _) hxy⟩,
     fun h ↦ ⟨fun x y _ _ hxy ↦ h.convex x y hxy⟩⟩
@@ -52,7 +52,7 @@ This is a convenience instance so that `Convex μ` can be used wherever `ConvexI
 expected.
 -/
 instance {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-{S : Type*} [CompleteLattice S] {μ : {p :ℒ × ℒ // p.1 < p.2} → S} [Convex μ] :
+{S : Type*} [CompleteLattice S] {μ : Intvl ℒ → S} [Convex μ] :
 ConvexI TotIntvl μ :=
   (ConvexI_TotIntvl_iff_Convex μ).mpr inferInstance
 
@@ -62,7 +62,7 @@ Typeclass instance: interval-local convexity on the total interval implies globa
 This is the reverse direction of the previous instance.
 -/
 instance {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-{S : Type*} [CompleteLattice S] {μ : {p :ℒ × ℒ // p.1 < p.2} → S} [ConvexI TotIntvl μ] :
+{S : Type*} [CompleteLattice S] {μ : Intvl ℒ → S} [ConvexI TotIntvl μ] :
 Convex μ :=
   (ConvexI_TotIntvl_iff_Convex μ).mp inferInstance
 
@@ -80,13 +80,13 @@ It is written in a general lattice/complete lattice setting, and is later specia
 interval.
 -/
 lemma lem2d4₁
-  (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
+  (μ : Intvl ℒ → S)
   (x : ℒ) (w : ℒ) (hxw : ¬ x ≤ w)
   (u : ℒ) (huxw : u ≤ x ⊓ w) :
-  μA μ ⟨(u, x), lt_of_le_of_lt huxw (inf_lt_left.2 hxw)⟩
-    ≤ μmax μ ⟨(x ⊓ w, x), inf_lt_left.2 hxw⟩ := by
-  have h1 : μA μ ⟨(u, x), lt_of_le_of_lt huxw
-      (inf_lt_left.2 hxw)⟩ ≤ μA μ ⟨(x ⊓ w, x), inf_lt_left.2 hxw⟩ := by
+  μA μ ⟨u, x, lt_of_le_of_lt huxw (inf_lt_left.2 hxw)⟩
+    ≤ μmax μ ⟨x ⊓ w, x, inf_lt_left.2 hxw⟩ := by
+  have h1 : μA μ ⟨u, x, lt_of_le_of_lt huxw
+      (inf_lt_left.2 hxw)⟩ ≤ μA μ ⟨x ⊓ w, x, inf_lt_left.2 hxw⟩ := by
     apply sInf_le_sInf
     rintro t ⟨a, ha, rfl⟩
     exact ⟨a, ⟨⟨le_trans huxw ha.1.1, ha.1.2⟩, ha.2⟩, rfl⟩
@@ -103,17 +103,17 @@ non-comparable pair `x,w`.
 API note: the conclusion is stated as an inequality between `μmax` on two strict pairs in `ℒ`.
 -/
 lemma lem2d4₂I
-  (I : {p : ℒ × ℒ // p.1 < p.2})
-  (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : ConvexI I μ)
-  (x : ℒ) (hxI : InIntvl I x)
-  (w : ℒ) (hwI : InIntvl I w)
+  (I : Intvl ℒ)
+  (μ : Intvl ℒ → S) (hμcvx : ConvexI I μ)
+  (x : ℒ) (hxI : x ∈ I)
+  (w : ℒ) (hwI : w ∈ I)
   (hxw : ¬ x ≤ w)
   (t : ℒ)
   (hxwt : x ⊔ w ≤ t) :
-  μmax μ ⟨(x ⊓ w, x), inf_lt_left.2 hxw⟩ ≤
-    μmax μ ⟨(w, t), lt_of_le_of_lt' hxwt <| right_lt_sup.2 hxw⟩ := by
-    let target := μmax μ ⟨(w, t), lt_of_le_of_lt' hxwt <| right_lt_sup.2 hxw⟩
-    have h : ∀ b : ℒ, (h' : x ⊓ w < b ∧ b ≤ x) → μ ⟨(x ⊓ w, b), h'.1⟩ ≤ target := by
+  μmax μ ⟨x ⊓ w, x, inf_lt_left.2 hxw⟩ ≤
+    μmax μ ⟨w, t, lt_of_le_of_lt' hxwt <| right_lt_sup.2 hxw⟩ := by
+    let target := μmax μ ⟨w, t, lt_of_le_of_lt' hxwt <| right_lt_sup.2 hxw⟩
+    have h : ∀ b : ℒ, (h' : x ⊓ w < b ∧ b ≤ x) → μ ⟨x ⊓ w, b, h'.1⟩ ≤ target := by
       intro b hb
       have hh : x ⊓ w = b ⊓ w :=
         le_antisymm (le_inf hb.1.le inf_le_right) (inf_le_inf_right w hb.2)
@@ -134,14 +134,14 @@ This combines `lem2d4₁` and `lem2d4₂I` to compare `μA` values on two differ
 by the non-comparable pair `x,w`.
 -/
 lemma lem2d4₃I
-  (I : {p : ℒ × ℒ // p.1 < p.2})
-  (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : ConvexI I μ)
-  (x : ℒ) (hxI : InIntvl I x)
-  (w : ℒ) (hwI : InIntvl I w)
+  (I : Intvl ℒ)
+  (μ : Intvl ℒ → S) (hμcvx : ConvexI I μ)
+  (x : ℒ) (hxI : x ∈ I)
+  (w : ℒ) (hwI : w ∈ I)
   (hxw : ¬ x ≤ w)
   (u : ℒ) (huxw : u ≤ x ⊓ w) :
-  μA μ ⟨(u, x), lt_of_le_of_lt huxw <| inf_lt_left.2 hxw⟩ ≤
-    μA μ ⟨(w, x ⊔ w), right_lt_sup.2 hxw⟩ := by
+  μA μ ⟨u, x, lt_of_le_of_lt huxw <| inf_lt_left.2 hxw⟩ ≤
+    μA μ ⟨w, x ⊔ w, right_lt_sup.2 hxw⟩ := by
   apply le_sInf
   rintro imy ⟨y, hy₁, rfl⟩
   have h₁ : ¬ x ≤ y := fun h ↦ lt_irrefl (x ⊔ w) <| lt_of_le_of_lt (sup_le_sup_right h w) <|
@@ -158,20 +158,20 @@ The result returns a triple of inequalities as a nested conjunction, matching th
 the public-facing statement `lemma_2_4` in `Convexity/Results.lean`.
 -/
 lemma lem2d4I
-  (I : {p : ℒ × ℒ // p.1 < p.2})
-  (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : ConvexI I μ)
-  (x : ℒ) (hxI : InIntvl I x) --(hx : I.val.1 ≠ x)
-  (w : ℒ) (hwI : InIntvl I w) --(hw : I.val.1 ≠ w)
+  (I : Intvl ℒ)
+  (μ : Intvl ℒ → S) (hμcvx : ConvexI I μ)
+  (x : ℒ) (hxI : x ∈ I) --(hx : I.left ≠ x)
+  (w : ℒ) (hwI : w ∈ I) --(hw : I.left ≠ w)
   (hxw : ¬ x ≤ w)
-  (u : ℒ) --(huI : InIntvl I u)
-  (t : ℒ) --(htI : InIntvl I t)
+  (u : ℒ) --(huI : u ∈ I)
+  (t : ℒ) --(htI : t ∈ I)
   --(hut : u ≤ t)
   (huxw : u ≤ x ⊓ w)
   (hxwt : x ⊔ w ≤ t) :
-  μA μ ⟨(u, x), lt_of_le_of_lt huxw <|inf_lt_left.2 hxw⟩ ≤ μmax μ ⟨(x ⊓ w, x), inf_lt_left.2 hxw⟩ ∧
-  μmax μ ⟨(x ⊓ w, x), inf_lt_left.2 hxw⟩ ≤
-    μmax μ ⟨(w, t), lt_of_le_of_lt' hxwt <| right_lt_sup.2 hxw⟩ ∧
-  μA μ ⟨(u, x), lt_of_le_of_lt huxw <| inf_lt_left.2 hxw⟩ ≤ μA μ ⟨(w, x ⊔ w), right_lt_sup.2 hxw⟩ :=
+  μA μ ⟨u, x, lt_of_le_of_lt huxw <|inf_lt_left.2 hxw⟩ ≤ μmax μ ⟨x ⊓ w, x, inf_lt_left.2 hxw⟩ ∧
+  μmax μ ⟨x ⊓ w, x, inf_lt_left.2 hxw⟩ ≤
+    μmax μ ⟨w, t, lt_of_le_of_lt' hxwt <| right_lt_sup.2 hxw⟩ ∧
+  μA μ ⟨u, x, lt_of_le_of_lt huxw <| inf_lt_left.2 hxw⟩ ≤ μA μ ⟨w, x ⊔ w, right_lt_sup.2 hxw⟩ :=
   ⟨lem2d4₁ μ x w hxw u huxw, lem2d4₂I I μ hμcvx x hxI w hwI hxw t hxwt,
     lem2d4₃I I μ hμcvx x hxI w hwI hxw u huxw⟩
 
@@ -182,8 +182,8 @@ Remark 2.5 (part 1), interval-local form: `μmax μ` inherits convexity from `μ
 This is a key closure property: convexity is preserved by the `μmax` construction.
 -/
 lemma rmk2d5₁
-  (I : {p : ℒ × ℒ // p.1 < p.2})
-  (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : ConvexI I μ) :
+  (I : Intvl ℒ)
+  (μ : Intvl ℒ → S) (hμcvx : ConvexI I μ) :
   ConvexI I (μmax μ)  :=
   ⟨fun x y hxI hyI hxy ↦ lem2d4₂I I μ hμcvx x hxI y hyI hxy (x ⊔ y) le_rfl⟩
 
@@ -195,16 +195,16 @@ The statement `μmax μ I = μmax (μmax μ) I` says that applying `μmax` twice
 result. Convexity is used to relate the two suprema.
 -/
 lemma rmk2d5₂
-  (I : {p : ℒ × ℒ // p.1 < p.2})
-  (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : ConvexI I μ) :
+  (I : Intvl ℒ)
+  (μ : Intvl ℒ → S) (hμcvx : ConvexI I μ) :
   μmax μ I = μmax (μmax μ) I := by
   apply eq_of_le_of_ge
-  · exact le_sSup ⟨I.val.2, ⟨⟨le_of_lt I.prop, le_rfl⟩, ne_of_lt I.prop⟩, rfl⟩
+  · exact le_sSup ⟨I.right, ⟨I.right_mem, I.lt.ne⟩, rfl⟩
   · apply sSup_le
     rintro b ⟨v, hv, rfl⟩
     simpa only [inf_eq_right.2 hv.1.1] using
-      lem2d4₂I I μ hμcvx v hv.1 I.val.1 ⟨le_rfl, le_of_lt I.prop⟩ (not_le_of_gt <|
-        lt_of_le_of_ne hv.1.1 hv.2) I.val.2 <| (sup_eq_left.2 hv.1.1).symm ▸ hv.1.2
+      lem2d4₂I I μ hμcvx v hv.1 I.left I.left_mem (not_le_of_gt <|
+        lt_of_le_of_ne hv.1.1 hv.2) I.right <| (sup_eq_left.2 hv.1.1).symm ▸ hv.1.2
 
 
 /--
@@ -214,13 +214,13 @@ Together with `rmk2d5₂`, this shows that the outer optimization `μA` is stabl
 closure.
 -/
 lemma rmk2d5₃
-  (I : {p : ℒ × ℒ // p.1 < p.2})
-  (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : ConvexI I μ) :
+  (I : Intvl ℒ)
+  (μ : Intvl ℒ → S) (hμcvx : ConvexI I μ) :
   μA μ I = μA (μmax μ) I := by
-  have key : ∀ a, I.val.1 ≤ a → ∀ h : a < I.val.2,
-      μmax μ ⟨(a, I.val.2), h⟩ = μmax (μmax μ) ⟨(a, I.val.2), h⟩ :=
-    fun a ha h ↦ rmk2d5₂ ⟨(a, I.val.2), h⟩ μ <|
-      Convex_of_Convex_large I ⟨(a, I.val.2), h⟩ ⟨ha, le_rfl⟩ μ hμcvx
+  have key : ∀ a, I.left ≤ a → ∀ h : a < I.right,
+      μmax μ ⟨a, I.right, h⟩ = μmax (μmax μ) ⟨a, I.right, h⟩ :=
+    fun a ha h ↦ rmk2d5₂ ⟨a, I.right, h⟩ μ <|
+      Convex_of_Convex_large I ⟨a, I.right, h⟩ ⟨ha, le_rfl⟩ μ hμcvx
   apply eq_of_le_of_ge
   · apply sInf_le_sInf
     rintro t ⟨a, ha, rfl⟩
@@ -236,10 +236,10 @@ Proposition 2.6 (monotonicity part): `μA (x,z) ≤ μA (y,z)` when `x<y<z`.
 This does not use convexity; it is a formal consequence of the definition of `μA` as an infimum.
 -/
 lemma prop2d6₀
-  (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
+  (μ : Intvl ℒ → S)
   (x : ℒ) (y : ℒ) (z : ℒ)
   (h : x < y ∧ y < z) :
-  μA μ ⟨(x, z), lt_trans h.1 h.2⟩ ≤ μA μ ⟨(y, z), h.2⟩  := by
+  μA μ ⟨x, z, lt_trans h.1 h.2⟩ ≤ μA μ ⟨y, z, h.2⟩  := by
   apply sInf_le_sInf
   rintro u ⟨v, hv, rfl⟩
   exact ⟨v, ⟨⟨le_of_lt <| lt_of_lt_of_le h.1 hv.1.1, hv.1.2⟩, hv.2⟩, rfl⟩
@@ -251,13 +251,13 @@ Proposition 2.6 (a): a lower bound on `μA (x,z)` by the infimum of the two adja
 This is the first convexity-dependent inequality in Proposition 2.6.
 -/
 lemma prop2d6₁I
-  (I : {p : ℒ × ℒ // p.1 < p.2})
-  (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : ConvexI I μ)
-  (x : ℒ) (hxI : InIntvl I x)
-  (y : ℒ) (hyI : InIntvl I y)
-  (z : ℒ) (hzI : InIntvl I z)
+  (I : Intvl ℒ)
+  (μ : Intvl ℒ → S) (hμcvx : ConvexI I μ)
+  (x : ℒ) (hxI : x ∈ I)
+  (y : ℒ) (hyI : y ∈ I)
+  (z : ℒ) (hzI : z ∈ I)
   (h : x < y ∧ y < z) :
-  (μA μ ⟨(x, y), h.1⟩ ⊓ (μA μ ⟨(y, z), h.2⟩)) ≤ μA μ ⟨(x, z), lt_trans h.1 h.2⟩ := by
+  (μA μ ⟨x, y, h.1⟩ ⊓ (μA μ ⟨y, z, h.2⟩)) ≤ μA μ ⟨x, z, lt_trans h.1 h.2⟩ := by
   apply le_sInf
   rintro d ⟨a, ha, rfl⟩
   by_cases hya : y ≤ a
@@ -273,14 +273,14 @@ Proposition 2.6 (b), case 1: if `μA (x,y) ≥ μA (y,z)` then `μA (y,z) = μA 
 This is a clean equality criterion extracted from the general inequality chain.
 -/
 lemma prop2d6₂I₁
-  (I : {p : ℒ × ℒ // p.1 < p.2})
-  (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : ConvexI I μ)
-  (x : ℒ) (hxI : InIntvl I x)
-  (y : ℒ) (hyI : InIntvl I y)
-  (z : ℒ) (hzI : InIntvl I z)
+  (I : Intvl ℒ)
+  (μ : Intvl ℒ → S) (hμcvx : ConvexI I μ)
+  (x : ℒ) (hxI : x ∈ I)
+  (y : ℒ) (hyI : y ∈ I)
+  (z : ℒ) (hzI : z ∈ I)
   (h : x < y ∧ y < z)
-  (h' : μA μ ⟨(x, y), h.1⟩ ≥ μA μ ⟨(y, z), h.2⟩) :
-  μA μ ⟨(y, z), h.2⟩ = μA μ ⟨(x, z), lt_trans h.1 h.2⟩
+  (h' : μA μ ⟨x, y, h.1⟩ ≥ μA μ ⟨y, z, h.2⟩) :
+  μA μ ⟨y, z, h.2⟩ = μA μ ⟨x, z, lt_trans h.1 h.2⟩
   := le_antisymm (le_trans (le_inf h' le_rfl) <|
     prop2d6₁I I μ hμcvx x hxI y hyI z hzI h) <| prop2d6₀ μ x y z h
 
@@ -291,15 +291,15 @@ Proposition 2.6 (b), case 2: if `μA (x,y) < μA (y,z)` then `μA (x,y) ≤ μA 
 This provides the comparison bounds needed for the strict-inequality branch.
 -/
 lemma prop2d6₂I₂
-  (I : {p : ℒ × ℒ // p.1 < p.2})
-  (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : ConvexI I μ)
-  (x : ℒ) (hxI : InIntvl I x)
-  (y : ℒ) (hyI : InIntvl I y)
-  (z : ℒ) (hzI : InIntvl I z)
+  (I : Intvl ℒ)
+  (μ : Intvl ℒ → S) (hμcvx : ConvexI I μ)
+  (x : ℒ) (hxI : x ∈ I)
+  (y : ℒ) (hyI : y ∈ I)
+  (z : ℒ) (hzI : z ∈ I)
   (h : x < y ∧ y < z)
-  (h' : μA μ ⟨(x, y), h.1⟩ < μA μ ⟨(y, z), h.2⟩) :
-  μA μ ⟨(x, y), h.1⟩ ≤ μA μ ⟨(x, z), lt_trans h.1 h.2⟩ ∧
-  μA μ ⟨(x, z), lt_trans h.1 h.2⟩ ≤ μA μ ⟨(y, z), h.2⟩
+  (h' : μA μ ⟨x, y, h.1⟩ < μA μ ⟨y, z, h.2⟩) :
+  μA μ ⟨x, y, h.1⟩ ≤ μA μ ⟨x, z, lt_trans h.1 h.2⟩ ∧
+  μA μ ⟨x, z, lt_trans h.1 h.2⟩ ≤ μA μ ⟨y, z, h.2⟩
   := ⟨le_trans (le_inf le_rfl h'.le) <|
     prop2d6₁I I μ hμcvx x hxI y hyI z hzI h, prop2d6₀ μ x y z h⟩
 
@@ -312,21 +312,21 @@ infimum defining `μA (x,z)`. The conclusion then provides a dichotomy between e
 improvement.
 -/
 lemma prop2d6₃I
-  (I : {p : ℒ × ℒ // p.1 < p.2})
-  (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : ConvexI I μ)
-  (x : ℒ) (hxI : InIntvl I x)
-  (y : ℒ) (hyI : InIntvl I y)
-  (z : ℒ) (hzI : InIntvl I z)
+  (I : Intvl ℒ)
+  (μ : Intvl ℒ → S) (hμcvx : ConvexI I μ)
+  (x : ℒ) (hxI : x ∈ I)
+  (y : ℒ) (hyI : y ∈ I)
+  (z : ℒ) (hzI : z ∈ I)
   (h : x < y ∧ y < z)
-  (h' : (IsComparable (μA μ ⟨(x, y), h.1⟩) (μA μ ⟨(y, z), h.2⟩)) ∨
-        (IsAttained μ ⟨(x, z), lt_trans h.1 h.2⟩)) :
-  μA μ ⟨(y, z), h.2⟩ = μA μ ⟨(x, z), lt_trans h.1 h.2⟩ ∨
-  (μA μ ⟨(x, y), h.1⟩ ≤ μA μ ⟨(x, z), lt_trans h.1 h.2⟩ ∧
-   μA μ ⟨(x, z), lt_trans h.1 h.2⟩ < μA μ ⟨(y, z), h.2⟩) := by
+  (h' : (IsComparable (μA μ ⟨x, y, h.1⟩) (μA μ ⟨y, z, h.2⟩)) ∨
+        (IsAttained μ ⟨x, z, lt_trans h.1 h.2⟩)) :
+  μA μ ⟨y, z, h.2⟩ = μA μ ⟨x, z, lt_trans h.1 h.2⟩ ∨
+  (μA μ ⟨x, y, h.1⟩ ≤ μA μ ⟨x, z, lt_trans h.1 h.2⟩ ∧
+   μA μ ⟨x, z, lt_trans h.1 h.2⟩ < μA μ ⟨y, z, h.2⟩) := by
   rcases h' with h₁ | h₂
-  · by_cases h₂ : μA μ ⟨(y, z), h.2⟩ = μA μ ⟨(x, z), lt_trans h.1 h.2⟩
+  · by_cases h₂ : μA μ ⟨y, z, h.2⟩ = μA μ ⟨x, z, lt_trans h.1 h.2⟩
     · exact Or.inl h₂
-    · have hne : ¬ μA μ ⟨(y, z), h.2⟩ ≤ μA μ ⟨(x, y), h.1⟩ :=
+    · have hne : ¬ μA μ ⟨y, z, h.2⟩ ≤ μA μ ⟨x, y, h.1⟩ :=
         fun hc ↦ h₂ (prop2d6₂I₁ I μ hμcvx x hxI y hyI z hzI h hc)
       obtain ⟨h₃, h₄⟩ := prop2d6₂I₂ I μ hμcvx x hxI y hyI z hzI h <|
         lt_of_le_not_ge (h₁.resolve_right hne) hne
@@ -348,12 +348,12 @@ This is a specialization of `prop2d6₃I` to the total interval and uses totalit
 -/
 lemma rmk2d7
   {S : Type*} [CompleteLinearOrder S]
-  (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : ConvexI ⟨(⊥, ⊤), bot_lt_top⟩ μ)
+  (μ : Intvl ℒ → S) (hμcvx : ConvexI ⟨⊥, ⊤, bot_lt_top⟩ μ)
   (x : ℒ) (h : ⊥ < x ∧ x < ⊤)
-  (h' : μA μ ⟨(⊥, x), h.1⟩ > μA μ ⟨(⊥, ⊤), bot_lt_top⟩) :
-  μA μ ⟨(x, ⊤), h.2⟩ = μA μ ⟨(⊥, ⊤), bot_lt_top⟩ :=
-  (prop2d6₃I ⟨(⊥, ⊤), bot_lt_top⟩ μ hμcvx ⊥ ⟨le_rfl, le_top⟩
-      x ⟨bot_le, le_top⟩ ⊤ ⟨bot_le, le_rfl⟩ h
+  (h' : μA μ ⟨⊥, x, h.1⟩ > μA μ ⟨⊥, ⊤, bot_lt_top⟩) :
+  μA μ ⟨x, ⊤, h.2⟩ = μA μ ⟨⊥, ⊤, bot_lt_top⟩ :=
+  (prop2d6₃I ⟨⊥, ⊤, bot_lt_top⟩ μ hμcvx ⊥ (in_TotIntvl ⊥)
+      x (in_TotIntvl x) ⊤ (in_TotIntvl ⊤) h
       (Or.inl <| le_total _ _)).resolve_right
     fun h₃ ↦ not_le_of_gt h' h₃.1
 
@@ -364,15 +364,15 @@ Proposition 2.8 (auxiliary step): a disjunction bounding one of two `μA` values
 This is an interval-local statement used to derive the “meet” inequality in Proposition 2.8.
 -/
 lemma prop2d8₀I
-  (I : {p : ℒ × ℒ // p.1 < p.2})
-  (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : ConvexI I μ)
-  (x : ℒ) (hxI : InIntvl I x)
-  (y : ℒ) (hyI : InIntvl I y)
+  (I : Intvl ℒ)
+  (μ : Intvl ℒ → S) (hμcvx : ConvexI I μ)
+  (x : ℒ) (hxI : x ∈ I)
+  (y : ℒ) (hyI : y ∈ I)
   (u : ℒ) (h : u < x ∧ u < y)
-  (w : ℒ) (hwI : InIntvl I w)
+  (w : ℒ) (hwI : w ∈ I)
   (hw : u ≤ w ∧ w < x ⊔ y) :
-  μA μ ⟨(u, x), h.1⟩ ≤ μmax μ ⟨(w, x ⊔ y), hw.2⟩ ∨
-  μA μ ⟨(u, y), h.2⟩ ≤ μmax μ ⟨(w, x ⊔ y), hw.2⟩ := by
+  μA μ ⟨u, x, h.1⟩ ≤ μmax μ ⟨w, x ⊔ y, hw.2⟩ ∨
+  μA μ ⟨u, y, h.2⟩ ≤ μmax μ ⟨w, x ⊔ y, hw.2⟩ := by
   rcases not_and_or.1 (fun hc ↦ not_le_of_gt hw.2 (sup_le hc.1 hc.2)) with h₁ | h₂
   · exact Or.inl <| le_trans (lem2d4₁ μ x w h₁ u <| le_inf (le_of_lt h.1) hw.1) <|
       lem2d4₂I I μ hμcvx x hxI w hwI h₁ (x ⊔ y) <| sup_le le_sup_left <| le_of_lt hw.2
@@ -386,13 +386,13 @@ Proposition 2.8 (a): `μA (u, x ⊔ y)` dominates the meet `μA (u,x) ⊓ μA (u
 This is obtained by taking an infimum and using `prop2d8₀I` to select the relevant branch.
 -/
 lemma prop2d8₁I
-  (I : {p : ℒ × ℒ // p.1 < p.2})
-  (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : ConvexI I μ)
-  (x : ℒ) (hxI : InIntvl I x)
-  (y : ℒ) (hyI : InIntvl I y)
-  (u : ℒ) (huI : InIntvl I u)
+  (I : Intvl ℒ)
+  (μ : Intvl ℒ → S) (hμcvx : ConvexI I μ)
+  (x : ℒ) (hxI : x ∈ I)
+  (y : ℒ) (hyI : y ∈ I)
+  (u : ℒ) (huI : u ∈ I)
   (h : u < x ∧ u < y) :
-  μA μ ⟨(u, x), h.1⟩ ⊓ μA μ ⟨(u, y), h.2⟩ ≤ μA μ ⟨(u, x ⊔ y), lt_sup_of_lt_left h.1⟩ := by
+  μA μ ⟨u, x, h.1⟩ ⊓ μA μ ⟨u, y, h.2⟩ ≤ μA μ ⟨u, x ⊔ y, lt_sup_of_lt_left h.1⟩ := by
   apply le_sInf
   rintro d ⟨w, hw, rfl⟩
   exact (prop2d8₀I I μ hμcvx x hxI y hyI u h w ⟨le_trans huI.1 hw.1.1, le_trans hw.1.2 <|
@@ -407,16 +407,16 @@ Proposition 2.8 (b): under comparability or attainment, one of the two `μA` val
 This is a “one-sided dominance” conclusion that matches the alternative in the paper statement.
 -/
 lemma prop2d8₂I
-  (I : {p : ℒ × ℒ // p.1 < p.2})
-  (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : ConvexI I μ)
-  (x : ℒ) (hxI : InIntvl I x)
-  (y : ℒ) (hyI : InIntvl I y)
-  (u : ℒ) (huI : InIntvl I u)
+  (I : Intvl ℒ)
+  (μ : Intvl ℒ → S) (hμcvx : ConvexI I μ)
+  (x : ℒ) (hxI : x ∈ I)
+  (y : ℒ) (hyI : y ∈ I)
+  (u : ℒ) (huI : u ∈ I)
   (h : u < x ∧ u < y)
-  (hcpb : IsComparable (μA μ ⟨(u, x), h.1⟩)
-  (μA μ ⟨(u, y), h.2⟩) ∨ IsAttained μ ⟨(u, x ⊔ y), lt_sup_of_lt_left h.1⟩) :
-  μA μ ⟨(u, x), h.1⟩ ≤ μA μ ⟨(u, x ⊔ y), lt_sup_of_lt_left h.1⟩ ∨
-  μA μ ⟨(u, y), h.2⟩ ≤ μA μ ⟨(u, x ⊔ y), lt_sup_of_lt_left h.1⟩ := by
+  (hcpb : IsComparable (μA μ ⟨u, x, h.1⟩)
+  (μA μ ⟨u, y, h.2⟩) ∨ IsAttained μ ⟨u, x ⊔ y, lt_sup_of_lt_left h.1⟩) :
+  μA μ ⟨u, x, h.1⟩ ≤ μA μ ⟨u, x ⊔ y, lt_sup_of_lt_left h.1⟩ ∨
+  μA μ ⟨u, y, h.2⟩ ≤ μA μ ⟨u, x ⊔ y, lt_sup_of_lt_left h.1⟩ := by
   rcases hcpb with h₁ | h₂
   · rcases h₁ with h₃ | h₄
     · exact Or.inl <| le_trans (le_inf le_rfl h₃) <| prop2d8₁I I μ hμcvx x hxI y hyI u huI h

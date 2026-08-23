@@ -50,8 +50,8 @@ API note: this is the main extra hypothesis needed for the existence theorem.
 -/
 class μ_Admissible {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S) where
-  μ_adm : (Std.Total (· ≤ · : S → S → Prop)) ∨ ∀ I : {p : ℒ × ℒ // p.1 < p.2},  IsAttained μ I
+(μ : Intvl ℒ → S) where
+  μ_adm : (Std.Total (· ≤ · : S → S → Prop)) ∨ ∀ I : Intvl ℒ,  IsAttained μ I
 
 /--
 In a complete linear order, admissibility is automatic.
@@ -60,7 +60,7 @@ This instance uses the fact that linearity implies totality of `≤`.
 -/
 instance {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLinearOrder S]
-{μ : {p :ℒ × ℒ // p.1 < p.2} → S} :
+{μ : Intvl ℒ → S} :
 μ_Admissible μ where
   μ_adm := Or.inl Std.instTotalLeOfIsLinearPreorder
 
@@ -88,17 +88,17 @@ API note: this structure is the central user-facing object of the filtration lay
 structure HarderNarasimhanFiltration
 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S) where
+(μ : Intvl ℒ → S) where
   filtration : ℕ → ℒ
   monotone             : Monotone filtration
   first_eq_bot         : filtration 0 = ⊥
   fin_len              : ∃ n : ℕ, filtration n = ⊤
   strict_mono          : ∀ i j : ℕ, i < j → j ≤ Nat.find (fin_len) → filtration i < filtration j
   piecewise_semistable : ∀ i : ℕ, (h: i < Nat.find (fin_len)) →
-    Semistable (Resμ ⟨(filtration i, filtration (i+1)), strict_mono i (i+1) (lt_add_one i) h⟩ μ)
+    Semistable (Resμ ⟨filtration i, filtration (i+1), strict_mono i (i+1) (lt_add_one i) h⟩ μ)
   μA_pseudo_strict_anti: ∀ i : ℕ, (hi : i + 1 < Nat.find fin_len) →
-    ¬ μA μ ⟨(filtration i, filtration (i+1)), strict_mono i (i+1) (lt_add_one i) <| le_of_lt hi⟩ ≤
-    μA μ ⟨(filtration (i+1), filtration (i+2)), strict_mono (i+1) (i+2) (Nat.lt_add_one (i + 1)) hi⟩
+    ¬ μA μ ⟨filtration i, filtration (i+1), strict_mono i (i+1) (lt_add_one i) <| le_of_lt hi⟩ ≤
+    μA μ ⟨filtration (i+1), filtration (i+2), strict_mono (i+1) (i+2) (Nat.lt_add_one (i + 1)) hi⟩
 
 
 /-- The relation “there is a semistable interval from `x` to `y`”.
@@ -109,7 +109,7 @@ structure HarderNarasimhanFiltration
 -/
 def IntervalSemistableRel {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S)
+(μ : Intvl ℒ → S)
 : SetRel ℒ ℒ :=
-{(x, y) | ∃ h : x < y, Semistable (Resμ ⟨(x, y), h⟩ μ)}
+{(x, y) | ∃ h : x < y, Semistable (Resμ ⟨x, y, h⟩ μ)}
 end HarderNarasimhan

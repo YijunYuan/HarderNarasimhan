@@ -32,7 +32,7 @@ API note: this is the main user-facing rewrite for `μAstar` under the standard 
 -/
 lemma proposition_4_1 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S)
+(μ : Intvl ℒ → S)
 (h₁ : WeakAscendingChainCondition μ) (h₂ : WeakSlopeLike₁ μ) :
 (
   μAstar μ = μmin μ TotIntvl
@@ -50,9 +50,9 @@ original slope.
 -/
 lemma dualμAstar_eq_μBstar {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S) :
-OrderDual.ofDual <| μAstar (fun (p : {p : ℒᵒᵈ × ℒᵒᵈ // p.1 < p.2}) ↦
-  OrderDual.toDual <| μ ⟨(p.val.2, p.val.1), p.prop⟩) = μBstar μ
+(μ : Intvl ℒ → S) :
+OrderDual.ofDual <| μAstar (fun (p : Intvl ℒᵒᵈ) ↦
+  OrderDual.toDual <| μ ⟨p.right, p.left, p.lt⟩) = μBstar μ
 := impl.dualμAstar_eq_μBstar μ
 
 
@@ -64,9 +64,9 @@ original slope.
 -/
 lemma dualμBstar_eq_μAstar {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S) :
-OrderDual.ofDual <| μBstar (fun (p : {p : ℒᵒᵈ × ℒᵒᵈ // p.1 < p.2}) ↦
-  OrderDual.toDual <| μ ⟨(p.val.2, p.val.1), p.prop⟩) = μAstar μ
+(μ : Intvl ℒ → S) :
+OrderDual.ofDual <| μBstar (fun (p : Intvl ℒᵒᵈ) ↦
+  OrderDual.toDual <| μ ⟨p.right, p.left, p.lt⟩) = μAstar μ
 := impl.dualμBstar_eq_μAstar μ
 
 
@@ -79,7 +79,7 @@ API note: this is the main user-facing rewrite for `μBstar` under the standard 
 -/
 lemma proposition_4_3 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S)
+(μ : Intvl ℒ → S)
 (h₁ : StrongDescendingChainCondition μ) (h₂ : WeakSlopeLike₂ μ) :
 (
   μBstar μ = μmax μ TotIntvl
@@ -98,9 +98,9 @@ chain condition.
 -/
 lemma remark_4_4 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S)
+(μ : Intvl ℒ → S)
 (r : ℒ → ℝ) (hr₁ : Monotone r) (hr₂ : IsWellOrder (Set.range r) (· < ·))
-(h : ∀ z : {p :ℒ × ℒ // p.1 < p.2}, r z.val.1 = r z.val.2 → μ z = ⊤) :
+(h : ∀ z : Intvl ℒ, r z.left = r z.right → μ z = ⊤) :
 StrongDescendingChainCondition μ
 := {wdcc := impl.rmk4d4 μ r hr₁ hr₂ h}
 

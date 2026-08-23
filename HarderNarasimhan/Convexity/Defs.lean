@@ -15,7 +15,7 @@ subintervals derived from a non-comparable pair `x,y`.
 API overview:
 - `Convex μ` is a global convexity condition, stated for all `x,y : ℒ`.
 - `ConvexI I μ` is the same condition localized to a fixed strict interval `I` via the predicate
-  `InIntvl`.
+  ` ∈ `.
 - `Convex_of_Convex_large` is a monotonicity lemma: convexity on a larger interval implies convexity
   on a smaller subinterval.
 
@@ -37,9 +37,9 @@ As an API, the class exposes a single field `convex` that can be invoked as `h.c
 -/
 class Convex {ℒ : Type*} [Lattice ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S) : Prop where
+(μ : Intvl ℒ → S) : Prop where
   convex : ∀ x y : ℒ, (h : ¬ x ≤ y) →
-    μ ⟨(x ⊓ y, x), inf_lt_left.2 h⟩ ≤ μ ⟨(y, x ⊔ y), right_lt_sup.2 h⟩
+    μ ⟨x ⊓ y, x, inf_lt_left.2 h⟩ ≤ μ ⟨y, x ⊔ y, right_lt_sup.2 h⟩
 
 /--
 Interval-localized convexity condition.
@@ -49,10 +49,10 @@ This is the same inequality as `Convex`, but only required for `x,y` that lie in
 -/
 class ConvexI {ℒ : Type*} [Lattice ℒ]
 {S : Type*} [CompleteLattice S]
-(I : {p : ℒ × ℒ // p.1 < p.2})
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S) : Prop where
-  convex : ∀ x y : ℒ, InIntvl I x → InIntvl I y → (h : ¬ x ≤ y) →
-    μ ⟨(x ⊓ y, x), inf_lt_left.2 h⟩ ≤ μ ⟨(y, x ⊔ y), right_lt_sup.2 h⟩
+(I : Intvl ℒ)
+(μ : Intvl ℒ → S) : Prop where
+  convex : ∀ x y : ℒ, x ∈ I → y ∈ I → (h : ¬ x ≤ y) →
+    μ ⟨x ⊓ y, x, inf_lt_left.2 h⟩ ≤ μ ⟨y, x ⊔ y, right_lt_sup.2 h⟩
 
 /--
 Monotonicity of interval-local convexity under shrinking the interval.
@@ -66,10 +66,10 @@ API note: the lemma is phrased as a function `ConvexI I₁ μ → ConvexI I₂ �
 -/
 lemma Convex_of_Convex_large {ℒ : Type*} [Lattice ℒ]
 {S : Type*} [CompleteLattice S]
-(I₁ : {p : ℒ × ℒ // p.1 < p.2})
-(I₂ : {p : ℒ × ℒ // p.1 < p.2})
-(hI : I₁.val.1 ≤ I₂.val.1 ∧ I₂.val.2 ≤ I₁.val.2)
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S) :
+(I₁ : Intvl ℒ)
+(I₂ : Intvl ℒ)
+(hI : I₁.left ≤ I₂.left ∧ I₂.right ≤ I₁.right)
+(μ : Intvl ℒ → S) :
 ConvexI I₁ μ → ConvexI I₂ μ :=
   fun h ↦ { convex := fun x y hx hy hxy ↦ h.convex x y ⟨le_trans hI.1 hx.1,
     le_trans hx.2 hI.2⟩ ⟨le_trans hI.1 hy.1, le_trans hy.2 hI.2⟩ hxy }

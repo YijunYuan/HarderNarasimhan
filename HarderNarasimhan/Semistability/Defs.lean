@@ -41,9 +41,9 @@ API note: formulated as a class so it can be assumed as an implicit hypothesis i
 theorems.
 -/
 class μA_DescendingChainCondition {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-{S : Type*} [CompleteLattice S] (μ : {p :ℒ × ℒ // p.1 < p.2} → S) : Prop where
+{S : Type*} [CompleteLattice S] (μ : Intvl ℒ → S) : Prop where
   μ_dcc : ∀ a : ℒ, ∀ f : ℕ → ℒ, (h₁ : ∀ n : ℕ, f n > a) → StrictAnti f →
-    ∃ N : ℕ, ¬ μA μ ⟨(a, f N), h₁ N⟩ < μA μ ⟨(a, f <| N + 1), h₁ <| N + 1⟩
+    ∃ N : ℕ, ¬ μA μ ⟨a, f N, h₁ N⟩ < μA μ ⟨a, f <| N + 1, h₁ <| N + 1⟩
 
 
 /--
@@ -58,12 +58,12 @@ API note: the predicate is written in a negated `>` form to match later rewritin
 -/
 def S₁I {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S)
-(I : {p : ℒ × ℒ // p.1 < p.2})
-(x : ℒ) (hxI : InIntvl I x) (hx : I.val.1 ≠ x) : Prop :=
-∀ y : ℒ, (hyI : InIntvl I y) → (hy : I.val.1 ≠ y) →
-  ¬ μA μ ⟨(I.val.1 , y) , lt_of_le_of_ne hyI.left hy⟩ >
-    μA μ ⟨(I.val.1 , x) , lt_of_le_of_ne hxI.left hx⟩
+(μ : Intvl ℒ → S)
+(I : Intvl ℒ)
+(x : ℒ) (hxI : x ∈ I) (hx : I.left ≠ x) : Prop :=
+∀ y : ℒ, (hyI : y ∈ I) → (hy : I.left ≠ y) →
+  ¬ μA μ ⟨I.left, y , lt_of_le_of_ne hyI.left hy⟩ >
+    μA μ ⟨I.left, x , lt_of_le_of_ne hxI.left hx⟩
 
 
 /--
@@ -77,12 +77,12 @@ This tie-breaking condition is important for uniqueness/canonical choice argumen
 -/
 def S₂I {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S)
-(I : {p : ℒ × ℒ // p.1 < p.2})
-(x : ℒ) (hxI : InIntvl I x) (hx : I.val.1 ≠ x) : Prop :=
-∀ y : ℒ, (hyI : InIntvl I y) → (hy : I.val.1 ≠ y) →
-  μA μ ⟨(I.val.1 , y) , lt_of_le_of_ne hyI.left hy⟩ =
-  μA μ ⟨(I.val.1 , x) , lt_of_le_of_ne hxI.1 hx⟩ → y ≤ x
+(μ : Intvl ℒ → S)
+(I : Intvl ℒ)
+(x : ℒ) (hxI : x ∈ I) (hx : I.left ≠ x) : Prop :=
+∀ y : ℒ, (hyI : y ∈ I) → (hy : I.left ≠ y) →
+  μA μ ⟨I.left, y , lt_of_le_of_ne hyI.left hy⟩ =
+  μA μ ⟨I.left, x , lt_of_le_of_ne hxI.1 hx⟩ → y ≤ x
 
 
 /--
@@ -93,9 +93,9 @@ selection properties `S₁I` and `S₂I`. This packages the notion of a canonica
 -/
 def StI {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S)
-(I : {p : ℒ × ℒ // p.1 < p.2}) : Set ℒ :=
-{l : ℒ | ∃ hlI : InIntvl I l , ∃ hl : I.val.1 ≠ l ,  (S₁I μ I l hlI hl) ∧ (S₂I μ I l hlI hl)}
+(μ : Intvl ℒ → S)
+(I : Intvl ℒ) : Set ℒ :=
+{l : ℒ | ∃ hlI : l ∈ I , ∃ hl : I.left ≠ l ,  (S₁I μ I l hlI hl) ∧ (S₂I μ I l hlI hl)}
 
 
 /--
@@ -105,7 +105,7 @@ This is simply `StI μ TotIntvl`, but provided as a convenient abbreviation for 
 -/
 def St {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S) : Set ℒ :=
+(μ : Intvl ℒ → S) : Set ℒ :=
 StI μ TotIntvl
 
 
@@ -116,8 +116,8 @@ In other words, `I` is semistable if `I.right ∈ StI μ I`.
 -/
 def semistableI {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S)
-(I : {p : ℒ × ℒ // p.1 < p.2}) : Prop := I.val.2 ∈ StI μ I
+(μ : Intvl ℒ → S)
+(I : Intvl ℒ) : Prop := I.right ∈ StI μ I
 
 
 /--
@@ -131,9 +131,9 @@ API note: formulated as a class with a single field `semistable`.
 -/
 class Semistable {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S) : Prop where
+(μ : Intvl ℒ → S) : Prop where
   semistable : ∀x : ℒ, (hx : x ≠ ⊥) →
-    ¬ μA μ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx⟩ > μA μ ⟨(⊥,⊤),bot_lt_top⟩
+    ¬ μA μ ⟨⊥, x,bot_lt_iff_ne_bot.2 hx⟩ > μA μ ⟨⊥, ⊤,bot_lt_top⟩
 
 /--
 Global stability class.
@@ -146,8 +146,8 @@ accept `Stable μ` where `Semistable μ` is required.
 -/
 class Stable {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S) extends Semistable μ where
+(μ : Intvl ℒ → S) extends Semistable μ where
   stable : ∀x : ℒ, (hx : x ≠ ⊥) → x ≠ ⊤ →
-    μA μ ⟨(⊥,x), bot_lt_iff_ne_bot.2 hx⟩ ≠ μA μ ⟨(⊥,⊤),bot_lt_top⟩
+    μA μ ⟨⊥, x, bot_lt_iff_ne_bot.2 hx⟩ ≠ μA μ ⟨⊥, ⊤,bot_lt_top⟩
 
 end HarderNarasimhan

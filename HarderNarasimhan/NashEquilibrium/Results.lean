@@ -29,8 +29,8 @@ This is Remark 4.10 (preliminary inequality) in the development.
 -/
 lemma μmin_lt_μ_lt_μmax {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : {p : ℒ × ℒ // p.1 < p.2} → S) :
-∀ I : {p : ℒ × ℒ // p.1 < p.2}, μmin μ I ≤ μ I ∧ μ I ≤ μmax μ I
+(μ : Intvl ℒ → S) :
+∀ I : Intvl ℒ, μmin μ I ≤ μ I ∧ μ I ≤ μmax μ I
 := impl.rmk4d10₀ μ
 
 
@@ -42,22 +42,22 @@ API note: this lemma is a convenient gateway for proving/using `NashEquilibrium 
 -/
 lemma remark_4_10 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S) :
+(μ : Intvl ℒ → S) :
 (
   μBstar μ ≤ μAstar μ ↔ ∀ x : ℒ, (hx : x ≠ ⊤) → ∀ y : ℒ, (hy : ⊥ < y) →
-    μmin μ ⟨(⊥,y),hy⟩ ≤ μmax μ ⟨(x,⊤),lt_top_iff_ne_top.2 hx⟩
+    μmin μ ⟨⊥, y,hy⟩ ≤ μmax μ ⟨x, ⊤,lt_top_iff_ne_top.2 hx⟩
 ) ∧
 (
   WeakAscendingChainCondition μ → WeakSlopeLike₁ μ →
   (
     NashEquilibrium μ ↔ ∀ y : ℒ, (hy : y ≠ ⊥) →
-      μmin μ ⟨(⊥,y),bot_lt_iff_ne_bot.2 hy⟩ ≤ μmin μ TotIntvl
+      μmin μ ⟨⊥, y,bot_lt_iff_ne_bot.2 hy⟩ ≤ μmin μ TotIntvl
   )
 ) ∧ (
   StrongDescendingChainCondition μ → WeakSlopeLike₂ μ →
   (
     NashEquilibrium μ ↔ ∀ y : ℒ, (hy : y ≠ ⊤) →
-      μmax μ TotIntvl ≤ μmax μ ⟨(y,⊤),lt_top_iff_ne_top.2 hy⟩
+      μmax μ TotIntvl ≤ μmax μ ⟨y, ⊤,lt_top_iff_ne_top.2 hy⟩
   )
 )
 := ⟨impl.rmk4d10₁ μ,⟨impl.rmk4d10₂ μ,impl.rmk4d10₃ μ⟩⟩
@@ -68,7 +68,7 @@ Proposition 4.11: relating `μmin μ TotIntvl = μmax μ TotIntvl` and the inequ
 -/
 lemma proposition_4_11 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S) :
+(μ : Intvl ℒ → S) :
 (
   μmin μ TotIntvl = μmax μ TotIntvl → μBstar μ ≤ μAstar μ
 ) ∧ (
@@ -85,9 +85,9 @@ under a local “gap” condition.
 -/
 lemma proposition_4_12 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S)
-(h : ∀ x : ℒ, (hx : x ≠ ⊥ ∧ x ≠ ⊤) → ¬ μ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx.1⟩ ≤ μ TotIntvl ∨
-  μ TotIntvl ≤ μ ⟨(x,⊤),lt_top_iff_ne_top.2 hx.2⟩) :
+(μ : Intvl ℒ → S)
+(h : ∀ x : ℒ, (hx : x ≠ ⊥ ∧ x ≠ ⊤) → ¬ μ ⟨⊥, x,bot_lt_iff_ne_bot.2 hx.1⟩ ≤ μ TotIntvl ∨
+  μ TotIntvl ≤ μ ⟨x, ⊤,lt_top_iff_ne_top.2 hx.2⟩) :
 μmax μ TotIntvl = μ TotIntvl → μmin μ TotIntvl = μmax μ TotIntvl
 := impl.prop4d12 μ h
 
@@ -97,10 +97,10 @@ Remark 4.13: `SlopeLike` provides the “gap” condition used in Proposition 4.
 -/
 lemma remark_4_13 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : SlopeLike μ) :
+(μ : Intvl ℒ → S) (hμ : SlopeLike μ) :
 ∀ x : ℒ, (hx : x ≠ ⊥ ∧ x ≠ ⊤) →
-  ¬ μ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx.1⟩ ≤ μ TotIntvl ∨
-    μ TotIntvl ≤ μ ⟨(x,⊤),lt_top_iff_ne_top.2 hx.2⟩
+  ¬ μ ⟨⊥, x,bot_lt_iff_ne_bot.2 hx.1⟩ ≤ μ TotIntvl ∨
+    μ TotIntvl ≤ μ ⟨x, ⊤,lt_top_iff_ne_top.2 hx.2⟩
 := impl.rmk4d13 μ hμ
 
 
@@ -110,10 +110,10 @@ under the dual local condition.
 -/
 lemma proposition_4_14 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S)
+(μ : Intvl ℒ → S)
 (h : ∀ x : ℒ, (hx : x ≠ ⊥ ∧ x ≠ ⊤) →
-  μ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx.1⟩ ≤ μ TotIntvl ∨
-  ¬ μ TotIntvl ≤ μ ⟨(x,⊤),lt_top_iff_ne_top.2 hx.2⟩) :
+  μ ⟨⊥, x,bot_lt_iff_ne_bot.2 hx.1⟩ ≤ μ TotIntvl ∨
+  ¬ μ TotIntvl ≤ μ ⟨x, ⊤,lt_top_iff_ne_top.2 hx.2⟩) :
 μmin μ TotIntvl = μ TotIntvl → μmax μ TotIntvl = μmin μ TotIntvl
 := impl.prop4d14 μ h
 
@@ -123,10 +123,10 @@ Remark 4.15: `SlopeLike` provides the dual local condition used in Proposition 4
 -/
 lemma remark_4_15 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : SlopeLike μ) :
+(μ : Intvl ℒ → S) (hμ : SlopeLike μ) :
 ∀ x : ℒ, (hx : x ≠ ⊥ ∧ x ≠ ⊤) →
-  μ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx.1⟩ ≤ μ TotIntvl ∨
-  ¬ μ TotIntvl ≤ μ ⟨(x,⊤),lt_top_iff_ne_top.2 hx.2⟩
+  μ ⟨⊥, x,bot_lt_iff_ne_bot.2 hx.1⟩ ≤ μ TotIntvl ∨
+  ¬ μ TotIntvl ≤ μ ⟨x, ⊤,lt_top_iff_ne_top.2 hx.2⟩
 := impl.rmk4d15 μ hμ
 
 
@@ -136,7 +136,7 @@ and (under chain conditions) equivalence with Nash equilibrium.
 -/
 lemma proposition_4_16 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : SlopeLike μ) :
+(μ : Intvl ℒ → S) (hμ : SlopeLike μ) :
 (
   List.TFAE [
   μmax μ TotIntvl = μ TotIntvl,
@@ -166,7 +166,7 @@ follows from either one-sided hypothesis package.
 -/
 lemma proposition_4_18 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLinearOrder S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμ : Semistable μ) :
+(μ : Intvl ℒ → S) (hμ : Semistable μ) :
 (
   μBstar μ ≤ μAstar μ
 ) ∧ (
@@ -183,11 +183,11 @@ initial restrictions.
 -/
 lemma proposition_4_20 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S)
+(μ : Intvl ℒ → S)
 (h₁ : ∀ x : ℒ, (hx : x ≠ ⊥) →
-  WeakAscendingChainCondition (Resμ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx⟩ μ))
+  WeakAscendingChainCondition (Resμ ⟨⊥, x,bot_lt_iff_ne_bot.2 hx⟩ μ))
 (h₂ :  ∀ x : ℒ, (hx : x ≠ ⊥) →
-  WeakSlopeLike₁ (Resμ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx⟩ μ)) :
+  WeakSlopeLike₁ (Resμ ⟨⊥, x,bot_lt_iff_ne_bot.2 hx⟩ μ)) :
 NashEquilibrium μ → Semistable μ
 := impl.prop4d20 μ h₁ h₂
 
@@ -200,7 +200,7 @@ API note: this is the main user-facing equivalence statement of the Nash-equilib
 -/
 theorem NashEquil_equiv {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLinearOrder S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S) [hμ : SlopeLike μ]
+(μ : Intvl ℒ → S) [hμ : SlopeLike μ]
 [h₁ : WeakAscendingChainCondition μ] [h₂ : StrongDescendingChainCondition μ] :
 List.TFAE [
   μmax μ TotIntvl = μ TotIntvl,
@@ -211,7 +211,7 @@ List.TFAE [
 ∧ (
   Semistable μ → NashEquilibrium μ
 ) ∧ (
-  (∀ x : ℒ, (hx : x ≠ ⊥) → WeakAscendingChainCondition (Resμ ⟨(⊥,x),bot_lt_iff_ne_bot.2 hx⟩ μ)) →
+  (∀ x : ℒ, (hx : x ≠ ⊥) → WeakAscendingChainCondition (Resμ ⟨⊥, x,bot_lt_iff_ne_bot.2 hx⟩ μ)) →
   NashEquilibrium μ → Semistable μ
 )
 := impl.thm4d21 μ hμ h₁ h₂

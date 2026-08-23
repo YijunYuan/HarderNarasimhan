@@ -41,12 +41,12 @@ notation `Convex`.
 -/
 lemma proposition_3_2 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   {S : Type*} [CompleteLattice S]
-  (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : Convex μ)
+  (μ : Intvl ℒ → S) (hμcvx : Convex μ)
   (x : ℒ) (z : ℒ) (h : x < z)
-  (h' : μA μ ⟨(x, z), h⟩ = ⊤)
+  (h' : μA μ ⟨x, z, h⟩ = ⊤)
   (a : ℒ) (hax : a < x) :
 ------------
-  μA μ ⟨(a , x) , hax⟩ ≤ μA μ ⟨(a , z) , lt_trans hax h⟩
+  μA μ ⟨a, x , hax⟩ ≤ μA μ ⟨a, z , lt_trans hax h⟩
 ------------
   := by
     rw [← ConvexI_TotIntvl_iff_Convex] at hμcvx
@@ -72,7 +72,7 @@ API note: this is a common starting point for constructing filtrations.
 -/
 lemma proposition_3_4 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
   {S : Type*} [CompleteLattice S]
-  (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
+  (μ : Intvl ℒ → S)
   (hμDCC : μA_DescendingChainCondition μ) (hμcvx : Convex μ) :
 ------------
   (St μ).Nonempty
@@ -90,7 +90,7 @@ most one element, hence any two chosen stable points must be equal.
 -/
 lemma remark_3_5 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
   {S : Type*} [CompleteLinearOrder S]
-  (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
+  (μ : Intvl ℒ → S)
   (x : ℒ) (hxSt : x ∈ St μ)
   (y : ℒ) (hySt : y ∈ St μ) :
 ------------
@@ -113,20 +113,20 @@ API note: this lemma is a key interface for working with `St μ`.
 -/
 lemma proposition_3_7 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   {S : Type*} [CompleteLattice S]
-  (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : Convex μ)
+  (μ : Intvl ℒ → S) (hμcvx : Convex μ)
   (x : ℒ) (hxSt : x ∈ St μ) :
 ------------
   /- `(1)` -/
-  Semistable  (Resμ ⟨(⊥, x), lt_of_le_of_ne bot_le hxSt.out.choose_spec.choose⟩ μ)
+  Semistable  (Resμ ⟨⊥, x, lt_of_le_of_ne bot_le hxSt.out.choose_spec.choose⟩ μ)
   ∧
   /- `(2)` -/
   ∀ y : ℒ, (hy : y > x) →
-    ¬ μA μ ⟨(⊥ , x) , lt_of_le_of_ne hxSt.out.choose.1 hxSt.out.choose_spec.choose⟩ ≤
-      μA μ ⟨(x, y), hy⟩
+    ¬ μA μ ⟨⊥, x , lt_of_le_of_ne hxSt.out.choose.1 hxSt.out.choose_spec.choose⟩ ≤
+      μA μ ⟨x, y, hy⟩
 ------------
   := by
     rw [← ConvexI_TotIntvl_iff_Convex] at hμcvx
-    exact ⟨(semistableI_iff μ ⟨(⊥, x), lt_of_le_of_ne bot_le hxSt.out.choose_spec.choose⟩).1 <|
+    exact ⟨(semistableI_iff μ ⟨⊥, x, lt_of_le_of_ne bot_le hxSt.out.choose_spec.choose⟩).1 <|
         impl.prop3d7₁ μ TotIntvl x hxSt,
       fun y hy ↦ impl.prop3d7₂ μ TotIntvl hμcvx x hxSt y (in_TotIntvl y) hy⟩
 
@@ -147,9 +147,9 @@ breakpoint is chosen.
 -/
 lemma proposition_3_8 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
   {S : Type*} [CompleteLattice S]
-  (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : Convex μ)
+  (μ : Intvl ℒ → S) (hμcvx : Convex μ)
   (h : (@Std.Total S (· ≤ ·)) ∨
-     ∀ z : ℒ, (hz : ⊥ ≠ z) → IsAttained μ ⟨(⊥ , z) , lt_of_le_of_ne bot_le hz⟩) :
+     ∀ z : ℒ, (hz : ⊥ ≠ z) → IsAttained μ ⟨⊥, z , lt_of_le_of_ne bot_le hz⟩) :
 ------------
   (
   /- `(1)` -/
@@ -158,7 +158,7 @@ lemma proposition_3_8 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder
   /- `(2)` -/
   ∀ x : ℒ, (hxSt : x ∈ St μ) →
   (∀ y : ℒ, (hxy : y > x) →
-    μA μ ⟨(⊥ , y), lt_of_le_of_lt hxSt.out.choose.1 hxy⟩ = μA μ ⟨(x , y), hxy⟩)
+    μA μ ⟨⊥, y, lt_of_le_of_lt hxSt.out.choose.1 hxy⟩ = μA μ ⟨x, y, hxy⟩)
 ------------
  := by
   rw [← ConvexI_TotIntvl_iff_Convex] at hμcvx

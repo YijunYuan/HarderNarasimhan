@@ -44,16 +44,16 @@ API design:
 -/
 class SlopeLike {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S) : Prop where
+(μ : Intvl ℒ → S) : Prop where
   slopelike : ∀ (x y z : ℒ), (h : x < y ∧ y < z) →
 (
-  μ ⟨(x, y), h.1⟩ ≤ μ ⟨(x, z), lt_trans h.1 h.2⟩ ∨ μ ⟨(y, z), h.2⟩ < μ ⟨(x, z), lt_trans h.1 h.2⟩
+  μ ⟨x, y, h.1⟩ ≤ μ ⟨x, z, lt_trans h.1 h.2⟩ ∨ μ ⟨y, z, h.2⟩ < μ ⟨x, z, lt_trans h.1 h.2⟩
 ) ∧ (
-  μ ⟨(x, y), h.1⟩ < μ ⟨(x, z), lt_trans h.1 h.2⟩ ∨ μ ⟨(y, z), h.2⟩ ≤ μ ⟨(x, z), lt_trans h.1 h.2⟩
+  μ ⟨x, y, h.1⟩ < μ ⟨x, z, lt_trans h.1 h.2⟩ ∨ μ ⟨y, z, h.2⟩ ≤ μ ⟨x, z, lt_trans h.1 h.2⟩
 ) ∧ (
-  μ ⟨(x, z), lt_trans h.1 h.2⟩ < μ ⟨(x, y), h.1⟩ ∨ μ ⟨(x, z), lt_trans h.1 h.2⟩ ≤ μ ⟨(y, z), h.2⟩
+  μ ⟨x, z, lt_trans h.1 h.2⟩ < μ ⟨x, y, h.1⟩ ∨ μ ⟨x, z, lt_trans h.1 h.2⟩ ≤ μ ⟨y, z, h.2⟩
 ) ∧ (
-  μ ⟨(x, z), lt_trans h.1 h.2⟩ ≤ μ ⟨(x, y), h.1⟩ ∨ μ ⟨(x, z), lt_trans h.1 h.2⟩ < μ ⟨(y, z), h.2⟩
+  μ ⟨x, z, lt_trans h.1 h.2⟩ ≤ μ ⟨x, y, h.1⟩ ∨ μ ⟨x, z, lt_trans h.1 h.2⟩ < μ ⟨y, z, h.2⟩
 )
 
 
@@ -72,23 +72,23 @@ elsewhere.
 noncomputable def μQuotient {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {V : Type*} [AddCommGroup V] [Module ℝ V] [LinearOrder V] [IsOrderedAddMonoid V]
 [PosSMulStrictMono ℝ V]
-(r : {p :ℒ × ℒ // p.1 < p.2} → NNReal)
-(d : {p :ℒ × ℒ // p.1 < p.2} → V) :
-{p :ℒ × ℒ // p.1 < p.2} → DedekindCut V :=
+(r : Intvl ℒ → NNReal)
+(d : Intvl ℒ → V) :
+Intvl ℒ → DedekindCut V :=
   fun z ↦ if _ : r z > 0 then .principal ((r z)⁻¹ • d z) else ⊤
 
 
 /--
 Slope-likeness is stable under restriction to a subinterval.
 
-If `μ` is slope-like on `ℒ`, then the restricted function `Resμ z μ` is slope-like on `Interval z`.
+If `μ` is slope-like on `ℒ`, then the restricted function `Resμ z μ` is slope-like on `↥z`.
 This is proved by unpacking the restriction and applying `SlopeLike.slopelike` to underlying
 elements.
 -/
 instance {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-{μ : {p : ℒ × ℒ // p.1 < p.2} → S} [hsl : SlopeLike μ]
-{z : {p : ℒ × ℒ // p.1 < p.2}} : SlopeLike (Resμ z μ)
-:= { slopelike := fun x y z h ↦ hsl.slopelike x.val y.val z.val ⟨h.1, h.2⟩ }
+{μ : Intvl ℒ → S} [hsl : SlopeLike μ]
+{z : Intvl ℒ} : SlopeLike (Resμ z μ)
+:= { slopelike := fun x y z h ↦ hsl.slopelike x.val y.val z.val h }
 
 end HarderNarasimhan

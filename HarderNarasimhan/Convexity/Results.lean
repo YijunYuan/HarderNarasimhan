@@ -35,7 +35,7 @@ hypothesis into the interval-local form expected by implementation lemmas.
 -/
 theorem ConvexI_TotIntvl_iff_Convex {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S) : ConvexI TotIntvl μ ↔ Convex μ :=
+(μ : Intvl ℒ → S) : ConvexI TotIntvl μ ↔ Convex μ :=
   impl.ConvexI_TotIntvl_iff_Convex μ
 
 /--
@@ -49,20 +49,20 @@ using the equivalence `ConvexI TotIntvl μ ↔ Convex μ`.
 -/
 lemma lemma_2_4 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   {S : Type*} [CompleteLattice S]
-  (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : Convex μ)
+  (μ : Intvl ℒ → S) (hμcvx : Convex μ)
   (x : ℒ) (w : ℒ) (hxw : ¬ x ≤ w)
   (u : ℒ) (t : ℒ)
   (huxw : u ≤ x ⊓ w) (hxwt : x ⊔ w ≤ t) :
 ------------
   (
   --`(2.2)`
-  μA μ ⟨(u, x), lt_of_le_of_lt huxw (inf_lt_left.2 hxw)⟩ ≤
-    μmax μ ⟨(x ⊓ w, x), inf_lt_left.2 hxw⟩ ∧
-  μmax μ ⟨(x ⊓ w, x), inf_lt_left.2 hxw⟩ ≤
-    μmax μ ⟨(w, t), lt_of_le_of_lt' hxwt <| right_lt_sup.2 hxw⟩
+  μA μ ⟨u, x, lt_of_le_of_lt huxw (inf_lt_left.2 hxw)⟩ ≤
+    μmax μ ⟨x ⊓ w, x, inf_lt_left.2 hxw⟩ ∧
+  μmax μ ⟨x ⊓ w, x, inf_lt_left.2 hxw⟩ ≤
+    μmax μ ⟨w, t, lt_of_le_of_lt' hxwt <| right_lt_sup.2 hxw⟩
   ) ∧
   --`(2.3)`
-  μA μ ⟨(u, x), lt_of_le_of_lt huxw (inf_lt_left.2 hxw)⟩ ≤ μA μ ⟨(w, x ⊔ w), right_lt_sup.2 hxw⟩
+  μA μ ⟨u, x, lt_of_le_of_lt huxw (inf_lt_left.2 hxw)⟩ ≤ μA μ ⟨w, x ⊔ w, right_lt_sup.2 hxw⟩
 ------------
   := by
     apply (ConvexI_TotIntvl_iff_Convex _).2 at hμcvx
@@ -83,10 +83,10 @@ later files.
 -/
 lemma remark_2_5 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   {S : Type*} [CompleteLattice S]
-  (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : Convex μ) :
+  (μ : Intvl ℒ → S) (hμcvx : Convex μ) :
 ------------
   Convex (μmax μ) ∧
-  ∀  I : {p : ℒ × ℒ // p.1 < p.2},
+  ∀  I : Intvl ℒ,
     μmax μ I = μmax (μmax μ) I ∧ μA μ I = μA (μmax μ) I
 ------------
   := by
@@ -109,33 +109,33 @@ paper.
 -/
 lemma proposition_2_6 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   {S : Type*} [CompleteLattice S]
-  (μ : {p :ℒ × ℒ // p.1 < p.2} → S)
+  (μ : Intvl ℒ → S)
   (x : ℒ) (y : ℒ) (z : ℒ)
   (h : x < y ∧ y < z) :
 ------------
   --`(2.4)`
-  μA μ ⟨(x, z), lt_trans h.1 h.2⟩ ≤ μA μ ⟨(y, z), h.2⟩ ∧
+  μA μ ⟨x, z, lt_trans h.1 h.2⟩ ≤ μA μ ⟨y, z, h.2⟩ ∧
   (
   Convex μ →
   --`(a)`
-  μA μ ⟨(x, z), lt_trans h.1 h.2⟩ ≥ (μA μ ⟨(x, y), h.1⟩ ⊓ (μA μ ⟨(y, z), h.2⟩))
+  μA μ ⟨x, z, lt_trans h.1 h.2⟩ ≥ (μA μ ⟨x, y, h.1⟩ ⊓ (μA μ ⟨y, z, h.2⟩))
   ∧ (
   --`(b)`
   (
-  μA μ ⟨(x, y), h.1⟩ ≥ μA μ ⟨(y, z), h.2⟩ →
-    μA μ ⟨(y, z), h.2⟩ = μA μ ⟨(x, z), lt_trans h.1 h.2⟩
+  μA μ ⟨x, y, h.1⟩ ≥ μA μ ⟨y, z, h.2⟩ →
+    μA μ ⟨y, z, h.2⟩ = μA μ ⟨x, z, lt_trans h.1 h.2⟩
   ) ∧ (
-  μA μ ⟨(x, y), h.1⟩ < μA μ ⟨(y, z), h.2⟩ →
-    μA μ ⟨(x, y), h.1⟩ ≤ μA μ ⟨(x, z), lt_trans h.1 h.2⟩ ∧
-    μA μ ⟨(x, z), lt_trans h.1 h.2⟩ ≤ μA μ ⟨(y, z), h.2⟩
+  μA μ ⟨x, y, h.1⟩ < μA μ ⟨y, z, h.2⟩ →
+    μA μ ⟨x, y, h.1⟩ ≤ μA μ ⟨x, z, lt_trans h.1 h.2⟩ ∧
+    μA μ ⟨x, z, lt_trans h.1 h.2⟩ ≤ μA μ ⟨y, z, h.2⟩
   )
   ) ∧ (
   --`(c)`
-  IsComparable (μA μ ⟨(x, y), h.1⟩) (μA μ ⟨(y, z), h.2⟩) ∨
-  IsAttained μ ⟨(x, z), lt_trans h.1 h.2⟩ →
-    μA μ ⟨(y, z), h.2⟩ = μA μ ⟨(x, z), lt_trans h.1 h.2⟩ ∨
-    (μA μ ⟨(x, y), h.1⟩ ≤ μA μ ⟨(x, z), lt_trans h.1 h.2⟩ ∧
-     μA μ ⟨(x, z), lt_trans h.1 h.2⟩ < μA μ ⟨(y, z), h.2⟩)
+  IsComparable (μA μ ⟨x, y, h.1⟩) (μA μ ⟨y, z, h.2⟩) ∨
+  IsAttained μ ⟨x, z, lt_trans h.1 h.2⟩ →
+    μA μ ⟨y, z, h.2⟩ = μA μ ⟨x, z, lt_trans h.1 h.2⟩ ∨
+    (μA μ ⟨x, y, h.1⟩ ≤ μA μ ⟨x, z, lt_trans h.1 h.2⟩ ∧
+     μA μ ⟨x, z, lt_trans h.1 h.2⟩ < μA μ ⟨y, z, h.2⟩)
     )
   )
 ------------
@@ -158,11 +158,11 @@ API note: this is stated with `μA μ TotIntvl` to use the abbreviation for the 
 -/
 lemma remark_2_7 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   {S : Type*} [CompleteLinearOrder S]
-  (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : Convex μ)
+  (μ : Intvl ℒ → S) (hμcvx : Convex μ)
   (x : ℒ) (h : ⊥ < x ∧ x < ⊤)
-  (h' : μA μ ⟨(⊥, x), h.1⟩ > μA μ TotIntvl) :
+  (h' : μA μ ⟨⊥, x, h.1⟩ > μA μ TotIntvl) :
 ------------
-  μA μ ⟨(x, ⊤), h.2⟩ = μA μ TotIntvl
+  μA μ ⟨x, ⊤, h.2⟩ = μA μ TotIntvl
 ------------
 := by
   rw [← ConvexI_TotIntvl_iff_Convex] at hμcvx
@@ -178,18 +178,18 @@ itself dominated by `μA (u, x ⊔ y)`.
 -/
 lemma proposition_2_8 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   {S : Type*} [CompleteLattice S]
-  (μ : {p :ℒ × ℒ // p.1 < p.2} → S) (hμcvx : Convex μ)
+  (μ : Intvl ℒ → S) (hμcvx : Convex μ)
   (x : ℒ) (y : ℒ) (u : ℒ)
   (h : u < x ∧ u < y) :
 ------------
   --`(a)`
-  μA μ ⟨(u, x ⊔ y), lt_sup_of_lt_left h.1⟩ ≥ μA μ ⟨(u, x), h.1⟩ ⊓ μA μ ⟨(u, y), h.2⟩
+  μA μ ⟨u, x ⊔ y, lt_sup_of_lt_left h.1⟩ ≥ μA μ ⟨u, x, h.1⟩ ⊓ μA μ ⟨u, y, h.2⟩
   ∧ (
   --`(b)`
-  IsComparable (μA μ ⟨(u, x), h.1⟩) (μA μ ⟨(u, y), h.2⟩) ∨
-  IsAttained μ ⟨(u, x ⊔ y), lt_sup_of_lt_left h.1⟩ →
-    μA μ ⟨(u, x ⊔ y), lt_sup_of_lt_left h.1⟩ ≥ μA μ ⟨(u, x), h.1⟩ ∨
-    μA μ ⟨(u, x ⊔ y), lt_sup_of_lt_left h.1⟩ ≥ μA μ ⟨(u, y), h.2⟩
+  IsComparable (μA μ ⟨u, x, h.1⟩) (μA μ ⟨u, y, h.2⟩) ∨
+  IsAttained μ ⟨u, x ⊔ y, lt_sup_of_lt_left h.1⟩ →
+    μA μ ⟨u, x ⊔ y, lt_sup_of_lt_left h.1⟩ ≥ μA μ ⟨u, x, h.1⟩ ∨
+    μA μ ⟨u, x ⊔ y, lt_sup_of_lt_left h.1⟩ ≥ μA μ ⟨u, y, h.2⟩
   )
 ------------
 := by
@@ -201,11 +201,11 @@ lemma proposition_2_8 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder
 User-facing equivalence between localized convexity and convexity of the restricted measure.
 
 It enables rewriting convexity hypotheses when switching between an interval `I` in `ℒ`
-and the subtype `Interval I` equipped with the restricted function `Resμ I μ`.
+and the subtype `↥I` equipped with the restricted function `Resμ I μ`.
 -/
 theorem ConvexI_iff_Convex_res {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(I : {p : ℒ × ℒ // p.1 < p.2}) (μ : {p :ℒ × ℒ // p.1 < p.2} → S) :
+(I : Intvl ℒ) (μ : Intvl ℒ → S) :
 ConvexI I μ ↔ Convex (Resμ I μ) := by
   rw [← ConvexI_TotIntvl_iff_Convex]
   constructor

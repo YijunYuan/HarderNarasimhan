@@ -52,7 +52,7 @@ API note: this instance is the standard way to access the canonical filtration.
 noncomputable instance instInhabitedHarderNarasimhanFiltration
 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLattice S]
-{μ : {p :ℒ × ℒ // p.1 < p.2} → S}
+{μ : Intvl ℒ → S}
 [hμ : μA_DescendingChainCondition μ] [hμcvx : Convex μ] [h : μ_Admissible μ] :
 ------------
 Inhabited (HarderNarasimhanFiltration μ) where
@@ -90,7 +90,7 @@ after extensionality, so you can treat the HN filtration as canonical.
 noncomputable instance instUniqueHarderNarasimhanFiltration
 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLinearOrder S]
-{μ : {p :ℒ × ℒ // p.1 < p.2} → S} [hμ : μA_DescendingChainCondition μ] [hμcvx : Convex μ] :
+{μ : Intvl ℒ → S} [hμ : μA_DescendingChainCondition μ] [hμcvx : Convex μ] :
 ------------
 Unique (HarderNarasimhanFiltration μ)
 ------------
@@ -102,9 +102,9 @@ where
       (Nat.le_induction (Nat.find_spec a.fin_len) fun n _ hn' ↦ eq_top_iff.2 <| hn' ▸ a.monotone
       (Nat.le_succ n)) a.piecewise_semistable fun i  ↦ by
     have : ∀ (j : ℕ) (hij : i + 1 ≤ j) (hj : j < Nat.find a.fin_len),
-  μA μ ⟨(a.filtration i, a.filtration (i + 1)), a.strict_mono i (i + 1) (lt_add_one i)
-  (by linarith)⟩ > μA μ ⟨(a.filtration j, a.filtration
-    (j + 1)), a.strict_mono j (j + 1) (lt_add_one j) hj⟩ := by
+  μA μ ⟨a.filtration i, a.filtration (i + 1), a.strict_mono i (i + 1) (lt_add_one i)
+  (by linarith)⟩ > μA μ ⟨a.filtration j, a.filtration
+    (j + 1), a.strict_mono j (j + 1) (lt_add_one j) hj⟩ := by
       apply Nat.le_induction
       · exact fun hj ↦ lt_of_not_ge (a.μA_pseudo_strict_anti i hj)
       · refine fun j hij hind hj ↦ gt_trans (hind (Nat.lt_of_succ_lt hj)) ?_
@@ -127,14 +127,14 @@ API note: this is the `RelSeries`-shaped entry point extracted from the canonica
 theorem exists_relSeries_isIntervalSemistable
 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S)
+(μ : Intvl ℒ → S)
 [hμ : μA_DescendingChainCondition μ] [hμcvx : Convex μ] [h : μ_Admissible μ] :
 ------------
 ∃ s : RelSeries (IntervalSemistableRel μ),
   s.head = ⊥ ∧ s.last = ⊤ ∧
   ∀ i : ℕ, (hi : i + 1 < s.length) →
-    ¬   μA μ ⟨(s.toFun i, s.toFun ↑(i+1)), impl.relSeries_step_lt s hi⟩
-      ≤ μA μ ⟨(s.toFun ↑(i+1), s.toFun ↑(i+2)), impl.relSeries_succ_step_lt s hi⟩
+    ¬   μA μ ⟨s.toFun i, s.toFun ↑(i+1), impl.relSeries_step_lt s hi⟩
+      ≤ μA μ ⟨s.toFun ↑(i+1), s.toFun ↑(i+2), impl.relSeries_succ_step_lt s hi⟩
 ------------
  := by
   let HNfil : HarderNarasimhanFiltration μ := default
@@ -166,14 +166,14 @@ series (up to extensional equality).
 theorem exists_unique_relSeries_isIntervalSemistable_of_completeLinearOrder
 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLinearOrder S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S)
+(μ : Intvl ℒ → S)
 [hμ : μA_DescendingChainCondition μ] [hμcvx : Convex μ] :
 ------------
 ∃! s : RelSeries (IntervalSemistableRel μ),
   s.head = ⊥ ∧ s.last = ⊤ ∧
   ∀ i : ℕ, (hi : i + 1 < s.length) →
-    ¬   μA μ ⟨(s.toFun i, s.toFun ↑(i+1)), impl.relSeries_step_lt s hi⟩
-      ≤ μA μ ⟨(s.toFun ↑(i+1), s.toFun ↑(i+2)), impl.relSeries_succ_step_lt s hi⟩
+    ¬   μA μ ⟨s.toFun i, s.toFun ↑(i+1), impl.relSeries_step_lt s hi⟩
+      ≤ μA μ ⟨s.toFun ↑(i+1), s.toFun ↑(i+2), impl.relSeries_succ_step_lt s hi⟩
 ------------
 := by
   apply existsUnique_of_exists_of_unique

@@ -179,13 +179,13 @@ This is later turned into a finset and then coerced into the complete lattice `S
 -/
 abbrev _μ (R : Type*) [CommRing R] [IsNoetherianRing R]
 (M : Type*) [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]
-(I : {z: (ℒ R M) × (ℒ R M) // z.1 < z.2}) :
+(I : Intvl (ℒ R M)) :
 ------------
 Set (LinearExtension (PrimeSpectrum R))
 ------------
 :=
 { {asIdeal := p, isPrime := h.out.1} |
-  (p : Ideal R) (h : p ∈ associatedPrimes R (I.val.2⧸(I.val.1.submoduleOf I.val.2))) }
+  (p : Ideal R) (h : p ∈ associatedPrimes R (I.right⧸(I.left.submoduleOf I.right))) }
 
 /--
 Finiteness of `_μ R M I`.
@@ -195,11 +195,11 @@ finitely generated module is finite; this yields a `Fintype` instance.
 -/
 noncomputable instance {R : Type*} [CommRing R] [IsNoetherianRing R]
 {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]
-{I : {z: (ℒ R M) × (ℒ R M) // z.1 < z.2}} :
+{I : Intvl (ℒ R M)} :
 ------------
 Fintype ((_μ R M) I)
 ------------
-:= (Set.Finite.dependent_image (associatedPrimes.finite R (I.val.2⧸(I.val.1.submoduleOf I.val.2)))
+:= (Set.Finite.dependent_image (associatedPrimes.finite R (I.right⧸(I.left.submoduleOf I.right)))
   (fun I hI ↦ ({asIdeal := I, isPrime := hI.out.1} : LinearExtension (PrimeSpectrum R)))).fintype
 
 /--
@@ -215,7 +215,7 @@ API note: this is the primary slope map exported by the coprimary layer.
 noncomputable abbrev μ (R : Type*) [CommRing R] [IsNoetherianRing R]
 (M : Type*) [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] :
 ------------
-{z: (ℒ R M) × (ℒ R M) // z.1 < z.2} → (S R)
+Intvl (ℒ R M) → (S R)
 ------------
 := fun I ↦ .principal ((_μ R M) I).toFinset
 

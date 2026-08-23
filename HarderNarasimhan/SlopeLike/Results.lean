@@ -34,15 +34,15 @@ definition.
 -/
 lemma seesaw {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S) :
+(μ : Intvl ℒ → S) :
 ------------
 SlopeLike μ ↔
 ∀ (x y z : ℒ), (h : x < y ∧ y < z) → (
-  μ ⟨(x, y), h.1⟩ < μ ⟨(x, z), lt_trans h.1 h.2⟩ ∧ μ ⟨(x, z), lt_trans h.1 h.2⟩ < μ ⟨(y, z), h.2⟩
+  μ ⟨x, y, h.1⟩ < μ ⟨x, z, lt_trans h.1 h.2⟩ ∧ μ ⟨x, z, lt_trans h.1 h.2⟩ < μ ⟨y, z, h.2⟩
   ∨
-  μ ⟨(x, y), h.1⟩ > μ ⟨(x, z), lt_trans h.1 h.2⟩ ∧ μ ⟨(x, z), lt_trans h.1 h.2⟩ > μ ⟨(y, z), h.2⟩
+  μ ⟨x, y, h.1⟩ > μ ⟨x, z, lt_trans h.1 h.2⟩ ∧ μ ⟨x, z, lt_trans h.1 h.2⟩ > μ ⟨y, z, h.2⟩
   ∨
-  μ ⟨(x, y), h.1⟩ = μ ⟨(x, z), lt_trans h.1 h.2⟩ ∧ μ ⟨(x, z), lt_trans h.1 h.2⟩ = μ ⟨(y, z), h.2⟩
+  μ ⟨x, y, h.1⟩ = μ ⟨x, z, lt_trans h.1 h.2⟩ ∧ μ ⟨x, z, lt_trans h.1 h.2⟩ = μ ⟨y, z, h.2⟩
 )
 ------------
 := impl.prop4d6 μ
@@ -58,12 +58,12 @@ given additivity of rank `r` and degree `d` on composable intervals and a positi
 theorem SlopeLike_of_μQuotient {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {V : Type*} [AddCommGroup V] [Module ℝ V] [LinearOrder V] [IsOrderedAddMonoid V]
 [PosSMulStrictMono ℝ V] [Nontrivial V]
-(r : {p :ℒ × ℒ // p.1 < p.2} → NNReal)
-(d : {p :ℒ × ℒ // p.1 < p.2} → V)
+(r : Intvl ℒ → NNReal)
+(d : Intvl ℒ → V)
 (h₁ : ∀ (x y z : ℒ), (h : x < y ∧ y < z) →
-  d ⟨(x, z), lt_trans h.1 h.2⟩ = d ⟨(x, y), h.1⟩ + d ⟨(y, z), h.2⟩ ∧
-  r ⟨(x, z), lt_trans h.1 h.2⟩ = r ⟨(x, y), h.1⟩ + r ⟨(y, z), h.2⟩)
-(h₂ : ∀ (x y : ℒ), (h : x < y) → r ⟨(x, y), h⟩ = 0 → d ⟨(x, y), h⟩ > 0) :
+  d ⟨x, z, lt_trans h.1 h.2⟩ = d ⟨x, y, h.1⟩ + d ⟨y, z, h.2⟩ ∧
+  r ⟨x, z, lt_trans h.1 h.2⟩ = r ⟨x, y, h.1⟩ + r ⟨y, z, h.2⟩)
+(h₂ : ∀ (x y : ℒ), (h : x < y) → r ⟨x, y, h⟩ = 0 → d ⟨x, y, h⟩ > 0) :
 ------------
  SlopeLike (μQuotient r d)
 ------------
@@ -81,41 +81,41 @@ remaining relations need to be derived.
 -/
 lemma seesaw' {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S) :
+(μ : Intvl ℒ → S) :
 ------------
 SlopeLike μ → ∀ (x y z : ℒ), (h : x < y ∧ y < z) →
 (
   (
-    μ ⟨(x,y),h.1⟩ < μ ⟨(x,z),lt_trans h.1 h.2⟩ →
-      μ ⟨(x,y),h.1⟩ < μ ⟨(y,z),h.2⟩ ∧ μ ⟨(x,z),lt_trans h.1 h.2⟩ < μ ⟨(y,z),h.2⟩
+    μ ⟨x, y,h.1⟩ < μ ⟨x, z,lt_trans h.1 h.2⟩ →
+      μ ⟨x, y,h.1⟩ < μ ⟨y, z,h.2⟩ ∧ μ ⟨x, z,lt_trans h.1 h.2⟩ < μ ⟨y, z,h.2⟩
   ) ∧ (
-    μ ⟨(x,y),h.1⟩ < μ ⟨(y,z),h.2⟩ →
-      μ ⟨(x,y),h.1⟩ < μ ⟨(x,z),lt_trans h.1 h.2⟩ ∧ μ ⟨(x,z),lt_trans h.1 h.2⟩ < μ ⟨(y,z),h.2⟩
+    μ ⟨x, y,h.1⟩ < μ ⟨y, z,h.2⟩ →
+      μ ⟨x, y,h.1⟩ < μ ⟨x, z,lt_trans h.1 h.2⟩ ∧ μ ⟨x, z,lt_trans h.1 h.2⟩ < μ ⟨y, z,h.2⟩
   ) ∧ (
-    μ ⟨(x,z),lt_trans h.1 h.2⟩ < μ ⟨(y,z),h.2⟩ →
-      μ ⟨(x,y),h.1⟩ < μ ⟨(x,z),lt_trans h.1 h.2⟩ ∧ μ ⟨(x,y),h.1⟩ < μ ⟨(y,z),h.2⟩
+    μ ⟨x, z,lt_trans h.1 h.2⟩ < μ ⟨y, z,h.2⟩ →
+      μ ⟨x, y,h.1⟩ < μ ⟨x, z,lt_trans h.1 h.2⟩ ∧ μ ⟨x, y,h.1⟩ < μ ⟨y, z,h.2⟩
   )
 ) ∧ (
   (
-    μ ⟨(x,y),h.1⟩ > μ ⟨(x,z),lt_trans h.1 h.2⟩ →
-      μ ⟨(x,y),h.1⟩ > μ ⟨(y,z),h.2⟩ ∧ μ ⟨(x,z),lt_trans h.1 h.2⟩ > μ ⟨(y,z),h.2⟩
+    μ ⟨x, y,h.1⟩ > μ ⟨x, z,lt_trans h.1 h.2⟩ →
+      μ ⟨x, y,h.1⟩ > μ ⟨y, z,h.2⟩ ∧ μ ⟨x, z,lt_trans h.1 h.2⟩ > μ ⟨y, z,h.2⟩
   ) ∧ (
-    μ ⟨(x,y),h.1⟩ > μ ⟨(y,z),h.2⟩ →
-      μ ⟨(x,y),h.1⟩ > μ ⟨(x,z),lt_trans h.1 h.2⟩ ∧ μ ⟨(x,z),lt_trans h.1 h.2⟩ > μ ⟨(y,z),h.2⟩
+    μ ⟨x, y,h.1⟩ > μ ⟨y, z,h.2⟩ →
+      μ ⟨x, y,h.1⟩ > μ ⟨x, z,lt_trans h.1 h.2⟩ ∧ μ ⟨x, z,lt_trans h.1 h.2⟩ > μ ⟨y, z,h.2⟩
   ) ∧ (
-    μ ⟨(x,z),lt_trans h.1 h.2⟩ > μ ⟨(y,z),h.2⟩ →
-      μ ⟨(x,y),h.1⟩ > μ ⟨(x,z),lt_trans h.1 h.2⟩ ∧ μ ⟨(x,y),h.1⟩ > μ ⟨(y,z),h.2⟩
+    μ ⟨x, z,lt_trans h.1 h.2⟩ > μ ⟨y, z,h.2⟩ →
+      μ ⟨x, y,h.1⟩ > μ ⟨x, z,lt_trans h.1 h.2⟩ ∧ μ ⟨x, y,h.1⟩ > μ ⟨y, z,h.2⟩
   )
 ) ∧ (
   (
-    μ ⟨(x,y),h.1⟩ = μ ⟨(x,z),lt_trans h.1 h.2⟩ →
-      μ ⟨(x,y),h.1⟩ = μ ⟨(y,z),h.2⟩ ∧ μ ⟨(x,z),lt_trans h.1 h.2⟩ = μ ⟨(y,z),h.2⟩
+    μ ⟨x, y,h.1⟩ = μ ⟨x, z,lt_trans h.1 h.2⟩ →
+      μ ⟨x, y,h.1⟩ = μ ⟨y, z,h.2⟩ ∧ μ ⟨x, z,lt_trans h.1 h.2⟩ = μ ⟨y, z,h.2⟩
   ) ∧ (
-    μ ⟨(x,y),h.1⟩ = μ ⟨(y,z),h.2⟩ →
-      μ ⟨(x,y),h.1⟩ = μ ⟨(x,z),lt_trans h.1 h.2⟩ ∧ μ ⟨(x,z),lt_trans h.1 h.2⟩ = μ ⟨(y,z),h.2⟩
+    μ ⟨x, y,h.1⟩ = μ ⟨y, z,h.2⟩ →
+      μ ⟨x, y,h.1⟩ = μ ⟨x, z,lt_trans h.1 h.2⟩ ∧ μ ⟨x, z,lt_trans h.1 h.2⟩ = μ ⟨y, z,h.2⟩
   ) ∧ (
-    μ ⟨(x,z),lt_trans h.1 h.2⟩ = μ ⟨(y,z),h.2⟩ →
-      μ ⟨(x,y),h.1⟩ = μ ⟨(x,z),lt_trans h.1 h.2⟩ ∧ μ ⟨(x,y),h.1⟩ = μ ⟨(y,z),h.2⟩
+    μ ⟨x, z,lt_trans h.1 h.2⟩ = μ ⟨y, z,h.2⟩ →
+      μ ⟨x, y,h.1⟩ = μ ⟨x, z,lt_trans h.1 h.2⟩ ∧ μ ⟨x, y,h.1⟩ = μ ⟨y, z,h.2⟩
   )
 ) := by
   intro hsl x y z h
