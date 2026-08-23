@@ -123,7 +123,7 @@ def semistableI {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 /--
 Global semistability class.
 
-This expresses that for every `x ≠ ⊥`, the value `μA μ (⊥,x)` is not strictly greater than the
+This expresses that for every `x > ⊥`, the value `μA μ (⊥,x)` is not strictly greater than the
 global value `μA μ (⊥,⊤)`.
 
 Interpretation: no proper initial segment yields a strictly better `μA`-value than the whole object.
@@ -132,14 +132,14 @@ API note: formulated as a class with a single field `semistable`.
 class Semistable {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : Intvl ℒ → S) : Prop where
-  semistable : ∀x : ℒ, (hx : x ≠ ⊥) →
-    ¬ μA μ ⟨⊥, x,bot_lt_iff_ne_bot.2 hx⟩ > μA μ ⟨⊥, ⊤,bot_lt_top⟩
+  semistable : ∀ x : ℒ, (hx : ⊥ < x) →
+    ¬ μA μ ⟨⊥, x, hx⟩ > μA μ ⟨⊥, ⊤, bot_lt_top⟩
 
 /--
 Global stability class.
 
-This strengthens `Semistable μ` by requiring strict inequality: for any proper `x` (non-bottom and
-not-top), the value `μA μ (⊥,x)` must be different from the global value `μA μ (⊥,⊤)`.
+This strengthens `Semistable μ` by requiring strict inequality: for any proper `x`
+(with `⊥ < x < ⊤`), the value `μA μ (⊥,x)` must be different from the global value `μA μ (⊥,⊤)`.
 
 API note: we extend `Semistable μ` to reuse the semistability field and allow downstream lemmas to
 accept `Stable μ` where `Semistable μ` is required.
@@ -147,7 +147,7 @@ accept `Stable μ` where `Semistable μ` is required.
 class Stable {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : Intvl ℒ → S) extends Semistable μ where
-  stable : ∀x : ℒ, (hx : x ≠ ⊥) → x ≠ ⊤ →
-    μA μ ⟨⊥, x, bot_lt_iff_ne_bot.2 hx⟩ ≠ μA μ ⟨⊥, ⊤,bot_lt_top⟩
+  stable : ∀ x : ℒ, (hx : ⊥ < x) → x < ⊤ →
+    μA μ ⟨⊥, x, hx⟩ ≠ μA μ ⟨⊥, ⊤, bot_lt_top⟩
 
 end HarderNarasimhan

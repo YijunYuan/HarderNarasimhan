@@ -393,7 +393,7 @@ NashEquilibrium μ → Semistable μ := by
     intro x hx
     rw [← this]
     exact le_sSup ⟨x, hx, rfl⟩
-  exact {semistable := fun x hx ↦ (this x hx).not_gt}
+  exact {semistable := fun x hx ↦ (this x hx.ne').not_gt}
 
 
 

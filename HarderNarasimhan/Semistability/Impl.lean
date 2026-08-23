@@ -624,8 +624,8 @@ theorem semistable_iff {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrde
   simp only [semistableI, StI, S₁I, TotIntvl, ne_eq, gt_iff_lt, S₂I, Set.mem_ofPred_eq, le_top,
     implies_true, and_true, bot_ne_top, not_false_eq_true, exists_true_left]
   constructor
-  · exact fun h ↦ ⟨in_TotIntvl _, fun y hyI hy ↦ h.semistable y <| Ne.symm hy⟩
-  · exact fun h ↦ {semistable := fun y hyI hy ↦ (h.choose_spec y (in_TotIntvl _) (Ne.symm hyI)) hy}
+  · exact fun h ↦ ⟨in_TotIntvl _, fun y hyI hy ↦ h.semistable y <| bot_le.lt_of_ne hy⟩
+  · exact fun h ↦ {semistable := fun y hyI hy ↦ (h.choose_spec y (in_TotIntvl _) hyI.ne) hy}
 
 
 /--

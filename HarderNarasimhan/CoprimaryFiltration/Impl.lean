@@ -410,7 +410,7 @@ Semistable (μ R M) ↔ ∀ N : (ℒ R M), (hN : ⊥ < N) → μA (μ R M) ⟨�
   ({(((_μ R M) ⟨⊥, ⊤,bot_lt_top⟩).toFinset.min' (μ_nonempty _))} : S₀ R) := by
   constructor
   · intro hst N hN
-    replace hst := hst.semistable N (bot_lt_iff_ne_bot.1 hN)
+    replace hst := hst.semistable N hN
     rw [prop3d12 ⟨⊥, N,hN⟩, prop3d12 ⟨(⊥ : ℒ R M), ⊤, bot_lt_top⟩] at hst
     rw [prop3d12 ⟨⊥, N,hN⟩]
     simp only [DedekindCut.principal_inj, Finset.singleton_inj]
@@ -420,10 +420,10 @@ Semistable (μ R M) ↔ ∀ N : (ℒ R M), (hN : ⊥ < N) → μA (μ R M) ⟨�
       Set.toFinset_subset_toFinset.mpr <| _μ_mono_right hN le_top
   · intro h
     refine { semistable := fun N hN ↦ ?_ }
-    specialize h N (bot_lt_iff_ne_bot.2 hN)
-    rw [prop3d12 ⟨⊥, N,bot_lt_iff_ne_bot.2 hN⟩] at h
+    specialize h N hN
+    rw [prop3d12 ⟨⊥, N, hN⟩] at h
     simp only [DedekindCut.principal_inj, Finset.singleton_inj] at h
-    rw [prop3d12 ⟨⊥, N,bot_lt_iff_ne_bot.2 hN⟩, prop3d12 ⟨(⊥ : ℒ R M), ⊤, bot_lt_top⟩]
+    rw [prop3d12 ⟨⊥, N, hN⟩, prop3d12 ⟨(⊥ : ℒ R M), ⊤, bot_lt_top⟩]
     simp only [gt_iff_lt, DedekindCut.principal_lt_principal, not_lt]
     exact (S₀_order.2 _ _).1 h.le
 
@@ -605,9 +605,10 @@ lemma semistable_res_iff_semistable_quot {R : Type*} [CommRing R] [IsNoetherianR
     intro X hX
     have hres := h.semistable
       ⟨lift_quot N₁ N₂ X, lift_quot_middle N₁ N₂ (le_of_lt hN) X⟩
-      (fun hc ↦ lift_quot_not_bot N₁ N₂ X hX (Subtype.coe_inj.mpr hc))
+      (bot_lt_iff_ne_bot.2 fun hc ↦
+        lift_quot_not_bot N₁ N₂ X hX.ne' (Subtype.coe_inj.mpr hc))
     have hmid := lift_quot_middle N₁ N₂ (le_of_lt hN) X
-    have hneq : lift_quot N₁ N₂ X ≠ N₁ := lift_quot_not_bot N₁ N₂ X hX
+    have hneq : lift_quot N₁ N₂ X ≠ N₁ := lift_quot_not_bot N₁ N₂ X hX.ne'
     have hres' :
         ¬ μA (μ R M) ⟨N₁, lift_quot N₁ N₂ X, lt_of_le_of_ne hmid.1 hneq.symm⟩ >
           μA (μ R M) ⟨N₁, N₂, hN⟩ := by
@@ -621,10 +622,10 @@ lemma semistable_res_iff_semistable_quot {R : Type*} [CommRing R] [IsNoetherianR
     let : Nontrivial (↥N₂ ⧸ N₁.submoduleOf N₂) := quot_ntl hN
     refine { semistable := ?_ }
     intro W hW
-    have hW' : W.val ≠ N₁ := fun hEq ↦ hW (Subtype.ext hEq)
+    have hW' : W.val ≠ N₁ := fun hEq ↦ hW.ne' (Subtype.ext hEq)
     have hquot := h.semistable
       (Submodule.map (N₁.submoduleOf N₂).mkQ (Submodule.comap N₂.subtype W.val))
-      (map_comap_ne_bot W.prop.1 W.prop.2 hW')
+      (bot_lt_iff_ne_bot.2 <| map_comap_ne_bot W.prop.1 W.prop.2 hW')
     have hquot' :
         ¬ μA (μ R M) ⟨N₁, W.val, lt_of_le_of_ne W.prop.1 hW'.symm⟩ >
           μA (μ R M) ⟨N₁, N₂, hN⟩ := by

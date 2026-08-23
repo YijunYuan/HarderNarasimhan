@@ -665,14 +665,14 @@ lemma stable_of_step_cond₂
       let stepI : Intvl ℒ :=
         ⟨filtration (i + 1), filtration i, strict_anti i (i + 1) (lt_add_one i) hi⟩
       have hx_left : filtration (i + 1) < x.val :=
-        lt_of_le_of_ne x.prop.1 fun hc ↦ hx <| Subtype.coe_inj.1 hc.symm
+        lt_of_le_of_ne x.prop.1 fun hc ↦ hx.ne' <| Subtype.coe_inj.1 hc.symm
       have hAstar_step := (proposition_4_1 (Resμ stepI μ) inferInstance inferInstance).1
       have hAstar_x := (proposition_4_1 (Resμ ⟨filtration (i + 1), x.val, hx_left⟩ μ)
         inferInstance inferInstance).1
       simp only [μAstar, μA_res_intvl,μmin_res_intvl] at *
       rw [hAstar_step]
-      replace hAstar_x : μA μ (Intvl.ofSub ⟨⊥, x, bot_lt_iff_ne_bot.2 hx⟩) =
-        μmin μ (Intvl.ofSub ⟨⊥, x, bot_lt_iff_ne_bot.2 hx⟩) := hAstar_x
+      replace hAstar_x : μA μ (Intvl.ofSub ⟨⊥, x, hx⟩) =
+        μmin μ (Intvl.ofSub ⟨⊥, x, hx⟩) := hAstar_x
       rw [hAstar_x]
       have hss := semistable_of_step_cond₂ μ filtration fin_len strict_anti h i hi
       have hNash_step :=
@@ -682,7 +682,7 @@ lemma stable_of_step_cond₂
       simp only [μmin_res_intvl,μ_res_intvl] at hμmin_step
       rw [hμmin_step]
       exact ne_of_lt <| lt_of_le_of_lt (rmk4d10₀ μ ⟨filtration (i + 1), ↑x, hx_left⟩).1 <|
-        h i hi x.val hx_left <| lt_top_iff_ne_top.2 hx'
+        h i hi x.val hx_left hx'
 
 open Classical in
 /-- `step_cond₂_of_stable` is the converse direction: stability implies the strict step condition.
@@ -708,8 +708,8 @@ lemma step_cond₂_of_stable {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [Bound
   let stepI : Intvl ℒ :=
     ⟨filtration (i + 1), filtration i, strict_anti i (i + 1) (lt_add_one i) hi⟩
   let midI : ↥stepI := ⟨z, le_of_lt hz, le_of_lt hz'⟩
-  have hmid_ne_bot : midI ≠ ⊥ := fun hc ↦ ne_of_gt hz (congrArg Subtype.val hc)
-  have hmid_ne_top : midI ≠ ⊤ := fun hc ↦ ne_of_lt hz' (congrArg Subtype.val hc)
+  have hmid_ne_bot : ⊥ < midI := bot_lt_iff_ne_bot.2 fun hc ↦ ne_of_gt hz (congrArg Subtype.val hc)
+  have hmid_ne_top : midI < ⊤ := lt_top_iff_ne_top.2 fun hc ↦ ne_of_lt hz' (congrArg Subtype.val hc)
   have hss := (hst i hi).toSemistable.semistable midI hmid_ne_bot
   simp only [gt_iff_lt, not_lt] at hss
   have hst' := lt_of_le_of_ne hss ((hst i hi).stable midI hmid_ne_bot hmid_ne_top)
@@ -720,7 +720,7 @@ lemma step_cond₂_of_stable {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [Bound
     inferInstance inferInstance).1
   unfold μAstar at hAstar_mid
   have hb : μA (Resμ ⟨filtration (i + 1), filtration i, gt_trans hz' hz⟩ μ)
-    ⟨⊥, midI, bot_lt_iff_ne_bot.2 hmid_ne_bot⟩ =
+    ⟨⊥, midI, hmid_ne_bot⟩ =
     μA (Resμ ⟨filtration (i + 1), z, hz⟩ μ) ⟨⊥, ⊤, bot_lt_top⟩ := by
     simp only [μA_res_intvl,μmin_res_intvl] at *
     rfl
@@ -738,8 +738,8 @@ lemma step_cond₂_of_stable {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [Bound
   simp only [ne_eq, Set.mem_ofPred_eq, forall_exists_index] at hsSup_step
   have hsSup_step_bak := hsSup_step
   have hsSup_mid := hsSup_step (Resμ ⟨filtration (i + 1), filtration i, gt_trans hz' hz⟩
-    μ ⟨⊥, midI, bot_lt_iff_ne_bot.2 hmid_ne_bot⟩)
-    midI ⟨in_TotIntvl _, fun hc => hmid_ne_bot hc.symm⟩ rfl
+    μ ⟨⊥, midI, hmid_ne_bot⟩)
+    midI ⟨in_TotIntvl _, hmid_ne_bot.ne⟩ rfl
   have hsSup_mid' : μ ⟨filtration (i + 1), z, hz⟩ ≤ μ ⟨filtration (i + 1), filtration i,
       strict_anti i (i + 1) (lt_add_one i) hi⟩ := hsSup_mid
   refine lt_of_le_of_ne hsSup_mid' ?_
