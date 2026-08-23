@@ -479,20 +479,31 @@ Semistable (μ R M) ↔ ∃! p, p ∈ associatedPrimes R M := by
     exact PrimeSpectrum.ext ((hp_unique _ hq).trans (hp_unique _ hp0).symm)
 
 /--
-If the interval quotient has a unique associated prime, `Finset.min'` computes it.
+The chosen minimum of `_μ R M I` is itself an associated prime of the interval quotient.
+-/
+lemma min'_asIdeal_mem {R : Type*} [CommRing R] [IsNoetherianRing R]
+{M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]
+(I : Intvl (ℒ R M)) :
+(((_μ R M) I).toFinset.min' (μ_nonempty I)).asIdeal ∈
+  associatedPrimes R (I.right ⧸ I.left.submoduleOf I.right) := by
+  obtain ⟨p, hp1, hp2⟩ := Set.mem_toFinset.mp <| ((_μ R M) I).toFinset.min'_mem (μ_nonempty I)
+  rwa [← hp2]
+
+/--
+If the interval quotient has a unique associated prime, every associated prime computes the
+`Finset.min'` of `_μ R M I`.
 
 This is the bridge between the `Coprimary` predicate on graded pieces and the minimal
 associated primes compared by the Harder–Narasimhan axioms.
 -/
-lemma min'_eq_of_unique {R : Type*} [CommRing R] [IsNoetherianRing R]
+lemma toLinearExtension_eq_min' {R : Type*} [CommRing R] [IsNoetherianRing R]
 {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]
 (I : Intvl (ℒ R M))
-(hu : ∃! p, p ∈ associatedPrimes R (I.right ⧸ I.left.submoduleOf I.right)) :
-((_μ R M) I).toFinset.min' (μ_nonempty I) =
-  ⟨hu.exists.choose, hu.exists.choose_spec.out.1⟩ := by
-  obtain ⟨p, hp1, hp2⟩ := Set.mem_toFinset.mp <| ((_μ R M) I).toFinset.min'_mem (μ_nonempty I)
-  rw [← hp2]
-  exact PrimeSpectrum.ext (hu.unique hp1 hu.exists.choose_spec)
+(hu : ∃! p, p ∈ associatedPrimes R (I.right ⧸ I.left.submoduleOf I.right))
+{p : PrimeSpectrum R}
+(hp : p.asIdeal ∈ associatedPrimes R (I.right ⧸ I.left.submoduleOf I.right)) :
+toLinearExtension p = ((_μ R M) I).toFinset.min' (μ_nonempty I) :=
+  PrimeSpectrum.ext (hu.unique hp (min'_asIdeal_mem I))
 
 /--
 Admissibility of the slope `μ R M`.
@@ -723,17 +734,17 @@ Inhabited (CoprimaryFiltration R M) := by
     CoprimaryFiltration.mk HNFil.filtration HNFil.monotone HNFil.first_eq_bot HNFil.fin_len
     HNFil.strict_mono (piecewise_coprimary HNFil) ?_)
   }
-  intro n hn
+  intro n hn p q hp hq
   have := lt_of_not_ge <| HNFil.μA_pseudo_strict_anti n hn
   rw [prop3d12, prop3d12, DedekindCut.principal_lt_principal] at this
   replace this := S₀_order'.2 this
-  have pcn := (piecewise_coprimary HNFil n <| Nat.lt_of_succ_lt hn).coprimary
-  have pcnp1 := (piecewise_coprimary HNFil (n+1) hn).coprimary
-  have t' := min'_eq_of_unique ⟨HNFil.filtration (n + 1), HNFil.filtration (n + 2),
-    HNFil.strict_mono (n+1) (n+2) (Nat.lt_add_one (n + 1)) hn⟩ pcnp1
-  have t'' := min'_eq_of_unique ⟨HNFil.filtration n, HNFil.filtration (n + 1),
-    HNFil.strict_mono n (n+1) (Nat.lt_add_one n) (Nat.le_of_succ_le hn)⟩ pcn
-  exact t' ▸ t'' ▸ this
+  rw [toLinearExtension_eq_min' ⟨HNFil.filtration (n + 1), HNFil.filtration (n + 2),
+      HNFil.strict_mono (n+1) (n+2) (Nat.lt_add_one (n + 1)) hn⟩
+      (piecewise_coprimary HNFil (n+1) hn).coprimary hp,
+    toLinearExtension_eq_min' ⟨HNFil.filtration n, HNFil.filtration (n + 1),
+      HNFil.strict_mono n (n+1) (Nat.lt_add_one n) (Nat.le_of_succ_le hn)⟩
+      (piecewise_coprimary HNFil n <| Nat.lt_of_succ_lt hn).coprimary hq]
+  exact this
 
 instance {R : Type*} [CommRing R] [IsNoetherianRing R]
 {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] :
@@ -765,12 +776,11 @@ lemma CoprimaryFiltration.toHarderNarasimhanFiltration {R : Type*} [CommRing R] 
         rw [prop3d12, prop3d12]
         simp only [DedekindCut.principal_le_principal, not_le]
         apply S₀_order'.1
-        rw [min'_eq_of_unique ⟨a.filtration (i + 1), a.filtration (i + 2), a.strict_mono (i+1)
-              (i+2) (Nat.lt_add_one (i + 1)) hi⟩ (a.piecewise_coprimary (i+1) hi).coprimary,
-          min'_eq_of_unique ⟨a.filtration i, a.filtration (i + 1), a.strict_mono i
-              (i+1) (Nat.lt_add_one i) (Nat.le_of_succ_le hi)⟩
-            (a.piecewise_coprimary i (Nat.lt_of_succ_lt hi)).coprimary]
-        exact a.strict_mono_associated_prime i hi
+        exact a.strict_anti_associated_prime i hi _ _
+          (min'_asIdeal_mem ⟨a.filtration (i + 1), a.filtration (i + 2), a.strict_mono (i+1)
+            (i+2) (Nat.lt_add_one (i + 1)) hi⟩)
+          (min'_asIdeal_mem ⟨a.filtration i, a.filtration (i + 1), a.strict_mono i
+            (i+1) (Nat.lt_add_one i) (Nat.le_of_succ_le hi)⟩)
   use ahn
 
 /--

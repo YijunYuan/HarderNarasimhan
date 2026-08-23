@@ -240,8 +240,12 @@ The `Nonempty`/`Unique` instances live in `HarderNarasimhan.CoprimaryFiltration.
 This mirrors `HarderNarasimhanFiltration` but strengthens the “piecewise semistable”
 condition to a concrete algebraic one: each successive quotient is coprimary.
 
-Additionally, `strict_mono_associated_prime` enforces a strict monotonicity condition
-on the associated primes of successive factors (using the fixed linear extension).
+Additionally, `strict_anti_associated_prime` enforces strict decrease of the associated
+primes of successive factors along the filtration (in the fixed linear extension): any
+associated prime of a later piece is strictly below any associated prime of an earlier piece.
+Since each piece is coprimary, its set of associated primes is a singleton, so this
+universally quantified form is equivalent to comparing "the" primes — but it avoids
+`Exists.choose` in the statement and dependence on the proof of `piecewise_coprimary`.
 
 API note: this is the main structure that users quantify over in the coprimary chapter.
 -/
@@ -259,18 +263,14 @@ structure CoprimaryFiltration (R : Type*) [CommRing R] [IsNoetherianRing R]
   piecewise_coprimary :
     ∀ n : ℕ, n < Nat.find (fin_len) →
       Coprimary R (filtration (n+1)⧸ ((filtration n).submoduleOf (filtration (n+1))))
-  strict_mono_associated_prime :
-    ∀ n : ℕ, (hn : n + 1 < Nat.find (fin_len)) →
-        @LT.lt (LinearExtension (PrimeSpectrum R)) Preorder.toLT
-        ({
-          asIdeal := (piecewise_coprimary (n+1) hn).coprimary.exists.choose,
-          isPrime := (piecewise_coprimary (n+1) hn).coprimary.exists.choose_spec.out.1
-          })
-        ({
-          asIdeal := (piecewise_coprimary n (Nat.lt_of_succ_lt hn)).coprimary.exists.choose,
-          isPrime := (piecewise_coprimary n (Nat.lt_of_succ_lt hn)
-            ).coprimary.exists.choose_spec.out.1
-          })
+  strict_anti_associated_prime :
+    ∀ n : ℕ, n + 1 < Nat.find (fin_len) →
+      ∀ p q : PrimeSpectrum R,
+        p.asIdeal ∈ associatedPrimes R
+          (filtration (n+2) ⧸ (filtration (n+1)).submoduleOf (filtration (n+2))) →
+        q.asIdeal ∈ associatedPrimes R
+          (filtration (n+1) ⧸ (filtration n).submoduleOf (filtration (n+1))) →
+        toLinearExtension p < toLinearExtension q
 
 
 namespace CoprimaryFiltration
