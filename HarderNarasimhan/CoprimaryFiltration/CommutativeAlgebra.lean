@@ -76,19 +76,13 @@ lemma mem_associatedPrimes_ker_mkLinearMap_of_mem_associatedPrimes_of_inter_none
   have hry : r • y = 0 := by
     rw [hy] at hrp
     simpa [Submodule.mem_colon_singleton] using hrp
-  have hyker : y ∈ LinearMap.ker (LocalizedModule.mkLinearMap S M) := by
-    rw [LinearMap.mem_ker]
-    exact (LocalizedModule.mem_ker_mkLinearMap_iff (S := S) (m := y)).2 ⟨r, hrS, hry⟩
+  have hyker : y ∈ LinearMap.ker (LocalizedModule.mkLinearMap S M) :=
+    (LocalizedModule.mem_ker_mkLinearMap_iff (S := S) (m := y)).2 ⟨r, hrS, hry⟩
   refine ((isAssociatedPrime_iff (R := R) (M := LinearMap.ker (LocalizedModule.mkLinearMap S M))).2
     ⟨hpPrime, ⟨y, hyker⟩, ?_⟩)
+  rw [hy]
   ext z
-  constructor
-  · intro hz
-    rw [hy] at hz
-    simpa [Submodule.mem_colon_singleton] using hz
-  · intro hz
-    rw [hy]
-    simpa [Submodule.mem_colon_singleton] using hz
+  simp [Submodule.mem_colon_singleton, Subtype.ext_iff]
 
 /--
 Associated primes of the kernel of the localization map.
@@ -164,29 +158,13 @@ lemma associatedPrimes_localizedModule_subset_disjoint
   intro p hp
   rcases hp with ⟨hpPrime, x, hx⟩
   apply Set.not_nonempty_iff_eq_empty.mp
-  intro hne
-  rcases hne with ⟨r, hrp, hrS⟩
-  have hrxR_mem : r ∈ (Submodule.colon (⊥ : Submodule R (LocalizedModule S M)) {x}).radical :=
-    hx ▸ hrp
-  rcases Ideal.mem_radical_iff.mp hrxR_mem with ⟨n, hn⟩
-  have hrxn_smul : r ^ n • x = 0 := by
-    rw [Submodule.mem_colon_singleton, Submodule.mem_bot] at hn
-    exact hn
-  have hrnS : r ^ n ∈ S := Submonoid.pow_mem S hrS n
-  have hrxS : (⟨r ^ n, hrnS⟩ : S) • x = 0 := by
-    simpa [Submonoid.smul_def] using hrxn_smul
-  have hx0 : x = 0 := by
-    apply (IsLocalizedModule.smul_injective (f := LocalizedModule.mkLinearMap S M) ⟨r ^ n, hrnS⟩)
-    simpa using hrxS
-  have hpTop : p = ⊤ := by
-    apply top_unique
-    intro a ha
-    rw [hx]
-    rw [Ideal.mem_radical_iff]
-    refine ⟨1, ?_⟩
-    rw [Submodule.mem_colon_singleton, Submodule.mem_bot, hx0]
-    simp
-  exact hpPrime.ne_top hpTop
+  rintro ⟨r, hrp, hrS⟩
+  obtain ⟨n, hn⟩ := Ideal.mem_radical_iff.mp (hx ▸ hrp)
+  rw [Submodule.mem_colon_singleton, Submodule.mem_bot] at hn
+  have hx0 : x = 0 :=
+    IsLocalizedModule.smul_injective (f := LocalizedModule.mkLinearMap S M) ⟨r ^ n, pow_mem hrS n⟩
+      (by simpa [Submonoid.smul_def] using hn)
+  exact hpPrime.ne_top (hx.trans (by rw [hx0, Submodule.colon_singleton_zero, Ideal.radical_top]))
 
 /--
 Associated primes of the localization quotient are disjoint from the multiplicative set.
@@ -380,48 +358,17 @@ lemma bourbaki_elements_math_alg_comm_chIV_sec1_no2_prop6
     have hKleN : K ≤ N := by
       intro x hxK
       by_contra hxN
-      let xq : M ⧸ N := N.mkQ x
-      have hxq_ne : xq ≠ 0 := by simpa [xq, Submodule.Quotient.mk_eq_zero] using hxN
-      let C : Submodule R (M ⧸ N) := Submodule.span R ({xq} : Set (M ⧸ N))
-      have hxq_mem_C : xq ∈ C := Submodule.subset_span (by simp [xq])
-      have hxq_sub_ne : (⟨xq, hxq_mem_C⟩ : C) ≠ 0 := by
-        intro h
-        apply hxq_ne <| Subtype.ext_iff.mp h
-      have hxq_sub_ne' : (0 : C) ≠ ⟨xq, hxq_mem_C⟩ := by
-        simpa [eq_comm] using hxq_sub_ne
-      have : Nontrivial C := ⟨⟨0, by simp [C]⟩, ⟨⟨xq, hxq_mem_C⟩, by
-        exact hxq_sub_ne'⟩⟩
-      obtain ⟨p, hpC⟩ := associatedPrimes.nonempty R C
-      have hpMN : p ∈ associatedPrimes R (M ⧸ N) :=
-        associatedPrimes.subset_of_injective (R := R) (f := C.subtype)
-          (Submodule.injective_subtype C) hpC
+      obtain ⟨p, hpMN, hple⟩ := exists_le_isAssociatedPrime_of_isNoetherianRing R (N.mkQ x)
+        (by simpa [Submodule.Quotient.mk_eq_zero] using hxN)
       have hpDisj : p.carrier ∩ S = ∅ := by
         have hpSet : p ∈ { p ∈ associatedPrimes R M | p.carrier ∩ S = ∅ } := by
-          simpa [hAss.2] using hpMN
+          rw [← hAss.2]
+          exact hpMN
         exact hpSet.2
-      rcases hpC with ⟨hpPrime, y, hy⟩
       rcases (LocalizedModule.mem_ker_mkLinearMap_iff (S := S) (m := x)).1 (by simpa [K] using hxK)
         with ⟨s, hsS, hsx⟩
-      have hsxq : s • xq = 0 := by
-        change N.mkQ (s • x) = 0
-        simp [hsx]
-      have hsy : s • y = 0 := by
-        apply Subtype.ext
-        change s • (y : M ⧸ N) = 0
-        rcases Submodule.mem_span_singleton.mp y.2 with ⟨r, hr⟩
-        have hr' : (y : M ⧸ N) = r • xq := by
-          simpa [eq_comm] using hr
-        rw [hr']
-        calc
-          s • (r • xq) = (s * r) • xq := by simp [smul_smul]
-          _ = r • (s • xq) := by simp [smul_smul, mul_comm]
-          _ = 0 := by simp [hsxq]
-      have hsP : s ∈ p := by
-        rw [hy]
-        rw [Ideal.mem_radical_iff]
-        refine ⟨1, ?_⟩
-        rw [Submodule.mem_colon_singleton]
-        simpa using hsy
+      have hsP : s ∈ p := hple (by
+        rw [Submodule.mem_colon_singleton, Submodule.mem_bot, ← map_smul, hsx, map_zero])
       exact Set.notMem_empty s (hpDisj ▸ ⟨hsP, hsS⟩)
     simpa [K] using le_antisymm hNleK hKleN
   · intro hN

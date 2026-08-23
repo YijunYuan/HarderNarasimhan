@@ -127,7 +127,7 @@ instance {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 {μ : {p : ℒ × ℒ // p.1 < p.2} → S} [h : StrongDescendingChainCondition' μ]
 {I : {p : ℒ × ℒ // p.1 < p.2}} : StrongDescendingChainCondition' (Resμ I μ) where
-  wdcc' := fun f saf ↦ h.wdcc' (fun n ↦ (f n).val) fun ⦃_ _⦄ hn ↦ lt_iff_le_not_ge.mpr (saf hn)
+  wdcc' := fun f saf ↦ h.wdcc' (fun n ↦ (f n).val) fun ⦃_ _⦄ hn ↦ saf hn
 
 
 /--

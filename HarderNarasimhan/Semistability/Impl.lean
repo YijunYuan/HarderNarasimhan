@@ -113,7 +113,7 @@ iterating:
   well-foundedness,
 - if there is no improvement, jump to the left endpoint.
 
-API note: the definition is noncomputable due to classical choice and well-founded `has_min`.
+API note: the definition is noncomputable due to classical choice and well-founded `min`.
 -/
 noncomputable def prop3d4₀func
 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [h : WellFoundedGT ℒ]
@@ -129,8 +129,7 @@ noncomputable def prop3d4₀func
       ⟨I.val.1, ⟨le_rfl,le_of_lt I.prop⟩⟩
     else
       if hne : (ℒₛ μ I prev hbot).Nonempty then
-        let res := h.wf.has_min (ℒₛ μ I prev hbot) hne
-        ⟨(res).choose,res.choose_spec.1.out.choose⟩
+        ⟨h.wf.min (ℒₛ μ I prev hbot) hne, (h.wf.min_mem (ℒₛ μ I prev hbot) hne).out.choose⟩
       else
         ⟨I.val.1, ⟨le_rfl,le_of_lt I.prop⟩⟩
 
@@ -172,8 +171,8 @@ lemma prop3d4₀func_defprop1
     by_contra hcontra
     simp only [prop3d4₀func, prop3d4₀func_helper μ I i hi, hcontra] at hi
     simp only [↓reduceDIte, ne_eq, not_true_eq_false] at hi
-  simpa only [hne, ↓reduceDIte] using (inst_3.wf.has_min (ℒₛ μ I (prop3d4₀func μ I i) <|
-    prop3d4₀func_helper μ I i hi) hne).choose_spec.1.out.choose_spec.choose_spec
+  simpa only [hne, ↓reduceDIte] using (inst_3.wf.min_mem (ℒₛ μ I (prop3d4₀func μ I i) <|
+    prop3d4₀func_helper μ I i hi) hne).out.choose_spec.choose_spec
 
 
 /--
@@ -181,7 +180,7 @@ Another key property of the recursion: step `i+1` is chosen to be “maximal amo
 its `μA`-value”, in the sense that no `z` strictly between step `i+1` and step `i` can have
 `μA (I.left, z)` greater-or-equal to `μA (I.left, step(i+1))`.
 
-This is a tie-breaking/optimality condition derived from minimality in the well-founded `has_min`
+This is a tie-breaking/optimality condition derived from minimality in the well-founded `min`
 choice.
 -/
 lemma prop3d4₀func_defprop2
@@ -209,14 +208,14 @@ lemma prop3d4₀func_defprop2
       apply lt_of_le_of_ne hz.2
       by_contra hcontra'
       simp only [hcontra', ↓reduceDIte, ge_iff_le] at hcontra
-      exact (inst_3.wf.has_min (ℒₛ μ I (prop3d4₀func μ I i) <| prop3d4₀func_helper μ I i hi) hne
-        ).choose_spec.1.out.choose_spec.choose_spec.not_ge hcontra
+      exact (inst_3.wf.min_mem (ℒₛ μ I (prop3d4₀func μ I i) <| prop3d4₀func_helper μ I i hi) hne
+        ).out.choose_spec.choose_spec.not_ge hcontra
     use ⟨ne_of_lt <| lt_of_le_of_lt (prop3d4₀func μ I (i+1)).prop.1 hz.1,h''⟩, lt_of_le_of_lt'
-      hcontra.ge (inst_3.wf.has_min (ℒₛ μ I (prop3d4₀func μ I i) <| prop3d4₀func_helper μ I i hi)
-      hne).choose_spec.1.out.choose_spec.choose_spec
+      hcontra.ge (inst_3.wf.min_mem (ℒₛ μ I (prop3d4₀func μ I i) <| prop3d4₀func_helper μ I i hi)
+      hne).out.choose_spec.choose_spec
   simp only [prop3d4₀func, prop3d4₀func_helper μ I i hi, hne] at hz
-  exact (inst_3.wf.has_min (ℒₛ μ I (prop3d4₀func μ I i) <| prop3d4₀func_helper μ I i hi) hne
-    ).choose_spec.2 z h' hz.1
+  exact inst_3.wf.not_lt_min (ℒₛ μ I (prop3d4₀func μ I i) <| prop3d4₀func_helper μ I i hi)
+    h' hz.1
 
 
 /--
@@ -238,8 +237,8 @@ lemma prop3d4₀func_strict_decreasing
   · simp only [prop3d4₀func, hi, ↓reduceDIte] at h
     by_cases hne : (ℒₛ μ I (prop3d4₀func μ I i) hi).Nonempty
     · simp only [hne, ↓reduceDIte] at h
-      exact False.elim ((inst_3.wf.has_min (ℒₛ μ I (prop3d4₀func μ I i) hi) hne
-        ).choose_spec.1.out.choose_spec.choose.1 h)
+      exact False.elim ((inst_3.wf.min_mem (ℒₛ μ I (prop3d4₀func μ I i) hi) hne
+        ).out.choose_spec.choose.1 h)
     · simp only [prop3d4₀func, hi, hne]
       exact lt_of_le_of_ne (prop3d4₀func μ I i).prop.1 hi
   · simp only [prop3d4₀func, hi, ↓reduceDIte]
@@ -247,8 +246,8 @@ lemma prop3d4₀func_strict_decreasing
       by_contra hcontra
       simp only [prop3d4₀func, prop3d4₀func_helper μ I i h, hcontra,
         ↓reduceDIte, not_true_eq_false] at h
-    simpa only [hne, ↓reduceDIte] using (inst_3.wf.has_min (ℒₛ μ I (prop3d4₀func μ I i) hi) hne
-      ).choose_spec.1.out.choose_spec.choose.2
+    simpa only [hne, ↓reduceDIte] using (inst_3.wf.min_mem (ℒₛ μ I (prop3d4₀func μ I i) hi) hne
+      ).out.choose_spec.choose.2
 
 
 /--
@@ -361,9 +360,9 @@ lemma prop3d4₀func_defprop3
       simp only [prop3d4₀func, ne_of_lt <| prop3d4₀func_defprop3₀ μ I hμDCC (len - 1)
         (Nat.sub_one_lt <| prop3d4₀func_len_nonzero μ I hμDCC)] at h₂
       simp only [↓reduceDIte, hcontra'] at h₂
-      apply (inst_3.wf.has_min (ℒₛ μ I (prop3d4₀func μ I (len-1)) (ne_of_lt <|
+      apply (inst_3.wf.min_mem (ℒₛ μ I (prop3d4₀func μ I (len-1)) (ne_of_lt <|
         prop3d4₀func_defprop3₀ μ I hμDCC (len - 1) (Nat.sub_one_lt <|
-        prop3d4₀func_len_nonzero μ I hμDCC))) hcontra').choose_spec.1.out.choose_spec.choose.1
+        prop3d4₀func_len_nonzero μ I hμDCC))) hcontra').out.choose_spec.choose.1
         h₂.symm
     refine h₃ ?_
     use y, ⟨le_of_lt hy.1,le_trans hy.2 (prop3d4₀func μ I (prop3d4₀func_len μ I hμDCC - 1)

@@ -226,17 +226,6 @@ lemma HNFil_μA_pseudo_strict_anti {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] 
     lt_trans (lt_add_one i) hj) <| HNFil_is_strict_mono μ (i + 1) <|
     Nat.find_min (HNFil_of_fin_len μ) <| hj,le_top⟩
 
-/--
-Convenience: admissibility is automatic for complete linear orders.
-
-This duplicates the instance from `Filtration.Defs` inside the implementation file so
-users of `Filtration.Impl` alone get the instance as well.
--/
-instance {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
-{S : Type*} [CompleteLinearOrder S]
-{μ : {p :ℒ × ℒ // p.1 < p.2} → S} : μ_Admissible μ :=
-{μ_adm := Or.inl Std.instTotalLeOfIsLinearPreorder}
-
 open Classical in
 /--
 Uniqueness of the canonical Harder–Narasimhan filtration (`theorem3d10`).
@@ -361,6 +350,16 @@ section Fil_to_RelSeries
 open Fin.NatCast
 
 /--
+Helper lemma: the underlying function of a `RelSeries (IntervalSemistableRel μ)` is
+strictly monotone, obtained by forgetting the semistability witnesses to get an `LTSeries`.
+-/
+private lemma relSeries_strictMono {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+{S : Type*} [CompleteLattice S]
+{μ : {p :ℒ × ℒ // p.1 < p.2} → S}
+(s : RelSeries (IntervalSemistableRel μ)) : StrictMono s.toFun :=
+  LTSeries.strictMono (s.map ⟨id, fun h ↦ h.choose⟩)
+
+/--
 Helper lemma: consecutive elements in a `RelSeries` are strictly increasing.
 
 This extracts the `<` witness from the step relation, rewriting indices so it can be
@@ -372,12 +371,8 @@ lemma relSeries_step_lt {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrd
 {μ : {p :ℒ × ℒ // p.1 < p.2} → S}
 (s : RelSeries (IntervalSemistableRel μ))
 {i : ℕ} (hi : i + 1 < s.length)
- : s.toFun ↑i < s.toFun ↑(i + 1) := by
-  have := (s.step ⟨i,Nat.lt_of_succ_lt hi⟩).choose
-  simp only [Fin.castSucc_mk, Fin.succ_mk] at this
-  convert this
-  · exact Fin.val_cast_of_lt <| lt_trans (Nat.lt_add_one _) <| lt_trans hi <| Nat.lt_add_one _
-  · exact Fin.val_cast_of_lt <| lt_trans hi <| Nat.lt_add_one _
+ : s.toFun ↑i < s.toFun ↑(i + 1) :=
+  relSeries_strictMono s (Fin.natCast_strictMono hi.le (lt_add_one i))
 
 /--
 Helper lemma: the “next” consecutive inequality, shifted by one.
@@ -391,13 +386,8 @@ lemma relSeries_succ_step_lt {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [Bound
 {μ : {p :ℒ × ℒ // p.1 < p.2} → S}
 (s : RelSeries (IntervalSemistableRel μ))
 {i : ℕ} (hi : i + 1 < s.length)
- : s.toFun ↑(i + 1) < s.toFun ↑(i + 2) := by
-  have := (s.step ⟨i+1, hi⟩).choose
-  simp only [Fin.castSucc_mk, Fin.succ_mk] at this
-  convert this
-  · exact Fin.val_cast_of_lt <| Nat.lt_add_right 1 hi
-  · simp only [Fin.val_natCast, Nat.mod_succ_eq_iff_lt, Nat.succ_eq_add_one]
-    exact Nat.succ_lt_succ hi
+ : s.toFun ↑(i + 1) < s.toFun ↑(i + 2) :=
+  relSeries_strictMono s (Fin.natCast_strictMono hi (lt_add_one (i + 1)))
 
 open Classical in
 /--
@@ -427,18 +417,8 @@ lemma hHFil_of_hNSeries {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrd
     use F1.length
     simp only [le_refl, ↓reduceIte, Fin.natCast_eq_last]
     exact h1.2.1
-  have Fmono : ∀ i j : ℕ, i < j → j ≤ F1.length → F1.toFun ↑i < F1.toFun ↑j := by
-    intro i
-    refine Nat.le_induction (fun h => ?_) (fun n hn hind h => ?_)
-    · convert (F1.step ⟨i,h⟩).choose
-      · exact Fin.eq_mk_iff_val_eq.mpr <| Fin.val_cast_of_lt <| Nat.lt_add_right 1 h
-      · exact Fin.eq_mk_iff_val_eq.mpr <| Fin.val_cast_of_lt <| Nat.add_lt_add_right h 1
-    · refine lt_trans (hind (Nat.le_of_succ_le h)) ?_
-      have := (F1.step ⟨n , h⟩).choose
-      simp only [Fin.castSucc_mk, Fin.succ_mk] at this
-      convert this
-      · exact Fin.val_cast_of_lt <| Nat.lt_add_right 1 h
-      · exact Fin.val_cast_of_lt <| Nat.add_lt_add_right h 1
+  have Fmono : ∀ i j : ℕ, i < j → j ≤ F1.length → F1.toFun ↑i < F1.toFun ↑j :=
+    fun _ _ hij hj ↦ relSeries_strictMono F1 (Fin.natCast_strictMono hj hij)
   have hslen : Nat.find hstrange  = F1.length := by
       have := Nat.find_min' hstrange ((by
         simp only [filtration1, le_refl, ↓reduceIte, Fin.natCast_eq_last]
@@ -460,11 +440,7 @@ lemma hHFil_of_hNSeries {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrd
           simp only [filtration1,hn, ↓reduceIte]
           if hn' : n + 1 ≤ F1.length then
             simp only [hn', ↓reduceIte]
-            convert le_of_lt (F1.step ⟨n,hn'⟩).choose
-            · simp only [Fin.castSucc_mk]
-              exact Fin.eq_mk_iff_val_eq.mpr <| Fin.val_cast_of_lt <| Nat.lt_add_right 1 hn'
-            · simp only [Fin.succ_mk]
-              exact Fin.eq_mk_iff_val_eq.mpr <| Fin.val_cast_of_lt <| Nat.add_lt_add_right hn' 1
+            exact (Fmono n (n + 1) (lt_add_one n) hn').le
           else
           simp only [hn', ↓reduceIte, le_top]
         else
@@ -486,34 +462,15 @@ lemma hHFil_of_hNSeries {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrd
         exact Fmono i j hij hj,
       piecewise_semistable := by
         intro i hi
-        unfold filtration1
         rw [hslen] at hi
-        have this': i + 1 ≤ F1.length := by linarith
-        convert (F1.step ⟨i,hslen ▸ hi⟩).choose_spec
-        · simp only [le_of_lt hi, ↓reduceIte, Fin.castSucc_mk]
-          congr
-          exact Fin.eq_mk_iff_val_eq.mpr <| Fin.val_cast_of_lt <| Nat.lt_add_right 1 hi
-        · simp only [this', ↓reduceIte, Fin.succ_mk]
-          congr
-          exact Fin.eq_mk_iff_val_eq.mpr <| Fin.val_cast_of_lt <| Nat.add_lt_add_right hi 1
-        · simp only [le_of_lt hi, ↓reduceIte, Fin.castSucc_mk]
-          congr
-          exact Fin.eq_mk_iff_val_eq.mpr <| Fin.val_cast_of_lt <| Nat.lt_add_right 1 hi
-        · simp only [this', ↓reduceIte, Fin.succ_mk]
-          congr
-          exact Fin.eq_mk_iff_val_eq.mpr <| Fin.val_cast_of_lt <| Nat.add_lt_add_right hi 1
-        · simp only [le_of_lt hi, ↓reduceIte, Fin.castSucc_mk]
-          congr
-          exact Fin.eq_mk_iff_val_eq.mpr <| Fin.val_cast_of_lt <| Nat.lt_add_right 1 hi
-        · simp only [this', ↓reduceIte, Fin.succ_mk]
-          congr
-          exact Fin.eq_mk_iff_val_eq.mpr <| Fin.val_cast_of_lt <| Nat.add_lt_add_right hi 1
-        · simp only [le_of_lt hi, ↓reduceIte, Fin.castSucc_mk]
-          congr
-          exact Fin.eq_mk_iff_val_eq.mpr <| Fin.val_cast_of_lt <| Nat.lt_add_right 1 hi
-        · simp only [this', ↓reduceIte, Fin.succ_mk]
-          congr
-          exact Fin.eq_mk_iff_val_eq.mpr <| Fin.val_cast_of_lt <| Nat.add_lt_add_right hi 1,
+        have e₁ : filtration1 i = F1.toFun (Fin.castSucc ⟨i, hi⟩) := by
+          simp only [filtration1, hi.le, ↓reduceIte, Fin.castSucc_mk,
+            Fin.natCast_eq_mk (Nat.lt_add_right 1 hi)]
+        have e₂ : filtration1 (i + 1) = F1.toFun (Fin.succ ⟨i, hi⟩) := by
+          simp only [filtration1, show i + 1 ≤ F1.length from hi, ↓reduceIte, Fin.succ_mk,
+            Fin.natCast_eq_mk (Nat.add_lt_add_right hi 1)]
+        convert (F1.step ⟨i, hi⟩).choose_spec using 2
+        all_goals exact Subtype.ext (Prod.ext e₁ e₂),
       μA_pseudo_strict_anti := by
         intro i hi
         unfold filtration1

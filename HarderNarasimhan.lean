@@ -18,8 +18,6 @@ import HarderNarasimhan.Filtration.Results
 
 import HarderNarasimhan.FirstMoverAdvantage.Results
 
-import HarderNarasimhan.OrderTheory.DedekindMacNeilleCompletion
-
 import HarderNarasimhan.SlopeLike.Defs
 import HarderNarasimhan.SlopeLike.Results
 

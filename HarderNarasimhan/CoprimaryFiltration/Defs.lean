@@ -12,12 +12,13 @@ import Mathlib.Order.Extension.Linear
 import Mathlib.Algebra.Module.Submodule.Defs
 import Mathlib.RingTheory.Ideal.AssociatedPrime.Finiteness
 
+import Mathlib.Order.Completion
+
 import HarderNarasimhan.Basic
 import HarderNarasimhan.Convexity.Results
-import HarderNarasimhan.OrderTheory.DedekindMacNeilleCompletion
 import HarderNarasimhan.Semistability.Defs
 import HarderNarasimhan.Filtration.Results
-import HarderNarasimhan.OrderTheory.Lex'Order
+import Mathlib.Combinatorics.Colex
 
 /-!
 Definitions for coprimary filtrations in the Noetherian module setting.
@@ -28,7 +29,7 @@ concrete “slope” construction:
 * `ℒ R M` is the lattice of submodules of a finite module `M` over a Noetherian
   commutative ring `R`.
 * `S₀ R` is a finset-valued slope codomain built from linear extensions of
-  `PrimeSpectrum R`, equipped with a custom linear order (`Lex'Order`).
+  `PrimeSpectrum R`, equipped with the colexicographic linear order (`Finset.Colex`).
 * `S R` is the Dedekind–MacNeille completion of `S₀ R`, making it a complete lattice.
 * `μ R M` assigns to each strict inclusion of submodules the finset of associated
   primes of the corresponding quotient, coerced into `S R`.
@@ -52,8 +53,8 @@ namespace HarderNarasimhan
 /--
 The “discrete” slope codomain: finsets of a linearly extended prime spectrum.
 
-We work with `Finset (LinearExtension (PrimeSpectrum R))` so that `Lex'Order` can
-provide a linear order compatible with subset inclusion.
+We work with `Finset (LinearExtension (PrimeSpectrum R))` so that the colexicographic order
+(`Finset.Colex` from mathlib) can provide a linear order compatible with subset inclusion.
 -/
 abbrev S₀ (R : Type*) [CommRing R] [IsNoetherianRing R]
 ------------
@@ -67,7 +68,8 @@ instance {R : Type*} [CommRing R] (p : LinearExtension (PrimeSpectrum R)) :
     p.asIdeal.IsPrime := PrimeSpectrum.isPrime p
 
 /--
-Linear order on `S₀ R` induced by `Lex'Order`.
+Linear order on `S₀ R`: mathlib's colexicographic order, transported from the `Colex` type
+synonym to `S₀ R` itself.
 
 This is an intentionally “local” instance with an explicit priority, so we do not
 pollute global typeclass search with a new linear order on `Finset`.
@@ -76,7 +78,7 @@ noncomputable instance (priority := 114514) {R : Type*} [CommRing R] [IsNoetheri
 ------------
 LinearOrder (S₀ R)
 ------------
-:= (Lex'Order.Lex'Order_prop (LinearExtension (PrimeSpectrum R))).choose
+:= LinearOrder.lift' toColex fun _ _ h ↦ by simpa using h
 
 /--
 The induced partial order on `S₀ R`.
@@ -103,14 +105,13 @@ where
   le := instLinearOrderS₀.le
 
 /--
-Core monotonicity property of the chosen `S₀ R` order.
-
-This packages two facts provided by `Lex'Order_prop`:
+Core monotonicity property of the chosen `S₀ R` order:
 
 * subset inclusion implies `≤` on finsets, and
 * for singletons, `≤` agrees with the underlying order on the linear extension.
 
-These are used throughout the coprimary filtration construction.
+Both are inherited from the colexicographic order. These are used throughout the coprimary
+filtration construction.
 -/
 lemma S₀_order {R : Type*} [CommRing R] [IsNoetherianRing R] :
 ------------
@@ -121,7 +122,8 @@ lemma S₀_order {R : Type*} [CommRing R] [IsNoetherianRing R] :
 ) ∧
 ∀ a b : LinearExtension (PrimeSpectrum R), a ≤ b ↔ ({a} : (S₀ R)) ≤ ({b} : (S₀ R))
 ------------
-:= (Lex'Order.Lex'Order_prop (LinearExtension (PrimeSpectrum R))).choose_spec
+:= ⟨fun _ _ h ↦ Finset.Colex.toColex_le_toColex_of_subset h,
+  fun _ _ ↦ Finset.Colex.singleton_le_singleton.symm⟩
 
 /--
 Strict inequality on the linear extension matches strict inequality of singletons.
@@ -140,12 +142,21 @@ a < b ↔ ({a} : (S₀ R)) < ({b} : (S₀ R))
 /--
 The completed slope codomain `S R`.
 
-We use the Dedekind–MacNeille completion so that the codomain is a complete lattice,
-as required by the general Harder–Narasimhan framework.
+We use the Dedekind–MacNeille completion (`DedekindCut` from mathlib) so that the codomain is a
+complete lattice, as required by the general Harder–Narasimhan framework. The cut is taken with
+respect to the colexicographic order on `S₀ R` pinned explicitly.
 -/
 abbrev S (R : Type*) [CommRing R] [IsNoetherianRing R]
 ------------
-:= @OrderTheory.DedekindMacNeilleCompletion (S₀ R) instPartialOrderS₀
+:= @DedekindCut (S₀ R) instPartialOrderS₀.toPreorder
+
+/--
+View an element of `S₀ R` as a principal cut in the completion `S R`.
+
+This lets statements compare `μA`-values in `S R` with explicit finsets in `S₀ R`.
+-/
+noncomputable instance {R : Type*} [CommRing R] [IsNoetherianRing R] : Coe (S₀ R) (S R) :=
+  ⟨DedekindCut.principal⟩
 
 /--
 The lattice of submodules of a finite module.
@@ -206,7 +217,7 @@ noncomputable abbrev μ (R : Type*) [CommRing R] [IsNoetherianRing R]
 ------------
 {z: (ℒ R M) × (ℒ R M) // z.1 < z.2} → (S R)
 ------------
-:= fun I ↦ ↑((_μ R M) I).toFinset
+:= fun I ↦ .principal ((_μ R M) I).toFinset
 
 /--
 Predicate asserting that a module is coprimary.

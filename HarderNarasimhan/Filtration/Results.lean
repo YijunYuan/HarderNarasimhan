@@ -74,21 +74,6 @@ default :=
   }
 
 
-/--
-Convenience instance: existence of a Harder–Narasimhan filtration.
-
-This follows immediately from the `Inhabited` instance above.
--/
-instance instNonemptyHarderNarasimhanFiltration
-{ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
-{S : Type*} [CompleteLattice S]
-{μ : {p :ℒ × ℒ // p.1 < p.2} → S}
-[hμ : μA_DescendingChainCondition μ] [hμcvx : Convex μ] [h : μ_Admissible μ] :
-------------
-Nonempty (HarderNarasimhanFiltration μ)
-------------
-:= inferInstance
-
 open Classical in
 /--
 Uniqueness of Harder–Narasimhan filtrations in a complete linear order.

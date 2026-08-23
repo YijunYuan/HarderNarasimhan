@@ -406,12 +406,8 @@ private lemma subseqIdx.lt_succ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [Bo
 
 private lemma subseqIdx.ge_self {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   (f : ℕ → ℒ) (atf : ∃ k, f k = ⊥) (hf : Antitone f) :
-  ∀ n : ℕ, n ≤ subseqIdx f atf hf n := by
-  intro n
-  induction n with
-  | zero => simp
-  | succ n ih =>
-    exact Nat.succ_le_of_lt <| lt_of_le_of_lt ih (subseqIdx.lt_succ f atf hf n)
+  ∀ n : ℕ, n ≤ subseqIdx f atf hf n :=
+  (strictMono_nat_of_lt_succ (subseqIdx.lt_succ f atf hf)).id_le
 
 open Classical in
 private lemma subseqIdx.const_between {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
@@ -458,25 +454,13 @@ lemma subseqIdx_strictAnti {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [Bounded
 (f : ℕ → ℒ) (hf0 : f 0 = ⊤) (atf : ∃ k, f k = ⊥) (hfat : Antitone f) :
 ∀ (i j : ℕ), i < j → j ≤ Nat.find (subseqIdx_hits_bot f atf hfat hf0) →
   f (subseqIdx f atf hfat j) < f (subseqIdx f atf hfat i) := by
-  intro i
-  let A := Nat.find (subseqIdx_hits_bot f atf hfat hf0)
-  have step_lt : ∀ i : ℕ, i < A →
-      f (subseqIdx f atf hfat (i + 1)) < f (subseqIdx f atf hfat i) := by
-    intro i hi
-    have hbot : f (subseqIdx f atf hfat i) ≠ ⊥ := by
-      intro h
-      exact (Nat.find_min (subseqIdx_hits_bot f atf hfat hf0) hi) h
-    rw [subseqIdx.succ_eq_find f atf hfat i hbot]
-    exact (Nat.find_spec (subseqIdx.next_exists f atf hfat i hbot)).2
-  have haux : ∀ j : ℕ, i + 1 ≤ j → j ≤ A →
-      f (subseqIdx f atf hfat j) < f (subseqIdx f atf hfat i) := by
-    apply Nat.le_induction
-    · intro hj
-      simpa [A] using step_lt i (Nat.lt_of_succ_le hj)
-    · intro j hij hind hj
-      exact lt_trans (step_lt j (lt_of_lt_of_le (Nat.lt_succ_self j) hj)) <|
-        hind (le_trans (Nat.le_succ j) hj)
-  exact fun j hij hj => haux j (Nat.succ_le_of_lt hij) hj
+  intro i j hij hj
+  have hbot : f (subseqIdx f atf hfat i) ≠ ⊥ :=
+    Nat.find_min (subseqIdx_hits_bot f atf hfat hf0) (lt_of_lt_of_le hij hj)
+  refine lt_of_le_of_lt
+    (hfat ((strictMono_nat_of_lt_succ (subseqIdx.lt_succ f atf hfat)).monotone hij)) ?_
+  rw [subseqIdx.succ_eq_find f atf hfat i hbot]
+  exact (Nat.find_spec (subseqIdx.next_exists f atf hfat i hbot)).2
 
 open Classical in
 /-- `subseqIdx_find_ne_of_plateau` is a technical combinatorial lemma about the index where
@@ -753,7 +737,7 @@ lemma stable_of_step_cond₂
         apply Subtype.coe_inj.1
         simpa [← hc] using by rfl
       refine lt_of_le_of_lt hμmin_le ?_
-      exact (h i hi) x.val hx_left <| lt_iff_le_not_ge.mpr (lt_top_iff_ne_top.2 hx')
+      exact (h i hi) x.val hx_left <| lt_top_iff_ne_top.2 hx'
 
 open Classical in
 /-- `step_cond₂_of_stable` is the converse direction: stability implies the strict step condition.
@@ -1054,8 +1038,7 @@ lemma induction_on_length_of_JordanHolderFiltration (n : ℕ) :
           exact Eq.symm (min_self (μ TotIntvl))
       have tj1 := hj' j (le_of_lt <| lt_of_lt_of_le hj <| Nat.find_min' atRaw JH_raw_fin_len)
       have := tj1 ▸ ((seesaw' μ hsl ⊥ (x0 ⊔ JHy.filtration (j + 1))
-        (x0 ⊔ JHy.filtration j) ⟨lt_of_lt_of_le hx0_bot le_sup_left,
-        lt_iff_le_not_ge.mpr hfj⟩).2.2.1 <|
+        (x0 ⊔ JHy.filtration j) ⟨lt_of_lt_of_le hx0_bot le_sup_left, hfj⟩).2.2.1 <|
         tj1 ▸ hj' (j + 1) (lt_of_lt_of_le hj <| Nat.find_min' atRaw JH_raw_fin_len)).2
       rw [← this]
       exact hstepx0.symm
@@ -1078,7 +1061,7 @@ lemma induction_on_length_of_JordanHolderFiltration (n : ℕ) :
           (fun w ↦ ∀ z : Interval Ires, (hw : w.val.1 < z) → z < w.val.2 →
             (Resμ Ires μ) ⟨(w.val.1, z), hw⟩ < (Resμ Ires μ) w)
           (fun j hj hfj w hw1 hw2 ↦ ((seesaw' μ hsl ↑(JH_raw (j + 1)) w ↑(JH_raw j)
-              ⟨lt_iff_le_not_ge.mpr hw1, lt_iff_le_not_ge.mpr hw2⟩).1.2.2 ?_).1) i hi
+              ⟨hw1, hw2⟩).1.2.2 ?_).1) i hi
         have := hcond1 j hj hfj; simp only [Resμ] at this
         have this' := JHx.step_cond₁ (Nat.find JHx.fin_len - 1) (by omega)
         simp only [Nat.sub_one_add_one <| JH_pos_len JHx, Nat.find_spec JHx.fin_len] at this'
@@ -1087,37 +1070,36 @@ lemma induction_on_length_of_JordanHolderFiltration (n : ℕ) :
         have hproblem : JHy.filtration (j + 1) ≠ JHy.filtration j ⊓ ↑w := by
           by_contra hc
           simp only [JH_raw] at hw1
-          have hw1 := lt_iff_le_not_ge.mpr hw1
           simp only [JH_raw] at hw2
-          have hw2 := lt_iff_le_not_ge.mpr hw2
           have := @hmod.sup_inf_le_assoc_of_le x0 (JHy.filtration j) w.val (by
             apply le_of_lt <| lt_of_le_of_lt le_sup_left hw1
             )
-          rw [← hc, inf_eq_right.2 <| le_of_lt hw2] at this
+          rw [← hc, inf_eq_right.2 <|
+            (le_of_lt hw2 : (↑w : ℒ) ≤ x0 ⊔ JHy.filtration j)] at this
           exact (not_le_of_gt hw1) this
         have hnle : ¬ (JHy.filtration j ≤ w) := by
           by_contra hc
           simp only [JH_raw] at hw2
           refine (not_le_of_gt hw2) <| sup_le_iff.2 ⟨?_,hc⟩
           simp only [JH_raw] at hw1
-          apply le_of_lt <| lt_of_le_of_lt le_sup_left <| lt_iff_le_not_ge.mpr hw1
-        have heqs : μ ⟨(↑w, ↑(JH_raw j)), lt_iff_le_not_ge.mpr hw2⟩ =
+          apply le_of_lt <| lt_of_le_of_lt le_sup_left hw1
+        have heqs : μ ⟨(↑w, ↑(JH_raw j)), hw2⟩ =
           μ ⟨(JHy.filtration j ⊓ w,JHy.filtration j),inf_lt_left.2 hnle⟩ := by
           rw [affine.affine (JHy.filtration j) w.val hnle]
           have : ↑(JH_raw j) = JHy.filtration j ⊔ w.val := by
             simp only [JH_raw]
             apply eq_of_le_of_ge ?_ ?_
             · simp only [JH_raw] at hw1
-              replace hw1 := lt_iff_le_not_ge.mpr hw1
-              replace hw1 := sup_le_sup_right (le_of_lt hw1) (JHy.filtration j)
+              replace hw1 := sup_le_sup_right
+                (le_of_lt hw1 : x0 ⊔ JHy.filtration (j + 1) ≤ ↑w) (JHy.filtration j)
               replace := left_eq_sup.2 <| JHy.antitone (Nat.le_add_right j 1)
               rw [sup_comm] at this
               rw [sup_assoc, ← this] at hw1
               nth_rw 2 [sup_comm] at hw1
               exact hw1
             · simp only [JH_raw] at hw2
-              replace hw2 := lt_iff_le_not_ge.mpr hw2
-              replace hw2 := sup_le_sup_right (le_of_lt hw2) (JHy.filtration j)
+              replace hw2 := sup_le_sup_right
+                (le_of_lt hw2 : (↑w : ℒ) ≤ x0 ⊔ JHy.filtration j) (JHy.filtration j)
               nth_rw 1 [sup_assoc,sup_comm] at hw2
               simp only [Nat.find_le_iff, forall_exists_index, and_imp, Nat.lt_find_iff, ne_eq,
                 le_refl, sup_of_le_left, sup_le_iff, le_sup_right, true_and, ge_iff_le, JH_raw] at *
@@ -1129,7 +1111,7 @@ lemma induction_on_length_of_JordanHolderFiltration (n : ℕ) :
         have hlt : JHy.filtration (j+1) < JHy.filtration j ⊓ w := by
           refine lt_of_le_of_ne (le_inf (JHy.antitone <| Nat.le_add_right j 1) ?_) hproblem
           simp only [sup_comm, JH_raw] at hw1
-          exact le_of_lt <| lt_of_le_of_lt (le_sup_left) <| lt_iff_le_not_ge.mpr hw1
+          exact le_of_lt <| lt_of_le_of_lt (le_sup_left) hw1
         refine ((seesaw' μ hsl (JHy.filtration (j+1)) (JHy.filtration j ⊓ w) (JHy.filtration j)
           ⟨hlt,inf_lt_left.2 hnle⟩).1.1 ?_).2
         exact JHy.step_cond₂ j (by
@@ -1263,10 +1245,10 @@ lemma induction_on_length_of_JordanHolderFiltration (n : ℕ) :
         have htemp : JHx.filtration (i + 1) < z.val := by
           simp only [JHfun,Eq.mpr (id (congrArg (fun _a ↦ i + 1 ≤ _a) hhard.symm)) hi,
             ↓reduceDIte] at hz
-          exact lt_iff_le_not_ge.mpr hz
+          exact hz
         have htemp2 : z < JHx.filtration i := by
           simp only [JHfun,le_of_lt <| hhard ▸ hi, ↓reduceDIte] at hz'
-          exact lt_iff_le_not_ge.mpr hz'
+          exact hz'
         simp only [JHfun]; simp only [Eq.mpr (id (congrArg (fun _a ↦ i + 1 ≤ _a) hhard.symm)) hi,
           ↓reduceDIte, le_of_lt <| hhard ▸ hi, gt_iff_lt]
         exact JHx.step_cond₂ i (Nat.lt_of_lt_pred <| hhard ▸ hi) z htemp htemp2

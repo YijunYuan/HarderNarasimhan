@@ -57,32 +57,23 @@ instance {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 /--
 The order on `Interval z` is inherited from the ambient order on `ℒ` via the subtype coercion.
 
-API note: this is the standard subtype order; antisymmetry uses `Subtype.ext`.
+API note: this is mathlib's standard subtype order.
 -/
 instance {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
-{z : {p : ℒ × ℒ // p.1 < p.2}} : PartialOrder (Interval z) where
-  le := fun a b => a.val ≤ b.val
-  le_refl a := le_refl a.val
-  le_trans _ _ _ h1 h2 := le_trans h1 h2
-  le_antisymm := fun a b h1 h2 ↦ Subtype.ext <| le_antisymm h1 h2
+{z : {p : ℒ × ℒ // p.1 < p.2}} : PartialOrder (Interval z) :=
+  Subtype.partialOrder _
 
 
 /--
 If `ℒ` is a lattice, then `Interval z` is a lattice with `⊔`/`⊓` defined pointwise.
 
-Mathematically, the interval is closed under sup/inf; the proof obligations are discharged
-using the endpoint bounds stored in the subtype.
+Mathematically, the interval is closed under sup/inf; the closure proofs are discharged
+using the endpoint bounds stored in the subtype, and `Subtype.lattice` does the rest.
 -/
 instance {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-{z : {p : ℒ × ℒ // p.1 < p.2}} : Lattice (Interval z) where
-    sup := fun a b => ⟨a.val ⊔ b.val, ⟨le_trans a.prop.1 le_sup_left,sup_le a.prop.2 b.prop.2⟩⟩
-    sup_le := fun _ _ _ h1 h2 ↦ sup_le h1 h2
-    le_sup_left := fun _ _ ↦ le_sup_left
-    le_sup_right := fun _ _ ↦ le_sup_right
-    inf := fun a b => ⟨a.val ⊓ b.val,⟨le_inf a.prop.1 b.prop.1, le_trans inf_le_right b.prop.2⟩⟩
-    le_inf := fun _ _ _ h1 h2 ↦ le_inf h1 h2
-    inf_le_left := fun _ _ ↦ inf_le_left
-    inf_le_right := fun _ _ ↦ inf_le_right
+{z : {p : ℒ × ℒ // p.1 < p.2}} : Lattice (Interval z) :=
+  Subtype.lattice (fun _ _ hx hy ↦ ⟨le_trans hx.1 le_sup_left, sup_le hx.2 hy.2⟩)
+    (fun _ _ hx hy ↦ ⟨le_inf hx.1 hy.1, le_trans inf_le_right hy.2⟩)
 
 
 /--
@@ -128,7 +119,7 @@ This is used to turn a strict pair in `Interval z` into a strict pair in the amb
 lemma lt_lt {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {z : {p : ℒ × ℒ // p.1 < p.2}} {p : {p :(Interval z) × (Interval z) // p.1 < p.2}} :
 (p.val.1.val, p.val.2.val).1 < (p.val.1.val, p.val.2.val).2 :=
-  Subtype.coe_lt_coe.mpr (Subtype.mk_lt_mk.2 (lt_iff_le_not_ge.mpr p.prop))
+  Subtype.coe_lt_coe.mpr p.prop
 
 
 /--
@@ -161,18 +152,38 @@ Well-foundedness is inherited by intervals: if `ℒ` is well-founded with respec
 infinite
 strictly descending chains), then so is `Interval z`.
 
-API note: we prove the “has minimum” characterization by mapping a nonempty set in `Interval z` to
-its image
-in `ℒ`, taking a minimum there, and transporting it back.
+API note: the strict order on `Interval z` is the pullback of the strict order on `ℒ` along
+`Subtype.val`, so well-foundedness transports along `InvImage.wf`.
 -/
 instance {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ] [hw : WellFoundedGT ℒ]
-{z : {p : ℒ × ℒ // p.1 < p.2}} : WellFoundedGT (Interval z) := by
-    refine { wf := WellFounded.wellFounded_iff_has_min.mpr fun S hS ↦ ?_ }
-    rcases hw.wf.has_min (Subtype.val '' S) ( Set.Nonempty.image Subtype.val hS) with ⟨a,ha⟩
-    obtain ⟨⟨b, hb⟩, hbS, rfl⟩ := ha.1
-    exact Exists.intro ⟨b, hb⟩ ⟨hbS, fun y hy h ↦ ha.right y.val
-      (Set.mem_image_of_mem Subtype.val hy) (lt_iff_le_not_ge.2 h)⟩
+{z : {p : ℒ × ℒ // p.1 < p.2}} : WellFoundedGT (Interval z) :=
+  ⟨Subrelation.wf (fun h ↦ Subtype.coe_lt_coe.mpr h) (InvImage.wf Subtype.val hw.wf)⟩
 
+
+/--
+Common index-set bijection behind the `_res_intvl` lemmas below: interior points of a strict pair
+`J` inside `Interval I` (cut out by a side condition `D`) correspond to interior points of the
+underlying strict pair in `ℒ` (cut out by the corresponding ambient condition `C`).
+
+The value function `f` may depend on the ambient membership proof; all proof positions are
+handled by proof irrelevance.
+-/
+private lemma res_intvl_set_eq {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
+{I : {p : ℒ × ℒ // p.1 < p.2}} {S : Type*} [CompleteLattice S]
+{J : {p :(Interval I) × (Interval I) // p.1 < p.2}}
+{D : Interval I → Prop} {C : ℒ → Prop}
+(hDC : ∀ u : Interval I, InIntvl J u → (D u ↔ C u.val))
+(f : (a : ℒ) → InIntvl (⟨(J.val.1.val, J.val.2.val), lt_lt⟩ : {p : ℒ × ℒ // p.1 < p.2}) a ∧
+  C a → S) :
+{x | ∃ (u : Interval I) (h : InIntvl J u ∧ D u), f u.val ⟨⟨h.1.1, h.1.2⟩, (hDC u h.1).1 h.2⟩ = x} =
+{x | ∃ (a : ℒ) (h : InIntvl ⟨(J.val.1.val, J.val.2.val), lt_lt⟩ a ∧ C a), f a h = x} := by
+  ext x
+  constructor
+  · rintro ⟨u, h, rfl⟩
+    exact ⟨u.val, ⟨⟨h.1.1, h.1.2⟩, (hDC u h.1).1 h.2⟩, rfl⟩
+  · rintro ⟨a, h, rfl⟩
+    exact ⟨⟨a, le_trans J.val.1.prop.1 h.1.1, le_trans h.1.2 J.val.2.prop.2⟩,
+      ⟨⟨h.1.1, h.1.2⟩, (hDC _ ⟨h.1.1, h.1.2⟩).2 h.2⟩, rfl⟩
 
 /--
 Unfolding lemma for restriction: evaluating `Resμ` is definitionally `μ` on the underlying strict
@@ -208,18 +219,9 @@ lemma μmax_res_intvl {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [Bounded
 := by
   unfold μmax
   simp only [μ_res_intvl, ne_eq]
-  congr
-  ext x
-  constructor
-  · rintro ⟨u,hu1,hu2⟩
-    use u.val
-    use ⟨hu1.1,fun hc ↦ hu1.right (Subtype.coe_inj.1 hc)⟩
-  · rintro ⟨u,hu1,hu2⟩
-    use ⟨u,le_trans ((J.val).1.prop.1) hu1.1.1
-      ,le_trans hu1.1.2 ((J.val).2.prop.2)⟩
-    rw [← hu2]
-    simp only [exists_prop, and_true]
-    exact ⟨hu1.1,fun hc ↦ hu1.right (Subtype.coe_inj.2 hc)⟩
+  exact congrArg sSup <| res_intvl_set_eq (D := fun u ↦ ¬J.val.1 = u)
+    (C := fun a ↦ ¬J.val.1.val = a) (fun u _ ↦ not_congr Subtype.ext_iff)
+    fun a h ↦ μ ⟨(J.val.1.val, a), lt_of_le_of_ne h.1.1 h.2⟩
 
 /--
 Restriction commutes with the “right-anchored infimum” construction `μmin` from `Basic.lean`.
@@ -237,18 +239,9 @@ lemma μmin_res_intvl {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [Bounded
 := by
   unfold μmin
   simp only [μ_res_intvl, ne_eq]
-  congr
-  ext x
-  constructor
-  · rintro ⟨u,hu1,hu2⟩
-    use u.val
-    use ⟨hu1.1,fun hc ↦ hu1.right (Subtype.coe_inj.1 hc)⟩
-  · rintro ⟨u,hu1,hu2⟩
-    use ⟨u,le_trans ((J.val).1.prop.1) hu1.1.1
-      ,le_trans hu1.1.2 ((J.val).2.prop.2)⟩
-    rw [← hu2]
-    simp only [exists_prop, and_true]
-    exact ⟨hu1.1,fun hc ↦ hu1.right (Subtype.coe_inj.2 hc)⟩
+  exact congrArg sInf <| res_intvl_set_eq (D := fun u ↦ ¬u = J.val.2)
+    (C := fun a ↦ ¬a = J.val.2.val) (fun u _ ↦ not_congr Subtype.ext_iff)
+    fun a h ↦ μ ⟨(a, J.val.2.val), lt_of_le_of_ne h.1.2 h.2⟩
 
 /--
 Restriction commutes with `μA`, the infimum over right-endpoints of `μmax` values.
@@ -266,18 +259,9 @@ lemma μA_res_intvl {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOr
 := by
   unfold μA
   simp only [μmax_res_intvl, ne_eq]
-  congr
-  ext x
-  constructor
-  · rintro ⟨u,hu1,hu2⟩
-    use u.val
-    use ⟨hu1.1,fun hc ↦ hu1.right (Subtype.coe_inj.1 hc)⟩
-  · rintro ⟨u,hu1,hu2⟩
-    use ⟨u,le_trans ((J.val).1.prop.1) hu1.1.1
-      ,le_trans hu1.1.2 ((J.val).2.prop.2)⟩
-    rw [← hu2]
-    simp only [exists_prop, and_true]
-    exact ⟨hu1.1,fun hc ↦ hu1.right (Subtype.coe_inj.2 hc)⟩
+  exact congrArg sInf <| res_intvl_set_eq (D := fun u ↦ ¬u = J.val.2)
+    (C := fun a ↦ ¬a = J.val.2.val) (fun u _ ↦ not_congr Subtype.ext_iff)
+    fun a h ↦ μmax μ ⟨(a, J.val.2.val), lt_of_le_of_ne h.1.2 h.2⟩
 
 /--
 Restriction commutes with `μB`, the supremum over left-endpoints of `μmin` values.
@@ -295,18 +279,9 @@ lemma μB_res_intvl {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOr
 := by
   unfold μB
   simp only [μmin_res_intvl, ne_eq]
-  congr
-  ext x
-  constructor
-  · rintro ⟨u,hu1,hu2⟩
-    use u.val
-    use ⟨hu1.1,fun hc ↦ hu1.right (Subtype.coe_inj.1 hc)⟩
-  · rintro ⟨u,hu1,hu2⟩
-    use ⟨u,le_trans ((J.val).1.prop.1) hu1.1.1
-      ,le_trans hu1.1.2 ((J.val).2.prop.2)⟩
-    rw [← hu2]
-    simp only [exists_prop, and_true]
-    exact ⟨hu1.1,fun hc ↦ hu1.right (Subtype.coe_inj.2 hc)⟩
+  exact congrArg sSup <| res_intvl_set_eq (D := fun u ↦ ¬J.val.1 = u)
+    (C := fun a ↦ ¬J.val.1.val = a) (fun u _ ↦ not_congr Subtype.ext_iff)
+    fun a h ↦ μmin μ ⟨(J.val.1.val, a), lt_of_le_of_ne h.1.1 h.2⟩
 
 /--
 Projection lemma: the bottom element of `Interval ⟨(a,b), h⟩` is definitionally the left endpoint

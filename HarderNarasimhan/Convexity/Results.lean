@@ -200,8 +200,7 @@ lemma proposition_2_8 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder
 /--
 User-facing equivalence between localized convexity and convexity of the restricted measure.
 
-This is essentially `impl.ConvexI_iff_Convex_Res`, but presented as a theorem in the public
-namespace. It enables rewriting convexity hypotheses when switching between an interval `I` in `ℒ`
+It enables rewriting convexity hypotheses when switching between an interval `I` in `ℒ`
 and the subtype `Interval I` equipped with the restricted function `Resμ I μ`.
 -/
 theorem ConvexI_iff_Convex_res {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]

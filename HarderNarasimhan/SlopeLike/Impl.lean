@@ -100,25 +100,15 @@ SlopeLike μ ↔ ∀ (x y z : ℒ), (h : x < y ∧ y < z) → (
 
 
 /--
-In a nontrivial totally ordered real vector space, the coercion of any vector is strictly below `⊤`
-in the Dedekind–MacNeille completion.
+In a nontrivial totally ordered real vector space, the principal cut of any vector is strictly
+below `⊤` in the Dedekind–MacNeille completion.
 
-This lemma is used to derive contradictions when an equality forces a coerced value to be `⊤`.
+This lemma is used to derive contradictions when an equality forces a principal cut to be `⊤`.
 -/
 lemma not_top_of_Nontrivial_TotallyOrderedRealVectorSpace
-{V : Type*} [TotallyOrderedRealVectorSpace V] [hnt : Nontrivial V] :
-∀ v : V, OrderTheory.coe' v < (⊤ : OrderTheory.DedekindMacNeilleCompletion V) := by
-  intro v
-  rcases hnt.exists_pair_ne with ⟨v₁, v₂, hne⟩
-  let v₀ := if v₁ < v₂ then v₂ - v₁ else v₁ - v₂
-  have hpos : v₀ > 0 := by
-    by_cases h : v₁ < v₂
-    · simp only [h, ↓reduceIte, gt_iff_lt, sub_pos, v₀]
-    · simp only [h, ↓reduceIte, gt_iff_lt, sub_pos, v₀]
-      exact (eq_or_gt_of_not_lt h).resolve_left hne
-  by_contra!
-  exact not_top_lt <| top_le_iff.1 this ▸
-    (OrderTheory.coe'.lt_iff_lt.2 <| lt_add_of_pos_right v hpos)
+{V : Type*} [TotallyOrderedRealVectorSpace V] [Nontrivial V] :
+∀ v : V, DedekindCut.principal v < (⊤ : DedekindCut V) := fun v ↦
+  DedekindCut.principal_lt_iff.2 ⟨(exists_gt v).choose, trivial, (exists_gt v).choose_spec⟩
 
 
 /--
@@ -131,11 +121,8 @@ lemma μQuotient_helper {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [Bound
 {V : Type*} [TotallyOrderedRealVectorSpace V]
 (r : {p :ℒ × ℒ // p.1 < p.2} → NNReal)
 (d : {p :ℒ × ℒ // p.1 < p.2} → V) : ∀ z : {p :ℒ × ℒ // p.1 < p.2}, r z > 0 →
-  ∃ (μ : V), (μQuotient r d) z = OrderTheory.coe' μ ∧ (r z) • μ = (d z) :=
-  fun z h ↦ ⟨(r z)⁻¹ • d z,⟨by
-    simp only [μQuotient, gt_iff_lt, h, ↓reduceDIte, OrderTheory.coe', RelEmbedding.coe_mk]
-    rfl,
-      smul_inv_smul₀ (Ne.symm (ne_of_lt h)) (d z)⟩⟩
+  ∃ (μ : V), (μQuotient r d) z = DedekindCut.principal μ ∧ (r z) • μ = (d z) :=
+  fun z h ↦ ⟨(r z)⁻¹ • d z, dif_pos h, smul_inv_smul₀ (Ne.symm (ne_of_lt h)) (d z)⟩
 
 
 /--
@@ -160,12 +147,6 @@ lemma prop4d8 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder �
   d ⟨(y, z), h.2⟩ ∧ r ⟨(x, z), lt_trans h.1 h.2⟩ = r ⟨(x, y), h.1⟩ + r ⟨(y, z), h.2⟩)
 (h₂ : ∀ (x y : ℒ), (h : x < y) → r ⟨(x, y), h⟩ = 0 → d ⟨(x, y), h⟩ > 0)
 : SlopeLike (μQuotient r d) := by
-  have smul_lt_smul_iff_pos {c : NNReal} (hc : c > 0) (b₁ b₂ : V) :
-      c • b₁ < c • b₂ ↔ b₁ < b₂ := by
-    have hc' : (0 : ℝ) < (c : ℝ) := NNReal.coe_pos.mpr hc
-    simpa [NNReal.smul_def] using smul_lt_smul_iff_of_pos_left hc'
-  have smul_lt_smul_pos {c : NNReal} {b₁ b₂ : V} (hb : b₁ < b₂) (hc : c > 0) : c • b₁ < c • b₂ :=
-    (smul_lt_smul_iff_pos hc b₁ b₂).2 hb
   let μ := μQuotient r d
   refine (prop4d6 μ).2 fun x y z h ↦ ?_
   rcases eq_zero_or_pos (r ⟨(x, z), lt_trans h.1 h.2⟩) with h' | h'
@@ -188,12 +169,12 @@ lemma prop4d8 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder �
       rcases μQuotient_helper r d ⟨(x, z), lt_trans h.1 h.2⟩ h' with ⟨μxz,⟨hxz₁,hxz₂⟩⟩
       have := add_smul (r ⟨(x, y), h.1⟩) (r ⟨(y, z), h.2⟩) μxz ▸ (h₁ x y z h).2 ▸
         hxy₂ ▸ hyz₂ ▸ hxz₂ ▸ (h₁ x y z h).1
-      simp only [hxy₁, hxz₁, OrderEmbedding.lt_iff_lt, hyz₁, gt_iff_lt,
-        EmbeddingLike.apply_eq_iff_eq, μ]
+      simp only [hxy₁, hxz₁, DedekindCut.principal_lt_principal, hyz₁, gt_iff_lt,
+        DedekindCut.principal_inj, μ]
       by_cases hs : μxy < μxz
-      · exact Or.inl ⟨hs,(smul_lt_smul_iff_pos h''.2 _ _).1 <|
+      · exact Or.inl ⟨hs,(smul_lt_smul_iff_of_pos_left h''.2).1 <|
           (add_lt_add_iff_left <| r ⟨(x, y), h.1⟩ • μxy).1 <| lt_sub_iff_add_lt.1 <|
-          (eq_sub_of_add_eq this) ▸ (smul_lt_smul_iff_pos h''.1 _ _).2 hs⟩
+          (eq_sub_of_add_eq this) ▸ (smul_lt_smul_iff_of_pos_left h''.1).2 hs⟩
       · by_cases hs' : μxy = μxz
         · refine Or.inr <| Or.inr <| ⟨hs',?_⟩
           rw [hs'] at this
@@ -203,14 +184,14 @@ lemma prop4d8 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder �
             by_contra! hne
             have hlt : μxz < μyz ∨ μyz < μxz := lt_or_gt_of_ne hne
             rcases hlt with (hlt | hlt)
-            · exact (smul_lt_smul_pos hlt h''.2).ne h_eq
-            · exact (smul_lt_smul_pos hlt h''.2).ne h_eq.symm
+            · exact (smul_lt_smul_of_pos_left hlt h''.2).ne h_eq
+            · exact (smul_lt_smul_of_pos_left hlt h''.2).ne h_eq.symm
           exact hμ_eq
         · have hs' : μxz < μxy := lt_of_not_ge (Eq.mpr (id (congrArg (fun _a ↦ ¬_a)
             (propext le_iff_eq_or_lt))) (not_or.mpr ⟨hs', hs⟩))
-          exact Or.inr <| Or.inl <| ⟨hs',(smul_lt_smul_iff_pos h''.2 _ _).1 <|
+          exact Or.inr <| Or.inl <| ⟨hs',(smul_lt_smul_iff_of_pos_left h''.2).1 <|
             (add_lt_add_iff_left <| r ⟨(x, y), h.1⟩ • μxy).1 <| sub_lt_iff_lt_add.1 <|
-            (eq_sub_of_add_eq this) ▸ (smul_lt_smul_iff_pos h''.1 _ _).2 hs'⟩
+            (eq_sub_of_add_eq this) ▸ (smul_lt_smul_iff_of_pos_left h''.1).2 hs'⟩
     · by_cases h''' : r ⟨(x, y), h.1⟩ = 0 ∧ r ⟨(y, z), h.2⟩ > 0
       · have h2 : μ ⟨(x, y), h.1⟩ = ⊤ := by simp only [μQuotient, h'''.1, gt_iff_lt,
         lt_self_iff_false, ↓reduceDIte, μ]
@@ -223,9 +204,8 @@ lemma prop4d8 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder �
             not_top_of_Nontrivial_TotallyOrderedRealVectorSpace w))
         · refine Or.inr <| Or.inl <| ⟨h3,?_⟩
           simp only [μQuotient, gt_iff_lt, Eq.mpr (id (congrArg (fun _a ↦ _a > 0) h4)) h'''.right,
-            ↓reduceDIte, Function.Embedding.toFun_eq_coe, RelEmbedding.coe_toEmbedding, h'''.2,
-            OrderEmbedding.lt_iff_lt, μ]
-          exact h4 ▸ ((smul_lt_smul_iff_pos (by exact Right.inv_pos.mpr h') _ _).2 <|
+            ↓reduceDIte, h'''.2, DedekindCut.principal_lt_principal, μ]
+          exact h4 ▸ ((smul_lt_smul_iff_of_pos_left (Right.inv_pos.mpr h')).2 <|
             (h₁ x y z h).1 ▸ lt_add_of_pos_left (d ⟨(y, z), h.right⟩) <| h₂ x y h.1 h'''.1)
       · apply not_and_or.1 at h''
         apply not_and_or.1 at h'''
@@ -242,10 +222,9 @@ lemma prop4d8 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder �
           exact False.elim (not_top_lt
             ((h2 ▸ h3 ▸ hw₁).symm ▸ not_top_of_Nontrivial_TotallyOrderedRealVectorSpace w))
         · refine Or.inl <| ⟨?_,h3⟩
-          simp only [μQuotient, gt_iff_lt, this', ↓reduceDIte, Function.Embedding.toFun_eq_coe,
-            RelEmbedding.coe_toEmbedding, Eq.mpr (id (congrArg (fun _a ↦ _a > 0) h4)),
-            OrderEmbedding.lt_iff_lt, μ]
-          exact h4 ▸ ((smul_lt_smul_iff_pos (by exact Right.inv_pos.mpr h') _ _).2 <|
+          simp only [μQuotient, gt_iff_lt, this', ↓reduceDIte,
+            Eq.mpr (id (congrArg (fun _a ↦ _a > 0) h4)), DedekindCut.principal_lt_principal, μ]
+          exact h4 ▸ ((smul_lt_smul_iff_of_pos_left (Right.inv_pos.mpr h')).2 <|
             (h₁ x y z h).1 ▸ lt_add_of_pos_right (d ⟨(x, y), h.1⟩) <| h₂ y z h.2 this)
 end impl
 

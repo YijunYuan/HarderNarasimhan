@@ -48,28 +48,6 @@ Convex μ := by
   · exact fun h ↦ ⟨fun x y _ _ h_4 ↦ Convex.convex x y h_4⟩
 
 /--
-Interval-local convexity is equivalent to global convexity of the restricted measure `Resμ I μ`.
-
-Mathematically: convexity on an interval `I` for `μ` is the same as convexity on the total interval
-for the induced function on `Interval I`.
-
-API note: this is a key adapter used whenever we pass between “ambient” and “interval subtype”
-viewpoints.
--/
-lemma ConvexI_iff_Convex_Res {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-{S : Type*} [CompleteLattice S]
-(I : {p :ℒ × ℒ // p.1 < p.2})
-(μ : {p :ℒ × ℒ // p.1 < p.2} → S) : ConvexI I μ ↔ Convex (Resμ I μ) := by
-  constructor
-  · intro h
-    refine {convex := fun x y hxy ↦ ?_ }
-    unfold Resμ
-    simp only
-    exact h.convex x.val y.val x.prop y.prop hxy
-  · exact fun h ↦ ⟨fun x y hxI hyI hxy ↦
-      h.convex ⟨x,hxI⟩ ⟨y,hyI⟩ hxy⟩
-
-/--
 Typeclass instance: a globally convex `μ` induces interval-local convexity on the total interval.
 
 This is a convenience instance so that `Convex μ` can be used wherever `ConvexI TotIntvl μ` is
@@ -141,10 +119,8 @@ lemma lem2d4₂I
     let target := μmax μ ⟨(w, t), lt_of_le_of_lt' hxwt <| right_lt_sup.2 hxw⟩
     have h : ∀ b : ℒ, (h' : x ⊓ w < b ∧ b ≤ x) → μ ⟨(x ⊓ w, b), h'.1⟩ ≤ target := by
       intro b hb
-      have hh : x ⊓ w = b ⊓ w := by
-        refine le_antisymm ?_ <| inf_le_inf_right w hb.2
-        nth_rw 1 [← inf_idem w, ← inf_assoc]
-        exact inf_le_inf_right w <| le_of_lt hb.1
+      have hh : x ⊓ w = b ⊓ w :=
+        le_antisymm (le_inf hb.1.le inf_le_right) (inf_le_inf_right w hb.2)
       simp only [hh, ge_iff_le]
       have hbnlew : ¬ b ≤ w := inf_lt_left.mp
         ((congrArg (fun _a ↦ _a < b) (hh.symm)) ▸ hb.1)
@@ -361,10 +337,8 @@ This is a small propositional normalization used in the proof of `prop2d6₃I`.
 lemma comparable_iff {L : Type*} [PartialOrder L]
 (x : L) (y : L)
 (h : IsComparable x y) :
-x < y ∨ y ≤ x := by
-  rcases h with h | h
-  · exact (lt_or_eq_of_le h).elim Or.inl fun e ↦ Or.inr (le_of_eq e.symm)
-  · exact Or.inr h
+x < y ∨ y ≤ x :=
+  h.elim (fun h' ↦ h'.lt_or_eq.imp id Eq.ge) Or.inr
 
 
 /--

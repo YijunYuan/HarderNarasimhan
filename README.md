@@ -10,8 +10,10 @@
 A Lean 4 project around the **Harder–Narasimhan game** development.
 
 The repository is structured as a collection of modules defining order-theoretic infrastructure
-(intervals, Dedekind–MacNeille completion, lexicographic orders on finsets) and building up
+(intervals and interval-restricted invariants) and building up
 notions such as convexity, slope-like behavior, semistability, and filtrations.
+The Dedekind–MacNeille completion (`DedekindCut`) and the colexicographic order on finsets
+(`Finset.Colex`) are taken from mathlib.
 
 ## Mathematical Overview
 
@@ -65,11 +67,6 @@ The library follows a consistent internal pattern: most conceptual modules are s
 	results built on top of the semistability layer.
 - `NashEquilibrium/`, `FirstMoverAdvantage/`: game-theoretic results and interfaces that connect back to the
 	Harder–Narasimhan perspective.
-
-### General Order Theory Utilities
-
-- `OrderTheory/`: auxiliary order-theoretic tools used by multiple modules (e.g. Dedekind–MacNeille
-	completion, lexicographic orders on finsets).
 
 ## How to Read This Repository
 

@@ -509,8 +509,7 @@ List.TFAE [
       intro x hx
       refine {wsl₁ := ?_}
       intro a b
-      rcases (hμ.slopelike a.val.1 a.val.2 x
-        ⟨lt_iff_le_not_ge.2 (by aesop),lt_iff_le_not_ge.2 (by aesop)⟩).1 with this | this
+      rcases (hμ.slopelike a.val.1 a.val.2 x ⟨a.prop, b⟩).1 with this | this
       · exact Or.inl this
       · exact Or.inr <| le_of_lt this
 
