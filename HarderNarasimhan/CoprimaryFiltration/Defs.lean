@@ -184,14 +184,15 @@ abbrev _μ (R : Type*) [CommRing R] [IsNoetherianRing R]
 Set (LinearExtension (PrimeSpectrum R))
 ------------
 :=
-{ {asIdeal := p, isPrime := h.out.1} |
-  (p : Ideal R) (h : p ∈ associatedPrimes R (I.right⧸(I.left.submoduleOf I.right))) }
+{q : LinearExtension (PrimeSpectrum R) |
+  q.asIdeal ∈ associatedPrimes R (I.right ⧸ I.left.submoduleOf I.right)}
 
 /--
 Finiteness of `_μ R M I`.
 
 For a Noetherian ring and a finite module, the set of associated primes of any
-finitely generated module is finite; this yields a `Fintype` instance.
+finitely generated module is finite; since `_μ` is its preimage under the injective map
+`q ↦ q.asIdeal`, this yields a `Fintype` instance.
 -/
 noncomputable instance {R : Type*} [CommRing R] [IsNoetherianRing R]
 {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]
@@ -199,8 +200,8 @@ noncomputable instance {R : Type*} [CommRing R] [IsNoetherianRing R]
 ------------
 Fintype ((_μ R M) I)
 ------------
-:= (Set.Finite.dependent_image (associatedPrimes.finite R (I.right⧸(I.left.submoduleOf I.right)))
-  (fun I hI ↦ ({asIdeal := I, isPrime := hI.out.1} : LinearExtension (PrimeSpectrum R)))).fintype
+:= (Set.Finite.preimage (Set.injOn_of_injective fun _ _ h ↦ PrimeSpectrum.ext h)
+  (associatedPrimes.finite R (I.right ⧸ I.left.submoduleOf I.right))).fintype
 
 /--
 The slope function `μ` valued in the complete lattice `S R`.
