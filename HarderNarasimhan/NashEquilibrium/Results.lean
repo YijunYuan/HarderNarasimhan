@@ -51,44 +51,44 @@ lemma remark_4_10 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrde
   WeakAscendingChainCondition μ → WeakSlopeLike₁ μ →
   (
     NashEquilibrium μ ↔ ∀ y : ℒ, (hy : y ≠ ⊥) →
-      μmin μ ⟨⊥, y,bot_lt_iff_ne_bot.2 hy⟩ ≤ μmin μ TotIntvl
+      μmin μ ⟨⊥, y,bot_lt_iff_ne_bot.2 hy⟩ ≤ μmin μ ⊤
   )
 ) ∧ (
   StrongDescendingChainCondition μ → WeakSlopeLike₂ μ →
   (
     NashEquilibrium μ ↔ ∀ y : ℒ, (hy : y ≠ ⊤) →
-      μmax μ TotIntvl ≤ μmax μ ⟨y, ⊤,lt_top_iff_ne_top.2 hy⟩
+      μmax μ ⊤ ≤ μmax μ ⟨y, ⊤,lt_top_iff_ne_top.2 hy⟩
   )
 )
 := ⟨impl.rmk4d10₁ μ,⟨impl.rmk4d10₂ μ,impl.rmk4d10₃ μ⟩⟩
 
 
 /--
-Proposition 4.11: relating `μmin μ TotIntvl = μmax μ TotIntvl` and the inequality `μBstar ≤ μAstar`.
+Proposition 4.11: relating `μmin μ ⊤ = μmax μ ⊤` and the inequality `μBstar ≤ μAstar`.
 -/
 lemma proposition_4_11 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : Intvl ℒ → S) :
 (
-  μmin μ TotIntvl = μmax μ TotIntvl → μBstar μ ≤ μAstar μ
+  μmin μ ⊤ = μmax μ ⊤ → μBstar μ ≤ μAstar μ
 ) ∧ (
   WeakAscendingChainCondition μ → WeakSlopeLike₁ μ →
   StrongDescendingChainCondition μ → WeakSlopeLike₂ μ →
-  μBstar μ ≤ μAstar μ → μmin μ TotIntvl = μmax μ TotIntvl
+  μBstar μ ≤ μAstar μ → μmin μ ⊤ = μmax μ ⊤
 )
 := ⟨impl.prop4d11₁ μ,impl.prop4d11₂ μ⟩
 
 
 /--
-Proposition 4.12: an implication `μmax TotIntvl = μ TotIntvl → μmin TotIntvl = μmax TotIntvl`
+Proposition 4.12: an implication `μmax ⊤ = μ ⊤ → μmin ⊤ = μmax ⊤`
 under a local “gap” condition.
 -/
 lemma proposition_4_12 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : Intvl ℒ → S)
-(h : ∀ x : ℒ, (hx : x ≠ ⊥ ∧ x ≠ ⊤) → ¬ μ ⟨⊥, x,bot_lt_iff_ne_bot.2 hx.1⟩ ≤ μ TotIntvl ∨
-  μ TotIntvl ≤ μ ⟨x, ⊤,lt_top_iff_ne_top.2 hx.2⟩) :
-μmax μ TotIntvl = μ TotIntvl → μmin μ TotIntvl = μmax μ TotIntvl
+(h : ∀ x : ℒ, (hx : x ≠ ⊥ ∧ x ≠ ⊤) → ¬ μ ⟨⊥, x,bot_lt_iff_ne_bot.2 hx.1⟩ ≤ μ ⊤ ∨
+  μ ⊤ ≤ μ ⟨x, ⊤,lt_top_iff_ne_top.2 hx.2⟩) :
+μmax μ ⊤ = μ ⊤ → μmin μ ⊤ = μmax μ ⊤
 := impl.prop4d12 μ h
 
 
@@ -99,22 +99,22 @@ lemma remark_4_13 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrde
 {S : Type*} [CompleteLattice S]
 (μ : Intvl ℒ → S) (hμ : SlopeLike μ) :
 ∀ x : ℒ, (hx : x ≠ ⊥ ∧ x ≠ ⊤) →
-  ¬ μ ⟨⊥, x,bot_lt_iff_ne_bot.2 hx.1⟩ ≤ μ TotIntvl ∨
-    μ TotIntvl ≤ μ ⟨x, ⊤,lt_top_iff_ne_top.2 hx.2⟩
+  ¬ μ ⟨⊥, x,bot_lt_iff_ne_bot.2 hx.1⟩ ≤ μ ⊤ ∨
+    μ ⊤ ≤ μ ⟨x, ⊤,lt_top_iff_ne_top.2 hx.2⟩
 := impl.rmk4d13 μ hμ
 
 
 /--
-Proposition 4.14: a dual implication `μmin TotIntvl = μ TotIntvl → μmax TotIntvl = μmin TotIntvl`
+Proposition 4.14: a dual implication `μmin ⊤ = μ ⊤ → μmax ⊤ = μmin ⊤`
 under the dual local condition.
 -/
 lemma proposition_4_14 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : Intvl ℒ → S)
 (h : ∀ x : ℒ, (hx : x ≠ ⊥ ∧ x ≠ ⊤) →
-  μ ⟨⊥, x,bot_lt_iff_ne_bot.2 hx.1⟩ ≤ μ TotIntvl ∨
-  ¬ μ TotIntvl ≤ μ ⟨x, ⊤,lt_top_iff_ne_top.2 hx.2⟩) :
-μmin μ TotIntvl = μ TotIntvl → μmax μ TotIntvl = μmin μ TotIntvl
+  μ ⟨⊥, x,bot_lt_iff_ne_bot.2 hx.1⟩ ≤ μ ⊤ ∨
+  ¬ μ ⊤ ≤ μ ⟨x, ⊤,lt_top_iff_ne_top.2 hx.2⟩) :
+μmin μ ⊤ = μ ⊤ → μmax μ ⊤ = μmin μ ⊤
 := impl.prop4d14 μ h
 
 
@@ -125,13 +125,13 @@ lemma remark_4_15 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrde
 {S : Type*} [CompleteLattice S]
 (μ : Intvl ℒ → S) (hμ : SlopeLike μ) :
 ∀ x : ℒ, (hx : x ≠ ⊥ ∧ x ≠ ⊤) →
-  μ ⟨⊥, x,bot_lt_iff_ne_bot.2 hx.1⟩ ≤ μ TotIntvl ∨
-  ¬ μ TotIntvl ≤ μ ⟨x, ⊤,lt_top_iff_ne_top.2 hx.2⟩
+  μ ⟨⊥, x,bot_lt_iff_ne_bot.2 hx.1⟩ ≤ μ ⊤ ∨
+  ¬ μ ⊤ ≤ μ ⟨x, ⊤,lt_top_iff_ne_top.2 hx.2⟩
 := impl.rmk4d15 μ hμ
 
 
 /--
-Proposition 4.16: a `TFAE` package relating the three equalities for `μmin/μmax` on `TotIntvl`,
+Proposition 4.16: a `TFAE` package relating the three equalities for `μmin/μmax` on `⊤`,
 and (under chain conditions) equivalence with Nash equilibrium.
 -/
 lemma proposition_4_16 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
@@ -139,17 +139,12 @@ lemma proposition_4_16 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [Bounde
 (μ : Intvl ℒ → S) (hμ : SlopeLike μ) :
 (
   List.TFAE [
-  μmax μ TotIntvl = μ TotIntvl,
-  μmin μ TotIntvl = μ TotIntvl,
-  μmin μ TotIntvl = μmax μ TotIntvl
+  μmax μ ⊤ = μ ⊤, μmin μ ⊤ = μ ⊤, μmin μ ⊤ = μmax μ ⊤
   ]
 ) ∧ (
   WeakAscendingChainCondition μ → StrongDescendingChainCondition μ →
   List.TFAE [
-  μmax μ TotIntvl = μ TotIntvl,
-  μmin μ TotIntvl = μ TotIntvl,
-  μmin μ TotIntvl = μmax μ TotIntvl,
-  NashEquilibrium μ
+  μmax μ ⊤ = μ ⊤, μmin μ ⊤ = μ ⊤, μmin μ ⊤ = μmax μ ⊤, NashEquilibrium μ
   ]
 )
 := by
@@ -194,7 +189,7 @@ NashEquilibrium μ → Semistable μ
 
 /--
 Theorem 4.21: a `TFAE` package for Nash equilibrium and the `μmin/μmax` equalities.
-It characterizes `NashEquilibrium μ` in terms of the equalities among `μmin`/`μmax` on `TotIntvl`.
+It characterizes `NashEquilibrium μ` in terms of the equalities among `μmin`/`μmax` on `⊤`.
 
 API note: this is the main user-facing equivalence statement of the Nash-equilibrium chapter.
 -/
@@ -203,10 +198,7 @@ theorem NashEquil_equiv {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrd
 (μ : Intvl ℒ → S) [hμ : SlopeLike μ]
 [h₁ : WeakAscendingChainCondition μ] [h₂ : StrongDescendingChainCondition μ] :
 List.TFAE [
-  μmax μ TotIntvl = μ TotIntvl,
-  μmin μ TotIntvl = μ TotIntvl,
-  μmin μ TotIntvl = μmax μ TotIntvl,
-  NashEquilibrium μ
+  μmax μ ⊤ = μ ⊤, μmin μ ⊤ = μ ⊤, μmin μ ⊤ = μmax μ ⊤, NashEquilibrium μ
   ]
 ∧ (
   Semistable μ → NashEquilibrium μ

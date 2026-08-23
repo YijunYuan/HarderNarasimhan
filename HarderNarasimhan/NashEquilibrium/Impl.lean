@@ -16,7 +16,7 @@ import Mathlib.Data.List.TFAE
 
   This file contains the internal (non-export) proofs for the Nash-equilibrium layer
   of the development. The key technical theme is to relate the global extremal values
-  `μmin μ TotIntvl` and `μmax μ TotIntvl` to the “best responses” quantities `μAstar μ`
+  `μmin μ ⊤` and `μmax μ ⊤` to the “best responses” quantities `μAstar μ`
   and `μBstar μ`, and to package the resulting equivalences as TFAE chains.
 
   The statements are named after the corresponding remarks/propositions/theorem in the
@@ -58,8 +58,8 @@ lemma rmk4d10₁ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder
     unfold μA μB at h
     apply sSup_le_iff.1 at h
     simp only [ne_eq, Set.mem_ofPred_eq, le_sInf_iff, forall_exists_index] at h
-    exact h (μmin μ ⟨⊥, y, hy⟩) y ⟨in_TotIntvl y, ne_of_lt hy⟩ rfl
-      (μmax μ ⟨x, ⊤, lt_top_iff_ne_top.2 hx⟩) x ⟨in_TotIntvl x, hx⟩ rfl
+    exact h (μmin μ ⟨⊥, y, hy⟩) y ⟨Intvl.mem_top y, ne_of_lt hy⟩ rfl
+      (μmax μ ⟨x, ⊤, lt_top_iff_ne_top.2 hx⟩) x ⟨Intvl.mem_top x, hx⟩ rfl
   · refine fun h ↦ sSup_le_iff.2 ?_
     simp only [ne_eq, Set.mem_ofPred_eq, forall_exists_index]
     refine fun b x hx h' ↦ h' ▸ le_sInf_iff.2 ?_
@@ -72,26 +72,26 @@ lemma rmk4d10₁ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder
   chain condition together with the first weak slope-like axiom.
 
   Under these hypotheses, Nash equilibrium is equivalent to a single family of
-  inequalities comparing `μmin` on bottom-anchored intervals with `μmin` on `TotIntvl`.
+  inequalities comparing `μmin` on bottom-anchored intervals with `μmin` on `⊤`.
 -/
 lemma rmk4d10₂ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : Intvl ℒ → S)
 (h₁ : WeakAscendingChainCondition μ) (h₂ : WeakSlopeLike₁ μ) :
 NashEquilibrium μ ↔
-  ∀ y : ℒ, (hy : y ≠ ⊥) → μmin μ ⟨⊥, y,bot_lt_iff_ne_bot.2 hy⟩ ≤ μmin μ TotIntvl := by
+  ∀ y : ℒ, (hy : y ≠ ⊥) → μmin μ ⟨⊥, y,bot_lt_iff_ne_bot.2 hy⟩ ≤ μmin μ ⊤ := by
   constructor
   · intro h y hy
     replace h := h.nash_eq
     rw [impl.prop4d1₁ ℒ S μ h₁.wacc h₂.wsl₁] at h
-    simp only [TotIntvl, μBstar, μB, ne_eq] at h
+    simp only [Intvl.left_top, μBstar, μB, ne_eq] at h
     rw [h]
-    exact le_sSup ⟨y, ⟨in_TotIntvl y, Ne.symm hy⟩, rfl⟩
+    exact le_sSup ⟨y, ⟨Intvl.mem_top y, Ne.symm hy⟩, rfl⟩
   · intro h
     refine {nash_eq := ?_}
     rw [impl.prop4d1₁ ℒ S μ h₁.wacc h₂.wsl₁]
     simp only [μBstar, μB, ne_eq]
-    exact eq_of_le_of_ge (le_sSup ⟨⊤, ⟨in_TotIntvl ⊤, bot_ne_top⟩, rfl⟩)
+    exact eq_of_le_of_ge (le_sSup ⟨⊤, ⟨Intvl.mem_top ⊤, bot_ne_top⟩, rfl⟩)
       (sSup_le fun b ⟨h1, h2, h3⟩ ↦ h3 ▸ (h h1 <| Ne.symm h2.2))
 
 
@@ -100,47 +100,46 @@ NashEquilibrium μ ↔
 
   Assuming a strong descending chain condition and the second weak slope-like axiom,
   Nash equilibrium is equivalent to a family of inequalities comparing `μmax` on
-  `TotIntvl` with `μmax` on top-anchored intervals.
+  `⊤` with `μmax` on top-anchored intervals.
 -/
 lemma rmk4d10₃ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : Intvl ℒ → S)
 (h₁ : StrongDescendingChainCondition μ) (h₂ : WeakSlopeLike₂ μ) :
 NashEquilibrium μ ↔
-  ∀ y : ℒ, (hy : y ≠ ⊤) → μmax μ TotIntvl ≤ μmax μ ⟨y, ⊤,lt_top_iff_ne_top.2 hy⟩ := by
+  ∀ y : ℒ, (hy : y ≠ ⊤) → μmax μ ⊤ ≤ μmax μ ⟨y, ⊤,lt_top_iff_ne_top.2 hy⟩ := by
   constructor
   · intro h y hy
     replace h := h.nash_eq
     rw [impl.prop4d3₁ μ h₁.wdcc h₂.wsl₂] at h
-    simp only [TotIntvl] at h
     rw [← h]
     unfold μAstar μA
-    exact sInf_le ⟨y, ⟨in_TotIntvl y, hy⟩, rfl⟩
+    exact sInf_le ⟨y, ⟨Intvl.mem_top y, hy⟩, rfl⟩
   · intro h
     refine {nash_eq := ?_}
     rw [impl.prop4d3₁ μ h₁.wdcc h₂.wsl₂]
     simp only [μAstar, μA, ne_eq]
-    exact eq_of_le_of_ge (sInf_le ⟨⊥, ⟨in_TotIntvl ⊥, bot_ne_top⟩, rfl⟩)
+    exact eq_of_le_of_ge (sInf_le ⟨⊥, ⟨Intvl.mem_top ⊥, bot_ne_top⟩, rfl⟩)
       (le_sInf fun b ⟨h1, h2, h3⟩ ↦ h3 ▸ (h h1 h2.2))
 
 
 
-/-- `prop4d11₁` shows that if the global extremal values on `TotIntvl` coincide, then
+/-- `prop4d11₁` shows that if the global extremal values on `⊤` coincide, then
   the best-response inequality `μBstar μ ≤ μAstar μ` holds.
 -/
 lemma prop4d11₁ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : Intvl ℒ → S) :
-μmin μ TotIntvl = μmax μ TotIntvl → μBstar μ ≤ μAstar μ := by
-  have h₁ : μBstar μ ≤ μmax μ TotIntvl := by
-    unfold μBstar μB μmax TotIntvl
+μmin μ ⊤ = μmax μ ⊤ → μBstar μ ≤ μAstar μ := by
+  have h₁ : μBstar μ ≤ μmax μ ⊤ := by
+    unfold μBstar μB μmax
     exact sSup_le fun b ⟨hb1, hb2, hb3⟩ ↦ hb3 ▸ le_trans
       (rmk4d10₀ μ ⟨⊥, hb1, bot_lt_iff_ne_bot.2 <| Ne.symm hb2.2⟩).1 <|
-      le_sSup ⟨hb1, ⟨in_TotIntvl hb1, hb2.2⟩, rfl⟩
-  have h₂ : μmin μ TotIntvl ≤ μAstar μ := by
-    unfold μAstar μA μmin TotIntvl
+      le_sSup ⟨hb1, ⟨Intvl.mem_top hb1, hb2.2⟩, rfl⟩
+  have h₂ : μmin μ ⊤ ≤ μAstar μ := by
+    unfold μAstar μA μmin
     exact le_sInf fun b ⟨hb1, hb2, hb3⟩ ↦ hb3 ▸ le_trans
-      (sInf_le ⟨hb1, ⟨in_TotIntvl hb1, hb2.2⟩, rfl⟩)
+      (sInf_le ⟨hb1, ⟨Intvl.mem_top hb1, hb2.2⟩, rfl⟩)
       (rmk4d10₀ μ ⟨hb1, ⊤, lt_top_iff_ne_top.2 <| hb2.2⟩).2
   exact fun h ↦ h₁.trans (h ▸ h₂)
 
@@ -148,35 +147,36 @@ lemma prop4d11₁ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrde
 
 /-- `prop4d11₂` is a converse direction: under the weak chain/slope hypotheses on both
   sides, the inequality `μBstar μ ≤ μAstar μ` forces equality of the global extremal
-  values `μmin μ TotIntvl` and `μmax μ TotIntvl`.
+  values `μmin μ ⊤` and `μmax μ ⊤`.
 -/
 lemma prop4d11₂ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : Intvl ℒ → S)
 (h₁ : WeakAscendingChainCondition μ) (h₂ : WeakSlopeLike₁ μ)
 (h₁' : StrongDescendingChainCondition μ) (h₂' : WeakSlopeLike₂ μ) :
-μBstar μ ≤ μAstar μ → μmin μ TotIntvl = μmax μ TotIntvl :=
-  fun h ↦ eq_of_le_of_ge (le_trans (rmk4d10₀ μ TotIntvl).1 (rmk4d10₀ μ ⟨⊥, ⊤,bot_lt_top⟩).2) <|
+μBstar μ ≤ μAstar μ → μmin μ ⊤ = μmax μ ⊤ :=
+  fun h ↦ eq_of_le_of_ge (le_trans (rmk4d10₀ μ ⊤).1 (rmk4d10₀ μ ⊤).2) <|
     (impl.prop4d3₁ μ h₁'.wdcc h₂'.wsl₂) ▸ (impl.prop4d1₁ ℒ S μ h₁.wacc h₂.wsl₁) ▸ h
 
 
 
-/-- `prop4d12` derives the equality `μmin μ TotIntvl = μmax μ TotIntvl` from the
-  stronger equality `μmax μ TotIntvl = μ TotIntvl`, provided a pointwise dichotomy
+/-- `prop4d12` derives the equality `μmin μ ⊤ = μmax μ ⊤` from the
+  stronger equality `μmax μ ⊤ = μ ⊤`, provided a pointwise dichotomy
   that rules out “intermediate” points simultaneously satisfying both comparisons.
 -/
 lemma prop4d12 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : Intvl ℒ → S)
-(h : ∀ x : ℒ, (hx : x ≠ ⊥ ∧ x ≠ ⊤) → ¬ μ ⟨⊥, x,bot_lt_iff_ne_bot.2 hx.1⟩ ≤ μ TotIntvl ∨
-  μ TotIntvl ≤ μ ⟨x, ⊤,lt_top_iff_ne_top.2 hx.2⟩) :
-μmax μ TotIntvl = μ TotIntvl → μmin μ TotIntvl = μmax μ TotIntvl := by
-  refine fun h' ↦ h' ▸ eq_of_le_of_ge (rmk4d10₀ μ TotIntvl).1
+(h : ∀ x : ℒ, (hx : x ≠ ⊥ ∧ x ≠ ⊤) → ¬ μ ⟨⊥, x,bot_lt_iff_ne_bot.2 hx.1⟩ ≤ μ ⊤ ∨
+  μ ⊤ ≤ μ ⟨x, ⊤,lt_top_iff_ne_top.2 hx.2⟩) :
+μmax μ ⊤ = μ ⊤ → μmin μ ⊤ = μmax μ ⊤ := by
+  refine fun h' ↦ h' ▸ eq_of_le_of_ge (rmk4d10₀ μ ⊤).1
     (le_sInf fun b ⟨hb1, hb2, hb3⟩ ↦ hb3 ▸ ?_)
   by_cases hbot : hb1 = ⊥
-  · simp only [hbot, le_refl]
+  · subst hbot
+    exact le_rfl
   refine Or.resolve_left (h hb1 ⟨hbot, hb2.2⟩) (not_not.2 ?_)
-  exact h' ▸ le_sSup ⟨hb1, ⟨in_TotIntvl hb1, Ne.symm hbot⟩, rfl⟩
+  exact h' ▸ le_sSup ⟨hb1, ⟨Intvl.mem_top hb1, Ne.symm hbot⟩, rfl⟩
 
 
 
@@ -186,28 +186,29 @@ lemma prop4d12 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder �
 lemma rmk4d13 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : Intvl ℒ → S) (hμ : SlopeLike μ) :
-∀ x : ℒ, (hx : x ≠ ⊥ ∧ x ≠ ⊤) → ¬ μ ⟨⊥, x,bot_lt_iff_ne_bot.2 hx.1⟩ ≤ μ TotIntvl ∨
-  μ TotIntvl ≤ μ ⟨x, ⊤,lt_top_iff_ne_top.2 hx.2⟩ :=
+∀ x : ℒ, (hx : x ≠ ⊥ ∧ x ≠ ⊤) → ¬ μ ⟨⊥, x,bot_lt_iff_ne_bot.2 hx.1⟩ ≤ μ ⊤ ∨
+  μ ⊤ ≤ μ ⟨x, ⊤,lt_top_iff_ne_top.2 hx.2⟩ :=
   fun x hx ↦ ((hμ.slopelike ⊥ x ⊤
     ⟨bot_lt_iff_ne_bot.2 hx.1,lt_top_iff_ne_top.2 hx.2⟩).2.2.1).imp_left not_le_of_gt
 
 
 
-/-- `prop4d14` is the dual analogue of `prop4d12`: starting from `μmin μ TotIntvl = μ TotIntvl`
-  and a suitable dichotomy, it deduces `μmax μ TotIntvl = μmin μ TotIntvl`.
+/-- `prop4d14` is the dual analogue of `prop4d12`: starting from `μmin μ ⊤ = μ ⊤`
+  and a suitable dichotomy, it deduces `μmax μ ⊤ = μmin μ ⊤`.
 -/
 lemma prop4d14 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : Intvl ℒ → S)
-(h : ∀ x : ℒ, (hx : x ≠ ⊥ ∧ x ≠ ⊤) → μ ⟨⊥, x,bot_lt_iff_ne_bot.2 hx.1⟩ ≤ μ TotIntvl ∨
-  ¬ μ TotIntvl ≤ μ ⟨x, ⊤,lt_top_iff_ne_top.2 hx.2⟩) :
-μmin μ TotIntvl = μ TotIntvl → μmax μ TotIntvl = μmin μ TotIntvl := by
+(h : ∀ x : ℒ, (hx : x ≠ ⊥ ∧ x ≠ ⊤) → μ ⟨⊥, x,bot_lt_iff_ne_bot.2 hx.1⟩ ≤ μ ⊤ ∨
+  ¬ μ ⊤ ≤ μ ⟨x, ⊤,lt_top_iff_ne_top.2 hx.2⟩) :
+μmin μ ⊤ = μ ⊤ → μmax μ ⊤ = μmin μ ⊤ := by
   refine fun h' ↦ h' ▸ eq_of_le_of_ge
-    (sSup_le fun b ⟨hb1, hb2, hb3⟩ ↦ hb3 ▸ ?_) (rmk4d10₀ μ TotIntvl).2
+    (sSup_le fun b ⟨hb1, hb2, hb3⟩ ↦ hb3 ▸ ?_) (rmk4d10₀ μ ⊤).2
   by_cases htop : hb1 = ⊤
-  · simp only [htop, le_refl]
+  · subst htop
+    exact le_rfl
   refine Or.resolve_right (h hb1 ⟨Ne.symm hb2.2, htop⟩) (not_not.2 ?_)
-  exact h' ▸ sInf_le ⟨hb1, ⟨in_TotIntvl hb1, htop⟩, rfl⟩
+  exact h' ▸ sInf_le ⟨hb1, ⟨Intvl.mem_top hb1, htop⟩, rfl⟩
 
 
 
@@ -217,8 +218,8 @@ lemma prop4d14 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder �
 lemma rmk4d15 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : Intvl ℒ → S) (hμ : SlopeLike μ) :
-∀ x : ℒ, (hx : x ≠ ⊥ ∧ x ≠ ⊤) → μ ⟨⊥, x,bot_lt_iff_ne_bot.2 hx.1⟩ ≤ μ TotIntvl ∨
-  ¬ μ TotIntvl ≤ μ ⟨x, ⊤,lt_top_iff_ne_top.2 hx.2⟩ :=
+∀ x : ℒ, (hx : x ≠ ⊥ ∧ x ≠ ⊤) → μ ⟨⊥, x,bot_lt_iff_ne_bot.2 hx.1⟩ ≤ μ ⊤ ∨
+  ¬ μ ⊤ ≤ μ ⟨x, ⊤,lt_top_iff_ne_top.2 hx.2⟩ :=
   fun x hx ↦ ((hμ.slopelike ⊥ x ⊤
     ⟨bot_lt_iff_ne_bot.2 hx.1,lt_top_iff_ne_top.2 hx.2⟩).1).imp_right not_le_of_gt
 
@@ -232,20 +233,18 @@ lemma prop4d16₁ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrde
 {S : Type*} [CompleteLattice S]
 (μ : Intvl ℒ → S) (hμ : SlopeLike μ) :
 List.TFAE [
-  μmax μ TotIntvl = μ TotIntvl,
-  μmin μ TotIntvl = μ TotIntvl,
-  μmin μ TotIntvl = μmax μ TotIntvl
+  μmax μ ⊤ = μ ⊤, μmin μ ⊤ = μ ⊤, μmin μ ⊤ = μmax μ ⊤
   ] := by
   tfae_have 1 → 3 := prop4d12 μ (rmk4d13 μ hμ)
   tfae_have 2 → 3 := fun h ↦ (prop4d14 μ (rmk4d15 μ hμ) h).symm
-  tfae_have 3 → 1 := fun h ↦ (h ▸ rmk4d10₀ μ TotIntvl).elim eq_of_le_of_ge
-  tfae_have 3 → 2 := fun h ↦ (h.symm ▸ rmk4d10₀ μ TotIntvl).elim eq_of_le_of_ge
+  tfae_have 3 → 1 := fun h ↦ (h ▸ rmk4d10₀ μ ⊤).elim eq_of_le_of_ge
+  tfae_have 3 → 2 := fun h ↦ (h.symm ▸ rmk4d10₀ μ ⊤).elim eq_of_le_of_ge
   tfae_finish
 
 
 
 /-- `prop4d16₂` is the main bridge: under `SlopeLike μ` and both chain conditions,
-  Nash equilibrium is equivalent to the equality `μmin μ TotIntvl = μmax μ TotIntvl`.
+  Nash equilibrium is equivalent to the equality `μmin μ ⊤ = μmax μ ⊤`.
 
   The proof packages the slope-like axiom into weak slope-like data on restrictions,
   and then combines `prop4d11₁` and `prop4d11₂` with the earlier characterisations.
@@ -254,7 +253,7 @@ lemma prop4d16₂ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrde
 {S : Type*} [CompleteLattice S]
 (μ : Intvl ℒ → S) (hμ : SlopeLike μ)
 (h₁ : WeakAscendingChainCondition μ) (h₂ : StrongDescendingChainCondition μ) :
-μmin μ TotIntvl = μmax μ TotIntvl ↔ NashEquilibrium μ := by
+μmin μ ⊤ = μmax μ ⊤ ↔ NashEquilibrium μ := by
   have : ∀ (z : Intvl ℒ) (hz : z.right < ⊤), μ z ≤
     μ ⟨z.left, ⊤, lt_trans z.lt hz⟩ ∨
     μ ⟨z.right, ⊤, hz⟩ ≤ μ ⟨z.left, ⊤, lt_trans z.lt hz⟩ :=
@@ -275,7 +274,7 @@ lemma prop4d18₁ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ
   rw [semistable_iff] at hμ
   have : sSup {μA μ ⟨⊥, x,hx⟩ | (x : ℒ) (hx : ⊥ < x)} ≤ μAstar μ :=
     sSup_le fun b ⟨hb1, hb2, hb3⟩ ↦ le_of_not_gt <| hb3 ▸
-      hμ.out.choose_spec.choose_spec.1 hb1 (in_TotIntvl hb1) (Ne.symm <| bot_lt_iff_ne_bot.1 hb2)
+      hμ.out.choose_spec.choose_spec.1 hb1 (Intvl.mem_top hb1) (Ne.symm <| bot_lt_iff_ne_bot.1 hb2)
   refine le_trans (sSup_le_sSup_of_isCofinalFor ?_) this
   rintro x ⟨hx1,⟨hx2,hx3⟩⟩
   refine ⟨μA μ ⟨⊥, hx1, bot_lt_iff_ne_bot.2 <| Ne.symm hx2.2⟩,
@@ -320,7 +319,7 @@ NashEquilibrium μ → Semistable μ := by
     · simp only [ne_eq, Set.mem_ofPred_eq, forall_exists_index]
       intro x hx hx'
       rw [← hx']
-      use x, ⟨in_TotIntvl _,Ne.symm hx⟩
+      use x, ⟨Intvl.mem_top _,Ne.symm hx⟩
       refine Eq.trans ?_ <| Eq.trans (Eq.symm <| impl.prop4d1₁
         ↥(⟨⊥, x, bot_lt_iff_ne_bot.2 hx⟩ : Intvl ℒ) S (Resμ ⟨⊥, x, bot_lt_iff_ne_bot.2 hx⟩ μ)
         (h₁ x hx).wacc (h₂ x hx).wsl₁) ?_
@@ -328,14 +327,14 @@ NashEquilibrium μ → Semistable μ := by
         congr 1; ext
         constructor
         · rintro ⟨ha1,⟨ha2,ha3⟩⟩
-          exact ⟨⟨ha1,ha2.1⟩, ⟨in_TotIntvl _,Subtype.coe_ne_coe.1 ha2.2⟩, ha3⟩
+          exact ⟨⟨ha1,ha2.1⟩, ⟨Intvl.mem_top _,Subtype.coe_ne_coe.1 ha2.2⟩, ha3⟩
         · rintro ⟨ha1,⟨ha2,ha3⟩⟩
-          exact ⟨ha1, ⟨in_TotIntvl ha1,Subtype.coe_ne_coe.2 ha2.2⟩, ha3⟩
+          exact ⟨ha1, ⟨Intvl.mem_top ha1,Subtype.coe_ne_coe.2 ha2.2⟩, ha3⟩
       · simp only [μAstar, μA, ne_eq]
         congr 1; ext
         constructor
         · rintro ⟨ha1,⟨ha2,ha3⟩⟩
-          refine ⟨ha1, ⟨in_TotIntvl ha1,Subtype.coe_ne_coe.2 ha2.2⟩, ha3 ▸ ?_⟩
+          refine ⟨ha1, ⟨Intvl.mem_top ha1,Subtype.coe_ne_coe.2 ha2.2⟩, ha3 ▸ ?_⟩
           simp only [μmax, ne_eq]
           congr 1; ext
           constructor
@@ -344,7 +343,7 @@ NashEquilibrium μ → Semistable μ := by
           · rintro ⟨hb1,⟨hb2,hb3⟩⟩
             exact ⟨hb1, ⟨hb2.1,Subtype.coe_ne_coe.2 hb2.2⟩, hb3⟩
         · rintro ⟨ha1,⟨ha2,ha3⟩⟩
-          refine ⟨⟨ha1,ha2.1⟩, ⟨in_TotIntvl _,Subtype.coe_ne_coe.1 ha2.2⟩, ha3 ▸ ?_⟩
+          refine ⟨⟨ha1,ha2.1⟩, ⟨Intvl.mem_top _,Subtype.coe_ne_coe.1 ha2.2⟩, ha3 ▸ ?_⟩
           simp only [μmax, ne_eq]
           congr 1; ext
           constructor
@@ -363,7 +362,7 @@ NashEquilibrium μ → Semistable μ := by
         congr 1; ext
         constructor
         · rintro ⟨ha1,⟨ha2,ha3⟩⟩
-          refine ⟨⟨ha1,ha2.1⟩, ⟨in_TotIntvl _,Subtype.coe_ne_coe.1 ha2.2⟩, ha3 ▸ ?_⟩
+          refine ⟨⟨ha1,ha2.1⟩, ⟨Intvl.mem_top _,Subtype.coe_ne_coe.1 ha2.2⟩, ha3 ▸ ?_⟩
           simp only [μmax, ne_eq]
           congr 1; ext
           constructor
@@ -372,7 +371,7 @@ NashEquilibrium μ → Semistable μ := by
           · rintro ⟨hb1,⟨hb2,hb3⟩⟩
             exact ⟨⟨hb1,⟨bot_le,hb2.1.2⟩⟩, ⟨hb2.1,Subtype.coe_ne_coe.1 hb2.2⟩, hb3⟩
         · rintro ⟨ha1,⟨ha2,ha3⟩⟩
-          refine ⟨ha1, ⟨in_TotIntvl ha1,Subtype.coe_ne_coe.2 ha2.2⟩, ha3 ▸ ?_⟩
+          refine ⟨ha1, ⟨Intvl.mem_top ha1,Subtype.coe_ne_coe.2 ha2.2⟩, ha3 ▸ ?_⟩
           simp only [μmax, ne_eq]
           congr 1; ext
           constructor
@@ -384,10 +383,10 @@ NashEquilibrium μ → Semistable μ := by
         congr 1; ext
         constructor
         · rintro ⟨ha1,⟨ha2,ha3⟩⟩
-          exact ⟨ha1, ⟨in_TotIntvl ha1,Subtype.coe_ne_coe.2 ha2.2⟩, ha3⟩
+          exact ⟨ha1, ⟨Intvl.mem_top ha1,Subtype.coe_ne_coe.2 ha2.2⟩, ha3⟩
         · rintro ⟨ha1,⟨ha2,ha3⟩⟩
-          exact ⟨⟨ha1,ha2.1⟩, ⟨in_TotIntvl _,Subtype.coe_ne_coe.1 ha2.2⟩, ha3⟩
-  replace : ∀ x : ℒ, (hx : x ≠ ⊥) → μA μ ⟨⊥, x,bot_lt_iff_ne_bot.2 hx⟩ ≤ μA μ TotIntvl := by
+          exact ⟨⟨ha1,ha2.1⟩, ⟨Intvl.mem_top _,Subtype.coe_ne_coe.1 ha2.2⟩, ha3⟩
+  replace : ∀ x : ℒ, (hx : x ≠ ⊥) → μA μ ⟨⊥, x,bot_lt_iff_ne_bot.2 hx⟩ ≤ μA μ ⊤ := by
     rw [← h] at this
     simp only [ne_eq, μAstar] at this
     intro x hx
@@ -408,10 +407,7 @@ theorem thm4d21 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 (μ : Intvl ℒ → S) (hμ : SlopeLike μ)
 (h₁ : WeakAscendingChainCondition μ) (h₂ : StrongDescendingChainCondition μ) :
 List.TFAE [
-  μmax μ TotIntvl = μ TotIntvl,
-  μmin μ TotIntvl = μ TotIntvl,
-  μmin μ TotIntvl = μmax μ TotIntvl,
-  NashEquilibrium μ,
+  μmax μ ⊤ = μ ⊤, μmin μ ⊤ = μ ⊤, μmin μ ⊤ = μmax μ ⊤, NashEquilibrium μ,
   ] ∧
 (Semistable μ → NashEquilibrium μ) ∧
 ((∀ x : ℒ, (hx : x ≠ ⊥) →

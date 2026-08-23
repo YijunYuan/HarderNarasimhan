@@ -97,7 +97,7 @@ Unique (HarderNarasimhanFiltration μ)
 ------------
 where
   uniq := by
-    rw [← ConvexI_TotIntvl_iff_Convex] at hμcvx
+    rw [← ConvexI_top_iff_Convex] at hμcvx
     exact fun a ↦ HarderNarasimhanFiltration.ext (funext fun n ↦ congrFun
       (impl.theorem3d10 μ hμ hμcvx a.filtration a.first_eq_bot a.fin_len
       (fun i j hij hj ↦ a.strict_mono (hij.le.trans hj) hj hij)

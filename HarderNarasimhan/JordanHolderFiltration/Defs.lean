@@ -43,7 +43,7 @@ API note: this is a standard non-degeneracy hypothesis for the Jordan–Hölder 
 class FiniteTotalPayoff {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : Intvl ℒ → S) : Prop where
-  fin_tot_payoff : μ ⟨⊥, ⊤,bot_lt_top⟩ ≠ ⊤
+  fin_tot_payoff : μ ⊤ ≠ ⊤
 
 
 /--
@@ -83,7 +83,7 @@ where
   strict_anti : StrictAntiOn filtration (Set.Iic (Nat.find fin_len))
   first_eq_top : filtration 0 = ⊤
   step_cond₁ : ∀ k : ℕ,  (hk : k < Nat.find (fin_len)) → μ ⟨filtration (k + 1), filtration k,
-    strict_anti hk.le hk (lt_add_one k)⟩ = μ ⟨⊥, ⊤,bot_lt_top⟩
+    strict_anti hk.le hk (lt_add_one k)⟩ = μ ⊤
   step_cond₂ : ∀ i : ℕ, (hi : i < Nat.find fin_len) →
     ∀ z : ℒ, (h' : filtration (i+1) < z) → (h'' : z < filtration i) →
     μ ⟨filtration (i+1), z, h'⟩ <
@@ -130,7 +130,7 @@ def JordanHolderRel {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
 {S : Type*} [CompleteLattice S]
 (μ : Intvl ℒ → S) : SetRel ℒ ℒ :=
 {(x, y) | ∃ h : y < x,
-    μ ⟨y, x, h⟩ = μ ⟨⊥, ⊤,bot_lt_top⟩
+    μ ⟨y, x, h⟩ = μ ⊤
   ∧ ∀ z : ℒ, (h' : y < z) → (h'' : z < x) →
     μ ⟨y, z, h'⟩ < μ ⟨y, x, h⟩
 }
@@ -190,7 +190,7 @@ This instance packages the standard implication by reducing to the internal conv
 instance {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 {μ : Intvl ℒ → S} [haff : Affine μ] : Convex μ := by
-  rw [← ConvexI_TotIntvl_iff_Convex]
+  rw [← ConvexI_top_iff_Convex]
   refine { convex := ?_ }
   intro x y hx hy hxy
   rw [haff.affine x y hxy]
@@ -210,14 +210,14 @@ FiniteTotalPayoff (Resμ ⟨⊥, x, hx⟩ μ) := by
   refine { fin_tot_payoff := ?_ }
   simp only [Resμ]
   by_contra h
-  have : Semistable μ → μmax μ TotIntvl = μ TotIntvl :=
+  have : Semistable μ → μmax μ ⊤ = μ ⊤ :=
     fun a ↦ (List.TFAE.out (impl.thm4d21 μ hsl inferInstance inferInstance).1 0 3).2
       ((impl.thm4d21 μ hsl inferInstance inferInstance).2.1 a)
   have := this hst
-  simp only [μmax, TotIntvl, ne_eq] at this
-  have this_q: μ ⟨⊥, x, hx⟩ ≤ μ ⟨⊥, ⊤, bot_lt_top⟩ := by
+  simp only [μmax, Intvl.left_top, ne_eq] at this
+  have this_q: μ ⟨⊥, x, hx⟩ ≤ μ ⊤ := by
     rw [← this]
-    exact le_sSup ⟨x, ⟨in_TotIntvl x, Ne.symm <| bot_lt_iff_ne_bot.1 hx⟩, rfl⟩
+    exact le_sSup ⟨x, ⟨Intvl.mem_top x, Ne.symm <| bot_lt_iff_ne_bot.1 hx⟩, rfl⟩
   exact (not_le_of_gt <| h ▸ lt_top_iff_ne_top.2 hftp.fin_tot_payoff) this_q
 
 

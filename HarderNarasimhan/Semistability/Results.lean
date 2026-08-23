@@ -12,7 +12,7 @@ This file collects the public-facing statements from the semistability chapter.
 
 The heavy lifting is done in `HarderNarasimhan.Semistability.Impl`; here we:
 
-* restate the main propositions/remarks using the global interval `TotIntvl` and the
+* restate the main propositions/remarks using the global interval `⊤` and the
   global predicates `St`/`Semistable`, and
 * provide short aliases that match the numbering used in the accompanying notes.
 
@@ -49,9 +49,9 @@ lemma proposition_3_2 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder
   μA μ ⟨a, x , hax⟩ ≤ μA μ ⟨a, z , lt_trans hax h⟩
 ------------
   := by
-    rw [← ConvexI_TotIntvl_iff_Convex] at hμcvx
-    exact impl.prop3d2 TotIntvl μ hμcvx x (in_TotIntvl x) z
-      (in_TotIntvl z) h h' a (in_TotIntvl a) hax
+    rw [← ConvexI_top_iff_Convex] at hμcvx
+    exact impl.prop3d2 ⊤ μ hμcvx x (Intvl.mem_top x) z
+      (Intvl.mem_top z) h h' a (Intvl.mem_top a) hax
 
 
 /-- Re-export of the internal corollary `impl.cor3d3` under the name used in the paper.
@@ -78,8 +78,8 @@ lemma proposition_3_4 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder
   (St μ).Nonempty
 ------------
   := by
-    rw [← ConvexI_TotIntvl_iff_Convex] at hμcvx
-    exact impl.prop3d4 μ hμDCC TotIntvl hμcvx
+    rw [← ConvexI_top_iff_Convex] at hμcvx
+    exact impl.prop3d4 μ hμDCC ⊤ hμcvx
 
 
 /--
@@ -96,7 +96,7 @@ lemma remark_3_5 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 ------------
   x = y
 ------------
-  := impl.rmk3d5 μ TotIntvl x hxSt y hySt
+  := impl.rmk3d5 μ ⊤ x hxSt y hySt
 
 
 /--
@@ -125,10 +125,10 @@ lemma proposition_3_7 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder
       μA μ ⟨x, y, hy⟩
 ------------
   := by
-    rw [← ConvexI_TotIntvl_iff_Convex] at hμcvx
+    rw [← ConvexI_top_iff_Convex] at hμcvx
     exact ⟨(semistableI_iff μ ⟨⊥, x, lt_of_le_of_ne bot_le hxSt.out.choose_spec.choose⟩).1 <|
-        impl.prop3d7₁ μ TotIntvl x hxSt,
-      fun y hy ↦ impl.prop3d7₂ μ TotIntvl hμcvx x hxSt y (in_TotIntvl y) hy⟩
+        impl.prop3d7₁ μ ⊤ x hxSt,
+      fun y hy ↦ impl.prop3d7₂ μ ⊤ hμcvx x hxSt y (Intvl.mem_top y) hy⟩
 
 
 /--
@@ -161,20 +161,20 @@ lemma proposition_3_8 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder
     μA μ ⟨⊥, y, lt_of_le_of_lt hxSt.out.choose.1 hxy⟩ = μA μ ⟨x, y, hxy⟩)
 ------------
  := by
-  rw [← ConvexI_TotIntvl_iff_Convex] at hμcvx
+  rw [← ConvexI_top_iff_Convex] at hμcvx
   constructor
   · constructor
     · rcases h with c1 | c2
-      · exact impl.prop3d8₁ μ TotIntvl hμcvx (Or.inl c1)
-      · exact impl.prop3d8₁ μ TotIntvl hμcvx (Or.inr fun z _ hz ↦ c2 z hz)
+      · exact impl.prop3d8₁ μ ⊤ hμcvx (Or.inl c1)
+      · exact impl.prop3d8₁ μ ⊤ hμcvx (Or.inr fun z _ hz ↦ c2 z hz)
     · intro hμDCC
       rcases h with c1 | c2
-      · exact impl.prop3d8₁' μ hμDCC TotIntvl hμcvx (Or.inl c1)
-      · exact impl.prop3d8₁' μ hμDCC TotIntvl hμcvx (Or.inr fun z _ hz ↦ c2 z hz)
+      · exact impl.prop3d8₁' μ hμDCC ⊤ hμcvx (Or.inl c1)
+      · exact impl.prop3d8₁' μ hμDCC ⊤ hμcvx (Or.inr fun z _ hz ↦ c2 z hz)
   · intro x hxSt y hxy
     rcases h with c1 | c2
-    · exact impl.prop3d8₂ μ TotIntvl hμcvx (Or.inl c1) x hxSt y (in_TotIntvl y) hxy
-    · exact impl.prop3d8₂ μ TotIntvl hμcvx (Or.inr fun z _ hz ↦ c2 z hz)
-        x hxSt y (in_TotIntvl y) hxy
+    · exact impl.prop3d8₂ μ ⊤ hμcvx (Or.inl c1) x hxSt y (Intvl.mem_top y) hxy
+    · exact impl.prop3d8₂ μ ⊤ hμcvx (Or.inr fun z _ hz ↦ c2 z hz)
+        x hxSt y (Intvl.mem_top y) hxy
 
 end HarderNarasimhan

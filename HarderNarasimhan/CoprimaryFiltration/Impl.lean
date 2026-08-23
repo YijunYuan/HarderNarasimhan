@@ -111,13 +111,13 @@ lemma μmax_eq_μ {R : Type*} [CommRing R] [IsNoetherianRing R]
 /--
 Proposition 3.11 (internal form): convexity of `μ R M` on the total interval.
 
-We prove `ConvexI TotIntvl (μ R M)` first, and later export it as global `Convex`.
+We prove `ConvexI ⊤ (μ R M)` first, and later export it as global `Convex`.
 The key step is that subset inclusion between associated-prime sets implies `≤` in
 the chosen `S₀ R` order.
 -/
 instance prop3d11 {R : Type*} [CommRing R] [IsNoetherianRing R]
 {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] :
-ConvexI TotIntvl (μ R M) := by
+ConvexI ⊤ (μ R M) := by
   refine { convex := fun x y _ _ hxy ↦ ?_ }
   refine DedekindCut.principal_le_principal.mpr <| S₀_order.1 _ _ <|
     Set.toFinset_subset_toFinset.mpr ?_
@@ -407,11 +407,11 @@ This is the main algebraic input behind Remark 3.14 in the public results.
 lemma rmk4d14₁ {R : Type*} [CommRing R] [IsNoetherianRing R]
 {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] :
 Semistable (μ R M) ↔ ∀ N : (ℒ R M), (hN : ⊥ < N) → μA (μ R M) ⟨⊥, N,hN⟩ =
-  ({(((_μ R M) ⟨⊥, ⊤,bot_lt_top⟩).toFinset.min' (μ_nonempty _))} : S₀ R) := by
+  ({(((_μ R M) ⊤).toFinset.min' (μ_nonempty _))} : S₀ R) := by
   constructor
   · intro hst N hN
     replace hst := hst.semistable N hN
-    rw [prop3d12 ⟨⊥, N,hN⟩, prop3d12 ⟨(⊥ : ℒ R M), ⊤, bot_lt_top⟩] at hst
+    rw [prop3d12 ⟨⊥, N,hN⟩, prop3d12 (⊤ : Intvl (ℒ R M))] at hst
     rw [prop3d12 ⟨⊥, N,hN⟩]
     simp only [DedekindCut.principal_inj, Finset.singleton_inj]
     simp only [gt_iff_lt, DedekindCut.principal_lt_principal, not_lt] at hst
@@ -423,7 +423,7 @@ Semistable (μ R M) ↔ ∀ N : (ℒ R M), (hN : ⊥ < N) → μA (μ R M) ⟨�
     specialize h N hN
     rw [prop3d12 ⟨⊥, N, hN⟩] at h
     simp only [DedekindCut.principal_inj, Finset.singleton_inj] at h
-    rw [prop3d12 ⟨⊥, N, hN⟩, prop3d12 ⟨(⊥ : ℒ R M), ⊤, bot_lt_top⟩]
+    rw [prop3d12 ⟨⊥, N, hN⟩, prop3d12 (⊤ : Intvl (ℒ R M))]
     simp only [gt_iff_lt, DedekindCut.principal_lt_principal, not_lt]
     exact (S₀_order.2 _ _).1 h.le
 
@@ -436,7 +436,7 @@ lemma rmk4d14₂ {R : Type*} [CommRing R] [IsNoetherianRing R]
 {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] :
 Semistable (μ R M) ↔ ∃! p, p ∈ associatedPrimes R M := by
   rw [rmk4d14₁]
-  let p0 := ((_μ R M ⟨⊥, ⊤, bot_lt_top⟩).toFinset.min' (μ_nonempty _))
+  let p0 := ((_μ R M ⊤).toFinset.min' (μ_nonempty _))
   have hbot (N : ℒ R M) : Submodule.submoduleOf (⊥ : ℒ R M) N = ⊥ :=
     Submodule.ker_subtype N
   let eTop :
@@ -444,7 +444,7 @@ Semistable (μ R M) ↔ ∃! p, p ∈ associatedPrimes R M := by
     (Submodule.quotEquivOfEqBot _ (hbot ⊤)).trans Submodule.topEquiv
   have hp0 : p0.asIdeal ∈ associatedPrimes R M := by
     simpa [LinearEquiv.AssociatedPrimes.eq eTop] using
-      min'_asIdeal_mem (⟨⊥, ⊤, bot_lt_top⟩ : Intvl (ℒ R M))
+      min'_asIdeal_mem (⊤ : Intvl (ℒ R M))
   constructor
   · refine fun hs => ⟨p0.asIdeal, hp0, fun J hJ => ?_⟩
     obtain ⟨hJp, t, ht⟩ := (isAssociatedPrime_iff (R := R) (M := M)).1 <|

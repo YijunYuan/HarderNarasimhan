@@ -18,13 +18,14 @@ applications), and `μ I` measures some quantity associated to the strict interv
 Core API:
 - `Intvl ℒ` is the type of strict intervals: ordered pairs `left < right`.
 - `x ∈ I` is the membership predicate `I.left ≤ x ≤ I.right`.
-- `TotIntvl` is the total interval `(⊥, ⊤)`.
+- `Intvl ℒ` is partially ordered by inclusion; when `ℒ` is a nontrivial bounded poset the total
+  interval `(⊥, ⊤)` is its top element `⊤`.
 - `μmax μ I` is a supremum of `μ ⟨I.left, u, _⟩` over interior points `u` of `I` (excluding the
   left endpoint).
 - `μmin μ I` is the dual infimum of `μ ⟨u, I.right, _⟩` over interior points `u` (excluding the
   right endpoint).
 - `μA` and `μB` iterate these extremal operations in the two directions; `μAstar`/`μBstar`
-  specialize to `TotIntvl`.
+  specialize to the total interval `⊤`.
 - `IsComparable` is a convenience predicate for comparability in a partial order.
 - `IsAttained` records that the infimum defining `μA` is realized by some `a`.
 
@@ -72,21 +73,44 @@ lemma mem_iff_mem_Icc {ℒ : Type*} [Preorder ℒ] {I : Intvl ℒ} {x : ℒ} :
 @[simp] lemma right_mem {ℒ : Type*} [Preorder ℒ] (I : Intvl ℒ) : I.right ∈ I :=
   ⟨I.lt.le, le_rfl⟩
 
+/--
+Strict intervals are partially ordered by inclusion: `I ≤ J` means `I` is a subinterval of `J`,
+i.e. `J.left ≤ I.left ∧ I.right ≤ J.right`.
+-/
+instance {ℒ : Type*} [PartialOrder ℒ] : PartialOrder (Intvl ℒ) where
+  le I J := J.left ≤ I.left ∧ I.right ≤ J.right
+  le_refl _ := ⟨le_rfl, le_rfl⟩
+  le_trans _ _ _ hIJ hJK := ⟨hJK.1.trans hIJ.1, hIJ.2.trans hJK.2⟩
+  le_antisymm _ _ hIJ hJI := Intvl.ext (le_antisymm hJI.1 hIJ.1) (le_antisymm hIJ.2 hJI.2)
+
+lemma le_def {ℒ : Type*} [PartialOrder ℒ] {I J : Intvl ℒ} :
+    I ≤ J ↔ J.left ≤ I.left ∧ I.right ≤ J.right := Iff.rfl
+
+/--
+When `ℒ` is a nontrivial bounded poset, the total interval `(⊥, ⊤)` is the greatest strict
+interval with respect to inclusion.
+-/
+instance {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ] : OrderTop (Intvl ℒ) where
+  top := ⟨⊥, ⊤, bot_lt_top⟩
+  le_top _ := ⟨bot_le, le_top⟩
+
+@[simp] lemma left_top {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ] :
+    (⊤ : Intvl ℒ).left = ⊥ := rfl
+
+@[simp] lemma right_top {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ] :
+    (⊤ : Intvl ℒ).right = ⊤ := rfl
+
+/--
+Every element lies in the total interval `⊤`.
+-/
+@[simp] lemma mem_top {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ] (x : ℒ) :
+    x ∈ (⊤ : Intvl ℒ) := ⟨bot_le, le_top⟩
+
+/-- An interval with endpoints `⊥` and `⊤` is the total interval `⊤`, whatever the proof. -/
+@[simp] lemma mk_bot_top {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
+    (h : (⊥ : ℒ) < ⊤) : (⟨⊥, ⊤, h⟩ : Intvl ℒ) = ⊤ := rfl
+
 end Intvl
-
-/--
-The total interval `(⊥, ⊤)` in a nontrivial bounded poset.
--/
-abbrev TotIntvl {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ] : Intvl ℒ :=
-  ⟨⊥, ⊤, bot_lt_top⟩
-
-/--
-Every element lies in the total interval.
-
-This lemma is the canonical source of `x ∈ TotIntvl`.
--/
-@[simp] lemma in_TotIntvl {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ] (x : ℒ) :
-    x ∈ (TotIntvl : Intvl ℒ) := ⟨bot_le, le_top⟩
 
 /--
 `μmax μ I` is the supremum of `μ ⟨I.left, u, _⟩` as `u` ranges over points in `I` distinct from the
@@ -129,11 +153,7 @@ This is a common global invariant used in later semistability and equilibrium st
 def μAstar {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : Intvl ℒ → S) : S :=
-μA μ TotIntvl
-
-@[simp] theorem μAstar_eq_μA_TotIntvl {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
-{S : Type*} [CompleteLattice S]
-(μ : Intvl ℒ → S) : μAstar μ = μA μ TotIntvl := rfl
+μA μ ⊤
 
 /--
 `μmin μ I` is the infimum of `μ ⟨u, I.right, _⟩` as `u` ranges over points in `I` distinct from the
@@ -163,11 +183,7 @@ sSup {μmin μ ⟨I.left, a, lt_of_le_of_ne ha.1.1 ha.2⟩ | (a : ℒ) (ha : a �
 def μBstar {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : Intvl ℒ → S) : S :=
-μB μ TotIntvl
-
-@[simp] theorem μBstar_eq_μB_TotIntvl {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
-{S : Type*} [CompleteLattice S]
-(μ : Intvl ℒ → S) : μBstar μ = μB μ TotIntvl := rfl
+μB μ ⊤
 
 /--
 Convenience predicate: two elements are comparable in a partial order.

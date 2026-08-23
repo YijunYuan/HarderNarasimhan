@@ -101,12 +101,12 @@ def StI {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 /--
 The global set of stable breakpoints for the total interval.
 
-This is simply `StI μ TotIntvl`, but provided as a convenient abbreviation for statements on `ℒ`.
+This is simply `StI μ ⊤`, but provided as a convenient abbreviation for statements on `ℒ`.
 -/
 def St {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : Intvl ℒ → S) : Set ℒ :=
-StI μ TotIntvl
+StI μ ⊤
 
 
 /--
@@ -133,7 +133,7 @@ class Semistable {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : Intvl ℒ → S) : Prop where
   semistable : ∀ x : ℒ, (hx : ⊥ < x) →
-    ¬ μA μ ⟨⊥, x, hx⟩ > μA μ ⟨⊥, ⊤, bot_lt_top⟩
+    ¬ μA μ ⟨⊥, x, hx⟩ > μA μ ⊤
 
 /--
 Global stability class.
@@ -148,6 +148,6 @@ class Stable {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : Intvl ℒ → S) extends Semistable μ where
   stable : ∀ x : ℒ, (hx : ⊥ < x) → x < ⊤ →
-    μA μ ⟨⊥, x, hx⟩ ≠ μA μ ⟨⊥, ⊤, bot_lt_top⟩
+    μA μ ⟨⊥, x, hx⟩ ≠ μA μ ⊤
 
 end HarderNarasimhan

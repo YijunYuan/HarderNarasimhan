@@ -35,7 +35,7 @@ lemma proposition_4_1 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [Bounded
 (μ : Intvl ℒ → S)
 (h₁ : WeakAscendingChainCondition μ) (h₂ : WeakSlopeLike₁ μ) :
 (
-  μAstar μ = μmin μ TotIntvl
+  μAstar μ = μmin μ ⊤
 ) ∧ (
   μAstar μ ≤ μBstar μ
 )
@@ -82,7 +82,7 @@ lemma proposition_4_3 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [Bounded
 (μ : Intvl ℒ → S)
 (h₁ : StrongDescendingChainCondition μ) (h₂ : WeakSlopeLike₂ μ) :
 (
-  μBstar μ = μmax μ TotIntvl
+  μBstar μ = μmax μ ⊤
 ) ∧ (
   μAstar μ ≤ μBstar μ
 )

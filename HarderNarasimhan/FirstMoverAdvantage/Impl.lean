@@ -10,7 +10,7 @@ import Mathlib.Data.Real.Basic
   # First-mover advantage: internal implementation lemmas
 
   This file contains the internal proofs used to relate the “A/B-star” quantities
-  (`μAstar`, `μBstar`) to the global extremal values on `TotIntvl`.
+  (`μAstar`, `μBstar`) to the global extremal values on `⊤`.
 
   The main results are Proposition 4.1 (the characterisation of `μAstar`) and
   Proposition 4.3 (the dual characterisation of `μBstar`), together with the
@@ -62,14 +62,14 @@ noncomputable def prop4d1₁_seq {ℒ : Type*} [Nontrivial ℒ] [PartialOrder �
 
 
 /-- `prop4d1_helper` rewrites the “top-anchored” sInf that appears naturally in the
-  proof of Proposition 4.1 as `μmin μ TotIntvl`.
+  proof of Proposition 4.1 as `μmin μ ⊤`.
 -/
 lemma prop4d1_helper {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : Intvl ℒ → S) :
-sInf {x | ∃ x_1, ∃ (hx : x_1 < ⊤), μ ⟨x_1, ⊤, hx⟩ = x} = μmin μ TotIntvl :=
+sInf {x | ∃ x_1, ∃ (hx : x_1 < ⊤), μ ⟨x_1, ⊤, hx⟩ = x} = μmin μ ⊤ :=
   congrArg sInf <| Set.ext fun _ ↦
-    ⟨fun ⟨w, hw, hw'⟩ ↦ ⟨w, ⟨in_TotIntvl w, ne_top_of_lt hw⟩, hw'⟩,
+    ⟨fun ⟨w, hw, hw'⟩ ↦ ⟨w, ⟨Intvl.mem_top w, ne_top_of_lt hw⟩, hw'⟩,
      fun ⟨w, hw, hw'⟩ ↦ ⟨w, lt_top_iff_ne_top.2 hw.2, hw'⟩⟩
 
 
@@ -77,7 +77,7 @@ sInf {x | ∃ x_1, ∃ (hx : x_1 < ⊤), μ ⟨x_1, ⊤, hx⟩ = x} = μmin μ T
 /-- `prop4d1₁` is the core statement behind Proposition 4.1: under the two hypotheses
   `h₁` (a weak “eventual improvement” along strict chains) and `h₂` (a weak slope-like
   alternative towards the top), the best-response value `μAstar μ` coincides with the
-  global infimum `μmin μ TotIntvl`.
+  global infimum `μmin μ ⊤`.
 -/
 lemma prop4d1₁ (ℒ : Type*) [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 (S : Type*) [CompleteLattice S]
@@ -88,7 +88,7 @@ lemma prop4d1₁ (ℒ : Type*) [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder
 (h₂ : ∀ z : Intvl ℒ, (hz :z.right < ⊤) →
   μ z ≤ μ ⟨z.left, ⊤,lt_trans z.lt hz⟩ ∨ μ ⟨z.right, ⊤,hz⟩ ≤
   μ ⟨z.left, ⊤,lt_trans z.lt hz⟩) :
-μAstar μ = μmin μ TotIntvl := by
+μAstar μ = μmin μ ⊤ := by
   rw [← prop4d1_helper]
   have : ∀ yA : ℒ, (hyA : yA < ⊤) → ∃ xA : ℒ, xA < ⊤ ∧ (∀ xB : ℒ, (hAB : xA < xB) →
     μ ⟨xA, xB, hAB⟩ ≤ μ ⟨yA, ⊤, hyA⟩) := by
@@ -104,7 +104,7 @@ lemma prop4d1₁ (ℒ : Type*) [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder
   refine le_antisymm ?_ ?_
   · refine le_sInf fun y ⟨yA, hyA, h⟩ ↦ ?_
     obtain ⟨xA, hxA, h'⟩ := this yA hyA
-    exact h.symm ▸ sInf_le_of_le ⟨xA, ⟨in_TotIntvl xA, ne_top_of_lt hxA⟩, rfl⟩
+    exact h.symm ▸ sInf_le_of_le ⟨xA, ⟨Intvl.mem_top xA, ne_top_of_lt hxA⟩, rfl⟩
       (sSup_le fun _ ⟨xB, hxB, hxB'⟩ ↦ hxB' ▸ h' xB (lt_of_le_of_ne hxB.1.1 hxB.2))
   · refine le_sInf fun t ⟨x, hx, h⟩ ↦ h.symm ▸
       sInf_le_of_le ⟨x, lt_top_iff_ne_top.2 hx.2, rfl⟩
@@ -113,7 +113,7 @@ lemma prop4d1₁ (ℒ : Type*) [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder
 
 
 /-- `prop4d1₂` is the easy inequality direction derived from `prop4d1₁`:
-  once `μAstar μ = μmin μ TotIntvl`, we get `μAstar μ ≤ μBstar μ` by exhibiting a
+  once `μAstar μ = μmin μ ⊤`, we get `μAstar μ ≤ μBstar μ` by exhibiting a
   single witness in the defining `sSup` for `μBstar`.
 -/
 lemma prop4d1₂ (ℒ : Type*) [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
@@ -205,11 +205,11 @@ OrderDual.ofDual <| μAstar (fun (p : Intvl ℒᵒᵈ) ↦
   refine congrArg (@sSup S _) <| Set.ext fun x ↦ ?_
   constructor
   · rintro ⟨a, ha, ha'⟩
-    refine ⟨a, ⟨in_TotIntvl a, Ne.symm ha.2⟩, ha' ▸ congrArg sInf (Set.ext fun r ↦ ?_)⟩
+    refine ⟨a, ⟨Intvl.mem_top a, Ne.symm ha.2⟩, ha' ▸ congrArg sInf (Set.ext fun r ↦ ?_)⟩
     exact ⟨fun ⟨b, hb, hb'⟩ ↦ ⟨b, ⟨⟨hb.1.2, hb.1.1⟩, Ne.symm hb.2⟩, hb'⟩,
       fun ⟨b, hb, hb'⟩ ↦ ⟨b, ⟨⟨hb.1.2, hb.1.1⟩, Ne.symm hb.2⟩, hb'⟩⟩
   · rintro ⟨a, ha, ha'⟩
-    refine ⟨a, ⟨in_TotIntvl (OrderDual.toDual a), Ne.symm ha.2⟩,
+    refine ⟨a, ⟨Intvl.mem_top (OrderDual.toDual a), Ne.symm ha.2⟩,
       ha' ▸ congrArg sSup (Set.ext fun r ↦ ?_)⟩
     exact ⟨fun ⟨b, hb, hb'⟩ ↦ ⟨b, ⟨⟨hb.1.2, hb.1.1⟩, Ne.symm hb.2⟩, hb'⟩,
       fun ⟨b, hb, hb'⟩ ↦ ⟨b, ⟨⟨hb.1.2, hb.1.1⟩, Ne.symm hb.2⟩, hb'⟩⟩
@@ -228,11 +228,11 @@ OrderDual.ofDual <| μBstar (fun (p : Intvl ℒᵒᵈ) ↦
   refine congrArg (@sInf S _) <| Set.ext fun x ↦ ?_
   constructor
   · rintro ⟨a, ha, ha'⟩
-    refine ⟨a, ⟨in_TotIntvl a, Ne.symm ha.2⟩, ha' ▸ congrArg sSup (Set.ext fun r ↦ ?_)⟩
+    refine ⟨a, ⟨Intvl.mem_top a, Ne.symm ha.2⟩, ha' ▸ congrArg sSup (Set.ext fun r ↦ ?_)⟩
     exact ⟨fun ⟨b, hb, hb'⟩ ↦ ⟨b, ⟨⟨hb.1.2, hb.1.1⟩, Ne.symm hb.2⟩, hb'⟩,
       fun ⟨b, hb, hb'⟩ ↦ ⟨b, ⟨⟨hb.1.2, hb.1.1⟩, Ne.symm hb.2⟩, hb'⟩⟩
   · rintro ⟨a, ha, ha'⟩
-    refine ⟨a, ⟨in_TotIntvl (OrderDual.toDual a), Ne.symm ha.2⟩,
+    refine ⟨a, ⟨Intvl.mem_top (OrderDual.toDual a), Ne.symm ha.2⟩,
       ha'.symm ▸ congrArg sInf (Set.ext fun r ↦ ?_)⟩
     exact ⟨fun ⟨b, hb, hb'⟩ ↦ ⟨b, ⟨⟨hb.1.2, hb.1.1⟩, Ne.symm hb.2⟩, hb'⟩,
       fun ⟨b, hb, hb'⟩ ↦ ⟨b, ⟨⟨hb.1.2, hb.1.1⟩, Ne.symm hb.2⟩, hb'⟩⟩
@@ -240,21 +240,21 @@ OrderDual.ofDual <| μBstar (fun (p : Intvl ℒᵒᵈ) ↦
 
 
 /-- `prop4d3_helper` rewrites the “bottom-anchored” sSup that appears naturally in the
-  dual argument as `μmax μ TotIntvl`.
+  dual argument as `μmax μ ⊤`.
 -/
 lemma prop4d3_helper {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : Intvl ℒ → S) :
-sSup {μ ⟨⊥, y,hy⟩ | (y : ℒ) (hy : ⊥ < y) } = μmax μ TotIntvl :=
+sSup {μ ⟨⊥, y,hy⟩ | (y : ℒ) (hy : ⊥ < y) } = μmax μ ⊤ :=
   congrArg sSup <| Set.ext fun _ ↦
-    ⟨fun ⟨w, hw, hw'⟩ ↦ ⟨w, ⟨in_TotIntvl w, ne_of_lt hw⟩, hw'⟩,
+    ⟨fun ⟨w, hw, hw'⟩ ↦ ⟨w, ⟨Intvl.mem_top w, ne_of_lt hw⟩, hw'⟩,
      fun ⟨w, hw, hw'⟩ ↦ ⟨w, bot_lt_iff_ne_bot.2 (Ne.symm hw.2), hw'⟩⟩
 
 
 
 /-- `prop4d3₁` is the dual form of Proposition 4.1: under hypotheses `h₁` and `h₂`
   phrased for strict anti-chains and bottom-anchored alternatives, the best-response
-  value `μBstar μ` coincides with the global supremum `μmax μ TotIntvl`.
+  value `μBstar μ` coincides with the global supremum `μmax μ ⊤`.
 
   The proof reduces to `prop4d1₁` on the order dual, and then translates the result
   back via the duality lemmas.
@@ -268,7 +268,7 @@ lemma prop4d3₁ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder
 (h₂ : ∀ z : Intvl ℒ, (hz : ⊥ < z.left) →
   μ ⟨⊥, z.right,lt_trans hz z.lt⟩ ≤ μ z ∨ μ ⟨⊥, z.right,lt_trans hz z.lt⟩ ≤
   μ ⟨⊥, z.left,hz⟩) :
-μBstar μ = μmax μ TotIntvl := by
+μBstar μ = μmax μ ⊤ := by
   have := prop4d1₁ ℒᵒᵈ Sᵒᵈ (fun (p : Intvl ℒᵒᵈ) ↦ OrderDual.toDual <|
     μ ⟨p.right, p.left, p.lt⟩) (h₁_dual_of_h₁ h₁) (h₂_dual_of_h₂ h₂)
   rw [← prop4d1_helper] at this

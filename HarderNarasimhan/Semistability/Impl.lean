@@ -69,14 +69,14 @@ API note: this turns a “top occurs along chains” assumption into the formal 
 -/
 lemma cor3d3 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 (S : Type*) [CompleteLattice S]
-(μ : Intvl ℒ → S) (hμcvx : ConvexI TotIntvl μ)
+(μ : Intvl ℒ → S) (hμcvx : ConvexI ⊤ μ)
 (h : ∀ f : ℕ → ℒ, (h : StrictAnti f) →  ∃N : ℕ, μA μ ⟨f <| N + 1, f N,h (lt_add_one N)⟩ = ⊤)
 : μA_DescendingChainCondition μ := by
   refine { μ_dcc := fun a f h₁ h₂ ↦ ?_ }
   obtain ⟨N, hN⟩ := h f h₂
-  exact ⟨N, not_lt_of_ge <| prop3d2 TotIntvl μ hμcvx (f <| N + 1)
-    (in_TotIntvl <| f <| N + 1) (f N) (in_TotIntvl <| f N)
-    (h₂ (lt_add_one N)) hN a (in_TotIntvl <| a) (h₁ <| N + 1)⟩
+  exact ⟨N, not_lt_of_ge <| prop3d2 ⊤ μ hμcvx (f <| N + 1)
+    (Intvl.mem_top <| f <| N + 1) (f N) (Intvl.mem_top <| f N)
+    (h₂ (lt_add_one N)) hN a (Intvl.mem_top <| a) (h₁ <| N + 1)⟩
 
 
 /--
@@ -615,17 +615,18 @@ Equivalence between the global typeclass `Semistable μ` and interval-local semi
 total interval.
 
 This lemma is an API bridge: it lets one freely move between the class-based semistability used in
-later modules and the predicate `semistableI μ TotIntvl` defined via `StI`.
+later modules and the predicate `semistableI μ ⊤` defined via `StI`.
 -/
 theorem semistable_iff {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : Intvl ℒ → S) :
-  Semistable μ ↔ semistableI μ TotIntvl := by
-  simp only [semistableI, StI, S₁I, TotIntvl, ne_eq, gt_iff_lt, S₂I, Set.mem_ofPred_eq, le_top,
+  Semistable μ ↔ semistableI μ ⊤ := by
+  simp only [semistableI, StI, S₁I, Intvl.left_top, Intvl.right_top, ne_eq, gt_iff_lt, S₂I,
+    Set.mem_ofPred_eq, le_top,
     implies_true, and_true, bot_ne_top, not_false_eq_true, exists_true_left]
   constructor
-  · exact fun h ↦ ⟨in_TotIntvl _, fun y hyI hy ↦ h.semistable y <| bot_le.lt_of_ne hy⟩
-  · exact fun h ↦ {semistable := fun y hyI hy ↦ (h.choose_spec y (in_TotIntvl _) hyI.ne) hy}
+  · exact fun h ↦ ⟨Intvl.mem_top _, fun y hyI hy ↦ h.semistable y <| bot_le.lt_of_ne hy⟩
+  · exact fun h ↦ {semistable := fun y hyI hy ↦ (h.choose_spec y (Intvl.mem_top _) hyI.ne) hy}
 
 
 /--
@@ -644,16 +645,17 @@ theorem semistableI_iff {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrd
 (μ : Intvl ℒ → S)
 (I : Intvl ℒ) : semistableI μ I ↔ Semistable (Resμ I μ) := by
   rw [semistable_iff (μ := Resμ I μ)]
-  simp only [semistableI, StI, S₁I, S₂I, TotIntvl, Set.mem_ofPred_eq, gt_iff_lt,
+  simp only [semistableI, StI, S₁I, S₂I, Intvl.left_top, Intvl.right_top, Set.mem_ofPred_eq,
+    gt_iff_lt,
     μA_res_intvl]
   constructor
   · rintro ⟨hI, hne, h₁, h₂⟩
-    exact ⟨in_TotIntvl _, ne_of_lt bot_lt_top,
+    exact ⟨Intvl.mem_top _, ne_of_lt bot_lt_top,
       fun y hyI hy ↦ h₁ y y.prop (fun h => hy <| Subtype.ext h),
       fun y hyI hy hy' ↦ h₂ y y.prop (fun h => hy <| Subtype.ext h) hy'⟩
   · rintro ⟨hI, hne, h₁, h₂⟩
     exact ⟨I.right_mem, I.lt.ne,
-      fun y hyI hy ↦ h₁ ⟨y, hyI⟩ (in_TotIntvl _) (fun h => hy <| congrArg Subtype.val h),
+      fun y hyI hy ↦ h₁ ⟨y, hyI⟩ (Intvl.mem_top _) (fun h => hy <| congrArg Subtype.val h),
       fun y hyI hy hy' ↦ hyI.2⟩
 
 

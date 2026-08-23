@@ -52,7 +52,7 @@ lemma μmax_eq_μ {R : Type*} [CommRing R] [IsNoetherianRing R]
 /--
 Proposition 3.11: convexity of the slope `μ R M`.
 
-Internally we build a `ConvexI TotIntvl` instance and then translate it to the
+Internally we build a `ConvexI ⊤` instance and then translate it to the
 global `Convex` predicate.
 -/
 instance proposition_3_11 {R : Type*} [CommRing R] [IsNoetherianRing R]
@@ -61,7 +61,7 @@ instance proposition_3_11 {R : Type*} [CommRing R] [IsNoetherianRing R]
 Convex (μ R M)
 ------------
 := by
-  apply (ConvexI_TotIntvl_iff_Convex _).1
+  apply (ConvexI_top_iff_Convex _).1
   infer_instance
 
 
@@ -113,7 +113,7 @@ lemma remark_3_14 {R : Type*} [CommRing R] [IsNoetherianRing R]
 List.TFAE [
 Semistable (μ R M),
 ∀ N : (ℒ R M), (hN : ⊥ < N) →
-  μA (μ R M) ⟨⊥, N,hN⟩ = ({(((_μ R M) ⟨⊥, ⊤,bot_lt_top⟩).toFinset.min' (μ_nonempty _))} : S₀ R),
+  μA (μ R M) ⟨⊥, N,hN⟩ = ({(((_μ R M) ⊤).toFinset.min' (μ_nonempty _))} : S₀ R),
 ∃! p, p ∈ associatedPrimes R M
 ]
 ------------

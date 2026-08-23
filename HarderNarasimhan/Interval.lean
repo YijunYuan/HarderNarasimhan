@@ -21,7 +21,8 @@ operations, bounds — the partial order comes from the generic subtype instance
 - `Resμ I μ` : the induced measure on `↥I`, i.e. `fun J ↦ μ J.ofSub`;
 - lemmas `μ*_res_intvl` stating that the induced constructions (`μmax`, `μmin`, `μA`, `μB`)
   commute with restriction;
-- `strip_bot`/`strip_top`, projection lemmas for the endpoints in the interval-as-bounded-order
+- `Intvl.val_bot`/`Intvl.val_top`, projection lemmas for the endpoints in the
+  interval-as-bounded-order
   view.
 -/
 
@@ -93,6 +94,10 @@ instance {ℒ : Type*} [PartialOrder ℒ] {I : Intvl ℒ} : CoeOut (Intvl ↥I) 
 
 @[simp] lemma ofSub_right {ℒ : Type*} [PartialOrder ℒ] {I : Intvl ℒ} (J : Intvl ↥I) :
     (ofSub J).right = J.right.val := rfl
+
+/-- The total interval of `↥I` maps back to `I` itself under `ofSub`. -/
+@[simp] lemma ofSub_top {ℒ : Type*} [PartialOrder ℒ] {I : Intvl ℒ} :
+    ofSub (⊤ : Intvl ↥I) = I := rfl
 
 end Intvl
 
@@ -228,19 +233,15 @@ lemma μB_res_intvl {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOr
     fun a h ↦ μmin μ ⟨(Intvl.ofSub J).left, a, lt_of_le_of_ne h.1.1 h.2⟩
 
 /--
-Projection lemma: the bottom element of `↥(⟨a, b, h⟩ : Intvl ℒ)` is definitionally the left
-endpoint `a`.
-
-API note: phrased using `Subtype.val` to make rewriting in proofs convenient.
+Projection lemma: the bottom element of the points type `↥I` is the left endpoint of `I`.
 -/
-lemma strip_bot {ℒ : Type*} [Lattice ℒ] {a b : ℒ} (h : a < b) :
-    (⊥ : ↥(⟨a, b, h⟩ : Intvl ℒ)).val = a := rfl
+@[simp] lemma Intvl.val_bot {ℒ : Type*} [PartialOrder ℒ] {I : Intvl ℒ} :
+    (⊥ : ↥I).val = I.left := rfl
 
 /--
-Projection lemma: the top element of `↥(⟨a, b, h⟩ : Intvl ℒ)` is definitionally the right
-endpoint `b`.
+Projection lemma: the top element of the points type `↥I` is the right endpoint of `I`.
 -/
-lemma strip_top {ℒ : Type*} [Lattice ℒ] {a b : ℒ} (h : a < b) :
-    (⊤ : ↥(⟨a, b, h⟩ : Intvl ℒ)).val = b := rfl
+@[simp] lemma Intvl.val_top {ℒ : Type*} [PartialOrder ℒ] {I : Intvl ℒ} :
+    (⊤ : ↥I).val = I.right := rfl
 
 end HarderNarasimhan

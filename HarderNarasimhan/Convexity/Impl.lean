@@ -34,27 +34,27 @@ intended to be stable user-facing identifiers.
 /--
 Convexity on the total interval is equivalent to global convexity.
 
-This lemma bridges the localized class `ConvexI TotIntvl μ` and the global class `Convex μ`.
+This lemma bridges the localized class `ConvexI ⊤ μ` and the global class `Convex μ`.
 It is marked `[simp]` so that typeclass conversions can be reduced automatically.
 -/
 @[simp]
-lemma ConvexI_TotIntvl_iff_Convex {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+lemma ConvexI_top_iff_Convex {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : Intvl ℒ → S) : ConvexI TotIntvl μ ↔
+(μ : Intvl ℒ → S) : ConvexI ⊤ μ ↔
 Convex μ :=
-  ⟨fun h ↦ ⟨fun x y hxy ↦ h.convex x y (in_TotIntvl _) (in_TotIntvl _) hxy⟩,
+  ⟨fun h ↦ ⟨fun x y hxy ↦ h.convex x y (Intvl.mem_top _) (Intvl.mem_top _) hxy⟩,
     fun h ↦ ⟨fun x y _ _ hxy ↦ h.convex x y hxy⟩⟩
 
 /--
 Typeclass instance: a globally convex `μ` induces interval-local convexity on the total interval.
 
-This is a convenience instance so that `Convex μ` can be used wherever `ConvexI TotIntvl μ` is
+This is a convenience instance so that `Convex μ` can be used wherever `ConvexI ⊤ μ` is
 expected.
 -/
 instance {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S] {μ : Intvl ℒ → S} [Convex μ] :
-ConvexI TotIntvl μ :=
-  (ConvexI_TotIntvl_iff_Convex μ).mpr inferInstance
+ConvexI ⊤ μ :=
+  (ConvexI_top_iff_Convex μ).mpr inferInstance
 
 /--
 Typeclass instance: interval-local convexity on the total interval implies global convexity.
@@ -62,9 +62,9 @@ Typeclass instance: interval-local convexity on the total interval implies globa
 This is the reverse direction of the previous instance.
 -/
 instance {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-{S : Type*} [CompleteLattice S] {μ : Intvl ℒ → S} [ConvexI TotIntvl μ] :
+{S : Type*} [CompleteLattice S] {μ : Intvl ℒ → S} [ConvexI ⊤ μ] :
 Convex μ :=
-  (ConvexI_TotIntvl_iff_Convex μ).mp inferInstance
+  (ConvexI_top_iff_Convex μ).mp inferInstance
 
 
 section
@@ -348,12 +348,12 @@ This is a specialization of `prop2d6₃I` to the total interval and uses totalit
 -/
 lemma rmk2d7
   {S : Type*} [CompleteLinearOrder S]
-  (μ : Intvl ℒ → S) (hμcvx : ConvexI ⟨⊥, ⊤, bot_lt_top⟩ μ)
+  (μ : Intvl ℒ → S) (hμcvx : ConvexI ⊤ μ)
   (x : ℒ) (h : ⊥ < x ∧ x < ⊤)
-  (h' : μA μ ⟨⊥, x, h.1⟩ > μA μ ⟨⊥, ⊤, bot_lt_top⟩) :
-  μA μ ⟨x, ⊤, h.2⟩ = μA μ ⟨⊥, ⊤, bot_lt_top⟩ :=
-  (prop2d6₃I ⟨⊥, ⊤, bot_lt_top⟩ μ hμcvx ⊥ (in_TotIntvl ⊥)
-      x (in_TotIntvl x) ⊤ (in_TotIntvl ⊤) h
+  (h' : μA μ ⟨⊥, x, h.1⟩ > μA μ ⊤) :
+  μA μ ⟨x, ⊤, h.2⟩ = μA μ ⊤ :=
+  (prop2d6₃I ⊤ μ hμcvx ⊥ (Intvl.mem_top ⊥)
+      x (Intvl.mem_top x) ⊤ (Intvl.mem_top ⊤) h
       (Or.inl <| le_total _ _)).resolve_right
     fun h₃ ↦ not_le_of_gt h' h₃.1
 
