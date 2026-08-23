@@ -56,7 +56,7 @@ The “discrete” slope codomain: finsets of a linearly extended prime spectrum
 We work with `Finset (LinearExtension (PrimeSpectrum R))` so that the colexicographic order
 (`Finset.Colex` from mathlib) can provide a linear order compatible with subset inclusion.
 -/
-abbrev S₀ (R : Type*) [CommRing R] [IsNoetherianRing R]
+abbrev S₀ (R : Type*) [CommRing R]
 ------------
 := Finset (LinearExtension (PrimeSpectrum R))
 
@@ -74,7 +74,7 @@ synonym to `S₀ R` itself.
 This is an intentionally “local” instance with an explicit priority, so we do not
 pollute global typeclass search with a new linear order on `Finset`.
 -/
-noncomputable instance (priority := 114514) {R : Type*} [CommRing R] [IsNoetherianRing R] :
+noncomputable instance (priority := 114514) {R : Type*} [CommRing R] :
 ------------
 LinearOrder (S₀ R)
 ------------
@@ -85,7 +85,7 @@ The induced partial order on `S₀ R`.
 
 This is obtained by forgetting the extra structure of the linear order instance.
 -/
-noncomputable instance (priority := 114513) {R : Type*} [CommRing R] [IsNoetherianRing R] :
+noncomputable instance (priority := 114513) {R : Type*} [CommRing R] :
 ------------
 PartialOrder (S₀ R)
 ------------
@@ -97,7 +97,7 @@ The `≤` relation on `S₀ R` exported as a standalone `LE` instance.
 Some downstream definitions refer to `LE` explicitly; we expose it to avoid
 unpleasant definitional equalities.
 -/
-noncomputable instance (priority := 114512) {R : Type*} [CommRing R] [IsNoetherianRing R] :
+noncomputable instance (priority := 114512) {R : Type*} [CommRing R] :
 ------------
 LE (S₀ R)
 ------------
@@ -113,7 +113,7 @@ Core monotonicity property of the chosen `S₀ R` order:
 Both are inherited from the colexicographic order. These are used throughout the coprimary
 filtration construction.
 -/
-lemma S₀_order {R : Type*} [CommRing R] [IsNoetherianRing R] :
+lemma S₀_order {R : Type*} [CommRing R] :
 ------------
 (
   -- `⊆` on `Finset` now elaborates to `LE.le`, which the high-priority `S₀ R` order
@@ -130,7 +130,7 @@ Strict inequality on the linear extension matches strict inequality of singleton
 
 This is a convenient corollary of `S₀_order` expressed in `<` form.
 -/
-lemma S₀_order' {R : Type*} [CommRing R] [IsNoetherianRing R]
+lemma S₀_order' {R : Type*} [CommRing R]
   {a b : LinearExtension (PrimeSpectrum R)} :
 ------------
 a < b ↔ ({a} : (S₀ R)) < ({b} : (S₀ R))
@@ -146,7 +146,7 @@ We use the Dedekind–MacNeille completion (`DedekindCut` from mathlib) so that 
 complete lattice, as required by the general Harder–Narasimhan framework. The cut is taken with
 respect to the colexicographic order on `S₀ R` pinned explicitly.
 -/
-abbrev S (R : Type*) [CommRing R] [IsNoetherianRing R]
+abbrev S (R : Type*) [CommRing R]
 ------------
 := @DedekindCut (S₀ R) instPartialOrderS₀.toPreorder
 
@@ -155,7 +155,7 @@ View an element of `S₀ R` as a principal cut in the completion `S R`.
 
 This lets statements compare `μA`-values in `S R` with explicit finsets in `S₀ R`.
 -/
-noncomputable instance {R : Type*} [CommRing R] [IsNoetherianRing R] : Coe (S₀ R) (S R) :=
+noncomputable instance {R : Type*} [CommRing R] : Coe (S₀ R) (S R) :=
   ⟨DedekindCut.principal⟩
 
 /--
@@ -163,8 +163,8 @@ The lattice of submodules of a finite module.
 
 This is the base lattice `ℒ` to which we apply the general filtration theory.
 -/
-abbrev ℒ (R : Type*) [CommRing R] [IsNoetherianRing R]
-(M : Type*) [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]
+abbrev ℒ (R : Type*) [CommRing R]
+(M : Type*) [AddCommGroup M] [Module R M]
 ------------
 := Submodule R M
 
@@ -177,8 +177,8 @@ quotient `N₂ / N₁`.
 
 This is later turned into a finset and then coerced into the complete lattice `S R`.
 -/
-abbrev _μ (R : Type*) [CommRing R] [IsNoetherianRing R]
-(M : Type*) [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]
+abbrev _μ (R : Type*) [CommRing R]
+(M : Type*) [AddCommGroup M] [Module R M]
 (I : Intvl (ℒ R M)) :
 ------------
 Set (LinearExtension (PrimeSpectrum R))
@@ -195,7 +195,7 @@ finitely generated module is finite; since `_μ` is its preimage under the injec
 `q ↦ q.asIdeal`, this yields a `Fintype` instance.
 -/
 noncomputable instance {R : Type*} [CommRing R] [IsNoetherianRing R]
-{M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]
+{M : Type*} [AddCommGroup M] [Module R M] [Module.Finite R M]
 {I : Intvl (ℒ R M)} :
 ------------
 Fintype ((_μ R M) I)
@@ -214,7 +214,7 @@ completion.
 API note: this is the primary slope map exported by the coprimary layer.
 -/
 noncomputable abbrev μ (R : Type*) [CommRing R] [IsNoetherianRing R]
-(M : Type*) [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] :
+(M : Type*) [AddCommGroup M] [Module R M] [Module.Finite R M] :
 ------------
 Intvl (ℒ R M) → (S R)
 ------------
@@ -229,7 +229,7 @@ This notion is used for the successive quotients in a coprimary filtration.
 
 API note: this is the user-facing predicate for “coprimary successive factors”.
 -/
-class Coprimary (R : Type*) [CommRing R] [IsNoetherianRing R]
+class Coprimary (R : Type*) [CommRing R]
   (M : Type*) [AddCommGroup M] [Module R M] : Prop where
   coprimary : ∃! p, p ∈ associatedPrimes R M
 

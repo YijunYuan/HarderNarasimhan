@@ -501,20 +501,6 @@ lemma quot_ntl {R : Type*} [CommRing R] [IsNoetherianRing R]
   rw [Submodule.Quotient.nontrivial_iff, ne_eq, Submodule.submoduleOf_eq_top]
   exact hN.not_ge
 
-/--
-Nontriviality of the induced submodule lattice on the quotient.
-
-This is the corresponding `Nontrivial` instance for the submodule lattice
-`ℒ R (N₂ / N₁)`.
--/
-lemma quot_ntl' {R : Type*} [CommRing R] [IsNoetherianRing R]
-{M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]
-{N₁ N₂ : ℒ R M} (hN : N₁ < N₂) :
-Nontrivial (@ℒ R _ _ (↥N₂ ⧸ Submodule.submoduleOf N₁ N₂) (@quot_ntl R _ _ M _ _ _ _ N₁ N₂ hN) _ _ _)
-:= (Submodule.nontrivial_iff R).mpr <| (@quot_ntl R _ _ M _ _ _ _ N₁ N₂ hN)
-
-
-
 /-- Quotients on an interval identify with the corresponding quotient submodules. -/
 noncomputable def quotEquivMapComap {R : Type*} [CommRing R] [IsNoetherianRing R]
 {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]
@@ -561,17 +547,9 @@ lemma _mu_eq_quot_mu {R : Type*} [CommRing R] [IsNoetherianRing R]
 {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]
 {N₁ N₂ W : ℒ R M} (h₁ : N₁ ≤ W) (h₂ : W ≤ N₂) (h₃ : W ≠ N₁) :
     _μ R M ⟨N₁, W, lt_of_le_of_ne h₁ (Ne.symm h₃)⟩ =
-      letI : Nontrivial (↥N₂ ⧸ N₁.submoduleOf N₂) :=
-        quot_ntl (lt_of_lt_of_le (lt_of_le_of_ne h₁ (Ne.symm h₃)) h₂)
-      letI : Nontrivial (ℒ R (↥N₂ ⧸ N₁.submoduleOf N₂)) :=
-        quot_ntl' (lt_of_lt_of_le (lt_of_le_of_ne h₁ (Ne.symm h₃)) h₂)
       _μ R (↥N₂ ⧸ N₁.submoduleOf N₂)
         ⟨⊥, Submodule.map (N₁.submoduleOf N₂).mkQ (Submodule.comap N₂.subtype W),
           bot_lt_iff_ne_bot.mpr <| map_comap_ne_bot h₁ h₂ h₃⟩ := by
-  let : Nontrivial (↥N₂ ⧸ N₁.submoduleOf N₂) :=
-    quot_ntl (lt_of_lt_of_le (lt_of_le_of_ne h₁ (Ne.symm h₃)) h₂)
-  let : Nontrivial (ℒ R (↥N₂ ⧸ N₁.submoduleOf N₂)) :=
-    quot_ntl' (lt_of_lt_of_le (lt_of_le_of_ne h₁ (Ne.symm h₃)) h₂)
   let X := Submodule.map (N₁.submoduleOf N₂).mkQ (Submodule.comap N₂.subtype W)
   have hX : Submodule.submoduleOf (⊥ : Submodule R (↥N₂ ⧸ N₁.submoduleOf N₂)) X = ⊥ :=
     Submodule.ker_subtype X
@@ -592,15 +570,11 @@ lemma muA_eq_quot_muA {R : Type*} [CommRing R] [IsNoetherianRing R]
     μA (μ R M) ⟨N₁, W, lt_of_le_of_ne h₁ (Ne.symm h₃)⟩ =
       letI : Nontrivial (↥N₂ ⧸ N₁.submoduleOf N₂) :=
         quot_ntl (lt_of_lt_of_le (lt_of_le_of_ne h₁ (Ne.symm h₃)) h₂)
-      letI : Nontrivial (ℒ R (↥N₂ ⧸ N₁.submoduleOf N₂)) :=
-        quot_ntl' (lt_of_lt_of_le (lt_of_le_of_ne h₁ (Ne.symm h₃)) h₂)
       μA (μ R (↥N₂ ⧸ N₁.submoduleOf N₂))
         ⟨⊥, Submodule.map (N₁.submoduleOf N₂).mkQ (Submodule.comap N₂.subtype W),
           bot_lt_iff_ne_bot.mpr <| map_comap_ne_bot h₁ h₂ h₃⟩ := by
   let : Nontrivial (↥N₂ ⧸ N₁.submoduleOf N₂) :=
     quot_ntl (lt_of_lt_of_le (lt_of_le_of_ne h₁ (Ne.symm h₃)) h₂)
-  let : Nontrivial (ℒ R (↥N₂ ⧸ N₁.submoduleOf N₂)) :=
-    quot_ntl' (lt_of_lt_of_le (lt_of_le_of_ne h₁ (Ne.symm h₃)) h₂)
   rw [prop3d12, prop3d12]
   simp only [DedekindCut.principal_inj, Finset.singleton_inj]
   simp [_mu_eq_quot_mu h₁ h₂ h₃]
@@ -615,21 +589,18 @@ This lemma is the key “translation” step for coprimary filtrations:
 * the induced slope on the submodule lattice of the quotient module `N₂ / N₁`.
 
 The statement is phrased as an equivalence between `Semistable (Resμ ...)` and a
-`Semistable` predicate on the quotient lattice, with all required `Nontrivial`
-instances provided by `quot_ntl`/`quot_ntl'`.
+`Semistable` predicate on the quotient lattice; the `Nontrivial` instance for the
+quotient is provided by `quot_ntl`.
 -/
 lemma semistable_res_iff_semistable_quot {R : Type*} [CommRing R] [IsNoetherianRing R]
 {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]
     (N₁ N₂ : ℒ R M) (hN : N₁ < N₂) :
     Semistable (Resμ ⟨N₁, N₂, hN⟩ (μ R M)) ↔
-      @Semistable (@ℒ R _ _ (↥N₂ ⧸ N₁.submoduleOf N₂) (@quot_ntl R _ _ M _ _ _ _ N₁ N₂ hN)
-        _ _ _) (@quot_ntl' R _ _ M _ _ _ _ N₁ N₂ hN) _ _ (S R) _
-        (@μ R _ _ (↥N₂ ⧸ Submodule.submoduleOf N₁ N₂)
-          (@quot_ntl R _ _ M _ _ _ _ N₁ N₂ hN) _ _ _) := by
+      letI : Nontrivial (↥N₂ ⧸ N₁.submoduleOf N₂) := quot_ntl hN
+      Semistable (μ R (↥N₂ ⧸ N₁.submoduleOf N₂)) := by
   refine ⟨?_, ?_⟩
   · intro h
     let : Nontrivial (↥N₂ ⧸ N₁.submoduleOf N₂) := quot_ntl hN
-    let : Nontrivial (ℒ R (↥N₂ ⧸ N₁.submoduleOf N₂)) := quot_ntl' hN
     refine { semistable := ?_ }
     intro X hX
     have hres := h.semistable
@@ -648,7 +619,6 @@ lemma semistable_res_iff_semistable_quot {R : Type*} [CommRing R] [IsNoetherianR
       Submodule.map_comap_eq_self, Submodule.range_mkQ] using hres'
   · intro h
     let : Nontrivial (↥N₂ ⧸ N₁.submoduleOf N₂) := quot_ntl hN
-    let : Nontrivial (ℒ R (↥N₂ ⧸ N₁.submoduleOf N₂)) := quot_ntl' hN
     refine { semistable := ?_ }
     intro W hW
     have hW' : W.val ≠ N₁ := fun hEq ↦ hW (Subtype.ext hEq)
@@ -684,7 +654,6 @@ lemma piecewise_coprimary {R : Type*} [CommRing R] [IsNoetherianRing R]
   intro n hn
   let hstep := HNFil.strict_mono n (n + 1) (Nat.lt_add_one n) hn
   let := quot_ntl hstep
-  let := quot_ntl' hstep
   exact {
     coprimary := rmk4d14₂.mp <|
       (semistable_res_iff_semistable_quot _ _ hstep).mp (HNFil.piecewise_semistable n hn)
@@ -739,8 +708,6 @@ lemma CoprimaryFiltration.toHarderNarasimhanFiltration {R : Type*} [CommRing R] 
         let hstep := a.strict_mono i (i + 1) (Nat.lt_add_one i) hi
         let : Nontrivial (↥(a.filtration (i + 1)) ⧸
             Submodule.submoduleOf (a.filtration i) (a.filtration (i + 1))) := quot_ntl hstep
-        let : Nontrivial (ℒ R (↥(a.filtration (i + 1)) ⧸
-            Submodule.submoduleOf (a.filtration i) (a.filtration (i + 1)))) := quot_ntl' hstep
         exact (semistable_res_iff_semistable_quot _ _ hstep).mpr <|
           rmk4d14₂.mpr (a.piecewise_coprimary i hi).coprimary
       · intro i hi
