@@ -273,4 +273,36 @@ structure CoprimaryFiltration (R : Type*) [CommRing R] [IsNoetherianRing R]
           })
 
 
+namespace CoprimaryFiltration
+
+open Classical in
+/--
+The length of a coprimary filtration: the first index at which it reaches `⊤`.
+
+All `Nat.find`-based bookkeeping about the chain length is encapsulated here and in the
+accompanying lemmas; downstream code should use `F.length` and never touch `Nat.find` directly.
+-/
+noncomputable def length {R : Type*} [CommRing R] [IsNoetherianRing R]
+    {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]
+    (F : CoprimaryFiltration R M) : ℕ := Nat.find F.fin_len
+
+open Classical in
+@[simp] lemma filtration_length {R : Type*} [CommRing R] [IsNoetherianRing R]
+    {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]
+    (F : CoprimaryFiltration R M) : F.filtration F.length = ⊤ := Nat.find_spec F.fin_len
+
+open Classical in
+lemma ne_top_of_lt_length {R : Type*} [CommRing R] [IsNoetherianRing R]
+    {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]
+    (F : CoprimaryFiltration R M) {m : ℕ} (h : m < F.length) :
+    F.filtration m ≠ ⊤ := Nat.find_min F.fin_len h
+
+open Classical in
+lemma length_le_of_eq_top {R : Type*} [CommRing R] [IsNoetherianRing R]
+    {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]
+    (F : CoprimaryFiltration R M) {m : ℕ} (h : F.filtration m = ⊤) :
+    F.length ≤ m := Nat.find_min' F.fin_len h
+
+end CoprimaryFiltration
+
 end HarderNarasimhan

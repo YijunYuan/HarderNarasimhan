@@ -99,11 +99,11 @@ where
     rw [← ConvexI_TotIntvl_iff_Convex] at hμcvx
     exact fun a ↦ HarderNarasimhanFiltration.ext (funext fun n ↦ congrFun
       (impl.theorem3d10 μ hμ hμcvx a.filtration a.first_eq_bot a.fin_len a.strict_mono
-      (Nat.le_induction (Nat.find_spec a.fin_len) fun n _ hn' ↦ eq_top_iff.2 <| hn' ▸ a.monotone
+      (Nat.le_induction (a.filtration_length) fun n _ hn' ↦ eq_top_iff.2 <| hn' ▸ a.monotone
       (Nat.le_succ n)) a.piecewise_semistable fun i  ↦ by
-    have : ∀ (j : ℕ) (hij : i + 1 ≤ j) (hj : j < Nat.find a.fin_len),
+    have : ∀ (j : ℕ) (hij : i + 1 ≤ j) (hj : j < a.length),
   μA μ ⟨a.filtration i, a.filtration (i + 1), a.strict_mono i (i + 1) (lt_add_one i)
-  (by linarith)⟩ > μA μ ⟨a.filtration j, a.filtration
+  (hij.trans hj.le)⟩ > μA μ ⟨a.filtration j, a.filtration
     (j + 1), a.strict_mono j (j + 1) (lt_add_one j) hj⟩ := by
       apply Nat.le_induction
       · exact fun hj ↦ lt_of_not_ge (a.μA_pseudo_strict_anti i hj)
@@ -140,12 +140,12 @@ theorem exists_relSeries_isIntervalSemistable
   let HNfil : HarderNarasimhanFiltration μ := default
   let HNseq : RelSeries (IntervalSemistableRel μ) := {
     toFun := fun n ↦ HNfil.filtration n,
-    length := Nat.find HNfil.fin_len
+    length := HNfil.length
     step := fun i ↦ ⟨HNfil.strict_mono i.val (i.succ).val (Nat.lt_add_one i.val) <|
       Fin.is_le i.succ, HNfil.piecewise_semistable i.val i.prop⟩
   }
   use HNseq
-  refine ⟨rfl,Nat.find_spec HNfil.fin_len,?_⟩
+  refine ⟨rfl,HNfil.filtration_length,?_⟩
   refine fun i hi hc ↦ HNfil.μA_pseudo_strict_anti i hi ?_
   convert hc
   · exact Eq.symm (Nat.mod_eq_of_lt <| lt_trans (Nat.lt_add_one i) <|lt_trans hi (Nat.lt_add_one _))

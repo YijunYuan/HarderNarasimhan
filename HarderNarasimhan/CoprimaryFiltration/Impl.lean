@@ -696,7 +696,7 @@ semistability as having a unique associated prime.
 lemma piecewise_coprimary {R : Type*} [CommRing R] [IsNoetherianRing R]
 {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]
 (HNFil : HarderNarasimhanFiltration (μ R M)) :
-∀ n < Nat.find HNFil.fin_len,
+∀ n < HNFil.length,
   Coprimary R (↥(HNFil.filtration (n + 1)) ⧸
     Submodule.submoduleOf (HNFil.filtration n) (HNFil.filtration (n + 1))) := by
   intro n hn

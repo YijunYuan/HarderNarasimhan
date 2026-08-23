@@ -89,12 +89,12 @@ theorem exists_JordanHolderSeries
 := by
   have := (inferInstance : Nonempty (JordanHolderFiltration μ)).some
   let JH : RelSeries (JordanHolderRel μ) := {
-    length := Nat.find this.fin_len,
+    length := this.length,
     toFun := fun n ↦ this.filtration n.toNat,
     step := fun n ↦ ⟨this.strict_anti n n.succ (Nat.lt_add_one ↑n) (Fin.is_le n.succ),
       this.step_cond₁ n n.isLt, this.step_cond₂ n n.isLt⟩
   }
-  exact ⟨JH, this.first_eq_top, Nat.find_spec this.fin_len⟩
+  exact ⟨JH, this.first_eq_top, this.filtration_length⟩
 
 open Classical in
 /--
@@ -135,12 +135,12 @@ theorem length_eq_of_JordanHolderFiltration
 {μ : Intvl ℒ → S}
 [FiniteTotalPayoff μ] [SlopeLike μ] [Semistable μ]
 [StrongDescendingChainCondition' μ] [Affine μ] :
-∀ JH1 JH2 : JordanHolderFiltration μ, Nat.find JH1.fin_len = Nat.find JH2.fin_len
+∀ JH1 JH2 : JordanHolderFiltration μ, JH1.length = JH2.length
 := fun JH1 JH2 ↦ eq_of_le_of_ge
   (impl.induction_on_length_of_JordanHolderFiltration (μ := μ)
-    (Nat.find JH2.fin_len) ⟨JH2, rfl.le⟩ JH1) <|
+    (JH2.length) ⟨JH2, rfl.le⟩ JH1) <|
   impl.induction_on_length_of_JordanHolderFiltration (μ := μ)
-    (Nat.find JH1.fin_len) ⟨JH1, rfl.le⟩ JH2
+    (JH1.length) ⟨JH1, rfl.le⟩ JH2
 
 
 end HarderNarasimhan

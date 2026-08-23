@@ -101,6 +101,34 @@ structure HarderNarasimhanFiltration
     μA μ ⟨filtration (i+1), filtration (i+2), strict_mono (i+1) (i+2) (Nat.lt_add_one (i + 1)) hi⟩
 
 
+namespace HarderNarasimhanFiltration
+
+variable {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+  {S : Type*} [CompleteLattice S] {μ : Intvl ℒ → S}
+
+open Classical in
+/--
+The length of a Harder–Narasimhan filtration: the first index at which it reaches `⊤`.
+
+All `Nat.find`-based bookkeeping about the chain length is encapsulated here and in the
+accompanying lemmas; downstream code should use `F.length` and never touch `Nat.find` directly.
+-/
+noncomputable def length (F : HarderNarasimhanFiltration μ) : ℕ := Nat.find F.fin_len
+
+open Classical in
+@[simp] lemma filtration_length (F : HarderNarasimhanFiltration μ) :
+    F.filtration F.length = ⊤ := Nat.find_spec F.fin_len
+
+open Classical in
+lemma ne_top_of_lt_length (F : HarderNarasimhanFiltration μ) {m : ℕ} (h : m < F.length) :
+    F.filtration m ≠ ⊤ := Nat.find_min F.fin_len h
+
+open Classical in
+lemma length_le_of_eq_top (F : HarderNarasimhanFiltration μ) {m : ℕ}
+    (h : F.filtration m = ⊤) : F.length ≤ m := Nat.find_min' F.fin_len h
+
+end HarderNarasimhanFiltration
+
 /-- The relation “there is a semistable interval from `x` to `y`”.
   This is a `SetRel ℒ ℒ` so that a filtration can be interpreted as a `RelSeries` whose
   successor steps certify semistability of each interval.

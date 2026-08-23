@@ -89,6 +89,34 @@ where
     μ ⟨filtration (i+1), z, h'⟩ <
     μ ⟨filtration (i+1), filtration i, strict_anti i (i+1) (lt_add_one i) hi⟩
 
+namespace JordanHolderFiltration
+
+variable {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+  {S : Type*} [CompleteLattice S] {μ : Intvl ℒ → S}
+
+open Classical in
+/--
+The length of a Jordan–Hölder filtration: the first index at which it reaches `⊥`.
+
+All `Nat.find`-based bookkeeping about the chain length is encapsulated here and in the
+accompanying lemmas; downstream code should use `F.length` and never touch `Nat.find` directly.
+-/
+noncomputable def length (F : JordanHolderFiltration μ) : ℕ := Nat.find F.fin_len
+
+open Classical in
+@[simp] lemma filtration_length (F : JordanHolderFiltration μ) :
+    F.filtration F.length = ⊥ := Nat.find_spec F.fin_len
+
+open Classical in
+lemma ne_bot_of_lt_length (F : JordanHolderFiltration μ) {m : ℕ} (h : m < F.length) :
+    F.filtration m ≠ ⊥ := Nat.find_min F.fin_len h
+
+open Classical in
+lemma length_le_of_eq_bot (F : JordanHolderFiltration μ) {m : ℕ}
+    (h : F.filtration m = ⊥) : F.length ≤ m := Nat.find_min' F.fin_len h
+
+end JordanHolderFiltration
+
 /--
 The step relation associated to `μ` for Jordan–Hölder filtrations.
 We declare `(x, y)` to be related if `y < x`, the payoff `μ (y, x)` equals the total payoff

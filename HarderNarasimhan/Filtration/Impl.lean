@@ -371,7 +371,7 @@ lemma hHFil_of_hNSeries {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrd
       ≤ μA μ ⟨F1.toFun ↑(i+1), F1.toFun ↑(i+2), relSeries_succ_step_lt F1 hi⟩) :
 ∃ HN1 : HarderNarasimhanFiltration μ,
   HN1.filtration = (fun n ↦ if n ≤ F1.length then F1.toFun n else ⊤) ∧
-                   (Nat.find HN1.fin_len = F1.length) := by
+                   (HN1.length = F1.length) := by
   let filtration1 := fun n ↦ if n ≤ F1.length then F1.toFun n else ⊤
   have hFtop : (if F1.length ≤ F1.length then F1.toFun ↑F1.length else ⊤) = ⊤ := by
     simp only [le_refl, ↓reduceIte, Fin.natCast_eq_last]
