@@ -3,26 +3,11 @@ Copyright (c) 2026 Yijun Yuan. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yijun Yuan
 -/
-import Mathlib.Algebra.Ring.Basic
-import Mathlib.RingTheory.Noetherian.Defs
-import Mathlib.Order.CompleteLattice.Defs
-import Mathlib.Order.BoundedOrder.Basic
-import Mathlib.RingTheory.Spectrum.Prime.Basic
-import Mathlib.Order.Extension.Linear
-import Mathlib.Algebra.Module.Submodule.Defs
-import Mathlib.RingTheory.Ideal.AssociatedPrime.Finiteness
-import Mathlib.Algebra.Module.LocalizedModule.Submodule
-import Mathlib.Algebra.Module.LocalizedModule.AtPrime
-import Mathlib.RingTheory.Support
 import Mathlib.Algebra.Module.Torsion.Basic
 
-import HarderNarasimhan.Basic
-import HarderNarasimhan.Convexity.Results
-import HarderNarasimhan.Semistability.Defs
 import HarderNarasimhan.Semistability.Translation
 import HarderNarasimhan.Filtration.Results
 import HarderNarasimhan.CoprimaryFiltration.CommutativeAlgebra
-
 import HarderNarasimhan.CoprimaryFiltration.Defs
 
 /-!
@@ -44,7 +29,8 @@ High-level structure:
 * Relate semistability of restricted slopes to semistability on quotient modules,
   and use this to build coprimary filtrations.
 
-Some classical results are still assumed via `HarderNarasimhan.CommutativeAlgebra`.
+The commutative-algebra input (associated primes of the quotient by a localization kernel)
+is provided by `HarderNarasimhan.CoprimaryFiltration.CommutativeAlgebra`.
 
 API note: most downstream files should import `HarderNarasimhan.CoprimaryFiltration.Results`
 instead of this implementation file. This module is large and contains commutative-algebraic
@@ -142,51 +128,15 @@ ConvexI TotIntvl (μ R M) := by
   exact (LinearEquiv.isAssociatedPrime_iff (LinearMap.quotientInfEquivSupQuotient x y)).1 hp1
 
 /--
-Membership in module support from an associated prime.
-
-Any associated prime of `M` is, by definition, the annihilator of some element; this
-implies the corresponding prime lies in `Module.support R M`.
-
-This is a small bridge lemma used when comparing minimality in `associatedPrimes`
-versus minimality in `support`.
--/
-lemma mem_support_of_mem_associatedPrimes {R : Type*} [CommRing R]
-{M : Type*} [AddCommGroup M] [Module R M] {x : Ideal R} :
-(hx : x ∈ associatedPrimes R M) →  {asIdeal := x, isPrime := hx.out.1} ∈  Module.support R M := by
-  intro hx
-  obtain ⟨_, m, hpm⟩ := (AssociatedPrimes.mem_iff (R := R) (M := M)).1 hx
-  refine Module.mem_support_iff_exists_annihilator.2 ⟨m, ?_⟩
-  change (R ∙ m).annihilator ≤ x
-  rw [hpm]
-  simpa [Submodule.bot_colon'] using (Ideal.le_radical : (⊥ : Submodule R M).colon {m} ≤ _)
-
-/--
-Existence of a minimal prime in the support below a given supported prime.
-
-For a finite module over a Noetherian ring, any prime in the support is above a
-minimal element of the support.
-
-This is used to compare arbitrary associated primes to the minimum element selected
-by `Finset.min'`.
--/
-lemma exists_minimal_prime_contained_supp {R : Type*} [CommRing R] [IsNoetherianRing R]
-{M : Type*} [AddCommGroup M] [Module R M] [Module.Finite R M] :
-∀ q : PrimeSpectrum R, q ∈ Module.support R M →
-  ∃ p : PrimeSpectrum R, Minimal (fun J ↦ J ∈ Module.support R M) p ∧ p ≤ q := by
-  intro q hq
-  obtain ⟨r, hr⟩ := Ideal.exists_minimalPrimes_le <| Module.mem_support_iff_of_finite.1 hq
-  refine ⟨⟨r, hr.1.out.1.1⟩, ?_, hr.2⟩
-  simp only [Module.mem_support_iff_of_finite]
-  exact ⟨hr.1.out.1.2, fun y hy1 hy2 ↦ hr.1.out.2 ⟨y.isPrime,hy1⟩ hy2⟩
-
-/--
 Lower bound property of the minimal associated prime.
 
 Given an intermediate submodule `N''` in an interval `I`, any associated prime of
 `I.val.2 / N''` is ≥ the minimal element of `_μ R M I`.
 
-This uses the admitted equivalence between minimal associated primes and minimal
-support, plus the existence of minimal primes in the support.
+Mathematically: such a prime `q` contains the annihilator of `I.val.2 / N''`, hence the
+annihilator of `I.val.2 / I.val.1` (of which it is a quotient); a minimal prime over that
+annihilator below `q` is an associated prime of `I.val.2 / I.val.1` (Noetherian, finite),
+and the chosen minimum is below it in the linear extension.
 -/
 lemma prop3d12p1 {R : Type*} [CommRing R] [IsNoetherianRing R]
 {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]
@@ -195,14 +145,24 @@ lemma prop3d12p1 {R : Type*} [CommRing R] [IsNoetherianRing R]
 ∀ q : Ideal R, (hq : q ∈ associatedPrimes R (I.val.2⧸N''.submoduleOf I.val.2)) →
   {asIdeal := q, isPrime := hq.out.1 } ≥ (((_μ R M) I).toFinset.min' (μ_nonempty I)) := by
   intro q hq
-  have hq' := Module.support_subset_of_surjective
-    (Submodule.factor (Submodule.comap_mono ha1.1)) (Submodule.factor_surjective _) <|
-    mem_support_of_mem_associatedPrimes hq
-  obtain ⟨r,hr,hr'⟩ := exists_minimal_prime_contained_supp {asIdeal := q, isPrime := hq.out.1 } hq'
-  rw [← CommutativeAlgebra.min_associated_prime_iff_min_supp] at hr
-  refine le_trans ?_ <| toLinearExtension.monotone' hr'
-  exact ((_μ R M) I).toFinset.min'_le (toLinearExtension r) <|
-    Set.mem_toFinset.mpr ⟨r.asIdeal, hr.1, rfl⟩
+  have : q.IsPrime := hq.out.1
+  have hle : I.val.1.submoduleOf I.val.2 ≤ N''.submoduleOf I.val.2 :=
+    Submodule.comap_mono ha1.1
+  have hann : Module.annihilator R (I.val.2⧸I.val.1.submoduleOf I.val.2) ≤ q := by
+    rw [← Submodule.annihilator_top]
+    refine le_trans ?_ hq.out.annihilator_le
+    intro a ha
+    rw [Submodule.mem_annihilator] at ha ⊢
+    intro x _
+    obtain ⟨y, rfl⟩ := Submodule.factor_surjective hle x
+    calc a • Submodule.factor hle y
+        = Submodule.factor hle (a • y) := (map_smul _ a y).symm
+      _ = 0 := by rw [ha y trivial, map_zero]
+  obtain ⟨r, hr, hrq⟩ := Ideal.exists_minimalPrimes_le hann
+  refine le_trans (((_μ R M) I).toFinset.min'_le (toLinearExtension ⟨r, hr.1.1⟩) <|
+    Set.mem_toFinset.mpr ⟨r,
+      Module.associatedPrimes.minimalPrimes_annihilator_subset_associatedPrimes _ _ hr, rfl⟩) <|
+    toLinearExtension.monotone' hrq
 
 
 /--
@@ -230,108 +190,110 @@ lemma prop3d12p2 {R : Type*} [CommRing R] [IsNoetherianRing R]
   exact le_trans h1 <| S₀_order.1 _ _ <| Finset.singleton_subset_iff.mpr <|
     (_μ R M ⟨(N'', I.val.2), lt_of_le_of_ne ha1.2 ha2⟩).toFinset.min'_mem <| μ_nonempty _
 
+open Classical in
 /--
-Auxiliary localization map used in the `μA` computation.
+Lift a submodule of a quotient back to a submodule of the ambient module.
 
-`CP.f1 I` is the canonical map into the localization of the quotient module
-`I.val.2 / I.val.1`, localized away from the (chosen) minimal associated prime.
+Given `x ≤ N₂ / N₁`, we define `lift_quot N₁ N₂ x` as the preimage of `x` under the
+quotient map `N₂ → N₂ / N₁`, mapped into `M` via the subtype inclusion `N₂ ↪ M`.
+
+This is used to relate semistability of a restricted slope (on an interval) to
+semistability of the induced slope on the quotient lattice.
 -/
-noncomputable abbrev CP.f1 {R : Type*} [CommRing R] [IsNoetherianRing R]
-{M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]
-(I : {z: (ℒ R M) × (ℒ R M) // z.1 < z.2}) :=
-  LocalizedModule.mkLinearMap (
-    ((_μ R M) I).toFinset.min' (μ_nonempty I)).asIdeal.primeCompl
-    (I.val.2⧸I.val.1.submoduleOf I.val.2)
-
-/-- Quotient map used in the `μA` computation.
-
-  `CP.f2 I` is the linear map `I.val.2 → I.val.2 / I.val.1`.
--/
-abbrev CP.f2 {R : Type*} [CommRing R] [IsNoetherianRing R]
-{M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]
-(I : {z: (ℒ R M) × (ℒ R M) // z.1 < z.2}) :
-I.val.2 →ₗ[R] (I.val.2⧸I.val.1.submoduleOf I.val.2) :=
-  (I.val.1.submoduleOf I.val.2).mkQ
+def lift_quot {R : Type*} [CommRing R] [IsNoetherianRing R]
+{M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] (N₁ N₂ : Submodule R M)
+(x : Submodule R (N₂ ⧸ (N₁.submoduleOf N₂))) : Submodule R M :=
+  Submodule.map N₂.subtype (Submodule.comap (N₁.submoduleOf N₂).mkQ x)
 
 /--
-Kernel lifted back to a submodule of `M`.
+Basic bounds for `lift_quot`.
 
-We consider the kernel of the composition `CP.f1 I ∘ CP.f2 I` on `I.val.2` and map it
-back into `M`. This submodule serves as the intermediate `N''` that realizes the
-infimum in the definition of `μA`.
+If `N₁ ≤ N₂`, then `N₁ ≤ lift_quot N₁ N₂ x ≤ N₂` for any submodule `x` of the
+quotient `N₂ / N₁`.
 -/
-noncomputable abbrev ker_of_quot_comp_localization {R : Type*} [CommRing R] [IsNoetherianRing R]
+lemma lift_quot_middle {R : Type*} [CommRing R] [IsNoetherianRing R]
 {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]
-(I : {z: (ℒ R M) × (ℒ R M) // z.1 < z.2})
-: ℒ R M :=
-Submodule.map I.val.2.subtype (LinearMap.ker ((CP.f1 I) ∘ₗ (CP.f2 I)))
+(N₁ N₂ : Submodule R M) (hN : N₁ ≤ N₂)
+(x : Submodule R (N₂ ⧸ (N₁.submoduleOf N₂))) :
+N₁ ≤ lift_quot N₁ N₂ x ∧ lift_quot N₁ N₂ x ≤ N₂ := by
+  refine ⟨?_, Submodule.map_subtype_le _ _⟩
+  refine le_trans ?_ (Submodule.map_mono (Submodule.le_comap_mkQ _ _))
+  change N₁ ≤ Submodule.map N₂.subtype (N₁.submoduleOf N₂)
+  rw [Submodule.submoduleOf, Submodule.map_comap_subtype, inf_eq_right.2 hN]
 
-/-- An isomorphism rewriting a quotient by `ker_of_quot_comp_localization`.
+/-- Nontriviality is preserved by `lift_quot`.
 
-  This lemma constructs a `LinearEquiv` identifying
-
-  `I.val.2 / ker_of_quot_comp_localization I`
-
-  with a quotient of `I.val.2 / I.val.1` by the kernel of the localization map
-  `CP.f1 I`.
-
-  It is a technical step toward computing the associated primes of the intermediate
-  quotient used in the proof of `prop3d12`.
+  If `x ≠ ⊥` as a submodule of the quotient `N₂ / N₁`, then the lifted submodule
+  `lift_quot N₁ N₂ x` is not equal to `N₁`.
 -/
-lemma koqcl_iso {R : Type*} [CommRing R] [IsNoetherianRing R]
+lemma lift_quot_not_bot {R : Type*} [CommRing R] [IsNoetherianRing R]
 {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]
-(I : {z: (ℒ R M) × (ℒ R M) // z.1 < z.2}) :
-∃ _ : LinearEquiv (RingHom.id R) (I.val.2⧸((ker_of_quot_comp_localization I).submoduleOf I.val.2))
-  ((I.val.2⧸(I.val.1.submoduleOf I.val.2))⧸ (LinearMap.ker (CP.f1 I))), True := by
-  unfold ker_of_quot_comp_localization
-  let S : Submodule R I.val.2 := I.val.1.submoduleOf I.val.2
-  let T : Submodule R I.val.2 := LinearMap.ker (CP.f1 I ∘ₗ CP.f2 I)
-  have hT_eq : T = Submodule.comap S.mkQ (LinearMap.ker (CP.f1 I)) := LinearMap.ker_comp _ _
-  have hST : S ≤ T := hT_eq ▸ Submodule.le_comap_mkQ _ _
-  have hsubT : T = (Submodule.map I.val.2.subtype T).submoduleOf I.val.2 :=
-    (Submodule.comap_map_eq_of_injective I.val.2.subtype_injective T).symm
-  have hST' : S ≤ (Submodule.map I.val.2.subtype T).submoduleOf I.val.2 := hsubT ▸ hST
-  have hmap : Submodule.map S.mkQ ((Submodule.map I.val.2.subtype T).submoduleOf I.val.2) =
-      LinearMap.ker (CP.f1 I) := by
-    rw [← hsubT, hT_eq, Submodule.map_comap_eq_self (Submodule.range_mkQ S ▸ le_top)]
-  exact ⟨hmap ▸ (Submodule.quotientQuotientEquivQuotient S _ hST').symm, trivial⟩
+(N₁ N₂ : Submodule R M)
+(x : Submodule R (N₂ ⧸ (N₁.submoduleOf N₂))) (hx : x ≠ ⊥) : lift_quot N₁ N₂ x ≠ N₁:= by
+  intro hc
+  refine hx ?_
+  have h_comap : Submodule.comap (N₁.submoduleOf N₂).mkQ x = N₁.submoduleOf N₂ := by
+    refine le_antisymm ?_ (Submodule.le_comap_mkQ _ _)
+    intro a ha
+    have ha' : a.val ∈ lift_quot N₁ N₂ x := ⟨a, ha, rfl⟩
+    rwa [hc] at ha'
+  rw [← (Submodule.comapMkQRelIso (N₁.submoduleOf N₂)).injective.eq_iff]
+  exact Subtype.ext (h_comap.trans (Submodule.ker_mkQ _).symm)
 
 /--
-Associated primes of the intermediate quotient are a singleton.
-
-After localizing away from the minimal associated prime, the admitted Bourbaki-style
-statement implies that the only associated prime that remains is exactly that
-minimal one. This yields the singleton formula used in `prop3d12`.
+Third isomorphism theorem for lifted submodules: the quotient of `N₂` by the lift of
+`X ≤ N₂ / N₁` is canonically the quotient `(N₂ / N₁) ⧸ X`.
 -/
-lemma associated_primes_quot_koqcl {R : Type*} [CommRing R] [IsNoetherianRing R]
+noncomputable def quotLiftQuotEquiv {R : Type*} [CommRing R] [IsNoetherianRing R]
+{M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] (N₁ N₂ : ℒ R M)
+(X : Submodule R (↥N₂ ⧸ N₁.submoduleOf N₂)) :
+    (↥N₂ ⧸ (lift_quot N₁ N₂ X).submoduleOf N₂) ≃ₗ[R] ((↥N₂ ⧸ N₁.submoduleOf N₂) ⧸ X) :=
+  (Submodule.quotEquivOfEq _ _ (Submodule.comap_map_eq_of_injective N₂.subtype_injective _)).trans
+    (Submodule.map_comap_eq_self (Submodule.range_mkQ (N₁.submoduleOf N₂) ▸ le_top (a := X)) ▸
+      (Submodule.quotientQuotientEquivQuotient (N₁.submoduleOf N₂) _
+        (Submodule.le_comap_mkQ _ _)).symm)
+
+/--
+The kernel of the localization map of the interval quotient at (the complement of) its
+minimal associated prime. Its lift realizes the infimum in the definition of `μA`.
+-/
+noncomputable abbrev locKer {R : Type*} [CommRing R] [IsNoetherianRing R]
 {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]
 (I : {z: (ℒ R M) × (ℒ R M) // z.1 < z.2}) :
-associatedPrimes R (I.val.2⧸(ker_of_quot_comp_localization I).submoduleOf I.val.2) =
-  {(((_μ R M) I).toFinset.min' (μ_nonempty I)).asIdeal}
-:= by
-  rcases koqcl_iso I with ⟨h, _⟩
-  rw [LinearEquiv.AssociatedPrimes.eq h]
-  have := CommutativeAlgebra.bourbaki_elements_math_alg_comm_chIV_sec1_no2_prop6
-    ((((_μ R M) I).toFinset.min' (μ_nonempty I)).asIdeal.primeCompl) (LinearMap.ker (CP.f1 I))
-  simp only [iff_true] at this
-  rw [this.2]
+Submodule R (↥I.val.2 ⧸ I.val.1.submoduleOf I.val.2) :=
+  LinearMap.ker (LocalizedModule.mkLinearMap
+    ((((_μ R M) I).toFinset.min' (μ_nonempty I)).asIdeal.primeCompl)
+    (↥I.val.2 ⧸ I.val.1.submoduleOf I.val.2))
+
+/--
+Associated primes of the witness quotient form a singleton.
+
+Quotienting by the lifted localization kernel leaves exactly the associated primes disjoint
+from the complement of the minimal prime (Bourbaki), i.e. those contained in it; by
+minimality of the chosen element in the linear extension, only the minimal prime remains.
+-/
+lemma associatedPrimes_quot_lift_locKer {R : Type*} [CommRing R] [IsNoetherianRing R]
+{M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]
+(I : {z: (ℒ R M) × (ℒ R M) // z.1 < z.2}) :
+associatedPrimes R (↥I.val.2 ⧸ (lift_quot I.val.1 I.val.2 (locKer I)).submoduleOf I.val.2) =
+  {(((_μ R M) I).toFinset.min' (μ_nonempty I)).asIdeal} := by
+  rw [LinearEquiv.AssociatedPrimes.eq (quotLiftQuotEquiv I.val.1 I.val.2 (locKer I)),
+    CommutativeAlgebra.associatedPrimes_quot_ker_mkLinearMap]
   ext q
   constructor
-  · intro hq
-    simp only [Set.mem_ofPred_eq] at hq
+  · rintro ⟨hq, hdisj⟩
     simp only [Set.mem_singleton_iff]
-    have hle : (⟨q, hq.1.out.1⟩ : PrimeSpectrum R) ≤ (_μ R M I).toFinset.min' (μ_nonempty I) :=
-      Set.sdiff_eq_empty.mp hq.2
-    have heq : toLinearExtension ⟨q, hq.1.out.1⟩ = (_μ R M I).toFinset.min' (μ_nonempty I) :=
+    have hle : (⟨q, hq.out.1⟩ : PrimeSpectrum R) ≤ (_μ R M I).toFinset.min' (μ_nonempty I) :=
+      Set.sdiff_eq_empty.mp hdisj
+    have heq : toLinearExtension ⟨q, hq.out.1⟩ = (_μ R M I).toFinset.min' (μ_nonempty I) :=
       eq_of_le_of_ge (toLinearExtension.monotone' hle) <|
-        ((_μ R M) I).toFinset.min'_le (toLinearExtension ⟨q, hq.1.out.1⟩)
-          (Set.mem_toFinset.mpr ⟨q, hq.1, rfl⟩)
+        ((_μ R M) I).toFinset.min'_le (toLinearExtension ⟨q, hq.out.1⟩)
+          (Set.mem_toFinset.mpr ⟨q, hq, rfl⟩)
     exact congrArg PrimeSpectrum.asIdeal heq
-  · intro hq
-    simp only [Set.sdiff_sep_self, Set.mem_singleton_iff,
-      Set.mem_ofPred_eq] at *
-    rw [hq]
-    constructor
+  · rintro hq
+    rw [Set.mem_singleton_iff] at hq
+    subst hq
+    refine ⟨?_, ?_⟩
     · obtain ⟨p, hp1, hp2⟩ := Set.mem_toFinset.mp <| ((_μ R M) I).toFinset.min'_mem (μ_nonempty I)
       exact hp2 ▸ hp1
     · unfold Ideal.primeCompl
@@ -346,9 +308,10 @@ singleton finset containing the minimal element of `_μ R M I` (in the `S₀ R` 
 
 Proof idea:
 
-* Show that the intermediate submodule `ker_of_quot_comp_localization I` realizes an
-  element of the defining set for the `inf` in `μA`.
-* Use `prop3d12p2` to show it is a lower bound, hence an infimum.
+* the lift of the localization kernel `locKer I` realizes the value `{min}` by
+  `associatedPrimes_quot_lift_locKer` (and is a genuine interior point since the witness
+  quotient has an associated prime, hence is nontrivial);
+* `prop3d12p2` shows `{min}` is a lower bound.
 -/
 lemma prop3d12 {R : Type*} [CommRing R] [IsNoetherianRing R]
 {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] :
@@ -358,64 +321,26 @@ lemma prop3d12 {R : Type*} [CommRing R] [IsNoetherianRing R]
   unfold μA
   simp only [μmax_eq_μ, ne_eq]
   unfold μ
+  have hne : lift_quot I.val.1 I.val.2 (locKer I) ≠ I.val.2 := fun hc ↦ by
+    have : Subsingleton (↥I.val.2 ⧸ (lift_quot I.val.1 I.val.2 (locKer I)).submoduleOf I.val.2) :=
+      Submodule.Quotient.subsingleton_iff.mpr (Submodule.submoduleOf_eq_top.mpr hc.ge)
+    exact Set.singleton_ne_empty _
+      ((associatedPrimes_quot_lift_locKer I).symm.trans associatedPrimes.eq_empty_of_subsingleton)
   have res1 : (DedekindCut.principal {(_μ R M I).toFinset.min' (μ_nonempty I)} : S R) ∈
     {x | ∃ a, ∃ (h : InIntvl I a ∧ ¬a = I.val.2), DedekindCut.principal
     (_μ R M ⟨(a, I.val.2), lt_of_le_of_ne h.1.2 h.2⟩).toFinset = x} := by
     simp only [Set.mem_ofPred_eq, DedekindCut.principal_inj]
-    use ker_of_quot_comp_localization I
+    refine ⟨lift_quot I.val.1 I.val.2 (locKer I),
+      ⟨lift_quot_middle I.val.1 I.val.2 I.prop.le (locKer I), hne⟩, ?_⟩
+    refine (Set.toFinset_congr ?_).trans (Set.toFinset_singleton _)
+    ext w
     constructor
-    · refine (Set.toFinset_congr ?_).trans (Set.toFinset_singleton _)
-      ext w
-      constructor
-      · rintro ⟨p, hp, rfl⟩
-        exact PrimeSpectrum.ext (Set.mem_singleton_iff.mp (associated_primes_quot_koqcl I ▸ hp))
-      · rintro rfl
-        exact ⟨((_μ R M I).toFinset.min' (μ_nonempty I)).asIdeal,
-          (associated_primes_quot_koqcl I).symm ▸ Set.mem_singleton _, rfl⟩
-    · constructor
-      · constructor
-        · unfold ker_of_quot_comp_localization
-          intro z hz
-          simp only [Submodule.mem_map, LinearMap.mem_ker, LinearMap.coe_comp,
-            Function.comp_apply, Submodule.subtype_apply, Subtype.exists,
-            exists_and_right, exists_eq_right]
-          use (le_of_lt I.prop) hz
-          have : Submodule.Quotient.mk ⟨z, le_of_lt I.prop hz⟩ =
-              (0 : ↥I.val.2 ⧸ Submodule.submoduleOf I.val.1 I.val.2) := by
-            simpa only [Submodule.Quotient.mk_eq_zero]
-          exact (congrArg (LocalizedModule.mk · 1) this).trans (LocalizedModule.zero_mk 1)
-        · exact Submodule.map_subtype_le _ _
-      · by_contra hc
-        obtain ⟨p, hp1, hp2⟩ := Set.mem_toFinset.mp <| ((_μ R M) I).toFinset.min'_mem (μ_nonempty I)
-        replace hp1 := (mem_support_of_mem_associatedPrimes hp1).out
-        have hker : LinearMap.ker (CP.f1 I) ≠ ⊤ := by
-          intro hk
-          apply LocalizedModule.subsingleton_iff_ker_eq_top.2 at hk
-          rw [hp2] at hp1
-          exact false_of_nontrivial_of_subsingleton (LocalizedModule
-            ((_μ R M I).toFinset.min' (μ_nonempty I)).asIdeal.primeCompl
-            (↥I.val.2 ⧸ Submodule.submoduleOf I.val.1 I.val.2))
-        have : ∃ m : (↥I.val.2 ⧸ Submodule.submoduleOf I.val.1 I.val.2), (CP.f1 I) m ≠ 0 := by
-          by_contra! hc'
-          exact hker (LinearMap.ker_eq_top.mpr (LinearMap.ext hc'))
-        rcases this with ⟨m,hm⟩
-        unfold ker_of_quot_comp_localization at hc
-        have this' : (CP.f1 I ∘ₗ CP.f2 I) m.out = 0 := by
-          have hmem : m.out.val ∈ Submodule.map (Submodule.subtype I.val.2)
-            (LinearMap.ker (CP.f1 I ∘ₗ CP.f2 I)) := by
-            have := m.out.prop
-            conv at this =>
-              arg 1
-              simp only [← hc]
-            exact this
-          simpa only [LocalizedModule.mkLinearMap_apply, Submodule.mem_map, LinearMap.mem_ker,
-            LinearMap.coe_comp, Function.comp_apply, Submodule.subtype_apply,
-            SetLike.coe_eq_coe, exists_eq_right] using hmem
-        unfold CP.f2 at this'
-        simp only [Submodule.mkQ_apply, LinearMap.coe_comp, Function.comp_apply] at this'
-        unfold Submodule.Quotient.mk Quotient.mk'' at this'
-        rw [Quotient.out_eq] at this'
-        exact hm this'
+    · rintro ⟨p, hp, rfl⟩
+      exact PrimeSpectrum.ext
+        (Set.mem_singleton_iff.mp (associatedPrimes_quot_lift_locKer I ▸ hp))
+    · rintro rfl
+      exact ⟨((_μ R M I).toFinset.min' (μ_nonempty I)).asIdeal,
+        (associatedPrimes_quot_lift_locKer I).symm ▸ Set.mem_singleton _, rfl⟩
   refine IsLeast.csInf_eq ⟨res1, ?_⟩
   rintro N ⟨a, ha1, rfl⟩
   exact DedekindCut.principal_le_principal.mpr <| prop3d12p2 I a ha1.1 ha1.2
@@ -518,41 +443,25 @@ Semistable (μ R M) ↔ ∃! p, p ∈ associatedPrimes R M := by
   · refine fun hs => ⟨p0.asIdeal, hp0, fun J hJ => ?_⟩
     obtain ⟨hJp, t, ht⟩ := (isAssociatedPrime_iff (R := R) (M := M)).1 <|
       (AssociatedPrimes.mem_iff (R := R) (M := M)).1 hJ
-    let N : ℒ R M := Submodule.span R {t}
-    let eN : (↥N ⧸ Submodule.submoduleOf (⊥ : ℒ R M) N) ≃ₗ[R] ↥N :=
-      Submodule.quotEquivOfEqBot _ (hbot N)
-    have hN : ⊥ < N := bot_lt_iff_ne_bot.mpr fun ht0 ↦ hJp.ne_top <| by
-      rw [ht, Submodule.span_singleton_eq_bot.mp ht0, Submodule.colon_singleton_zero]
-    have hJN : ⟨J, hJp⟩ ∈ _μ R M ⟨(⊥, N), hN⟩ := by
-      refine ⟨J, ?_, rfl⟩
-      have hJN' : J ∈ associatedPrimes R ↥N := by
-        refine (AssociatedPrimes.mem_iff (R := R) (M := ↥N)).2 ?_
-        refine (isAssociatedPrime_iff (R := R) (M := ↥N)).2 ⟨hJp, ⟨⟨t,
-          Submodule.mem_span_singleton_self t⟩, ?_⟩⟩
-        ext r
-        rw [ht]
-        simp only [Submodule.mem_colon_singleton, Submodule.mem_bot]
-        exact ⟨fun hr ↦ Subtype.ext hr, fun hr ↦ congrArg Subtype.val hr⟩
-      simpa [LinearEquiv.AssociatedPrimes.eq eN] using hJN'
-    have hJ_le : ∀ q ∈ _μ R M ⟨(⊥, N), hN⟩, ⟨J, hJp⟩ ≤ q := by
-      rintro q ⟨I, hI, rfl⟩
-      have hI' : I ∈ associatedPrimes R ↥N := by
-        simpa [LinearEquiv.AssociatedPrimes.eq eN] using hI
-      have hAnn : N.annihilator = J := by
-        ext r
-        rw [show N = Submodule.span R {t} by rfl, ht, Submodule.mem_annihilator_span_singleton,
-          Submodule.bot_colon', Submodule.mem_annihilator_span_singleton]
-      refine toLinearExtension.monotone' ?_
-      change J ≤ I
-      rw [← hAnn]
-      exact (Module.mem_support_iff_of_finite (R := R) (M := ↥N)).1
-        (mem_support_of_mem_associatedPrimes hI')
-    have hmin : ((_μ R M ⟨(⊥, N), hN⟩).toFinset.min' (μ_nonempty _)) = ⟨J, hJp⟩ := by
-      refine le_antisymm ((_μ R M ⟨(⊥, N), hN⟩).toFinset.min'_le _ <| Set.mem_toFinset.mpr hJN) ?_
-      exact hJ_le _ <| Set.mem_toFinset.mp <|
-        ((_μ R M ⟨(⊥, N), hN⟩).toFinset.min'_mem (μ_nonempty _))
-    have hs' := hs N hN
-    rw [prop3d12 ⟨(⊥, N), hN⟩] at hs'
+    have htors : Ideal.torsionOf R M t = J := by
+      ext a
+      rw [Ideal.mem_torsionOf_iff, ht, Submodule.mem_colon_singleton, Submodule.mem_bot]
+    have hN : ⊥ < (R ∙ t : ℒ R M) := by
+      rw [bot_lt_iff_ne_bot, ne_eq, Submodule.span_singleton_eq_bot]
+      exact fun ht0 ↦ hJp.ne_top (by rw [ht, ht0, Submodule.colon_singleton_zero])
+    have hassN : associatedPrimes R ↥(R ∙ t : ℒ R M) = {J} := by
+      rw [← LinearEquiv.AssociatedPrimes.eq (Ideal.quotTorsionOfEquivSpanSingleton R M t), htors,
+        associatedPrimes.eq_singleton_of_isPrimary hJp.isPrimary, hJp.radical]
+    have hmin : ((_μ R M ⟨(⊥, R ∙ t), hN⟩).toFinset.min' (μ_nonempty _)) = ⟨J, hJp⟩ := by
+      obtain ⟨p, hp1, hp2⟩ := Set.mem_toFinset.mp <|
+        ((_μ R M ⟨(⊥, R ∙ t), hN⟩).toFinset.min'_mem (μ_nonempty _))
+      rw [← hp2]
+      have hpN : p ∈ associatedPrimes R ↥(R ∙ t : ℒ R M) := by
+        simpa [LinearEquiv.AssociatedPrimes.eq
+          (Submodule.quotEquivOfEqBot _ (hbot (R ∙ t)))] using hp1
+      exact PrimeSpectrum.ext (Set.mem_singleton_iff.mp (hassN ▸ hpN))
+    have hs' := hs (R ∙ t) hN
+    rw [prop3d12 ⟨(⊥, R ∙ t), hN⟩] at hs'
     simp only [DedekindCut.principal_inj, Finset.singleton_inj] at hs'
     exact congrArg PrimeSpectrum.asIdeal (hmin.symm.trans hs')
   · rintro ⟨p, hp, hp_unique⟩ N hN
@@ -570,6 +479,22 @@ Semistable (μ R M) ↔ ∃! p, p ∈ associatedPrimes R M := by
     exact PrimeSpectrum.ext ((hp_unique _ hq).trans (hp_unique _ hp0).symm)
 
 /--
+If the interval quotient has a unique associated prime, `Finset.min'` computes it.
+
+This is the bridge between the `Coprimary` predicate on graded pieces and the minimal
+associated primes compared by the Harder–Narasimhan axioms.
+-/
+lemma min'_eq_of_unique {R : Type*} [CommRing R] [IsNoetherianRing R]
+{M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]
+(I : {z: (ℒ R M) × (ℒ R M) // z.1 < z.2})
+(hu : ∃! p, p ∈ associatedPrimes R (I.val.2 ⧸ I.val.1.submoduleOf I.val.2)) :
+((_μ R M) I).toFinset.min' (μ_nonempty I) =
+  ⟨hu.exists.choose, hu.exists.choose_spec.out.1⟩ := by
+  obtain ⟨p, hp1, hp2⟩ := Set.mem_toFinset.mp <| ((_μ R M) I).toFinset.min'_mem (μ_nonempty I)
+  rw [← hp2]
+  exact PrimeSpectrum.ext (hu.unique hp1 hu.exists.choose_spec)
+
+/--
 Admissibility of the slope `μ R M`.
 
 For the coprimary filtration application we only need the “totality” branch of
@@ -580,55 +505,6 @@ instance {R : Type*} [CommRing R] [IsNoetherianRing R]
 μ_Admissible (μ R M) where
   μ_adm := Or.inl inferInstance
 
-open Classical in
-/--
-Lift a submodule of a quotient back to a submodule of the ambient module.
-
-Given `x ≤ N₂ / N₁`, we define `lift_quot N₁ N₂ x` as the preimage of `x` under the
-quotient map `N₂ → N₂ / N₁`, mapped into `M` via the subtype inclusion `N₂ ↪ M`.
-
-This is used to relate semistability of a restricted slope (on an interval) to
-semistability of the induced slope on the quotient lattice.
--/
-def lift_quot {R : Type*} [CommRing R] [IsNoetherianRing R]
-{M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] (N₁ N₂ : Submodule R M)
-(x : Submodule R (N₂ ⧸ (N₁.submoduleOf N₂))) : Submodule R M :=
-  Submodule.map N₂.subtype (Submodule.comap (N₁.submoduleOf N₂).mkQ x)
-
-/--
-Basic bounds for `lift_quot`.
-
-If `N₁ ≤ N₂`, then `N₁ ≤ lift_quot N₁ N₂ x ≤ N₂` for any submodule `x` of the
-quotient `N₂ / N₁`.
--/
-lemma lift_quot_middle {R : Type*} [CommRing R] [IsNoetherianRing R]
-{M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]
-(N₁ N₂ : Submodule R M) (hN : N₁ ≤ N₂)
-(x : Submodule R (N₂ ⧸ (N₁.submoduleOf N₂))) :
-N₁ ≤ lift_quot N₁ N₂ x ∧ lift_quot N₁ N₂ x ≤ N₂ := by
-  refine ⟨?_, Submodule.map_subtype_le _ _⟩
-  refine le_trans ?_ (Submodule.map_mono (Submodule.le_comap_mkQ _ _))
-  change N₁ ≤ Submodule.map N₂.subtype (N₁.submoduleOf N₂)
-  rw [Submodule.submoduleOf, Submodule.map_comap_subtype, inf_eq_right.2 hN]
-
-/-- Nontriviality is preserved by `lift_quot`.
-
-  If `x ≠ ⊥` as a submodule of the quotient `N₂ / N₁`, then the lifted submodule
-  `lift_quot N₁ N₂ x` is not equal to `N₁`.
--/
-lemma lift_quot_not_bot {R : Type*} [CommRing R] [IsNoetherianRing R]
-{M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]
-(N₁ N₂ : Submodule R M)
-(x : Submodule R (N₂ ⧸ (N₁.submoduleOf N₂))) (hx : x ≠ ⊥) : lift_quot N₁ N₂ x ≠ N₁:= by
-  intro hc
-  refine hx ?_
-  have h_comap : Submodule.comap (N₁.submoduleOf N₂).mkQ x = N₁.submoduleOf N₂ := by
-    refine le_antisymm ?_ (Submodule.le_comap_mkQ _ _)
-    intro a ha
-    have ha' : a.val ∈ lift_quot N₁ N₂ x := ⟨a, ha, rfl⟩
-    rwa [hc] at ha'
-  rw [← (Submodule.comapMkQRelIso (N₁.submoduleOf N₂)).injective.eq_iff]
-  exact Subtype.ext (h_comap.trans (Submodule.ker_mkQ _).symm)
 
 /--
 Nontriviality of the quotient module for a strict inclusion.
@@ -855,22 +731,10 @@ Inhabited (CoprimaryFiltration R M) := by
   replace this := S₀_order'.2 this
   have pcn := (piecewise_coprimary HNFil n <| Nat.lt_of_succ_lt hn).coprimary
   have pcnp1 := (piecewise_coprimary HNFil (n+1) hn).coprimary
-  have t' : (_μ R M ⟨(HNFil.filtration (n + 1), HNFil.filtration (n + 2)), HNFil.strict_mono
-    (n+1) (n+2) (Nat.lt_add_one (n + 1)) hn⟩).toFinset.min' (μ_nonempty _) =
-    {asIdeal := pcnp1.exists.choose, isPrime := pcnp1.exists.choose_spec.out.1} := by
-    obtain ⟨p, hp1, hp2⟩ := Set.mem_toFinset.mp <|
-      (_μ R M ⟨(HNFil.filtration (n + 1), HNFil.filtration (n + 2)), HNFil.strict_mono
-        (n+1) (n+2) (Nat.lt_add_one (n + 1)) hn⟩).toFinset.min'_mem (μ_nonempty _)
-    rw [← hp2]
-    exact PrimeSpectrum.ext (pcnp1.unique pcnp1.exists.choose_spec hp1).symm
-  have t'' : (_μ R M ⟨(HNFil.filtration n, HNFil.filtration (n + 1)), HNFil.strict_mono n (n+1)
-    (Nat.lt_add_one n) (Nat.le_of_succ_le hn)⟩).toFinset.min' (μ_nonempty _) =
-    {asIdeal := pcn.exists.choose, isPrime := pcn.exists.choose_spec.out.1} := by
-    obtain ⟨p, hp1, hp2⟩ := Set.mem_toFinset.mp <|
-      (_μ R M ⟨(HNFil.filtration n, HNFil.filtration (n + 1)), HNFil.strict_mono n (n+1)
-        (Nat.lt_add_one n) <| le_of_lt hn⟩).toFinset.min'_mem (μ_nonempty _)
-    rw [← hp2]
-    exact PrimeSpectrum.ext (pcn.unique pcn.exists.choose_spec hp1).symm
+  have t' := min'_eq_of_unique ⟨(HNFil.filtration (n + 1), HNFil.filtration (n + 2)),
+    HNFil.strict_mono (n+1) (n+2) (Nat.lt_add_one (n + 1)) hn⟩ pcnp1
+  have t'' := min'_eq_of_unique ⟨(HNFil.filtration n, HNFil.filtration (n + 1)),
+    HNFil.strict_mono n (n+1) (Nat.lt_add_one n) (Nat.le_of_succ_le hn)⟩ pcn
   exact t' ▸ t'' ▸ this
 
 instance {R : Type*} [CommRing R] [IsNoetherianRing R]
@@ -903,29 +767,11 @@ lemma CoprimaryFiltration.toHarderNarasimhanFiltration {R : Type*} [CommRing R] 
         rw [prop3d12, prop3d12]
         simp only [DedekindCut.principal_le_principal, not_le]
         apply S₀_order'.1
-        have e1 : (_μ R M ⟨(a.filtration (i + 1), a.filtration (i + 2)), a.strict_mono (i+1)
-            (i+2) (Nat.lt_add_one (i + 1)) hi⟩).toFinset.min' (μ_nonempty _) =
-            {asIdeal := (a.piecewise_coprimary (i+1) hi).coprimary.exists.choose,
-              isPrime := (a.piecewise_coprimary (i+1) hi).coprimary.exists.choose_spec.out.1} := by
-          obtain ⟨p, hp1, hp2⟩ := Set.mem_toFinset.mp <|
-            (_μ R M ⟨(a.filtration (i + 1), a.filtration (i + 2)), a.strict_mono (i+1)
-              (i+2) (Nat.lt_add_one (i + 1)) hi⟩).toFinset.min'_mem (μ_nonempty _)
-          rw [← hp2]
-          exact PrimeSpectrum.ext ((a.piecewise_coprimary (i+1) hi).coprimary.unique
-            ((a.piecewise_coprimary (i+1) hi).coprimary.exists.choose_spec) hp1).symm
-        have e2 : (_μ R M ⟨(a.filtration i, a.filtration (i + 1)), a.strict_mono i
-            (i+1) (Nat.lt_add_one i) (Nat.le_of_succ_le hi)⟩).toFinset.min' (μ_nonempty _) =
-            {asIdeal := (a.piecewise_coprimary i (Nat.lt_of_succ_lt hi)).coprimary.exists.choose,
-              isPrime := (a.piecewise_coprimary i
-                (Nat.lt_of_succ_lt hi)).coprimary.exists.choose_spec.out.1} := by
-          obtain ⟨p, hp1, hp2⟩ := Set.mem_toFinset.mp <|
-            (_μ R M ⟨(a.filtration i, a.filtration (i + 1)), a.strict_mono i
-              (i+1) (Nat.lt_add_one i) (Nat.le_of_succ_le hi)⟩).toFinset.min'_mem (μ_nonempty _)
-          rw [← hp2]
-          exact PrimeSpectrum.ext ((a.piecewise_coprimary i (Nat.lt_of_succ_lt hi)).coprimary.unique
-            ((a.piecewise_coprimary i (Nat.lt_of_succ_lt hi)).coprimary.exists.choose_spec)
-            hp1).symm
-        rw [e1, e2]
+        rw [min'_eq_of_unique ⟨(a.filtration (i + 1), a.filtration (i + 2)), a.strict_mono (i+1)
+              (i+2) (Nat.lt_add_one (i + 1)) hi⟩ (a.piecewise_coprimary (i+1) hi).coprimary,
+          min'_eq_of_unique ⟨(a.filtration i, a.filtration (i + 1)), a.strict_mono i
+              (i+1) (Nat.lt_add_one i) (Nat.le_of_succ_le hi)⟩
+            (a.piecewise_coprimary i (Nat.lt_of_succ_lt hi)).coprimary]
         exact a.strict_mono_associated_prime i hi
   use ahn
 
