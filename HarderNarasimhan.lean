@@ -16,10 +16,10 @@ import HarderNarasimhan.PayoffFunction.Semistable.Breakpoints
 import HarderNarasimhan.Filtration.Defs
 import HarderNarasimhan.Filtration.Results
 
-import HarderNarasimhan.FirstMoverAdvantage.Results
+import HarderNarasimhan.PayoffFunction.SlopeLike
+import HarderNarasimhan.PayoffFunction.Slope
 
-import HarderNarasimhan.SlopeLike.Defs
-import HarderNarasimhan.SlopeLike.Results
+import HarderNarasimhan.FirstMoverAdvantage.Results
 
 import HarderNarasimhan.NashEquilibrium.Defs
 import HarderNarasimhan.NashEquilibrium.Results

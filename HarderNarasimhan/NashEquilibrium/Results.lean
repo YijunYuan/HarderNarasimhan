@@ -97,7 +97,7 @@ Remark 4.13: `SlopeLike` provides the “gap” condition used in Proposition 4.
 -/
 lemma remark_4_13 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : PayoffFunction ℒ S) (hμ : SlopeLike μ) :
+(μ : PayoffFunction ℒ S) (hμ : μ.IsSlopeLike) :
 ∀ x : ℒ, (hx : x ≠ ⊥ ∧ x ≠ ⊤) →
   ¬ μ ⟨⊥, x,bot_lt_iff_ne_bot.2 hx.1⟩ ≤ μ ⊤ ∨
     μ ⊤ ≤ μ ⟨x, ⊤,lt_top_iff_ne_top.2 hx.2⟩
@@ -123,7 +123,7 @@ Remark 4.15: `SlopeLike` provides the dual local condition used in Proposition 4
 -/
 lemma remark_4_15 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : PayoffFunction ℒ S) (hμ : SlopeLike μ) :
+(μ : PayoffFunction ℒ S) (hμ : μ.IsSlopeLike) :
 ∀ x : ℒ, (hx : x ≠ ⊥ ∧ x ≠ ⊤) →
   μ ⟨⊥, x,bot_lt_iff_ne_bot.2 hx.1⟩ ≤ μ ⊤ ∨
   ¬ μ ⊤ ≤ μ ⟨x, ⊤,lt_top_iff_ne_top.2 hx.2⟩
@@ -136,7 +136,7 @@ and (under chain conditions) equivalence with Nash equilibrium.
 -/
 lemma proposition_4_16 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : PayoffFunction ℒ S) (hμ : SlopeLike μ) :
+(μ : PayoffFunction ℒ S) (hμ : μ.IsSlopeLike) :
 (
   List.TFAE [
   μmax μ ⊤ = μ ⊤, μmin μ ⊤ = μ ⊤, μmin μ ⊤ = μmax μ ⊤
@@ -195,7 +195,7 @@ API note: this is the main user-facing equivalence statement of the Nash-equilib
 -/
 theorem NashEquil_equiv {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLinearOrder S]
-(μ : PayoffFunction ℒ S) [hμ : SlopeLike μ]
+(μ : PayoffFunction ℒ S) [hμ : μ.IsSlopeLike]
 [h₁ : WeakAscendingChainCondition μ] [h₂ : StrongDescendingChainCondition μ] :
 List.TFAE [
   μmax μ ⊤ = μ ⊤, μmin μ ⊤ = μ ⊤, μmin μ ⊤ = μmax μ ⊤, NashEquilibrium μ

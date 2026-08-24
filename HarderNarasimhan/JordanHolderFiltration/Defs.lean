@@ -5,7 +5,7 @@ Authors: Yijun Yuan
 -/
 import HarderNarasimhan.NashEquilibrium.Impl
 import HarderNarasimhan.FirstMoverAdvantage.Results
-import HarderNarasimhan.SlopeLike.Results
+import HarderNarasimhan.PayoffFunction.SlopeLike
 import HarderNarasimhan.PayoffFunction.Convex
 import Mathlib.Order.OrderIsoNat
 import Mathlib.Data.Rel
@@ -177,7 +177,7 @@ filtration.
 instance {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLinearOrder S]
 {μ : PayoffFunction ℒ S}
-[hftp : FiniteTotalPayoff μ] [hsl : SlopeLike μ] [hst : μ.IsSemistable]
+[hftp : FiniteTotalPayoff μ] [hsl : μ.IsSlopeLike] [hst : μ.IsSemistable]
 [hsdcc' : StrongDescendingChainCondition' μ] {x : ℒ} {hx : ⊥ < x} :
 FiniteTotalPayoff (Resμ ⟨⊥, x, hx⟩ μ) := by
   refine { fin_tot_payoff := ?_ }

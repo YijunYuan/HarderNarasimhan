@@ -6,7 +6,7 @@ Authors: Yijun Yuan
 import HarderNarasimhan.NashEquilibrium.Defs
 import HarderNarasimhan.FirstMoverAdvantage.Impl
 import HarderNarasimhan.FirstMoverAdvantage.Defs
-import HarderNarasimhan.SlopeLike.Defs
+import HarderNarasimhan.PayoffFunction.SlopeLike
 import HarderNarasimhan.PayoffFunction.Semistable.Breakpoints
 import HarderNarasimhan.Interval
 import Mathlib.Tactic.TFAE
@@ -166,11 +166,11 @@ lemma prop4d12 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder �
 
 
 /-- `rmk4d13` shows that the dichotomy assumption used in `prop4d12` follows from a
-  genuine `SlopeLike μ` structure.
+  genuine `μ.IsSlopeLike` structure.
 -/
 lemma rmk4d13 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : PayoffFunction ℒ S) (hμ : SlopeLike μ) :
+(μ : PayoffFunction ℒ S) (hμ : μ.IsSlopeLike) :
 ∀ x : ℒ, (hx : x ≠ ⊥ ∧ x ≠ ⊤) → ¬ μ ⟨⊥, x,bot_lt_iff_ne_bot.2 hx.1⟩ ≤ μ ⊤ ∨
   μ ⊤ ≤ μ ⟨x, ⊤,lt_top_iff_ne_top.2 hx.2⟩ :=
   fun x hx ↦ ((hμ.slopelike ⊥ x ⊤
@@ -198,11 +198,11 @@ lemma prop4d14 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder �
 
 
 /-- `rmk4d15` shows that the dichotomy assumption used in `prop4d14` also follows from
-  a `SlopeLike μ` structure.
+  a `μ.IsSlopeLike` structure.
 -/
 lemma rmk4d15 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : PayoffFunction ℒ S) (hμ : SlopeLike μ) :
+(μ : PayoffFunction ℒ S) (hμ : μ.IsSlopeLike) :
 ∀ x : ℒ, (hx : x ≠ ⊥ ∧ x ≠ ⊤) → μ ⟨⊥, x,bot_lt_iff_ne_bot.2 hx.1⟩ ≤ μ ⊤ ∨
   ¬ μ ⊤ ≤ μ ⟨x, ⊤,lt_top_iff_ne_top.2 hx.2⟩ :=
   fun x hx ↦ ((hμ.slopelike ⊥ x ⊤
@@ -216,7 +216,7 @@ lemma rmk4d15 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder �
 -/
 lemma prop4d16₁ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : PayoffFunction ℒ S) (hμ : SlopeLike μ) :
+(μ : PayoffFunction ℒ S) (hμ : μ.IsSlopeLike) :
 List.TFAE [
   μmax μ ⊤ = μ ⊤, μmin μ ⊤ = μ ⊤, μmin μ ⊤ = μmax μ ⊤
   ] := by
@@ -228,7 +228,7 @@ List.TFAE [
 
 
 
-/-- `prop4d16₂` is the main bridge: under `SlopeLike μ` and both chain conditions,
+/-- `prop4d16₂` is the main bridge: under `μ.IsSlopeLike` and both chain conditions,
   Nash equilibrium is equivalent to the equality `μmin μ ⊤ = μmax μ ⊤`.
 
   The proof packages the slope-like axiom into weak slope-like data on restrictions,
@@ -236,7 +236,7 @@ List.TFAE [
 -/
 lemma prop4d16₂ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : PayoffFunction ℒ S) (hμ : SlopeLike μ)
+(μ : PayoffFunction ℒ S) (hμ : μ.IsSlopeLike)
 (h₁ : WeakAscendingChainCondition μ) (h₂ : StrongDescendingChainCondition μ) :
 μmin μ ⊤ = μmax μ ⊤ ↔ NashEquilibrium μ := by
   have : ∀ (z : StrictIntvl ℒ) (hz : z.right < ⊤), μ z ≤
@@ -319,7 +319,7 @@ NashEquilibrium μ → μ.IsSemistable := by
 -/
 theorem thm4d21 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLinearOrder S]
-(μ : PayoffFunction ℒ S) (hμ : SlopeLike μ)
+(μ : PayoffFunction ℒ S) (hμ : μ.IsSlopeLike)
 (h₁ : WeakAscendingChainCondition μ) (h₂ : StrongDescendingChainCondition μ) :
 List.TFAE [
   μmax μ ⊤ = μ ⊤, μmin μ ⊤ = μ ⊤, μmin μ ⊤ = μmax μ ⊤, NashEquilibrium μ,

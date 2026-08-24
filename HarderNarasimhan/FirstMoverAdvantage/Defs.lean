@@ -3,7 +3,7 @@ Copyright (c) 2026 Yijun Yuan. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yijun Yuan
 -/
-import HarderNarasimhan.SlopeLike.Defs
+import HarderNarasimhan.PayoffFunction.SlopeLike
 import Mathlib.Order.OrderIsoNat
 
 /-!
@@ -105,7 +105,7 @@ This instance extracts the relevant disjunction by applying the `SlopeLike` axio
 -/
 instance {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLinearOrder S]
-{μ : PayoffFunction ℒ S} [hμ : SlopeLike μ] :
+{μ : PayoffFunction ℒ S} [hμ : μ.IsSlopeLike] :
 WeakSlopeLike₁ μ :=
   { wsl₁ := fun z hz ↦
     (hμ.slopelike z.left z.right ⊤ ⟨z.lt,hz⟩).1.imp id le_of_lt }
@@ -117,7 +117,7 @@ This instance extracts the relevant disjunction by applying the `SlopeLike` axio
 -/
 instance {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLinearOrder S]
-{μ : PayoffFunction ℒ S} [hμ : SlopeLike μ] :
+{μ : PayoffFunction ℒ S} [hμ : μ.IsSlopeLike] :
 WeakSlopeLike₂ μ :=
   { wsl₂ := fun z hz ↦
     (hμ.slopelike ⊥ z.left z.right ⟨hz,z.lt⟩).2.2.1.elim (Or.inr ∘ le_of_lt) Or.inl }
