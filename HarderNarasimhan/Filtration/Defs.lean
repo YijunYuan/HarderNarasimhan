@@ -50,7 +50,7 @@ API note: this is the main extra hypothesis needed for the existence theorem.
 -/
 class μ_Admissible {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : Intvl ℒ → S) where
+(μ : Intvl ℒ → S) : Prop where
   μ_adm : (Std.Total (· ≤ · : S → S → Prop)) ∨ ∀ I : Intvl ℒ,  IsAttained μ I
 
 /--

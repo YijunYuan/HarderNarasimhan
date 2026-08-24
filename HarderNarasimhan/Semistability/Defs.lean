@@ -146,7 +146,7 @@ accept `Stable μ` where `Semistable μ` is required.
 -/
 class Stable {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : Intvl ℒ → S) extends Semistable μ where
+(μ : Intvl ℒ → S) : Prop extends Semistable μ where
   stable : ∀ x : ℒ, (hx : ⊥ < x) → x < ⊤ →
     μA μ ⟨⊥, x, hx⟩ ≠ μA μ ⊤
 
