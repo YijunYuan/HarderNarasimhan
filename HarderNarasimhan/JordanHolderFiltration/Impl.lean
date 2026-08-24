@@ -347,6 +347,18 @@ lemma JH_pos_len {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   rw [h, JH.first_eq_top] at this
   exact top_ne_bot this
 
+/-/ `exists_next_lt` is the existence input for `Nat.find` in `subseqIdx`: for an antitone `f`
+that eventually hits `⊥`, from any index `n` with `f n ≠ ⊥` there is a later index where `f`
+drops strictly.
+-/
+private lemma exists_next_lt {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+  (f : ℕ → ℒ) (atf : ∃ k, f k = ⊥) (hf : Antitone f) (n : ℕ) (hcond : f n ≠ ⊥) :
+  ∃ k : ℕ, n < k ∧ f k < f n := by
+  let m := max (n + 1) atf.choose
+  refine ⟨m, lt_of_lt_of_le (Nat.lt_succ_self _) (le_max_left _ _), ?_⟩
+  have hm : f m = ⊥ := le_bot_iff.mp <| atf.choose_spec ▸ hf (le_max_right _ _)
+  simpa [hm] using bot_lt_iff_ne_bot.2 hcond
+
 open Classical in
 /-/ `subseqIdx f atf hf` is the greedy index sequence underlying the normalised subsequence.
 
@@ -359,13 +371,7 @@ noncomputable def subseqIdx {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [Bounde
   | 0 => 0
   | t + 1 =>
       if hcond : f (subseqIdx f atf hf t) = ⊥ then subseqIdx f atf hf t + 1
-      else
-        Nat.find (show ∃ k : ℕ, subseqIdx f atf hf t < k ∧ f k < f (subseqIdx f atf hf t) from by
-          let m := max (subseqIdx f atf hf t + 1) atf.choose
-          refine Exists.intro m ?_
-          refine And.intro (lt_of_lt_of_le (Nat.lt_succ_self _) (le_max_left _ _)) ?_
-          have hm : f m = ⊥ := le_bot_iff.mp <| atf.choose_spec ▸ hf (le_max_right _ _)
-          simpa [hm] using bot_lt_iff_ne_bot.2 hcond)
+      else Nat.find (exists_next_lt f atf hf (subseqIdx f atf hf t) hcond)
 
 /-/ `subseqIdx.next_exists` packages the witness that, as long as the current selected value is
 not `⊥`, there is a later index where `f` drops strictly.
@@ -373,11 +379,8 @@ not `⊥`, there is a later index where `f` drops strictly.
 private lemma subseqIdx.next_exists {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   (f : ℕ → ℒ) (atf : ∃ k, f k = ⊥) (hf : Antitone f) (t : ℕ)
   (hcond : f (subseqIdx f atf hf t) ≠ ⊥) :
-  ∃ k : ℕ, subseqIdx f atf hf t < k ∧ f k < f (subseqIdx f atf hf t) := by
-  let m := max (subseqIdx f atf hf t + 1) atf.choose
-  refine ⟨m, lt_of_lt_of_le (Nat.lt_succ_self _) (le_max_left _ _), ?_⟩
-  have hm : f m = ⊥ := le_bot_iff.mp <| atf.choose_spec ▸ hf (le_max_right _ _)
-  simpa [hm] using bot_lt_iff_ne_bot.2 hcond
+  ∃ k : ℕ, subseqIdx f atf hf t < k ∧ f k < f (subseqIdx f atf hf t) :=
+  exists_next_lt f atf hf (subseqIdx f atf hf t) hcond
 
 open Classical in
 private lemma subseqIdx.succ_eq_find {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
