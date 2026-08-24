@@ -227,6 +227,22 @@ theorem strongDCC_of_wellOrderedRank (μ : PayoffFunction ℒ S)
       (hn ▸ hmin ⟨r (x (n + 1)), Set.mem_range_self (x (n + 1))⟩ ⟨n + 1, rfl⟩)
   exact ⟨n, (h ⟨x (n + 1), x n, saf (Nat.lt_add_one n)⟩ heq.symm) ▸ le_top⟩
 
+section SlopeLike
+
+variable {S : Type*} [CompleteLinearOrder S] {μ : PayoffFunction ℒ S}
+
+omit [Nontrivial ℒ] [BoundedOrder ℒ] in
+/-- For a slope-like payoff function over a well-founded order, the first-player value of any
+interval is the minimum payoff.  This is the interval version of `A_top_eq_min_top`, obtained
+by restricting `μ` to the interval. -/
+lemma IsSlopeLike.min_eq_A [WellFoundedGT ℒ] (hsl : μ.IsSlopeLike) (I : StrictIntvl ℒ) :
+    μ.min I = μ.A I := by
+  have h := A_top_eq_min_top (μ := μ.restrict I)
+  rw [A_restrict_apply, min_restrict_apply, StrictIntvl.ofSub_top] at h
+  exact h.symm
+
+end SlopeLike
+
 end PayoffFunction
 
 end HarderNarasimhan

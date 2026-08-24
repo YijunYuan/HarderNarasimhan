@@ -22,8 +22,10 @@ import HarderNarasimhan.PayoffFunction.Slope
 import HarderNarasimhan.PayoffFunction.GameValue
 import HarderNarasimhan.PayoffFunction.NashEquilibrium
 
-import HarderNarasimhan.JordanHolderFiltration.Defs
-import HarderNarasimhan.JordanHolderFiltration.Results
+import HarderNarasimhan.JordanHolder.Defs
+import HarderNarasimhan.JordanHolder.Exists
+import HarderNarasimhan.JordanHolder.Stability
+import HarderNarasimhan.JordanHolder.Length
 
 import HarderNarasimhan.CoprimaryFiltration.Defs
 import HarderNarasimhan.CoprimaryFiltration.Results
