@@ -4,23 +4,20 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yijun Yuan
 -/
 import HarderNarasimhan.StrictIntvl
+
 import HarderNarasimhan.PayoffFunction.Defs
 import HarderNarasimhan.PayoffFunction.Restrict
-import HarderNarasimhan.Basic
-import HarderNarasimhan.Interval
-
 import HarderNarasimhan.PayoffFunction.Convex
 import HarderNarasimhan.PayoffFunction.Semistable.Defs
 import HarderNarasimhan.PayoffFunction.Semistable.Breakpoints
-
-import HarderNarasimhan.Filtration.Defs
-import HarderNarasimhan.Filtration.Exists
-import HarderNarasimhan.Filtration.Unique
-
 import HarderNarasimhan.PayoffFunction.SlopeLike
 import HarderNarasimhan.PayoffFunction.Slope
 import HarderNarasimhan.PayoffFunction.GameValue
 import HarderNarasimhan.PayoffFunction.NashEquilibrium
+
+import HarderNarasimhan.Filtration.Defs
+import HarderNarasimhan.Filtration.Exists
+import HarderNarasimhan.Filtration.Unique
 
 import HarderNarasimhan.JordanHolder.Defs
 import HarderNarasimhan.JordanHolder.Exists
@@ -35,13 +32,22 @@ import HarderNarasimhan.Coprimary.Filtration
 /-!
 # `HarderNarasimhan`: library root
 
-This module is the umbrella import for the project. It re-exports the main definitions and the
-public-facing results of each chapter.
+This module is the umbrella import for the project: importing `HarderNarasimhan` brings the
+whole formalization of the Harder–Narasimhan game of [ChenJeannin] into scope.  It declares no
+definitions or lemmas of its own.
 
-API overview:
+The library is organized in four blocks on top of the interval infrastructure
+`HarderNarasimhan.StrictIntvl`:
 
-* Import `HarderNarasimhan` when you want the standard collection of definitions and theorems.
-* For more granular dependencies, prefer importing individual `.../Defs` and `.../Results` modules.
+* `HarderNarasimhan.PayoffFunction.*` : the bundled `PayoffFunction` structure, the game values
+  `μ.max`/`μ.min`/`μ.A`/`μ.B`, restriction to subintervals, convexity, slope-like payoffs,
+  semistability and breakpoints, first-mover advantage, and Nash equilibria.
+* `HarderNarasimhan.Filtration.*` : Harder–Narasimhan filtrations — existence (`μ.hnFiltration`)
+  and uniqueness over a complete linear order.
+* `HarderNarasimhan.JordanHolder.*` : Jordan–Hölder filtrations — existence, piecewise stability,
+  and uniqueness of the length over a modular lattice.
+* `HarderNarasimhan.Coprimary.*` : the coprimary filtration of a finitely generated module over a
+  Noetherian ring, as an instance of the abstract theory.
 
-API note: this file declares no new definitions/lemmas; it is purely a re-export layer.
+For finer-grained dependencies, import the individual files instead.
 -/

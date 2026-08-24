@@ -53,9 +53,9 @@ def getAllConstsFromNamespace (n : String) : TermElabM (List Name) := do
   return consts.toArray.toList
 
 
-structure BFSState :=
-  (g : HashMap Name (List Name))
-  (outerLayer : List Name)
+structure BFSState where
+  g : HashMap Name (List Name)
+  outerLayer : List Name
 
 def getUsedConstantGraph (names : List Name) (depth : Nat) : TermElabM (List (Name × List Name)) := do
 

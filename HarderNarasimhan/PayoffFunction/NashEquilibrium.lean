@@ -5,7 +5,6 @@ Authors: Yijun Yuan
 -/
 import HarderNarasimhan.PayoffFunction.GameValue
 import HarderNarasimhan.PayoffFunction.Semistable.Defs
-import HarderNarasimhan.Interval
 import Mathlib.Tactic.TFAE
 import Mathlib.Data.List.TFAE
 

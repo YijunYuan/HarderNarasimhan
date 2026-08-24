@@ -1,6 +1,8 @@
 # HarderNarasimhan 项目重构计划书
 
-> 状态：**v2 —— §8 的十二项设计决议已全部与作者讨论定案**（2026-08-24）。
+> 状态：**已完成**（2026-08-25）——阶段 0–11 全部实施完毕，见 `refactor` 分支上
+> 首行为「阶段 n: …」的连续提交（阶段 0 `fa3bb37` 起，至阶段 11 收尾提交）。
+> §8 的十二项设计决议已全部与作者讨论定案（2026-08-24）。
 > 参考规范：
 > [mathlib style guide](https://leanprover-community.github.io/contribute/style.html) ·
 > [documentation style](https://leanprover-community.github.io/contribute/doc.html) ·
