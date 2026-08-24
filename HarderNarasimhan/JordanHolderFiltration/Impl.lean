@@ -13,7 +13,7 @@ import Mathlib.Data.List.TFAE
 import Mathlib.Order.OrderIsoNat
 import HarderNarasimhan.JordanHolderFiltration.Defs
 import HarderNarasimhan.PayoffFunction.SlopeLike
-import HarderNarasimhan.FirstMoverAdvantage.Results
+import HarderNarasimhan.PayoffFunction.GameValue
 import Mathlib.SetTheory.Cardinal.NatCard
 import Mathlib.Order.ModularLattice
 
@@ -556,7 +556,8 @@ lemma μA_eq_μmin {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
 (μ : PayoffFunction ℒ S)
 [μ.IsSlopeLike] (I : StrictIntvl ℒ) :
 μmin μ I = μA μ I := by
-  convert Eq.symm <| (proposition_4_1 (Resμ I μ) inferInstance inferInstance).1
+  convert Eq.symm <| (show μAstar (Resμ I μ) = μmin (Resμ I μ) ⊤ from
+    PayoffFunction.A_top_eq_min_top)
   · simpa only [μmin_res_intvl] using by rfl
   · simpa only [μAstar, μA_res_intvl] using by rfl
 
@@ -670,9 +671,11 @@ lemma stable_of_step_cond₂
       have hx_left : filtration (i + 1) < x.val :=
         lt_of_le_of_ne x.prop.1 fun hc ↦ hx.ne' <| Subtype.coe_inj.1 hc.symm
       change μA (Resμ stepI μ) ⟨⊥, x, hx⟩ ≠ μA (Resμ stepI μ) ⊤
-      have hAstar_step := (proposition_4_1 (Resμ stepI μ) inferInstance inferInstance).1
-      have hAstar_x := (proposition_4_1 (Resμ ⟨filtration (i + 1), x.val, hx_left⟩ μ)
-        inferInstance inferInstance).1
+      have hAstar_step : μAstar (Resμ stepI μ) = μmin (Resμ stepI μ) ⊤ :=
+        PayoffFunction.A_top_eq_min_top
+      have hAstar_x : μAstar (Resμ ⟨filtration (i + 1), x.val, hx_left⟩ μ) =
+          μmin (Resμ ⟨filtration (i + 1), x.val, hx_left⟩ μ) ⊤ :=
+        PayoffFunction.A_top_eq_min_top
       simp only [μAstar, μA_res_intvl,μmin_res_intvl] at *
       rw [hAstar_step]
       replace hAstar_x : μA μ (StrictIntvl.ofSub ⟨⊥, x, hx⟩) =
@@ -719,12 +722,12 @@ lemma step_cond₂_of_stable {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [Bound
   simp only [not_lt] at hss
   have hst' : μA (Resμ stepI μ) ⟨⊥, midI, hmid_ne_bot⟩ < μA (Resμ stepI μ) ⊤ :=
     lt_of_le_of_ne hss ((hst i hi).ne midI hmid_ne_bot hmid_ne_top)
-  have hAstar_step := (proposition_4_1 (Resμ stepI μ) inferInstance inferInstance).1
-  unfold μAstar at hAstar_step
+  have hAstar_step : μA (Resμ stepI μ) ⊤ = μmin (Resμ stepI μ) ⊤ :=
+    PayoffFunction.A_top_eq_min_top
   rw [hAstar_step] at hst'
-  have hAstar_mid := (proposition_4_1 (Resμ ⟨filtration (i + 1), z, hz⟩ μ)
-    inferInstance inferInstance).1
-  unfold μAstar at hAstar_mid
+  have hAstar_mid : μA (Resμ ⟨filtration (i + 1), z, hz⟩ μ) ⊤ =
+      μmin (Resμ ⟨filtration (i + 1), z, hz⟩ μ) ⊤ :=
+    PayoffFunction.A_top_eq_min_top
   have hb : μA (Resμ ⟨filtration (i + 1), filtration i, gt_trans hz' hz⟩ μ)
     ⟨⊥, midI, hmid_ne_bot⟩ =
     μA (Resμ ⟨filtration (i + 1), z, hz⟩ μ) ⊤ := by

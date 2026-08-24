@@ -48,13 +48,13 @@ lemma remark_4_10 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrde
     μmin μ ⟨⊥, y,hy⟩ ≤ μmax μ ⟨x, ⊤,lt_top_iff_ne_top.2 hx⟩
 ) ∧
 (
-  WeakAscendingChainCondition μ → WeakSlopeLike₁ μ →
+  μ.WeakACC → μ.WeakSlopeLikeAtTop →
   (
     NashEquilibrium μ ↔ ∀ y : ℒ, (hy : y ≠ ⊥) →
       μmin μ ⟨⊥, y,bot_lt_iff_ne_bot.2 hy⟩ ≤ μmin μ ⊤
   )
 ) ∧ (
-  StrongDescendingChainCondition μ → WeakSlopeLike₂ μ →
+  μ.StrongDCC → μ.WeakSlopeLikeAtBot →
   (
     NashEquilibrium μ ↔ ∀ y : ℒ, (hy : y ≠ ⊤) →
       μmax μ ⊤ ≤ μmax μ ⟨y, ⊤,lt_top_iff_ne_top.2 hy⟩
@@ -72,8 +72,8 @@ lemma proposition_4_11 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [Bounde
 (
   μmin μ ⊤ = μmax μ ⊤ → μBstar μ ≤ μAstar μ
 ) ∧ (
-  WeakAscendingChainCondition μ → WeakSlopeLike₁ μ →
-  StrongDescendingChainCondition μ → WeakSlopeLike₂ μ →
+  μ.WeakACC → μ.WeakSlopeLikeAtTop →
+  μ.StrongDCC → μ.WeakSlopeLikeAtBot →
   μBstar μ ≤ μAstar μ → μmin μ ⊤ = μmax μ ⊤
 )
 := ⟨impl.prop4d11₁ μ,impl.prop4d11₂ μ⟩
@@ -142,7 +142,7 @@ lemma proposition_4_16 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [Bounde
   μmax μ ⊤ = μ ⊤, μmin μ ⊤ = μ ⊤, μmin μ ⊤ = μmax μ ⊤
   ]
 ) ∧ (
-  WeakAscendingChainCondition μ → StrongDescendingChainCondition μ →
+  μ.WeakACC → μ.StrongDCC →
   List.TFAE [
   μmax μ ⊤ = μ ⊤, μmin μ ⊤ = μ ⊤, μmin μ ⊤ = μmax μ ⊤, NashEquilibrium μ
   ]
@@ -165,8 +165,8 @@ lemma proposition_4_18 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrde
 (
   μBstar μ ≤ μAstar μ
 ) ∧ (
-  (WeakAscendingChainCondition μ ∧ WeakSlopeLike₁ μ) ∨
-  (StrongDescendingChainCondition μ ∧ WeakSlopeLike₂ μ) →
+  (μ.WeakACC ∧ μ.WeakSlopeLikeAtTop) ∨
+  (μ.StrongDCC ∧ μ.WeakSlopeLikeAtBot) →
     NashEquilibrium μ
 )
 := ⟨impl.prop4d18₁ μ hμ,impl.prop4d18₂ μ hμ⟩
@@ -180,9 +180,9 @@ lemma proposition_4_20 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrde
 {S : Type*} [CompleteLattice S]
 (μ : PayoffFunction ℒ S)
 (h₁ : ∀ x : ℒ, (hx : x ≠ ⊥) →
-  WeakAscendingChainCondition (Resμ ⟨⊥, x,bot_lt_iff_ne_bot.2 hx⟩ μ))
+  PayoffFunction.WeakACC (Resμ ⟨⊥, x,bot_lt_iff_ne_bot.2 hx⟩ μ))
 (h₂ :  ∀ x : ℒ, (hx : x ≠ ⊥) →
-  WeakSlopeLike₁ (Resμ ⟨⊥, x,bot_lt_iff_ne_bot.2 hx⟩ μ)) :
+  PayoffFunction.WeakSlopeLikeAtTop (Resμ ⟨⊥, x,bot_lt_iff_ne_bot.2 hx⟩ μ)) :
 NashEquilibrium μ → μ.IsSemistable
 := impl.prop4d20 μ h₁ h₂
 
@@ -196,14 +196,14 @@ API note: this is the main user-facing equivalence statement of the Nash-equilib
 theorem NashEquil_equiv {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLinearOrder S]
 (μ : PayoffFunction ℒ S) [hμ : μ.IsSlopeLike]
-[h₁ : WeakAscendingChainCondition μ] [h₂ : StrongDescendingChainCondition μ] :
+[h₁ : μ.WeakACC] [h₂ : μ.StrongDCC] :
 List.TFAE [
   μmax μ ⊤ = μ ⊤, μmin μ ⊤ = μ ⊤, μmin μ ⊤ = μmax μ ⊤, NashEquilibrium μ
   ]
 ∧ (
   μ.IsSemistable → NashEquilibrium μ
 ) ∧ (
-  (∀ x : ℒ, (hx : x ≠ ⊥) → WeakAscendingChainCondition (Resμ ⟨⊥, x,bot_lt_iff_ne_bot.2 hx⟩ μ)) →
+  (∀ x : ℒ, (hx : x ≠ ⊥) → PayoffFunction.WeakACC (Resμ ⟨⊥, x,bot_lt_iff_ne_bot.2 hx⟩ μ)) →
   NashEquilibrium μ → μ.IsSemistable
 )
 := impl.thm4d21 μ hμ h₁ h₂

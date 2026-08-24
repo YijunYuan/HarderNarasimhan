@@ -4,8 +4,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yijun Yuan
 -/
 import HarderNarasimhan.NashEquilibrium.Defs
-import HarderNarasimhan.FirstMoverAdvantage.Impl
-import HarderNarasimhan.FirstMoverAdvantage.Defs
+import HarderNarasimhan.PayoffFunction.GameValue
+import HarderNarasimhan.PayoffFunction.GameValue
 import HarderNarasimhan.PayoffFunction.SlopeLike
 import HarderNarasimhan.PayoffFunction.Semistable.Breakpoints
 import HarderNarasimhan.Interval
@@ -30,6 +30,34 @@ import Mathlib.Data.List.TFAE
 namespace HarderNarasimhan
 
 namespace impl
+
+/- Transitional bridges restating the game-value computations of
+`HarderNarasimhan.PayoffFunction.GameValue` in the `μAstar`/`μBstar` spelling still used in
+this file; they disappear when this file is rewritten. -/
+
+private lemma prop4d1₁ (ℒ : Type*) [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
+    (S : Type*) [CompleteLattice S] (μ : PayoffFunction ℒ S)
+    [h₁ : μ.WeakACC] [h₂ : μ.WeakSlopeLikeAtTop] :
+    μAstar μ = μmin μ ⊤ :=
+  PayoffFunction.A_top_eq_min_top
+
+private lemma prop4d1₂ (ℒ : Type*) [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
+    (S : Type*) [CompleteLattice S] (μ : PayoffFunction ℒ S)
+    [h₁ : μ.WeakACC] [h₂ : μ.WeakSlopeLikeAtTop] :
+    μAstar μ ≤ μBstar μ :=
+  PayoffFunction.A_top_le_B_top
+
+private lemma prop4d3₁ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
+    {S : Type*} [CompleteLattice S] (μ : PayoffFunction ℒ S)
+    [h₁ : μ.StrongDCC] [h₂ : μ.WeakSlopeLikeAtBot] :
+    μBstar μ = μmax μ ⊤ :=
+  PayoffFunction.B_top_eq_max_top
+
+private lemma prop4d3₂ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
+    {S : Type*} [CompleteLattice S] (μ : PayoffFunction ℒ S)
+    [h₁ : μ.StrongDCC] [h₂ : μ.WeakSlopeLikeAtBot] :
+    μAstar μ ≤ μBstar μ :=
+  PayoffFunction.A_top_le_B_top_of_strongDCC
 
 /-- `rmk4d10₀` records the basic bounds: for any interval `I`, `μmin μ I ≤ μ I ≤ μmax μ I`.
   This is a direct consequence of the defining bounded-infimum/supremum characterisations.
@@ -70,7 +98,7 @@ lemma rmk4d10₁ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder
 lemma rmk4d10₂ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : PayoffFunction ℒ S)
-(h₁ : WeakAscendingChainCondition μ) (h₂ : WeakSlopeLike₁ μ) :
+(h₁ : μ.WeakACC) (h₂ : μ.WeakSlopeLikeAtTop) :
 NashEquilibrium μ ↔
   ∀ y : ℒ, (hy : y ≠ ⊥) → μmin μ ⟨⊥, y,bot_lt_iff_ne_bot.2 hy⟩ ≤ μmin μ ⊤ := by
   constructor
@@ -96,7 +124,7 @@ NashEquilibrium μ ↔
 lemma rmk4d10₃ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : PayoffFunction ℒ S)
-(h₁ : StrongDescendingChainCondition μ) (h₂ : WeakSlopeLike₂ μ) :
+(h₁ : μ.StrongDCC) (h₂ : μ.WeakSlopeLikeAtBot) :
 NashEquilibrium μ ↔
   ∀ y : ℒ, (hy : y ≠ ⊤) → μmax μ ⊤ ≤ μmax μ ⟨y, ⊤,lt_top_iff_ne_top.2 hy⟩ := by
   constructor
@@ -136,8 +164,8 @@ lemma prop4d11₁ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrde
 lemma prop4d11₂ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : PayoffFunction ℒ S)
-(h₁ : WeakAscendingChainCondition μ) (h₂ : WeakSlopeLike₁ μ)
-(h₁' : StrongDescendingChainCondition μ) (h₂' : WeakSlopeLike₂ μ) :
+(h₁ : μ.WeakACC) (h₂ : μ.WeakSlopeLikeAtTop)
+(h₁' : μ.StrongDCC) (h₂' : μ.WeakSlopeLikeAtBot) :
 μBstar μ ≤ μAstar μ → μmin μ ⊤ = μmax μ ⊤ :=
   fun h ↦ eq_of_le_of_ge (le_trans (rmk4d10₀ μ ⊤).1 (rmk4d10₀ μ ⊤).2) <|
     (impl.prop4d3₁ μ (h₁ := h₁') (h₂ := h₂')) ▸
@@ -237,15 +265,15 @@ List.TFAE [
 lemma prop4d16₂ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : PayoffFunction ℒ S) (hμ : μ.IsSlopeLike)
-(h₁ : WeakAscendingChainCondition μ) (h₂ : StrongDescendingChainCondition μ) :
+(h₁ : μ.WeakACC) (h₂ : μ.StrongDCC) :
 μmin μ ⊤ = μmax μ ⊤ ↔ NashEquilibrium μ := by
   have : ∀ (z : StrictIntvl ℒ) (hz : z.right < ⊤), μ z ≤
     μ ⟨z.left, ⊤, lt_trans z.lt hz⟩ ∨
     μ ⟨z.right, ⊤, hz⟩ ≤ μ ⟨z.left, ⊤, lt_trans z.lt hz⟩ :=
     fun z hz ↦ (hμ.slopelike z.left z.right ⊤ ⟨z.lt, hz⟩).1.imp_right le_of_lt
-  have hle : μAstar μ ≤ μBstar μ := impl.prop4d1₂ ℒ S μ (h₁ := h₁) (h₂ := {wsl₁ := this})
+  have hle : μAstar μ ≤ μBstar μ := impl.prop4d1₂ ℒ S μ (h₁ := h₁) (h₂ := { le_or_le := this})
   exact ⟨fun h ↦ {nash_eq := eq_of_le_of_ge hle <| prop4d11₁ μ h},
-    fun h ↦ prop4d11₂ μ h₁ {wsl₁ := this} h₂ {wsl₂ := fun z hz ↦
+    fun h ↦ prop4d11₂ μ h₁ { le_or_le := this} h₂ { le_or_le := fun z hz ↦
       ((hμ.slopelike ⊥ z.left z.right ⟨hz, z.lt⟩).2.2.1.imp_left le_of_lt).symm}
       h.nash_eq.symm.le⟩
 
@@ -272,8 +300,8 @@ lemma prop4d18₁ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ
 lemma prop4d18₂ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLinearOrder S]
 (μ : PayoffFunction ℒ S) (hμ : μ.IsSemistable)
-(h : (WeakAscendingChainCondition μ ∧ WeakSlopeLike₁ μ) ∨
-  (StrongDescendingChainCondition μ ∧ WeakSlopeLike₂ μ)) :
+(h : (μ.WeakACC ∧ μ.WeakSlopeLikeAtTop) ∨
+  (μ.StrongDCC ∧ μ.WeakSlopeLikeAtBot)) :
 NashEquilibrium μ :=
   {nash_eq := eq_of_le_of_ge
     (h.elim (fun h ↦ impl.prop4d1₂ ℒ S μ (h₁ := h.1) (h₂ := h.2))
@@ -288,8 +316,9 @@ NashEquilibrium μ :=
 lemma prop4d20 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : PayoffFunction ℒ S)
-(h₁ : ∀ x : ℒ, (hx : x ≠ ⊥) → WeakAscendingChainCondition (Resμ ⟨⊥, x,bot_lt_iff_ne_bot.2 hx⟩ μ))
-(h₂ :  ∀ x : ℒ, (hx : x ≠ ⊥) → WeakSlopeLike₁ (Resμ ⟨⊥, x,bot_lt_iff_ne_bot.2 hx⟩ μ)) :
+(h₁ : ∀ x : ℒ, (hx : x ≠ ⊥) → PayoffFunction.WeakACC (Resμ ⟨⊥, x,bot_lt_iff_ne_bot.2 hx⟩ μ))
+(h₂ : ∀ x : ℒ, (hx : x ≠ ⊥) →
+  PayoffFunction.WeakSlopeLikeAtTop (Resμ ⟨⊥, x, bot_lt_iff_ne_bot.2 hx⟩ μ)) :
 NashEquilibrium μ → μ.IsSemistable := by
   intro h
   replace h := h.nash_eq
@@ -320,13 +349,13 @@ NashEquilibrium μ → μ.IsSemistable := by
 theorem thm4d21 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLinearOrder S]
 (μ : PayoffFunction ℒ S) (hμ : μ.IsSlopeLike)
-(h₁ : WeakAscendingChainCondition μ) (h₂ : StrongDescendingChainCondition μ) :
+(h₁ : μ.WeakACC) (h₂ : μ.StrongDCC) :
 List.TFAE [
   μmax μ ⊤ = μ ⊤, μmin μ ⊤ = μ ⊤, μmin μ ⊤ = μmax μ ⊤, NashEquilibrium μ,
   ] ∧
 (μ.IsSemistable → NashEquilibrium μ) ∧
 ((∀ x : ℒ, (hx : x ≠ ⊥) →
-  WeakAscendingChainCondition (Resμ ⟨⊥, x,bot_lt_iff_ne_bot.2 hx⟩ μ)) →
+  PayoffFunction.WeakACC (Resμ ⟨⊥, x,bot_lt_iff_ne_bot.2 hx⟩ μ)) →
   NashEquilibrium μ → μ.IsSemistable)
   := by
   constructor
@@ -337,9 +366,9 @@ List.TFAE [
     tfae_finish
   · constructor
     · exact fun h ↦ prop4d18₂ μ h <| Or.inl ⟨h₁,
-        {wsl₁ := fun a b ↦ (hμ.slopelike a.left a.right ⊤ ⟨a.lt, b⟩).1.imp_right le_of_lt}⟩
+        { le_or_le := fun a b ↦ (hμ.slopelike a.left a.right ⊤ ⟨a.lt, b⟩).1.imp_right le_of_lt}⟩
     · exact fun h₁ ↦ prop4d20 μ h₁ fun x hx ↦
-        {wsl₁ := fun a b ↦ (hμ.slopelike a.left a.right x ⟨a.lt, b⟩).1.imp_right le_of_lt}
+        { le_or_le := fun a b ↦ (hμ.slopelike a.left a.right x ⟨a.lt, b⟩).1.imp_right le_of_lt}
 
 end impl
 

@@ -18,8 +18,7 @@ import HarderNarasimhan.Filtration.Results
 
 import HarderNarasimhan.PayoffFunction.SlopeLike
 import HarderNarasimhan.PayoffFunction.Slope
-
-import HarderNarasimhan.FirstMoverAdvantage.Results
+import HarderNarasimhan.PayoffFunction.GameValue
 
 import HarderNarasimhan.NashEquilibrium.Defs
 import HarderNarasimhan.NashEquilibrium.Results

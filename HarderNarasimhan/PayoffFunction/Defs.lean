@@ -65,6 +65,16 @@ instance : FunLike (PayoffFunction ℒ S) (StrictIntvl ℒ) S where
 
 @[ext] lemma ext {μ ν : PayoffFunction ℒ S} (h : ∀ I, μ I = ν I) : μ = ν := DFunLike.ext μ ν h
 
+/-- The order-dual payoff function: `μ.dual` plays the game on the order duals of `ℒ` and
+`S`, exchanging the two players.  See `A_top_dual` and `B_top_dual` in
+`HarderNarasimhan.PayoffFunction.GameValue` for the exchange of the game values. -/
+def dual (μ : PayoffFunction ℒ S) : PayoffFunction ℒᵒᵈ Sᵒᵈ :=
+  ⟨fun p ↦ OrderDual.toDual <| μ ⟨p.right, p.left, p.lt⟩⟩
+
+@[simp] lemma dual_apply (μ : PayoffFunction ℒ S) (p : StrictIntvl ℒᵒᵈ) :
+    μ.dual p = OrderDual.toDual (μ ⟨p.right, p.left, p.lt⟩) :=
+  rfl
+
 end FunLike
 
 variable [Preorder ℒ] [CompleteLattice S] (μ : PayoffFunction ℒ S)
@@ -159,6 +169,7 @@ an infimum and needs no convexity. -/
 lemma A_anti_left (μ : PayoffFunction ℒ S) {x y z : ℒ} (h₁ : x < y) (h₂ : y < z) :
     μ.A ⟨x, z, h₁.trans h₂⟩ ≤ μ.A ⟨y, z, h₂⟩ :=
   le_A fun _ hv ↦ A_le (I := ⟨x, z, h₁.trans h₂⟩) ⟨(h₁.trans_le hv.1).le, hv.2⟩
+
 
 end PayoffFunction
 

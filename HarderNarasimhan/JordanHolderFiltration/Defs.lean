@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yijun Yuan
 -/
 import HarderNarasimhan.NashEquilibrium.Impl
-import HarderNarasimhan.FirstMoverAdvantage.Results
+import HarderNarasimhan.PayoffFunction.GameValue
 import HarderNarasimhan.PayoffFunction.SlopeLike
 import HarderNarasimhan.PayoffFunction.Convex
 import Mathlib.Order.OrderIsoNat
@@ -144,8 +144,8 @@ inequality demanded by `StrongDescendingChainCondition`.
 instance {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 {μ : PayoffFunction ℒ S} [h : StrongDescendingChainCondition' μ] :
-StrongDescendingChainCondition μ where
-  wdcc := fun f saf ↦ let ⟨N, hN⟩ := h.sdcc' f saf; ⟨N, hN ▸ le_top⟩
+μ.StrongDCC where
+  exists_le := fun f saf ↦ let ⟨N, hN⟩ := h.sdcc' f saf; ⟨N, hN ▸ le_top⟩
 
 
 /--
