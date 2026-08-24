@@ -26,7 +26,6 @@ Core API:
   right endpoint).
 - `μA` and `μB` iterate these extremal operations in the two directions; `μAstar`/`μBstar`
   specialize to the total interval `⊤`.
-- `IsComparable` is a convenience predicate for comparability in a partial order.
 - `IsAttained` records that the infimum defining `μA` is realized by some `a`.
 
 Design notes:
@@ -184,14 +183,6 @@ def μBstar {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : Intvl ℒ → S) : S :=
 μB μ ⊤
-
-/--
-Convenience predicate: two elements are comparable in a partial order.
-
-This is often used to state that a poset is (locally) a total preorder.
--/
-def IsComparable {ℒ : Type*} [PartialOrder ℒ] : (x : ℒ) → (y : ℒ) → Prop :=
-  fun x y => x ≤ y ∨ y ≤ x
 
 /--
 `IsAttained μ I` asserts that the infimum defining `μA μ I` is realized by some `a` in the interval.

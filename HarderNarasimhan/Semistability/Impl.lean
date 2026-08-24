@@ -537,7 +537,7 @@ lemma prop3d8₁ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   have hx'lt : I.left < x' := lt_of_le_of_ne hx'I.1 hx'ne
   have hsI : (x ⊔ x') ∈ I := ⟨le_sup_of_le_left hxI.1, sup_le hxI.2 hx'I.2⟩
   have hsne : I.left ≠ x ⊔ x' := ne_of_lt <| lt_sup_of_lt_left hxlt
-  have h₁ : IsComparable (μA μ ⟨I.left, x, hxlt⟩) (μA μ ⟨I.left, x', hx'lt⟩) ∨
+  have h₁ : Relation.SymmGen (· ≤ ·) (μA μ ⟨I.left, x, hxlt⟩) (μA μ ⟨I.left, x', hx'lt⟩) ∨
       IsAttained μ ⟨I.left, x ⊔ x' , lt_sup_of_lt_right hx'lt⟩ := by
     rcases h with htotal | hattained
     · exact Or.inl <| htotal.total _ _
@@ -598,7 +598,7 @@ lemma prop3d8₂ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   obtain ⟨hxI, hxne, hxS₁, hxS₂⟩ := hxSt.out
   have hxlt : I.left < x := lt_of_le_of_ne hxI.1 hxne
   have hyne : I.left ≠ y := ne_of_lt <| lt_of_le_of_lt hxI.1 hxy
-  have h : IsComparable (μA μ ⟨I.left, x, hxlt⟩) (μA μ ⟨x, y, hxy⟩) ∨
+  have h : Relation.SymmGen (· ≤ ·) (μA μ ⟨I.left, x, hxlt⟩) (μA μ ⟨x, y, hxy⟩) ∨
       IsAttained μ ⟨I.left, y, lt_of_le_of_lt hxI.1 hxy⟩ := by
     rcases h with htotal | hattained
     · exact Or.inl <| htotal.total _ _

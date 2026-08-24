@@ -318,7 +318,7 @@ lemma prop2d6₃I
   (y : ℒ) (hyI : y ∈ I)
   (z : ℒ) (hzI : z ∈ I)
   (h : x < y ∧ y < z)
-  (h' : (IsComparable (μA μ ⟨x, y, h.1⟩) (μA μ ⟨y, z, h.2⟩)) ∨
+  (h' : (Relation.SymmGen (· ≤ ·) (μA μ ⟨x, y, h.1⟩) (μA μ ⟨y, z, h.2⟩)) ∨
         (IsAttained μ ⟨x, z, lt_trans h.1 h.2⟩)) :
   μA μ ⟨y, z, h.2⟩ = μA μ ⟨x, z, lt_trans h.1 h.2⟩ ∨
   (μA μ ⟨x, y, h.1⟩ ≤ μA μ ⟨x, z, lt_trans h.1 h.2⟩ ∧
@@ -413,7 +413,7 @@ lemma prop2d8₂I
   (y : ℒ) (hyI : y ∈ I)
   (u : ℒ) (huI : u ∈ I)
   (h : u < x ∧ u < y)
-  (hcpb : IsComparable (μA μ ⟨u, x, h.1⟩)
+  (hcpb : Relation.SymmGen (· ≤ ·) (μA μ ⟨u, x, h.1⟩)
   (μA μ ⟨u, y, h.2⟩) ∨ IsAttained μ ⟨u, x ⊔ y, lt_sup_of_lt_left h.1⟩) :
   μA μ ⟨u, x, h.1⟩ ≤ μA μ ⟨u, x ⊔ y, lt_sup_of_lt_left h.1⟩ ∨
   μA μ ⟨u, y, h.2⟩ ≤ μA μ ⟨u, x ⊔ y, lt_sup_of_lt_left h.1⟩ := by

@@ -131,7 +131,7 @@ lemma proposition_2_6 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder
   )
   ) ∧ (
   --`(c)`
-  IsComparable (μA μ ⟨x, y, h.1⟩) (μA μ ⟨y, z, h.2⟩) ∨
+  Relation.SymmGen (· ≤ ·) (μA μ ⟨x, y, h.1⟩) (μA μ ⟨y, z, h.2⟩) ∨
   IsAttained μ ⟨x, z, lt_trans h.1 h.2⟩ →
     μA μ ⟨y, z, h.2⟩ = μA μ ⟨x, z, lt_trans h.1 h.2⟩ ∨
     (μA μ ⟨x, y, h.1⟩ ≤ μA μ ⟨x, z, lt_trans h.1 h.2⟩ ∧
@@ -186,7 +186,7 @@ lemma proposition_2_8 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder
   μA μ ⟨u, x ⊔ y, lt_sup_of_lt_left h.1⟩ ≥ μA μ ⟨u, x, h.1⟩ ⊓ μA μ ⟨u, y, h.2⟩
   ∧ (
   --`(b)`
-  IsComparable (μA μ ⟨u, x, h.1⟩) (μA μ ⟨u, y, h.2⟩) ∨
+  Relation.SymmGen (· ≤ ·) (μA μ ⟨u, x, h.1⟩) (μA μ ⟨u, y, h.2⟩) ∨
   IsAttained μ ⟨u, x ⊔ y, lt_sup_of_lt_left h.1⟩ →
     μA μ ⟨u, x ⊔ y, lt_sup_of_lt_left h.1⟩ ≥ μA μ ⟨u, x, h.1⟩ ∨
     μA μ ⟨u, x ⊔ y, lt_sup_of_lt_left h.1⟩ ≥ μA μ ⟨u, y, h.2⟩
