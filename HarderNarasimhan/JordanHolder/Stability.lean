@@ -92,11 +92,11 @@ theorem piecewise_isStable_of_payoff_lt
     rw [hA_x]
     have hss := piecewise_isSemistable_of_payoff_lt μ f hsa h i hi
     have hNash_step := hss.hasNashEquilibrium
-    have hμmin_step : (μ.restrict stepI).min ⊤ = (μ.restrict stepI) ⊤ :=
+    have hmin_step : (μ.restrict stepI).min ⊤ = (μ.restrict stepI) ⊤ :=
       min_top_eq_apply_iff.2
         (min_top_eq_max_top_iff_hasNashEquilibrium.2 hNash_step)
-    simp only [min_restrict_apply, restrict_apply] at hμmin_step
-    rw [hμmin_step]
+    simp only [min_restrict_apply, restrict_apply] at hmin_step
+    rw [hmin_step]
     exact ne_of_lt <| lt_of_le_of_lt
       (min_le_apply (μ := μ) (I := ⟨f (i + 1), ↑x, hx_left⟩)) <|
       h i hi x.val hx_left hx'
@@ -134,17 +134,17 @@ theorem payoff_lt_of_piecewise_isStable
     rfl
   rw [hb, hA_mid] at hst'
   have hNash_step := (hst i hi).toIsSemistable.hasNashEquilibrium
-  have hμmin_step : (μ.restrict stepI).min ⊤ = (μ.restrict stepI) ⊤ :=
+  have hmin_step : (μ.restrict stepI).min ⊤ = (μ.restrict stepI) ⊤ :=
     min_top_eq_apply_iff.2
       (min_top_eq_max_top_iff_hasNashEquilibrium.2 hNash_step)
-  rw [hμmin_step] at hst'
-  have hμmax_step : (μ.restrict stepI).max ⊤ = (μ.restrict stepI) ⊤ :=
+  rw [hmin_step] at hst'
+  have hmax_step : (μ.restrict stepI).max ⊤ = (μ.restrict stepI) ⊤ :=
     max_top_eq_apply_iff.2
       (min_top_eq_max_top_iff_hasNashEquilibrium.2 hNash_step)
   simp only [min_restrict_apply, restrict_apply] at hst'
   have hsSup_step : ∀ (u : ↥stepI) (hu : (⊥ : ↥stepI) < u),
       (μ.restrict stepI) ⟨⊥, u, hu⟩ ≤ (μ.restrict stepI) ⊤ := fun u hu ↦
-    hμmax_step ▸ le_iSup₂_of_le u ⟨hu, le_top⟩ le_rfl
+    hmax_step ▸ le_iSup₂_of_le u ⟨hu, le_top⟩ le_rfl
   have hsSup_step_bak := hsSup_step
   have hsSup_mid := hsSup_step midI hmid_ne_bot
   have hsSup_mid' : μ ⟨f (i + 1), z, hz⟩ ≤ μ ⟨f (i + 1), f i,

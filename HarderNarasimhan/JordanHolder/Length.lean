@@ -315,10 +315,10 @@ private lemma length_le_of_exists_length_le (n : ℕ) :
     let JHfinal := fun m ↦ JH_raw (subseqIdx JH_raw atRaw JH_raw_antitone m)
     have JHfinal_first_top : JHfinal 0 = ⊤ := by
       simpa [JHfinal, subseqIdx] using JH_raw_first_top
-    have hμmax : μ.max ⊤ = μ ⊤ :=
+    have hmax_top : μ.max ⊤ = μ ⊤ :=
       max_top_eq_apply_iff.2
         (min_top_eq_max_top_iff_hasNashEquilibrium.2 hst.hasNashEquilibrium)
-    have hμA_eq_tot : ∀ (F : μ.JordanHolderFiltration) (k : ℕ), (hk : k < F.length) →
+    have hA_eq_tot : ∀ (F : μ.JordanHolderFiltration) (k : ℕ), (hk : k < F.length) →
         μ ⊤ = μ.A ⟨⊥, F k, F.bot_lt_of_lt hk⟩ := by
       intro F k hk
       rw [← hsl.min_eq_A]
@@ -333,7 +333,7 @@ private lemma length_le_of_exists_length_le (n : ℕ) :
             (bot_lt_iff_ne_bot.2 hubot) hu1.2).1 hc
           rw [hess] at hc
           have hμu : μ ⟨⊥, u, bot_lt_iff_ne_bot.mpr hubot⟩ ≤ μ ⊤ := by
-            rw [← hμmax]
+            rw [← hmax_top]
             exact le_iSup₂_of_le u ⟨bot_lt_iff_ne_bot.2 hubot, le_top⟩ le_rfl
           exact not_le_of_gt hc hμu
       · exact min_le_apply
@@ -354,7 +354,7 @@ private lemma length_le_of_exists_length_le (n : ℕ) :
       have hj' : ∀ j : ℕ, j ≤ leny →
           μ ⟨⊥, x0 ⊔ JHy j, lt_of_lt_of_le hx0_bot le_sup_left⟩ = μ ⊤ := by
         refine fun j hj ↦ eq_of_le_of_ge ?_ ?_
-        · rw [← hμmax]
+        · rw [← hmax_top]
           exact le_iSup₂_of_le (x0 ⊔ JHy j)
             ⟨lt_of_lt_of_le hx0_bot le_sup_left, le_top⟩ le_rfl
         · refine le_trans ?_ (min_le_apply (μ := μ)
@@ -380,11 +380,11 @@ private lemma length_le_of_exists_length_le (n : ℕ) :
             (inferInstance : μ.IsConvexOn ⊤).inf_A_le_A_sup (StrictIntvl.mem_top _)
               (StrictIntvl.mem_top _) (StrictIntvl.mem_top _) hx0_bot (Ne.bot_lt' hjbot)
           convert hsup
-          have t2 := hμA_eq_tot JHy j <| by
+          have t2 := hA_eq_tot JHy j <| by
             refine lt_of_le_of_ne hj ?_
             by_contra hc
             exact hjbot (hc ▸ JHy.apply_length).symm
-          rw [← hμA_eq_tot JHx (lenx - 1) (by omega), ← t2]
+          rw [← hA_eq_tot JHx (lenx - 1) (by omega), ← t2]
           exact Eq.symm (min_self (μ ⊤))
       have tj1 := hj' j hjy.le
       have hkey := tj1 ▸ ((hsl.seesaw_total_eq_right_iff

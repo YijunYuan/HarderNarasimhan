@@ -27,8 +27,10 @@ import HarderNarasimhan.JordanHolder.Exists
 import HarderNarasimhan.JordanHolder.Stability
 import HarderNarasimhan.JordanHolder.Length
 
-import HarderNarasimhan.CoprimaryFiltration.Defs
-import HarderNarasimhan.CoprimaryFiltration.Results
+import HarderNarasimhan.Coprimary.AssociatedPrimes
+import HarderNarasimhan.Coprimary.Defs
+import HarderNarasimhan.Coprimary.Semistability
+import HarderNarasimhan.Coprimary.Filtration
 
 /-!
 # `HarderNarasimhan`: library root

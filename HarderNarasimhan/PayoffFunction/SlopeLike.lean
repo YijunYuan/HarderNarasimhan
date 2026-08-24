@@ -4,7 +4,6 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yijun Yuan
 -/
 import HarderNarasimhan.PayoffFunction.Restrict
-import HarderNarasimhan.Interval
 import Mathlib.Tactic.Common
 import Mathlib.Tactic.Tauto
 
@@ -68,12 +67,6 @@ variable {μ : PayoffFunction ℒ S}
 
 /-- Slope-likeness is stable under restriction to a subinterval. -/
 instance {I : StrictIntvl ℒ} [hsl : μ.IsSlopeLike] : (μ.restrict I).IsSlopeLike :=
-  ⟨fun x y z h ↦ hsl.slopelike x.val y.val z.val h⟩
-
-/-- Slope-likeness is stable under restriction (transitional `Resμ`-keyed copy of the
-`PayoffFunction.restrict` instance, so that instance search fires on `Resμ`). -/
-instance [Nontrivial ℒ] [BoundedOrder ℒ] {I : StrictIntvl ℒ} [hsl : μ.IsSlopeLike] :
-    (Resμ I μ).IsSlopeLike :=
   ⟨fun x y z h ↦ hsl.slopelike x.val y.val z.val h⟩
 
 /-- The slope-like axiom is equivalent to the seesaw trichotomy: for any chain `x < y < z`

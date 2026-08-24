@@ -8,12 +8,12 @@ import Mathlib.Algebra.Module.LocalizedModule.Submodule
 import Mathlib.Algebra.Module.LocalizedModule.AtPrime
 
 /-!
-Auxiliary commutative algebra for the coprimary filtration development.
+# Associated primes of the quotient by a localization kernel
 
-The single fact needed by `HarderNarasimhan.CoprimaryFiltration.Impl` is the quotient half of
-Bourbaki, *Algèbre commutative*, Ch. IV, §1, no. 2, Prop. 6: writing `K` for the kernel of the
-localization map `M →ₗ[R] S⁻¹M`, the associated primes of `M ⧸ K` are exactly the associated
-primes of `M` that are disjoint from `S` (`associatedPrimes_quot_ker_mkLinearMap`).
+This file proves the quotient half of Bourbaki, *Algèbre commutative*, Ch. IV, §1, no. 2,
+Prop. 6: writing `K` for the kernel of the localization map `M →ₗ[R] S⁻¹M`, the associated
+primes of `M ⧸ K` are exactly the associated primes of `M` that are disjoint from `S`
+(`associatedPrimes_quot_ker_mkLinearMap`).
 
 The proof splits into three observations:
 
@@ -23,22 +23,48 @@ The proof splits into three observations:
 * conversely, an associated prime of `M ⧸ K` disjoint from `S` is an associated prime of `M`
   (localize at that prime: `K` localizes to zero).
 
-API note: this file is internal to the coprimary filtration implementation. Downstream
-developments should import `HarderNarasimhan.CoprimaryFiltration.Results` instead.
+The file also contains `associatedPrimes_subset_of_submoduleOf_le`, a general monotonicity
+lemma for associated primes of subquotients of a fixed module.
+
+This file is pure commutative algebra: it is independent of the Harder–Narasimhan game and
+is a candidate for upstreaming to mathlib.  Within this repository it provides the input for
+the computation of the first-player value of the coprimary payoff function in
+`HarderNarasimhan.Coprimary.Semistability`.
+
+## Main results
+
+* `HarderNarasimhan.associatedPrimes_quot_ker_mkLinearMap` : the associated primes of
+  `M ⧸ ker (M → S⁻¹M)` are exactly the associated primes of `M` disjoint from `S`.
+* `HarderNarasimhan.associatedPrimes_subset_of_submoduleOf_le` : for submodules `A ≤ B`,
+  every associated prime of `A ⧸ N` is an associated prime of `B ⧸ N`.
+
+## References
+
+* N. Bourbaki, *Algèbre commutative*, Ch. IV, §1, no. 2, Prop. 6
 -/
 
 namespace HarderNarasimhan
-namespace CommutativeAlgebra
 
-variable {R : Type*} [CommRing R] {M : Type*} [AddCommGroup M] [Module R M] (S : Submonoid R)
+variable {R : Type*} [CommRing R] {M : Type*} [AddCommGroup M] [Module R M]
 
-/--
-Every associated prime of the kernel of the localization map meets `S`.
+/-- For submodules `N, A, B` of `M` with `A ≤ B`, every associated prime of `A ⧸ N` is an
+associated prime of `B ⧸ N`: the inclusion `A ↪ B` induces an injection
+`A ⧸ N.submoduleOf A → B ⧸ N.submoduleOf B`, and associated primes push forward along
+injective linear maps. -/
+lemma associatedPrimes_subset_of_submoduleOf_le (N A B : Submodule R M) (h : A ≤ B) :
+    associatedPrimes R (↥A ⧸ N.submoduleOf A) ⊆ associatedPrimes R (↥B ⧸ N.submoduleOf B) := by
+  have hcomap : Submodule.comap (Submodule.inclusion h) (N.submoduleOf B) = N.submoduleOf A := rfl
+  refine associatedPrimes.subset_of_injective
+    (f := (N.submoduleOf A).mapQ (N.submoduleOf B) (Submodule.inclusion h) (le_of_eq hcomap.symm))
+    ?_
+  rw [← LinearMap.ker_eq_bot, Submodule.ker_mapQ, hcomap, Submodule.mkQ_map_self]
 
-Indeed, any element of the kernel is `S`-torsion, so the (radical) annihilator ideal defining
-the associated prime contains an element of `S`.
--/
-lemma meets_of_mem_associatedPrimes_ker {p : Ideal R}
+variable (S : Submonoid R)
+
+/-- Every associated prime of the kernel of the localization map `M → S⁻¹M` meets `S`:
+any element of the kernel is `S`-torsion, so the radical annihilator ideal defining the
+associated prime contains an element of `S`. -/
+lemma inter_nonempty_of_mem_associatedPrimes_ker {p : Ideal R}
     (hp : p ∈ associatedPrimes R (LinearMap.ker (LocalizedModule.mkLinearMap S M))) :
     (p.carrier ∩ S).Nonempty := by
   obtain ⟨hpPrime, x, hx⟩ := hp
@@ -47,10 +73,8 @@ lemma meets_of_mem_associatedPrimes_ker {p : Ideal R}
   rw [hx, Ideal.mem_radical_iff]
   exact ⟨1, by simpa [Submodule.mem_colon_singleton, Subtype.ext_iff] using hrx⟩
 
-/--
-Associated primes of a localized module (viewed over the base ring) are disjoint from the
-multiplicative set: elements of `S` act injectively on `S⁻¹M`.
--/
+/-- Associated primes of a localized module `S⁻¹M` (viewed over the base ring) are disjoint
+from the multiplicative set `S`, since elements of `S` act injectively on `S⁻¹M`. -/
 lemma inter_eq_empty_of_mem_associatedPrimes_localizedModule {p : Ideal R}
     (hp : p ∈ associatedPrimes R (LocalizedModule S M)) : p.carrier ∩ S = ∅ := by
   obtain ⟨hpPrime, x, hx⟩ := hp
@@ -62,10 +86,8 @@ lemma inter_eq_empty_of_mem_associatedPrimes_localizedModule {p : Ideal R}
       (by simpa [Submonoid.smul_def, Submodule.mem_colon_singleton] using hn)
   exact hpPrime.ne_top (hx.trans (by rw [hx0, Submodule.colon_singleton_zero, Ideal.radical_top]))
 
-/--
-Associated primes of `M ⧸ ker(M → S⁻¹M)` are disjoint from `S`, since the quotient embeds
-into the localized module.
--/
+/-- Associated primes of `M ⧸ ker (M → S⁻¹M)` are disjoint from `S`, since the quotient
+embeds into the localized module. -/
 lemma inter_eq_empty_of_mem_associatedPrimes_quot_ker {p : Ideal R}
     (hp : p ∈ associatedPrimes R (M ⧸ LinearMap.ker (LocalizedModule.mkLinearMap S M))) :
     p.carrier ∩ S = ∅ := by
@@ -76,14 +98,13 @@ lemma inter_eq_empty_of_mem_associatedPrimes_quot_ker {p : Ideal R}
     (associatedPrimes.subset_of_injective hfQ hp)
 
 open Module in
-/--
-An associated prime of `M ⧸ ker(M → S⁻¹M)` that is disjoint from `S` is an associated prime
-of `M`.
+/-- An associated prime of `M ⧸ ker (M → S⁻¹M)` that is disjoint from `S` is an associated
+prime of `M`.
 
-The proof localizes at `p`: the kernel localizes to zero (its elements are `S`-torsion and `S`
-consists of units in `R_p`), so `(M ⧸ K)_p ≅ M_p`, and associated primes transfer through the
-localization at a prime.
--/
+The proof localizes at `p`: the kernel localizes to zero (its elements are `S`-torsion and
+`S` consists of units in `R_p`), so `(M ⧸ K)_p ≅ M_p`, and associated primes transfer
+through the localization at a prime.  Noetherianity of `R` enters through the finite
+generation of `p`. -/
 lemma mem_associatedPrimes_of_mem_associatedPrimes_quot_ker [IsNoetherianRing R] {p : Ideal R}
     (hp : p ∈ associatedPrimes R (M ⧸ LinearMap.ker (LocalizedModule.mkLinearMap S M)))
     (hpDisj : p.carrier ∩ S = ∅) :
@@ -119,11 +140,9 @@ lemma mem_associatedPrimes_of_mem_associatedPrimes_quot_ker [IsNoetherianRing R]
       ((isNoetherianRing_iff_ideal_fg R).mp ‹IsNoetherianRing R› _)
   simpa [Localization.AtPrime.under_maximalIdeal] using hComap
 
-/--
-The quotient half of Bourbaki, *Algèbre commutative*, Ch. IV, §1, no. 2, Prop. 6: the
-associated primes of `M ⧸ ker(M → S⁻¹M)` are exactly the associated primes of `M` that are
-disjoint from `S`.
--/
+/-- The quotient half of Bourbaki, *Algèbre commutative*, Ch. IV, §1, no. 2, Prop. 6: the
+associated primes of `M ⧸ ker (M → S⁻¹M)` are exactly the associated primes of `M` that are
+disjoint from `S`. -/
 theorem associatedPrimes_quot_ker_mkLinearMap [IsNoetherianRing R] :
     associatedPrimes R (M ⧸ LinearMap.ker (LocalizedModule.mkLinearMap S M)) =
       { p ∈ associatedPrimes R M | p.carrier ∩ S = ∅ } := by
@@ -134,7 +153,6 @@ theorem associatedPrimes_quot_ker_mkLinearMap [IsNoetherianRing R] :
     fun p hp ↦ Or.resolve_left
       (associatedPrimes.subset_union_of_exact (Submodule.injective_subtype _)
         (LinearMap.exact_subtype_mkQ (LinearMap.ker (LocalizedModule.mkLinearMap S M))) hp.1)
-      fun hpKer ↦ (meets_of_mem_associatedPrimes_ker S hpKer).ne_empty hp.2
+      fun hpKer ↦ (inter_nonempty_of_mem_associatedPrimes_ker S hpKer).ne_empty hp.2
 
-end CommutativeAlgebra
 end HarderNarasimhan
