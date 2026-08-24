@@ -56,7 +56,7 @@ termination/compactness input to ensure the inductive construction reaches `⊥`
 class StrongDescendingChainCondition' {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : Intvl ℒ → S) : Prop where
-  wdcc' : ∀ x : ℕ → ℒ, (sax : StrictAnti x) → ∃ N : ℕ, μ ⟨x (N +1), x N, sax <| lt_add_one N⟩ = ⊤
+  sdcc' : ∀ x : ℕ → ℒ, (sax : StrictAnti x) → ∃ N : ℕ, μ ⟨x (N +1), x N, sax <| lt_add_one N⟩ = ⊤
 
 open Classical in
 /--
@@ -79,7 +79,7 @@ structure JordanHolderFiltration {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [B
 where
   filtration : ℕ → ℒ
   antitone : Antitone filtration
-  fin_len : ∃ N : ℕ, filtration N =⊥
+  fin_len : ∃ N : ℕ, filtration N = ⊥
   strict_anti : StrictAntiOn filtration (Set.Iic (Nat.find fin_len))
   first_eq_top : filtration 0 = ⊤
   step_cond₁ : ∀ k : ℕ,  (hk : k < Nat.find (fin_len)) → μ ⟨filtration (k + 1), filtration k,
@@ -145,7 +145,7 @@ instance {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 {μ : Intvl ℒ → S} [h : StrongDescendingChainCondition' μ] :
 StrongDescendingChainCondition μ where
-  wdcc := fun f saf ↦ let ⟨N, hN⟩ := h.wdcc' f saf; ⟨N, hN ▸ le_top⟩
+  wdcc := fun f saf ↦ let ⟨N, hN⟩ := h.sdcc' f saf; ⟨N, hN ▸ le_top⟩
 
 
 /--
@@ -155,7 +155,7 @@ instance {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 {μ : Intvl ℒ → S} [h : StrongDescendingChainCondition' μ]
 {I : Intvl ℒ} : StrongDescendingChainCondition' (Resμ I μ) where
-  wdcc' := fun f saf ↦ h.wdcc' (fun n ↦ (f n).val) fun ⦃_ _⦄ hn ↦ saf hn
+  sdcc' := fun f saf ↦ h.sdcc' (fun n ↦ (f n).val) fun ⦃_ _⦄ hn ↦ saf hn
 
 
 /--
@@ -205,7 +205,7 @@ instance {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFo
 {S : Type*} [CompleteLinearOrder S]
 {μ : Intvl ℒ → S}
 [hftp : FiniteTotalPayoff μ] [hsl : SlopeLike μ] [hst : Semistable μ]
-[hwdcc' : StrongDescendingChainCondition' μ] {x : ℒ} {hx : ⊥ < x} :
+[hsdcc' : StrongDescendingChainCondition' μ] {x : ℒ} {hx : ⊥ < x} :
 FiniteTotalPayoff (Resμ ⟨⊥, x, hx⟩ μ) := by
   refine { fin_tot_payoff := ?_ }
   simp only [Resμ]

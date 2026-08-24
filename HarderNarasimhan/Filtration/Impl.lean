@@ -53,7 +53,7 @@ greatest elements.
 noncomputable def HNFil {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : Intvl ℒ → S) [hμ : μA_DescendingChainCondition μ] [hμcvx : ConvexI ⊤ μ]
-[h : μ_Admissible μ]
+[h : μAdmissible μ]
 (k : Nat) : ℒ :=
   match k with
   | 0 => ⊥
@@ -79,7 +79,7 @@ noncomputable def HNFil {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrd
 lemma HNFil_prop_of_def {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : Intvl ℒ → S) [hμ : μA_DescendingChainCondition μ] [hμcvx : ConvexI ⊤ μ]
-[h : μ_Admissible μ] :
+[h : μAdmissible μ] :
 ∀ n : Nat, (h' : HNFil μ n ≠ ⊤) →
 IsGreatest (StI μ ⟨HNFil μ n, ⊤, lt_top_iff_ne_top.2 h'⟩) (HNFil μ (n + 1)) := by
   intro n h'
@@ -99,7 +99,7 @@ the “greatest element” property in `HNFil_prop_of_def`.
 lemma HNFil_is_strict_mono {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : Intvl ℒ → S) [hμ : μA_DescendingChainCondition μ] [hμcvx : ConvexI ⊤ μ]
-[h : μ_Admissible μ] :
+[h : μAdmissible μ] :
 ∀ n : Nat, HNFil μ n ≠ ⊤ → HNFil μ n < HNFil μ (n + 1) := fun
     n hn ↦ lt_of_le_of_ne (HNFil_prop_of_def μ n hn).1.1.1 (HNFil_prop_of_def μ n hn).1.2.1
 
@@ -113,7 +113,7 @@ descending chain in the `>` well-founded order, contradicting `WellFoundedGT ℒ
 lemma HNFil_of_fin_len {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 [inst_3 : WellFoundedGT ℒ] {S : Type*} [CompleteLattice S]
 (μ : Intvl ℒ → S) [hμ : μA_DescendingChainCondition μ] [hμcvx : ConvexI ⊤ μ]
-[h : μ_Admissible μ]
+[h : μAdmissible μ]
 : ∃ N : Nat, HNFil μ N = ⊤ := by
   by_contra!
   exact (wellFounded_iff_isEmpty_descending_chain.1 inst_3.wf).elim
@@ -127,7 +127,7 @@ open Classical in
 noncomputable def HNlen {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : Intvl ℒ → S) [hμ : μA_DescendingChainCondition μ] [hμcvx : ConvexI ⊤ μ]
-[h : μ_Admissible μ] : Nat := Nat.find (HNFil_of_fin_len μ)
+[h : μAdmissible μ] : Nat := Nat.find (HNFil_of_fin_len μ)
 
 open Classical in
   /--
@@ -138,7 +138,7 @@ open Classical in
 lemma HNFil_ne_top_iff_lt_len {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 [WellFoundedGT ℒ] {S : Type*} [CompleteLattice S]
 (μ : Intvl ℒ → S) [hμ : μA_DescendingChainCondition μ] [hμcvx : ConvexI ⊤ μ]
-[h : μ_Admissible μ] :
+[h : μAdmissible μ] :
   ∀ n : Nat, HNFil μ n ≠ ⊤ ↔ n < HNlen μ := by
   intro n
   refine ⟨fun hn ↦ ?_, Nat.find_min (HNFil_of_fin_len μ)⟩
@@ -155,7 +155,7 @@ If `i < j ≤ HNlen μ`, then `HNFil μ i < HNFil μ j`.
 lemma HNFil_is_strict_mono' {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 [WellFoundedGT ℒ] {S : Type*} [CompleteLattice S]
 (μ : Intvl ℒ → S) [hμ : μA_DescendingChainCondition μ] [hμcvx : ConvexI ⊤ μ]
-[h : μ_Admissible μ] :
+[h : μAdmissible μ] :
 StrictMonoOn (HNFil μ) (Set.Iic (HNlen μ)) := by
   have key : ∀ i j : ℕ, i < j → j ≤ HNlen μ → HNFil μ i < HNFil μ j := fun i ↦
     Nat.le_induction
@@ -176,7 +176,7 @@ translation lemma `semistableI_iff`.
 lemma HNFil_piecewise_semistable {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 [WellFoundedGT ℒ] {S : Type*} [CompleteLattice S]
 (μ : Intvl ℒ → S)
-[hμ : μA_DescendingChainCondition μ] [hμcvx : ConvexI ⊤ μ] [h : μ_Admissible μ] :
+[hμ : μA_DescendingChainCondition μ] [hμcvx : ConvexI ⊤ μ] [h : μAdmissible μ] :
 ∀ i : ℕ, (h: i < Nat.find (HNFil_of_fin_len μ)) →
     Semistable (Resμ ⟨HNFil μ i, HNFil μ (i+1),
       HNFil_is_strict_mono' μ h.le h (lt_add_one i)⟩ μ) :=
@@ -198,7 +198,7 @@ The proof is an application of the internal obstruction lemma `prop3d7₂`.
 lemma HNFil_μA_pseudo_strict_anti {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 [WellFoundedGT ℒ] {S : Type*} [CompleteLattice S]
 (μ : Intvl ℒ → S)
-[hμ : μA_DescendingChainCondition μ] [hμcvx : ConvexI ⊤ μ] [h : μ_Admissible μ] :
+[hμ : μA_DescendingChainCondition μ] [hμcvx : ConvexI ⊤ μ] [h : μAdmissible μ] :
 ∀ i : ℕ, (hi : i + 1 < Nat.find (HNFil_of_fin_len μ)) →
   ¬ μA μ ⟨HNFil μ i, HNFil μ (i+1),
       HNFil_is_strict_mono μ i (Nat.find_min (HNFil_of_fin_len μ) (Nat.lt_of_succ_lt hi))⟩ ≤

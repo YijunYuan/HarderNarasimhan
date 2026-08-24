@@ -476,11 +476,11 @@ Semistable (μ R M) ↔ ∃! p, p ∈ associatedPrimes R M := by
 Admissibility of the slope `μ R M`.
 
 For the coprimary filtration application we only need the “totality” branch of
-`μ_Admissible`: the codomain order is linear, hence total.
+`μAdmissible`: the codomain order is linear, hence total.
 -/
 instance {R : Type*} [CommRing R] [IsNoetherianRing R]
 {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] :
-μ_Admissible (μ R M) where
+μAdmissible (μ R M) where
   μ_adm := Or.inl inferInstance
 
 

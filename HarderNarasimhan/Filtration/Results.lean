@@ -53,7 +53,7 @@ noncomputable instance instInhabitedHarderNarasimhanFiltration
 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLattice S]
 {μ : Intvl ℒ → S}
-[hμ : μA_DescendingChainCondition μ] [hμcvx : Convex μ] [h : μ_Admissible μ] :
+[hμ : μA_DescendingChainCondition μ] [hμcvx : Convex μ] [h : μAdmissible μ] :
 ------------
 Inhabited (HarderNarasimhanFiltration μ) where
 ------------
@@ -131,7 +131,7 @@ theorem exists_relSeries_isIntervalSemistable
 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : Intvl ℒ → S)
-[hμ : μA_DescendingChainCondition μ] [hμcvx : Convex μ] [h : μ_Admissible μ] :
+[hμ : μA_DescendingChainCondition μ] [hμcvx : Convex μ] [h : μAdmissible μ] :
 ------------
 ∃ s : RelSeries (IntervalSemistableRel μ),
   s.head = ⊥ ∧ s.last = ⊤ ∧

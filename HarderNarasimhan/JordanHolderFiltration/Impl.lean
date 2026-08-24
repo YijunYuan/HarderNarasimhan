@@ -261,7 +261,7 @@ open Classical in
 lemma JHFil_refine_lt_step_payoff
 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [hacc : WellFoundedGT ℒ]
 {S : Type*} [CompleteLinearOrder S]
-(μ : Intvl ℒ → S) [hwdcc' : StrongDescendingChainCondition' μ]
+(μ : Intvl ℒ → S) [hsdcc' : StrongDescendingChainCondition' μ]
 (hμ : μ ⊤ ≠ ⊤)
 (hμsl : SlopeLike μ) (hst : Semistable μ)
 (hdc : ∀ x : ℕ → ℒ, (sax : StrictAnti x) → ∃ N : ℕ, μ ⟨x (N +1), x N, sax <| lt_add_one N⟩ = ⊤) :
@@ -824,10 +824,10 @@ lemma induction_on_length_of_JordanHolderFiltration (n : ℕ) :
       ∀ JH' : JordanHolderFiltration μ, JH'.length ≤ n := by
   induction n with
   | zero =>
-    intro ℒ ntl l bo wacc hmod S clo μ hftp hsl hst hwdcc' affine ⟨JH,hJH⟩ JH'
+    intro ℒ ntl l bo wacc hmod S clo μ hftp hsl hst hsdcc' affine ⟨JH,hJH⟩ JH'
     exact absurd (nonpos_iff_eq_zero.mp hJH) (JH_pos_len JH)
   | succ n hn =>
-    intro ℒ ntl l bo wacc hmod S clo μ hftp hsl hst hwdcc' affine ⟨JHy,hJHy⟩ JHx
+    intro ℒ ntl l bo wacc hmod S clo μ hftp hsl hst hsdcc' affine ⟨JHy,hJHy⟩ JHx
     let lenx := JHx.length
     let leny := JHy.length
     let x0 := JHx.filtration (lenx - 1)

@@ -12,7 +12,7 @@ Definitions for Harder–Narasimhan filtrations.
 
 This module introduces:
 
-* `μ_Admissible μ`: a mild hypothesis ensuring that the “stable breakpoint” machinery
+* `μAdmissible μ`: a mild hypothesis ensuring that the “stable breakpoint” machinery
   from semistability can be iterated (either because the codomain order is total, or
   because `μ` attains its relevant suprema),
 * `HarderNarasimhanFiltration μ`: the record packaging a finite increasing chain
@@ -26,7 +26,7 @@ The actual construction of the canonical filtration is carried out in
 
 API overview:
 
-* Import this file for the core types `μ_Admissible`, `HarderNarasimhanFiltration`, and the
+* Import this file for the core types `μAdmissible`, `HarderNarasimhanFiltration`, and the
   relation `IntervalSemistableRel` used to view filtrations as `RelSeries`.
 * Import `HarderNarasimhan.Filtration.Results` for the canonical inhabitant/uniqueness statements
   and for the “ready-to-use” `RelSeries` packaging.
@@ -36,7 +36,7 @@ namespace HarderNarasimhan
 
 /--
 Admissibility hypothesis for building Harder–Narasimhan filtrations.
-If your codomain `S` is a complete linear order, you typically get `μ_Admissible μ` for free.
+If your codomain `S` is a complete linear order, you typically get `μAdmissible μ` for free.
 
 We allow two common ways to ensure the “maximal stable element exists” steps needed
 in the construction:
@@ -48,7 +48,7 @@ This is phrased as a typeclass so later theorems can assume it implicitly.
 
 API note: this is the main extra hypothesis needed for the existence theorem.
 -/
-class μ_Admissible {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
+class μAdmissible {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : Intvl ℒ → S) : Prop where
   μ_adm : (Std.Total (· ≤ · : S → S → Prop)) ∨ ∀ I : Intvl ℒ,  IsAttained μ I
@@ -61,7 +61,7 @@ This instance uses the fact that linearity implies totality of `≤`.
 instance {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLinearOrder S]
 {μ : Intvl ℒ → S} :
-μ_Admissible μ where
+μAdmissible μ where
   μ_adm := Or.inl Std.instTotalLeOfIsLinearPreorder
 
 open Classical in

@@ -39,37 +39,37 @@ API note: this instance is the main entry point for “there exists a JH filtrat
 instance {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLinearOrder S]
 {μ : Intvl ℒ → S} [hftp : FiniteTotalPayoff μ] [hsl : SlopeLike μ]
-[hst : Semistable μ] [hwdcc' : StrongDescendingChainCondition' μ] :
+[hst : Semistable μ] [hsdcc' : StrongDescendingChainCondition' μ] :
 Nonempty (JordanHolderFiltration μ)
 := Nonempty.intro <|
-  have hanti : Antitone (impl.JHFil μ hftp.fin_tot_payoff hsl hst hwdcc'.wdcc') :=
+  have hanti : Antitone (impl.JHFil μ hftp.fin_tot_payoff hsl hst hsdcc'.sdcc') :=
     antitone_nat_of_succ_le fun n ↦ by
-      by_cases h : impl.JHFil μ hftp.fin_tot_payoff hsl hst hwdcc'.wdcc' n = ⊥
+      by_cases h : impl.JHFil μ hftp.fin_tot_payoff hsl hst hsdcc'.sdcc' n = ⊥
       · refine le_of_eq_of_le ?_ bot_le
         simp only [impl.JHFil, h]
         simp only [not_lt_bot, false_and, exists_false, Set.ofPred_false,
           Set.not_nonempty_empty, ↓reduceDIte]
-      · exact (impl.JHFil_anti_mono μ hftp.fin_tot_payoff hsl hst hwdcc'.wdcc' n <|
+      · exact (impl.JHFil_anti_mono μ hftp.fin_tot_payoff hsl hst hsdcc'.sdcc' n <|
           bot_lt_iff_ne_bot.2 h).le
   {
-  filtration := impl.JHFil μ hftp.fin_tot_payoff hsl hst hwdcc'.wdcc',
+  filtration := impl.JHFil μ hftp.fin_tot_payoff hsl hst hsdcc'.sdcc',
   antitone := hanti,
-  fin_len := impl.JHFil_fin_len μ hftp.fin_tot_payoff hsl hst hwdcc'.wdcc',
+  fin_len := impl.JHFil_fin_len μ hftp.fin_tot_payoff hsl hst hsdcc'.sdcc',
   strict_anti := fun x _ y hy hxy ↦
     lt_of_le_of_lt (hanti hxy) <|
-      impl.JHFil_anti_mono μ hftp.fin_tot_payoff hsl hst hwdcc'.wdcc' x <|
+      impl.JHFil_anti_mono μ hftp.fin_tot_payoff hsl hst hsdcc'.sdcc' x <|
         bot_lt_iff_ne_bot.2 <|
-          Nat.find_min (impl.JHFil_fin_len μ hftp.fin_tot_payoff hsl hst hwdcc'.wdcc') <|
+          Nat.find_min (impl.JHFil_fin_len μ hftp.fin_tot_payoff hsl hst hsdcc'.sdcc') <|
             lt_of_lt_of_le hxy hy,
   first_eq_top := of_eq_true (eq_self ⊤),
   step_cond₁ := fun k hk ↦
-    impl.JHFil_step_payoff_eq_tot μ hftp.fin_tot_payoff hsl hst hwdcc'.wdcc' k <|
+    impl.JHFil_step_payoff_eq_tot μ hftp.fin_tot_payoff hsl hst hsdcc'.sdcc' k <|
       bot_lt_iff_ne_bot.2 <|
-        (Nat.find_min <| impl.JHFil_fin_len μ hftp.fin_tot_payoff hsl hst hwdcc'.wdcc') hk,
+        (Nat.find_min <| impl.JHFil_fin_len μ hftp.fin_tot_payoff hsl hst hsdcc'.sdcc') hk,
   step_cond₂ := fun i hi z h' h'' ↦
-    impl.JHFil_refine_lt_step_payoff μ hftp.fin_tot_payoff hsl hst hwdcc'.wdcc' i
+    impl.JHFil_refine_lt_step_payoff μ hftp.fin_tot_payoff hsl hst hsdcc'.sdcc' i
       (bot_lt_iff_ne_bot.2 <| Nat.find_min
-        (impl.JHFil_fin_len μ hftp.fin_tot_payoff hsl hst hwdcc'.wdcc') hi) z h' h''
+        (impl.JHFil_fin_len μ hftp.fin_tot_payoff hsl hst hsdcc'.sdcc') hi) z h' h''
 }
 
 open Classical in
@@ -84,7 +84,7 @@ theorem exists_JordanHolderSeries
 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLinearOrder S]
 {μ : Intvl ℒ → S} [hftp : FiniteTotalPayoff μ] [hsl : SlopeLike μ]
-[hst : Semistable μ] [hwdcc' : StrongDescendingChainCondition' μ] :
+[hst : Semistable μ] [hsdcc' : StrongDescendingChainCondition' μ] :
 ∃ s : RelSeries (JordanHolderRel μ), s.head = ⊤ ∧ s.last = ⊥
 := by
   have := (inferInstance : Nonempty (JordanHolderFiltration μ)).some
