@@ -68,7 +68,7 @@ open Classical in
 noncomputable def JHFil
 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [hacc : WellFoundedGT ℒ]
 {S : Type*} [CompleteLinearOrder S]
-(μ : StrictIntvl ℒ → S)
+(μ : PayoffFunction ℒ S)
 (hμ : μ ⊤ ≠ ⊤)
 (hμsl : SlopeLike μ) (hst : Semistable μ)
 (hdc : ∀ x : ℕ → ℒ, (sax : StrictAnti x) →
@@ -93,7 +93,7 @@ noncomputable def JHFil
 lemma JHFil_anti_mono
 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [hacc : WellFoundedGT ℒ]
 {S : Type*} [CompleteLinearOrder S]
-(μ : StrictIntvl ℒ → S)
+(μ : PayoffFunction ℒ S)
 (hμ : μ ⊤ ≠ ⊤)
 (hμsl : SlopeLike μ) (hst : Semistable μ)
 (hdc : ∀ x : ℕ → ℒ, (sax : StrictAnti x) → ∃ N : ℕ, μ ⟨x (N +1), x N, sax <| lt_add_one N⟩ = ⊤) :
@@ -116,7 +116,7 @@ open Classical in
 lemma JHFil_step_payoff_eq_tot
 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [hacc : WellFoundedGT ℒ]
 {S : Type*} [CompleteLinearOrder S]
-(μ : StrictIntvl ℒ → S)
+(μ : PayoffFunction ℒ S)
 (hμ : μ ⊤ ≠ ⊤)
 (hμsl : SlopeLike μ) (hst : Semistable μ)
 (hdc : ∀ x : ℕ → ℒ, (sax : StrictAnti x) → ∃ N : ℕ, μ ⟨x (N + 1), x N, sax <| lt_add_one N⟩ = ⊤) :
@@ -178,7 +178,7 @@ lemma JHFil_step_payoff_eq_tot
           simp only [↓reduceDIte, exists_and_left, Set.mem_ofPred_eq, gt_iff_lt, and_imp,
             forall_exists_index, lt_self_iff_false, not_false_eq_true]
       conv_lhs =>
-        arg 1; arg 1
+        arg 2; arg 1
         unfold JHFil
         simp only [jh_kp2_ntop]
         simp only [↓reduceDIte, exists_and_left, Set.mem_ofPred_eq, gt_iff_lt, and_imp,
@@ -193,7 +193,7 @@ lemma JHFil_step_payoff_eq_tot
         forall_exists_index] at bot_jh_kp1_eq_ans
       exact bot_jh_kp1_eq_ans
     · conv_lhs =>
-        arg 1; arg 1
+        arg 2; arg 1
         unfold JHFil
         simp only [jh_kp2_ntop]
         simp only [↓reduceDIte]
@@ -240,7 +240,7 @@ lemma JHFil_step_payoff_eq_tot
 -/
 lemma JHFil_fin_len {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [hacc : WellFoundedGT ℒ]
 {S : Type*} [CompleteLinearOrder S]
-(μ : StrictIntvl ℒ → S)
+(μ : PayoffFunction ℒ S)
 (hμ : μ ⊤ ≠ ⊤)
 (hμsl : SlopeLike μ) (hst : Semistable μ)
 (hdc : ∀ x : ℕ → ℒ, (sax : StrictAnti x) → ∃ N : ℕ, μ ⟨x (N +1), x N, sax <| lt_add_one N⟩ = ⊤) :
@@ -261,7 +261,7 @@ open Classical in
 lemma JHFil_refine_lt_step_payoff
 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [hacc : WellFoundedGT ℒ]
 {S : Type*} [CompleteLinearOrder S]
-(μ : StrictIntvl ℒ → S) [hsdcc' : StrongDescendingChainCondition' μ]
+(μ : PayoffFunction ℒ S) [hsdcc' : StrongDescendingChainCondition' μ]
 (hμ : μ ⊤ ≠ ⊤)
 (hμsl : SlopeLike μ) (hst : Semistable μ)
 (hdc : ∀ x : ℕ → ℒ, (sax : StrictAnti x) → ∃ N : ℕ, μ ⟨x (N +1), x N, sax <| lt_add_one N⟩ = ⊤) :
@@ -292,7 +292,7 @@ lemma JHFil_refine_lt_step_payoff
     by_cases hk' : k = 0
     · simpa only [hk',JHFil]
     · conv_rhs =>
-        arg 1; arg 2; arg 6
+        arg 2; arg 2; arg 6
         rw [← Nat.sub_one_add_one hk']
       have hne : {p | ∃ (h : ⊥ < p), p < JHFil μ hμ hμsl hst hdc (k - 1) ∧ μ ⟨⊥, p, h⟩ =
         μ ⊤}.Nonempty := by
@@ -341,7 +341,7 @@ open Classical in
 -/
 lemma JH_pos_len {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLinearOrder S]
-{μ : StrictIntvl ℒ → S} : ∀ JH : JordanHolderFiltration μ, JH.length ≠ 0 := by
+{μ : PayoffFunction ℒ S} : ∀ JH : JordanHolderFiltration μ, JH.length ≠ 0 := by
   intro JH h
   have := JH.filtration_length
   rw [h, JH.first_eq_top] at this
@@ -553,7 +553,7 @@ lemma subseqIdx_inherit_step_predicate {ℒ : Type*} [Nontrivial ℒ] [Lattice �
 -/
 lemma μA_eq_μmin {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLinearOrder S]
-(μ : StrictIntvl ℒ → S)
+(μ : PayoffFunction ℒ S)
 [SlopeLike μ] (I : StrictIntvl ℒ) :
 μmin μ I = μA μ I := by
   convert Eq.symm <| (proposition_4_1 (Resμ I μ) inferInstance inferInstance).1
@@ -568,7 +568,7 @@ open Classical in
 -/
 lemma μ_bot_JH_eq_μ_tot {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLinearOrder S]
-{μ : StrictIntvl ℒ → S}
+{μ : PayoffFunction ℒ S}
 [hsl : SlopeLike μ] (JH : JordanHolderFiltration μ) :
 ∀ i : ℕ, (hi : i < JH.length) → μ ⟨⊥, JH.filtration i, by
   rw [← JH.filtration_length]
@@ -609,7 +609,7 @@ open Classical in
 lemma semistable_of_step_cond₂
 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLinearOrder S]
-(μ : StrictIntvl ℒ → S) [SlopeLike μ] [sdc : StrongDescendingChainCondition' μ]
+(μ : PayoffFunction ℒ S) [SlopeLike μ] [sdc : StrongDescendingChainCondition' μ]
 (filtration : ℕ → ℒ) (fin_len : ∃ N : ℕ, filtration N = ⊥)
 (strict_anti : ∀ i j : ℕ, i < j → j ≤ Nat.find (fin_len) → filtration j < filtration i) :
 (∀ i : ℕ, (hi : i < Nat.find fin_len) →
@@ -649,7 +649,7 @@ open Classical in
 lemma stable_of_step_cond₂
 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLinearOrder S]
-(μ : StrictIntvl ℒ → S) [SlopeLike μ] [sdc : StrongDescendingChainCondition' μ]
+(μ : PayoffFunction ℒ S) [SlopeLike μ] [sdc : StrongDescendingChainCondition' μ]
 (filtration : ℕ → ℒ) (fin_len : ∃ N : ℕ, filtration N = ⊥)
 (strict_anti : ∀ i j : ℕ, i < j → j ≤ Nat.find (fin_len) → filtration j < filtration i) :
 (∀ i : ℕ, (hi : i < Nat.find fin_len) →
@@ -695,7 +695,7 @@ open Classical in
 -/
 lemma step_cond₂_of_stable {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLinearOrder S]
-(μ : StrictIntvl ℒ → S) [SlopeLike μ] [sdc : StrongDescendingChainCondition' μ]
+(μ : PayoffFunction ℒ S) [SlopeLike μ] [sdc : StrongDescendingChainCondition' μ]
 (filtration : ℕ → ℒ) (fin_len : ∃ N : ℕ, filtration N = ⊥)
 (strict_anti : ∀ i j : ℕ, i < j → j ≤ Nat.find (fin_len) → filtration j < filtration i):
 (
@@ -772,7 +772,7 @@ open Classical in
 lemma semistable_resμ_of_jordanHolderFiltration
 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLinearOrder S]
-{μ : StrictIntvl ℒ → S}
+{μ : PayoffFunction ℒ S}
 [FiniteTotalPayoff μ] [SlopeLike μ] [Semistable μ]
 [StrongDescendingChainCondition' μ] [Affine μ] (JH : JordanHolderFiltration μ)
 (h : JH.filtration (JH.length - 1) < ⊤) :
@@ -810,7 +810,7 @@ lemma induction_on_length_of_JordanHolderFiltration (n : ℕ) :
     ∀ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
       [WellFoundedGT ℒ] [IsModularLattice ℒ]
       {S : Type*} [CompleteLinearOrder S]
-      {μ : StrictIntvl ℒ → S}
+      {μ : PayoffFunction ℒ S}
       [FiniteTotalPayoff μ] [SlopeLike μ] [Semistable μ]
       [StrongDescendingChainCondition' μ] [Affine μ],
       (∃ JH : JordanHolderFiltration μ, JH.length ≤ n) →
@@ -881,7 +881,7 @@ lemma induction_on_length_of_JordanHolderFiltration (n : ℕ) :
       (fun z ↦ Resμ Ires μ z = Resμ Ires μ ⊤)
               ⟨JH_raw (i + 1), JH_raw i, hfi⟩ := by
       intro j hj hfj
-      simp only [Resμ, StrictIntvl.ofSub, JH_raw]
+      simp only [Resμ, PayoffFunction.coe_mk, StrictIntvl.ofSub, JH_raw]
       have hj' : ∀ j : ℕ, j ≤ leny → μ ⟨⊥, x0 ⊔ JHy.filtration j, lt_of_lt_of_le hx0_bot
         le_sup_left⟩ = μ ⊤ := by
         refine fun j hj ↦ eq_of_le_of_ge ?_ ?_
@@ -939,7 +939,7 @@ lemma induction_on_length_of_JordanHolderFiltration (n : ℕ) :
           (fun j hj hfj w hw1 hw2 ↦ ((seesaw' μ hsl ↑(JH_raw (j + 1)) w ↑(JH_raw j)
               ⟨hw1, hw2⟩).1.2.2 ?_).1) i hi
         have := hcond1 j hj hfj
-        simp only [Resμ, StrictIntvl.ofSub] at this
+        simp only [Resμ, PayoffFunction.coe_mk, StrictIntvl.ofSub] at this
         have this' := JHx.step_cond₁ (JHx.length - 1) (Nat.sub_one_lt (JH_pos_len JHx))
         simp only [Nat.sub_one_add_one <| JH_pos_len JHx, JHx.filtration_length] at this'
         replace this' := ((seesaw' μ hsl ⊥ x0 ⊤ ⟨hx0_bot, nt⟩).2.2.1 this').2

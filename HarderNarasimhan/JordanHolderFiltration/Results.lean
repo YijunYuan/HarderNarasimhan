@@ -38,7 +38,7 @@ API note: this instance is the main entry point for “there exists a JH filtrat
 -/
 instance {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLinearOrder S]
-{μ : StrictIntvl ℒ → S} [hftp : FiniteTotalPayoff μ] [hsl : SlopeLike μ]
+{μ : PayoffFunction ℒ S} [hftp : FiniteTotalPayoff μ] [hsl : SlopeLike μ]
 [hst : Semistable μ] [hsdcc' : StrongDescendingChainCondition' μ] :
 Nonempty (JordanHolderFiltration μ)
 := Nonempty.intro <|
@@ -83,7 +83,7 @@ API note: this is the `RelSeries`-shaped entry point corresponding to the existe
 theorem exists_JordanHolderSeries
 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLinearOrder S]
-{μ : StrictIntvl ℒ → S} [hftp : FiniteTotalPayoff μ] [hsl : SlopeLike μ]
+{μ : PayoffFunction ℒ S} [hftp : FiniteTotalPayoff μ] [hsl : SlopeLike μ]
 [hst : Semistable μ] [hsdcc' : StrongDescendingChainCondition' μ] :
 ∃ s : RelSeries (JordanHolderRel μ), s.head = ⊤ ∧ s.last = ⊥
 := by
@@ -107,7 +107,7 @@ for the restricted slope on each step.
 theorem piecewise_stable_iff
 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLinearOrder S]
-(μ : StrictIntvl ℒ → S) [SlopeLike μ] [sdc : StrongDescendingChainCondition' μ]
+(μ : PayoffFunction ℒ S) [SlopeLike μ] [sdc : StrongDescendingChainCondition' μ]
 (filtration : ℕ → ℒ) (fin_len : ∃ N : ℕ, filtration N = ⊥)
 (strict_anti : ∀ i j : ℕ, i < j → j ≤ Nat.find (fin_len) → filtration j < filtration i) :
 (
@@ -133,7 +133,7 @@ Jordan–Hölder filtrations for `μ` have the same finite length.
 theorem length_eq_of_JordanHolderFiltration
 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ] [IsModularLattice ℒ]
 {S : Type*} [CompleteLinearOrder S]
-{μ : StrictIntvl ℒ → S}
+{μ : PayoffFunction ℒ S}
 [FiniteTotalPayoff μ] [SlopeLike μ] [Semistable μ]
 [StrongDescendingChainCondition' μ] [Affine μ] :
 ∀ JH1 JH2 : JordanHolderFiltration μ, JH1.length = JH2.length

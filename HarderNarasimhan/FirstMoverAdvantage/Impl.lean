@@ -36,7 +36,7 @@ namespace impl
 -/
 def prop4d1_badSet {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : StrictIntvl ℒ → S) : Set ℒ :=
+(μ : PayoffFunction ℒ S) : Set ℒ :=
   {YA | ∃ (h : YA < ⊤), ∀ xA < ⊤, ∃ xB, ∃ (hAB : xA < xB), ¬μ ⟨xA, xB, hAB⟩ ≤ μ ⟨YA, ⊤, h⟩}
 
 /-- `prop4d1₁_seq` is the auxiliary sequence used in the contradiction argument for
@@ -47,7 +47,7 @@ def prop4d1_badSet {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrd
 -/
 noncomputable def prop4d1₁_seq {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : StrictIntvl ℒ → S) [h₂ : WeakSlopeLike₁ μ]
+(μ : PayoffFunction ℒ S) [h₂ : WeakSlopeLike₁ μ]
 (h₃ : (prop4d1_badSet μ).Nonempty) (k : ℕ) : prop4d1_badSet μ :=
   match k with
   | 0 => ⟨h₃.choose,h₃.choose_spec⟩
@@ -70,7 +70,7 @@ noncomputable def prop4d1₁_seq {ℒ : Type*} [Nontrivial ℒ] [PartialOrder �
 -/
 lemma prop4d1_helper {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : StrictIntvl ℒ → S) :
+(μ : PayoffFunction ℒ S) :
 ⨅ (x : ℒ) (hx : x < ⊤), μ ⟨x, ⊤, hx⟩ = μmin μ ⊤ :=
   le_antisymm (le_iInf₂ fun u hu ↦ iInf₂_le u hu.2)
     (le_iInf₂ fun x hx ↦ iInf₂_le x ⟨bot_le, hx⟩)
@@ -84,7 +84,7 @@ lemma prop4d1_helper {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedO
 -/
 lemma prop4d1₁ (ℒ : Type*) [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 (S : Type*) [CompleteLattice S]
-(μ : StrictIntvl ℒ → S)
+(μ : PayoffFunction ℒ S)
 [h₁ : WeakAscendingChainCondition μ] [h₂ : WeakSlopeLike₁ μ] :
 μAstar μ = μmin μ ⊤ := by
   rw [← prop4d1_helper]
@@ -114,7 +114,7 @@ lemma prop4d1₁ (ℒ : Type*) [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder
 -/
 lemma prop4d1₂ (ℒ : Type*) [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 (S : Type*) [CompleteLattice S]
-(μ : StrictIntvl ℒ → S)
+(μ : PayoffFunction ℒ S)
 [h₁ : WeakAscendingChainCondition μ] [h₂ : WeakSlopeLike₁ μ] :
 μAstar μ ≤ μBstar μ :=
   (prop4d1₁ ℒ S μ).trans_le <| le_iSup₂_of_le ⊤ ⟨bot_lt_top, le_rfl⟩ le_rfl
@@ -125,10 +125,10 @@ lemma prop4d1₂ (ℒ : Type*) [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder
   weak ascending chain condition for the dualised slope on `ℒᵒᵈ`.
 -/
 lemma dual_wacc_of_sdcc {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
-{S : Type*} [CompleteLattice S] {μ : StrictIntvl ℒ → S}
+{S : Type*} [CompleteLattice S] {μ : PayoffFunction ℒ S}
 [h₁ : StrongDescendingChainCondition μ] :
-WeakAscendingChainCondition (fun (p : StrictIntvl ℒᵒᵈ) ↦
-  OrderDual.toDual <| μ ⟨p.right, p.left, p.lt⟩) :=
+WeakAscendingChainCondition (⟨fun (p : StrictIntvl ℒᵒᵈ) ↦
+  OrderDual.toDual <| μ ⟨p.right, p.left, p.lt⟩⟩) :=
   ⟨fun xd smf ↦ h₁.wdcc (fun n ↦ (xd n).ofDual) fun _ _ hab ↦ smf hab⟩
 
 
@@ -137,10 +137,10 @@ WeakAscendingChainCondition (fun (p : StrictIntvl ℒᵒᵈ) ↦
   first weak slope-like axiom for the dualised slope on `ℒᵒᵈ`.
 -/
 lemma dual_wsl₁_of_wsl₂ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
-{S : Type*} [CompleteLattice S] {μ : StrictIntvl ℒ → S}
+{S : Type*} [CompleteLattice S] {μ : PayoffFunction ℒ S}
 [h₂ : WeakSlopeLike₂ μ] :
-WeakSlopeLike₁ (fun (p : StrictIntvl ℒᵒᵈ) ↦
-  OrderDual.toDual <| μ ⟨p.right, p.left, p.lt⟩) :=
+WeakSlopeLike₁ (⟨fun (p : StrictIntvl ℒᵒᵈ) ↦
+  OrderDual.toDual <| μ ⟨p.right, p.left, p.lt⟩⟩) :=
   ⟨fun z hz ↦ h₂.wsl₂ ⟨z.right, z.left, z.lt⟩ hz⟩
 
 
@@ -152,9 +152,9 @@ WeakSlopeLike₁ (fun (p : StrictIntvl ℒᵒᵈ) ↦
 -/
 lemma dualμAstar_eq_μBstar {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : StrictIntvl ℒ → S) :
-OrderDual.ofDual <| μAstar (fun (p : StrictIntvl ℒᵒᵈ) ↦
-  OrderDual.toDual <| μ ⟨p.right, p.left, p.lt⟩) = μBstar μ
+(μ : PayoffFunction ℒ S) :
+OrderDual.ofDual <| μAstar (⟨fun (p : StrictIntvl ℒᵒᵈ) ↦
+  OrderDual.toDual <| μ ⟨p.right, p.left, p.lt⟩⟩) = μBstar μ
 :=
   le_antisymm
     (iSup₂_le fun a ha ↦ le_iSup₂_of_le (OrderDual.ofDual a) ⟨ha.2, ha.1⟩
@@ -168,9 +168,9 @@ OrderDual.ofDual <| μAstar (fun (p : StrictIntvl ℒᵒᵈ) ↦
 -/
 lemma dualμBstar_eq_μAstar {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : StrictIntvl ℒ → S) :
-OrderDual.ofDual <| μBstar (fun (p : StrictIntvl ℒᵒᵈ) ↦
-  OrderDual.toDual <| μ ⟨p.right, p.left, p.lt⟩) = μAstar μ
+(μ : PayoffFunction ℒ S) :
+OrderDual.ofDual <| μBstar (⟨fun (p : StrictIntvl ℒᵒᵈ) ↦
+  OrderDual.toDual <| μ ⟨p.right, p.left, p.lt⟩⟩) = μAstar μ
 :=
   le_antisymm
     (le_iInf₂ fun a ha ↦ iInf₂_le_of_le (OrderDual.toDual a) ⟨ha.2, ha.1⟩
@@ -185,7 +185,7 @@ OrderDual.ofDual <| μBstar (fun (p : StrictIntvl ℒᵒᵈ) ↦
 -/
 lemma prop4d3_helper {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : StrictIntvl ℒ → S) :
+(μ : PayoffFunction ℒ S) :
 ⨆ (y : ℒ) (hy : ⊥ < y), μ ⟨⊥, y, hy⟩ = μmax μ ⊤ :=
   le_antisymm (iSup₂_le fun y hy ↦ le_iSup₂_of_le y ⟨hy, le_top⟩ le_rfl)
     (iSup₂_le fun y hy ↦ le_iSup₂_of_le y hy.1 le_rfl)
@@ -201,13 +201,13 @@ lemma prop4d3_helper {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedO
 -/
 lemma prop4d3₁ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : StrictIntvl ℒ → S)
+(μ : PayoffFunction ℒ S)
 [h₁ : StrongDescendingChainCondition μ] [h₂ : WeakSlopeLike₂ μ] :
 μBstar μ = μmax μ ⊤ := by
   have := dual_wacc_of_sdcc (μ := μ)
   have := dual_wsl₁_of_wsl₂ (μ := μ)
-  have := prop4d1₁ ℒᵒᵈ Sᵒᵈ (fun (p : StrictIntvl ℒᵒᵈ) ↦ OrderDual.toDual <|
-    μ ⟨p.right, p.left, p.lt⟩)
+  have := prop4d1₁ ℒᵒᵈ Sᵒᵈ (⟨fun (p : StrictIntvl ℒᵒᵈ) ↦ OrderDual.toDual <|
+    μ ⟨p.right, p.left, p.lt⟩⟩)
   rw [← prop4d1_helper] at this
   rw [← prop4d3_helper, ← dualμAstar_eq_μBstar, this]
   rfl
@@ -219,13 +219,13 @@ lemma prop4d3₁ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder
 -/
 lemma prop4d3₂ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : StrictIntvl ℒ → S)
+(μ : PayoffFunction ℒ S)
 [h₁ : StrongDescendingChainCondition μ] [h₂ : WeakSlopeLike₂ μ] :
 μAstar μ ≤ μBstar μ := by
   have := dual_wacc_of_sdcc (μ := μ)
   have := dual_wsl₁_of_wsl₂ (μ := μ)
   exact (dualμAstar_eq_μBstar μ) ▸ (dualμBstar_eq_μAstar μ) ▸
-    prop4d1₂ ℒᵒᵈ Sᵒᵈ (fun (p : StrictIntvl ℒᵒᵈ) ↦ OrderDual.toDual <| μ ⟨p.right, p.left, p.lt⟩)
+    prop4d1₂ ℒᵒᵈ Sᵒᵈ (⟨fun (p : StrictIntvl ℒᵒᵈ) ↦ OrderDual.toDual <| μ ⟨p.right, p.left, p.lt⟩⟩)
 
 
 
@@ -238,7 +238,7 @@ lemma prop4d3₂ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder
 -/
 lemma rmk4d4 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : StrictIntvl ℒ → S)
+(μ : PayoffFunction ℒ S)
 (r : ℒ → ℝ) (hr₁ : Monotone r) (hr₂ : IsWellOrder (Set.range r) (· < ·))
 (h : ∀ z : StrictIntvl ℒ, r z.left = r z.right → μ z = ⊤) :
 ∀ x : ℕ → ℒ, (saf : StrictAnti x) → ∃ N : ℕ, μ ⟨⊥, x N, lt_of_le_of_lt bot_le <| saf <|

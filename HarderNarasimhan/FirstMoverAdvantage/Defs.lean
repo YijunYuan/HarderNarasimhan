@@ -36,7 +36,7 @@ This is the hypothesis used to control player A's "forward" moves.
 API note: this is one of the standard hypothesis packages used to compute `μAstar`.
 -/
 class WeakAscendingChainCondition {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
-{S : Type*} [CompleteLattice S] (μ : StrictIntvl ℒ → S) : Prop where
+{S : Type*} [CompleteLattice S] (μ : PayoffFunction ℒ S) : Prop where
   wacc : ∀ x : ℕ → ℒ, (smf : StrictMono x) →
     ∃ N : ℕ, μ ⟨x N, x (N+1), smf <| Nat.lt_add_one N⟩ ≤
       μ ⟨x N, ⊤, lt_of_lt_of_le (smf <| Nat.lt_add_one N) le_top⟩
@@ -47,7 +47,7 @@ In a well-founded partial order, strictly increasing sequences do not exist.
 Consequently, `WeakAscendingChainCondition μ` holds trivially.
 -/
 instance {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
-{S : Type*} [CompleteLattice S] {μ : StrictIntvl ℒ → S} : WeakAscendingChainCondition μ :=
+{S : Type*} [CompleteLattice S] {μ : PayoffFunction ℒ S} : WeakAscendingChainCondition μ :=
 {wacc := (fun f smf ↦ False.elim (not_strictMono_of_wellFoundedGT f smf))}
 
 
@@ -63,7 +63,7 @@ API note: this is the dual hypothesis package used to compute `μBstar`.
 -/
 class StrongDescendingChainCondition {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : StrictIntvl ℒ → S) : Prop where
+(μ : PayoffFunction ℒ S) : Prop where
   wdcc : ∀ x : ℕ → ℒ, (saf : StrictAnti x) →
     ∃ N : ℕ, μ ⟨⊥, x N, lt_of_le_of_lt bot_le <| saf <| Nat.lt_add_one N⟩ ≤
       μ ⟨x (N+1), x N, saf <| Nat.lt_add_one N⟩
@@ -78,7 +78,7 @@ API note: this is a weakening of `SlopeLike` tailored to the first-mover advanta
 -/
 class WeakSlopeLike₁ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : StrictIntvl ℒ → S) : Prop where
+(μ : PayoffFunction ℒ S) : Prop where
   wsl₁ : ∀ z : StrictIntvl ℒ, (hz :z.right < ⊤) →
     μ z ≤ μ ⟨z.left, ⊤,lt_trans z.lt hz⟩ ∨
     μ ⟨z.right, ⊤,hz⟩ ≤ μ ⟨z.left, ⊤,lt_trans z.lt hz⟩
@@ -93,7 +93,7 @@ API note: this is the dual weakening of `SlopeLike`, used for player B.
 -/
 class WeakSlopeLike₂ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : StrictIntvl ℒ → S) : Prop where
+(μ : PayoffFunction ℒ S) : Prop where
   wsl₂ : ∀ z : StrictIntvl ℒ, (hz : ⊥ < z.left) →
     μ ⟨⊥, z.right,lt_trans hz z.lt⟩ ≤ μ z ∨
     μ ⟨⊥, z.right,lt_trans hz z.lt⟩ ≤ μ ⟨⊥, z.left,hz⟩
@@ -105,7 +105,7 @@ This instance extracts the relevant disjunction by applying the `SlopeLike` axio
 -/
 instance {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLinearOrder S]
-{μ : StrictIntvl ℒ → S} [hμ : SlopeLike μ] :
+{μ : PayoffFunction ℒ S} [hμ : SlopeLike μ] :
 WeakSlopeLike₁ μ :=
   { wsl₁ := fun z hz ↦
     (hμ.slopelike z.left z.right ⊤ ⟨z.lt,hz⟩).1.imp id le_of_lt }
@@ -117,7 +117,7 @@ This instance extracts the relevant disjunction by applying the `SlopeLike` axio
 -/
 instance {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLinearOrder S]
-{μ : StrictIntvl ℒ → S} [hμ : SlopeLike μ] :
+{μ : PayoffFunction ℒ S} [hμ : SlopeLike μ] :
 WeakSlopeLike₂ μ :=
   { wsl₂ := fun z hz ↦
     (hμ.slopelike ⊥ z.left z.right ⟨hz,z.lt⟩).2.2.1.elim (Or.inr ∘ le_of_lt) Or.inl }

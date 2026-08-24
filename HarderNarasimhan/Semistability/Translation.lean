@@ -31,7 +31,7 @@ API note: this theorem is the recommended bridge between the “global” and �
 -/
 theorem semistable_iff {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : StrictIntvl ℒ → S) :
+(μ : PayoffFunction ℒ S) :
 ------------
   Semistable μ ↔ semistableI μ ⊤
 ------------
@@ -47,7 +47,7 @@ API note: this is the primary transport lemma for switching between `semistableI
 -/
 theorem semistableI_iff {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : StrictIntvl ℒ → S)
+(μ : PayoffFunction ℒ S)
 (I : StrictIntvl ℒ) :
 ------------
 semistableI μ I ↔ Semistable (Resμ I μ)

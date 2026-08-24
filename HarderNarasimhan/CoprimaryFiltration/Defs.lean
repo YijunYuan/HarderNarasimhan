@@ -216,9 +216,9 @@ API note: this is the primary slope map exported by the coprimary layer.
 noncomputable abbrev μ (R : Type*) [CommRing R] [IsNoetherianRing R]
 (M : Type*) [AddCommGroup M] [Module R M] [Module.Finite R M] :
 ------------
-StrictIntvl (ℒ R M) → (S R)
+PayoffFunction (ℒ R M) (S R)
 ------------
-:= fun I ↦ .principal ((_μ R M) I).toFinset
+:= ⟨fun I ↦ .principal ((_μ R M) I).toFinset⟩
 
 /--
 Predicate asserting that a module is coprimary.

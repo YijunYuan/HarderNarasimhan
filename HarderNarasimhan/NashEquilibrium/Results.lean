@@ -29,7 +29,7 @@ This is Remark 4.10 (preliminary inequality) in the development.
 -/
 lemma μmin_lt_μ_lt_μmax {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : StrictIntvl ℒ → S) :
+(μ : PayoffFunction ℒ S) :
 ∀ I : StrictIntvl ℒ, μmin μ I ≤ μ I ∧ μ I ≤ μmax μ I
 := impl.rmk4d10₀ μ
 
@@ -42,7 +42,7 @@ API note: this lemma is a convenient gateway for proving/using `NashEquilibrium 
 -/
 lemma remark_4_10 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : StrictIntvl ℒ → S) :
+(μ : PayoffFunction ℒ S) :
 (
   μBstar μ ≤ μAstar μ ↔ ∀ x : ℒ, (hx : x ≠ ⊤) → ∀ y : ℒ, (hy : ⊥ < y) →
     μmin μ ⟨⊥, y,hy⟩ ≤ μmax μ ⟨x, ⊤,lt_top_iff_ne_top.2 hx⟩
@@ -68,7 +68,7 @@ Proposition 4.11: relating `μmin μ ⊤ = μmax μ ⊤` and the inequality `μB
 -/
 lemma proposition_4_11 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : StrictIntvl ℒ → S) :
+(μ : PayoffFunction ℒ S) :
 (
   μmin μ ⊤ = μmax μ ⊤ → μBstar μ ≤ μAstar μ
 ) ∧ (
@@ -85,7 +85,7 @@ under a local “gap” condition.
 -/
 lemma proposition_4_12 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : StrictIntvl ℒ → S)
+(μ : PayoffFunction ℒ S)
 (h : ∀ x : ℒ, (hx : x ≠ ⊥ ∧ x ≠ ⊤) → ¬ μ ⟨⊥, x,bot_lt_iff_ne_bot.2 hx.1⟩ ≤ μ ⊤ ∨
   μ ⊤ ≤ μ ⟨x, ⊤,lt_top_iff_ne_top.2 hx.2⟩) :
 μmax μ ⊤ = μ ⊤ → μmin μ ⊤ = μmax μ ⊤
@@ -97,7 +97,7 @@ Remark 4.13: `SlopeLike` provides the “gap” condition used in Proposition 4.
 -/
 lemma remark_4_13 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : StrictIntvl ℒ → S) (hμ : SlopeLike μ) :
+(μ : PayoffFunction ℒ S) (hμ : SlopeLike μ) :
 ∀ x : ℒ, (hx : x ≠ ⊥ ∧ x ≠ ⊤) →
   ¬ μ ⟨⊥, x,bot_lt_iff_ne_bot.2 hx.1⟩ ≤ μ ⊤ ∨
     μ ⊤ ≤ μ ⟨x, ⊤,lt_top_iff_ne_top.2 hx.2⟩
@@ -110,7 +110,7 @@ under the dual local condition.
 -/
 lemma proposition_4_14 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : StrictIntvl ℒ → S)
+(μ : PayoffFunction ℒ S)
 (h : ∀ x : ℒ, (hx : x ≠ ⊥ ∧ x ≠ ⊤) →
   μ ⟨⊥, x,bot_lt_iff_ne_bot.2 hx.1⟩ ≤ μ ⊤ ∨
   ¬ μ ⊤ ≤ μ ⟨x, ⊤,lt_top_iff_ne_top.2 hx.2⟩) :
@@ -123,7 +123,7 @@ Remark 4.15: `SlopeLike` provides the dual local condition used in Proposition 4
 -/
 lemma remark_4_15 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : StrictIntvl ℒ → S) (hμ : SlopeLike μ) :
+(μ : PayoffFunction ℒ S) (hμ : SlopeLike μ) :
 ∀ x : ℒ, (hx : x ≠ ⊥ ∧ x ≠ ⊤) →
   μ ⟨⊥, x,bot_lt_iff_ne_bot.2 hx.1⟩ ≤ μ ⊤ ∨
   ¬ μ ⊤ ≤ μ ⟨x, ⊤,lt_top_iff_ne_top.2 hx.2⟩
@@ -136,7 +136,7 @@ and (under chain conditions) equivalence with Nash equilibrium.
 -/
 lemma proposition_4_16 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : StrictIntvl ℒ → S) (hμ : SlopeLike μ) :
+(μ : PayoffFunction ℒ S) (hμ : SlopeLike μ) :
 (
   List.TFAE [
   μmax μ ⊤ = μ ⊤, μmin μ ⊤ = μ ⊤, μmin μ ⊤ = μmax μ ⊤
@@ -161,7 +161,7 @@ follows from either one-sided hypothesis package.
 -/
 lemma proposition_4_18 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLinearOrder S]
-(μ : StrictIntvl ℒ → S) (hμ : Semistable μ) :
+(μ : PayoffFunction ℒ S) (hμ : Semistable μ) :
 (
   μBstar μ ≤ μAstar μ
 ) ∧ (
@@ -178,7 +178,7 @@ initial restrictions.
 -/
 lemma proposition_4_20 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : StrictIntvl ℒ → S)
+(μ : PayoffFunction ℒ S)
 (h₁ : ∀ x : ℒ, (hx : x ≠ ⊥) →
   WeakAscendingChainCondition (Resμ ⟨⊥, x,bot_lt_iff_ne_bot.2 hx⟩ μ))
 (h₂ :  ∀ x : ℒ, (hx : x ≠ ⊥) →
@@ -195,7 +195,7 @@ API note: this is the main user-facing equivalence statement of the Nash-equilib
 -/
 theorem NashEquil_equiv {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLinearOrder S]
-(μ : StrictIntvl ℒ → S) [hμ : SlopeLike μ]
+(μ : PayoffFunction ℒ S) [hμ : SlopeLike μ]
 [h₁ : WeakAscendingChainCondition μ] [h₂ : StrongDescendingChainCondition μ] :
 List.TFAE [
   μmax μ ⊤ = μ ⊤, μmin μ ⊤ = μ ⊤, μmin μ ⊤ = μmax μ ⊤, NashEquilibrium μ

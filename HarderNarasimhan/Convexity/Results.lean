@@ -35,7 +35,7 @@ hypothesis into the interval-local form expected by implementation lemmas.
 -/
 theorem ConvexI_top_iff_Convex {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : StrictIntvl ℒ → S) : ConvexI ⊤ μ ↔ Convex μ :=
+(μ : PayoffFunction ℒ S) : ConvexI ⊤ μ ↔ Convex μ :=
   impl.ConvexI_top_iff_Convex μ
 
 /--
@@ -49,7 +49,7 @@ using the equivalence `ConvexI ⊤ μ ↔ Convex μ`.
 -/
 lemma lemma_2_4 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   {S : Type*} [CompleteLattice S]
-  (μ : StrictIntvl ℒ → S) (hμcvx : Convex μ)
+  (μ : PayoffFunction ℒ S) (hμcvx : Convex μ)
   (x : ℒ) (w : ℒ) (hxw : ¬ x ≤ w)
   (u : ℒ) (t : ℒ)
   (huxw : u ≤ x ⊓ w) (hxwt : x ⊔ w ≤ t) :
@@ -83,7 +83,7 @@ later files.
 -/
 lemma remark_2_5 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   {S : Type*} [CompleteLattice S]
-  (μ : StrictIntvl ℒ → S) (hμcvx : Convex μ) :
+  (μ : PayoffFunction ℒ S) (hμcvx : Convex μ) :
 ------------
   Convex (μmax μ) ∧
   ∀  I : StrictIntvl ℒ,
@@ -109,7 +109,7 @@ paper.
 -/
 lemma proposition_2_6 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   {S : Type*} [CompleteLattice S]
-  (μ : StrictIntvl ℒ → S)
+  (μ : PayoffFunction ℒ S)
   (x : ℒ) (y : ℒ) (z : ℒ)
   (h : x < y ∧ y < z) :
 ------------
@@ -161,7 +161,7 @@ API note: this is stated with `μA μ ⊤` to use the abbreviation for the total
 -/
 lemma remark_2_7 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   {S : Type*} [CompleteLinearOrder S]
-  (μ : StrictIntvl ℒ → S) (hμcvx : Convex μ)
+  (μ : PayoffFunction ℒ S) (hμcvx : Convex μ)
   (x : ℒ) (h : ⊥ < x ∧ x < ⊤)
   (h' : μA μ ⟨⊥, x, h.1⟩ > μA μ ⊤) :
 ------------
@@ -181,7 +181,7 @@ itself dominated by `μA (u, x ⊔ y)`.
 -/
 lemma proposition_2_8 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   {S : Type*} [CompleteLattice S]
-  (μ : StrictIntvl ℒ → S) (hμcvx : Convex μ)
+  (μ : PayoffFunction ℒ S) (hμcvx : Convex μ)
   (x : ℒ) (y : ℒ) (u : ℒ)
   (h : u < x ∧ u < y) :
 ------------
@@ -210,7 +210,7 @@ and the subtype `↥I` equipped with the restricted function `Resμ I μ`.
 -/
 theorem ConvexI_iff_Convex_res {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(I : StrictIntvl ℒ) (μ : StrictIntvl ℒ → S) :
+(I : StrictIntvl ℒ) (μ : PayoffFunction ℒ S) :
 ConvexI I μ ↔ Convex (Resμ I μ) := by
   rw [← ConvexI_top_iff_Convex]
   constructor

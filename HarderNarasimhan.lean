@@ -4,6 +4,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yijun Yuan
 -/
 import HarderNarasimhan.StrictIntvl
+import HarderNarasimhan.PayoffFunction.Defs
+import HarderNarasimhan.PayoffFunction.Restrict
 import HarderNarasimhan.Basic
 import HarderNarasimhan.Interval
 

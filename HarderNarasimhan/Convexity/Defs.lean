@@ -37,7 +37,7 @@ As an API, the class exposes a single field `convex` that can be invoked as `h.c
 -/
 class Convex {ℒ : Type*} [Lattice ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : StrictIntvl ℒ → S) : Prop where
+(μ : PayoffFunction ℒ S) : Prop where
   convex : ∀ x y : ℒ, (h : ¬ x ≤ y) →
     μ ⟨x ⊓ y, x, inf_lt_left.2 h⟩ ≤ μ ⟨y, x ⊔ y, right_lt_sup.2 h⟩
 
@@ -50,7 +50,7 @@ This is the same inequality as `Convex`, but only required for `x,y` that lie in
 class ConvexI {ℒ : Type*} [Lattice ℒ]
 {S : Type*} [CompleteLattice S]
 (I : StrictIntvl ℒ)
-(μ : StrictIntvl ℒ → S) : Prop where
+(μ : PayoffFunction ℒ S) : Prop where
   convex : ∀ x y : ℒ, x ∈ I → y ∈ I → (h : ¬ x ≤ y) →
     μ ⟨x ⊓ y, x, inf_lt_left.2 h⟩ ≤ μ ⟨y, x ⊔ y, right_lt_sup.2 h⟩
 
@@ -69,7 +69,7 @@ lemma Convex_of_Convex_large {ℒ : Type*} [Lattice ℒ]
 (I₁ : StrictIntvl ℒ)
 (I₂ : StrictIntvl ℒ)
 (hI : I₁.left ≤ I₂.left ∧ I₂.right ≤ I₁.right)
-(μ : StrictIntvl ℒ → S) :
+(μ : PayoffFunction ℒ S) :
 ConvexI I₁ μ → ConvexI I₂ μ :=
   fun h ↦ { convex := fun x y hx hy hxy ↦ h.convex x y ⟨le_trans hI.1 hx.1,
     le_trans hx.2 hI.2⟩ ⟨le_trans hI.1 hy.1, le_trans hy.2 hI.2⟩ hxy }

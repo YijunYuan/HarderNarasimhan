@@ -32,7 +32,7 @@ API note: this is the main user-facing rewrite for `μAstar` under the standard 
 -/
 lemma proposition_4_1 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : StrictIntvl ℒ → S)
+(μ : PayoffFunction ℒ S)
 (h₁ : WeakAscendingChainCondition μ) (h₂ : WeakSlopeLike₁ μ) :
 (
   μAstar μ = μmin μ ⊤
@@ -50,9 +50,9 @@ original slope.
 -/
 lemma dualμAstar_eq_μBstar {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : StrictIntvl ℒ → S) :
-OrderDual.ofDual <| μAstar (fun (p : StrictIntvl ℒᵒᵈ) ↦
-  OrderDual.toDual <| μ ⟨p.right, p.left, p.lt⟩) = μBstar μ
+(μ : PayoffFunction ℒ S) :
+OrderDual.ofDual <| μAstar (⟨fun (p : StrictIntvl ℒᵒᵈ) ↦
+  OrderDual.toDual <| μ ⟨p.right, p.left, p.lt⟩⟩) = μBstar μ
 := impl.dualμAstar_eq_μBstar μ
 
 
@@ -64,9 +64,9 @@ original slope.
 -/
 lemma dualμBstar_eq_μAstar {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : StrictIntvl ℒ → S) :
-OrderDual.ofDual <| μBstar (fun (p : StrictIntvl ℒᵒᵈ) ↦
-  OrderDual.toDual <| μ ⟨p.right, p.left, p.lt⟩) = μAstar μ
+(μ : PayoffFunction ℒ S) :
+OrderDual.ofDual <| μBstar (⟨fun (p : StrictIntvl ℒᵒᵈ) ↦
+  OrderDual.toDual <| μ ⟨p.right, p.left, p.lt⟩⟩) = μAstar μ
 := impl.dualμBstar_eq_μAstar μ
 
 
@@ -79,7 +79,7 @@ API note: this is the main user-facing rewrite for `μBstar` under the standard 
 -/
 lemma proposition_4_3 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : StrictIntvl ℒ → S)
+(μ : PayoffFunction ℒ S)
 (h₁ : StrongDescendingChainCondition μ) (h₂ : WeakSlopeLike₂ μ) :
 (
   μBstar μ = μmax μ ⊤
@@ -98,7 +98,7 @@ chain condition.
 -/
 lemma remark_4_4 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : StrictIntvl ℒ → S)
+(μ : PayoffFunction ℒ S)
 (r : ℒ → ℝ) (hr₁ : Monotone r) (hr₂ : IsWellOrder (Set.range r) (· < ·))
 (h : ∀ z : StrictIntvl ℒ, r z.left = r z.right → μ z = ⊤) :
 StrongDescendingChainCondition μ

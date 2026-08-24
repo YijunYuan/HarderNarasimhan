@@ -23,8 +23,8 @@ Concretely, a strict interval `J` of `↥I` is sent to `μ ↑J`. This is the co
 throughout the development to reuse global constructions on subintervals.
 -/
 def Resμ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
-(I : StrictIntvl ℒ) {S : Type*} [CompleteLattice S] (μ : StrictIntvl ℒ → S) :
-StrictIntvl ↥I → S := fun J ↦ μ ↑J
+(I : StrictIntvl ℒ) {S : Type*} [CompleteLattice S] (μ : PayoffFunction ℒ S) :
+PayoffFunction ↥I S := ⟨fun J ↦ μ ↑J⟩
 
 /--
 Unfolding lemma for restriction: evaluating `Resμ` is definitionally `μ` on the underlying strict
@@ -33,7 +33,7 @@ interval.
 lemma μ_res_intvl {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {I : StrictIntvl ℒ}
 {S : Type*} [CompleteLattice S]
-{μ : StrictIntvl ℒ → S}
+{μ : PayoffFunction ℒ S}
 {J : StrictIntvl ↥I} :
 (Resμ I μ) J = μ ↑J := rfl
 
@@ -43,7 +43,7 @@ Restriction commutes with the “left-anchored supremum” construction `μmax`.
 lemma μmax_res_intvl {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {I : StrictIntvl ℒ}
 {S : Type*} [CompleteLattice S]
-{μ : StrictIntvl ℒ → S}
+{μ : PayoffFunction ℒ S}
 {J : StrictIntvl ↥I} :
 μmax (Resμ I μ) J = μmax μ ↑J :=
   le_antisymm
@@ -58,7 +58,7 @@ This is the dual statement to `μmax_res_intvl`.
 lemma μmin_res_intvl {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {I : StrictIntvl ℒ}
 {S : Type*} [CompleteLattice S]
-{μ : StrictIntvl ℒ → S}
+{μ : PayoffFunction ℒ S}
 {J : StrictIntvl ↥I} :
 μmin (Resμ I μ) J = μmin μ ↑J :=
   le_antisymm
@@ -74,7 +74,7 @@ This lemma is a key “locality” principle: computations of `μA` can be perfo
 lemma μA_res_intvl {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {I : StrictIntvl ℒ}
 {S : Type*} [CompleteLattice S]
-{μ : StrictIntvl ℒ → S}
+{μ : PayoffFunction ℒ S}
 {J : StrictIntvl ↥I} :
 μA (Resμ I μ) J = μA μ ↑J :=
   le_antisymm
@@ -92,7 +92,7 @@ This is the `μB`-analogue of `μA_res_intvl`.
 lemma μB_res_intvl {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {I : StrictIntvl ℒ}
 {S : Type*} [CompleteLattice S]
-{μ : StrictIntvl ℒ → S}
+{μ : PayoffFunction ℒ S}
 {J : StrictIntvl ↥I} :
 μB (Resμ I μ) J = μB μ ↑J :=
   le_antisymm

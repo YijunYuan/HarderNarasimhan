@@ -41,7 +41,7 @@ notation `Convex`.
 -/
 lemma proposition_3_2 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   {S : Type*} [CompleteLattice S]
-  (μ : StrictIntvl ℒ → S) (hμcvx : Convex μ)
+  (μ : PayoffFunction ℒ S) (hμcvx : Convex μ)
   (x : ℒ) (z : ℒ) (h : x < z)
   (h' : μA μ ⟨x, z, h⟩ = ⊤)
   (a : ℒ) (hax : a < x) :
@@ -72,7 +72,7 @@ API note: this is a common starting point for constructing filtrations.
 -/
 lemma proposition_3_4 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
   {S : Type*} [CompleteLattice S]
-  (μ : StrictIntvl ℒ → S)
+  (μ : PayoffFunction ℒ S)
   (hμDCC : μA_DescendingChainCondition μ) (hμcvx : Convex μ) :
 ------------
   (St μ).Nonempty
@@ -90,7 +90,7 @@ most one element, hence any two chosen stable points must be equal.
 -/
 lemma remark_3_5 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
   {S : Type*} [CompleteLinearOrder S]
-  (μ : StrictIntvl ℒ → S)
+  (μ : PayoffFunction ℒ S)
   (x : ℒ) (hxSt : x ∈ St μ)
   (y : ℒ) (hySt : y ∈ St μ) :
 ------------
@@ -113,7 +113,7 @@ API note: this lemma is a key interface for working with `St μ`.
 -/
 lemma proposition_3_7 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   {S : Type*} [CompleteLattice S]
-  (μ : StrictIntvl ℒ → S) (hμcvx : Convex μ)
+  (μ : PayoffFunction ℒ S) (hμcvx : Convex μ)
   (x : ℒ) (hxSt : x ∈ St μ) :
 ------------
   /- `(1)` -/
@@ -147,7 +147,7 @@ breakpoint is chosen.
 -/
 lemma proposition_3_8 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
   {S : Type*} [CompleteLattice S]
-  (μ : StrictIntvl ℒ → S) (hμcvx : Convex μ)
+  (μ : PayoffFunction ℒ S) (hμcvx : Convex μ)
   (h : (@Std.Total S (· ≤ ·)) ∨
      ∀ z : ℒ, (hz : ⊥ ≠ z) → IsAttained μ ⟨⊥, z , lt_of_le_of_ne bot_le hz⟩) :
 ------------

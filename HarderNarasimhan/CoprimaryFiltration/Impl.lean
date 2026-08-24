@@ -345,7 +345,7 @@ lemma prop3d12 {R : Type*} [CommRing R] [IsNoetherianRing R]
   refine iInf₂_le_of_le (lift_quot I.left I.right (locKer I))
     ⟨(lift_quot_middle I.left I.right I.lt.le (locKer I)).1,
      lt_of_le_of_ne (lift_quot_middle I.left I.right I.lt.le (locKer I)).2 hne⟩ (le_of_eq ?_)
-  simp only [DedekindCut.principal_inj]
+  simp only [PayoffFunction.coe_mk, DedekindCut.principal_inj]
   refine (Set.toFinset_congr ?_).trans (Set.toFinset_singleton _)
   ext w
   rw [Set.mem_ofPred_eq, associatedPrimes_quot_lift_locKer I, Set.mem_singleton_iff,

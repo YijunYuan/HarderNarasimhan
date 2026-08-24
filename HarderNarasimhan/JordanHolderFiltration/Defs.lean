@@ -42,7 +42,7 @@ API note: this is a standard non-degeneracy hypothesis for the Jordan–Hölder 
 -/
 class FiniteTotalPayoff {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : StrictIntvl ℒ → S) : Prop where
+(μ : PayoffFunction ℒ S) : Prop where
   fin_tot_payoff : μ ⊤ ≠ ⊤
 
 
@@ -55,7 +55,7 @@ termination/compactness input to ensure the inductive construction reaches `⊥`
 -/
 class StrongDescendingChainCondition' {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : StrictIntvl ℒ → S) : Prop where
+(μ : PayoffFunction ℒ S) : Prop where
   sdcc' : ∀ x : ℕ → ℒ, (sax : StrictAnti x) → ∃ N : ℕ, μ ⟨x (N +1), x N, sax <| lt_add_one N⟩ = ⊤
 
 open Classical in
@@ -75,7 +75,7 @@ API note: this structure is the central object of the Jordan–Hölder layer.
 @[ext]
 structure JordanHolderFiltration {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : StrictIntvl ℒ → S)
+(μ : PayoffFunction ℒ S)
 where
   filtration : ℕ → ℒ
   antitone : Antitone filtration
@@ -92,7 +92,7 @@ where
 namespace JordanHolderFiltration
 
 variable {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-  {S : Type*} [CompleteLattice S] {μ : StrictIntvl ℒ → S}
+  {S : Type*} [CompleteLattice S] {μ : PayoffFunction ℒ S}
 
 open Classical in
 /--
@@ -128,7 +128,7 @@ API note: use this relation when you want to express a filtration as a `RelSerie
 -/
 def JordanHolderRel {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : StrictIntvl ℒ → S) : SetRel ℒ ℒ :=
+(μ : PayoffFunction ℒ S) : SetRel ℒ ℒ :=
 {(x, y) | ∃ h : y < x,
     μ ⟨y, x, h⟩ = μ ⊤
   ∧ ∀ z : ℒ, (h' : y < z) → (h'' : z < x) →
@@ -143,7 +143,7 @@ inequality demanded by `StrongDescendingChainCondition`.
 -/
 instance {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-{μ : StrictIntvl ℒ → S} [h : StrongDescendingChainCondition' μ] :
+{μ : PayoffFunction ℒ S} [h : StrongDescendingChainCondition' μ] :
 StrongDescendingChainCondition μ where
   wdcc := fun f saf ↦ let ⟨N, hN⟩ := h.sdcc' f saf; ⟨N, hN ▸ le_top⟩
 
@@ -153,7 +153,7 @@ StrongDescendingChainCondition μ where
 -/
 instance {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-{μ : StrictIntvl ℒ → S} [h : StrongDescendingChainCondition' μ]
+{μ : PayoffFunction ℒ S} [h : StrongDescendingChainCondition' μ]
 {I : StrictIntvl ℒ} : StrongDescendingChainCondition' (Resμ I μ) where
   sdcc' := fun f saf ↦ h.sdcc' (fun n ↦ (f n).val) fun ⦃_ _⦄ hn ↦ saf hn
 
@@ -166,7 +166,7 @@ compatibility of `μ` with lattice operations (`⊓` and `⊔`). It is used to d
 -/
 class Affine {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : StrictIntvl ℒ → S) : Prop where
+(μ : PayoffFunction ℒ S) : Prop where
   affine : ∀ a b : ℒ, (h : ¬ a ≤ b) →
     μ ⟨a ⊓ b, a, inf_lt_left.2 h⟩ = μ ⟨b, a ⊔ b, right_lt_sup.2 h⟩
 
@@ -177,7 +177,7 @@ If `μ` is affine, then its restriction `Resμ I μ` to any interval `I` is affi
 -/
 instance {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-{μ : StrictIntvl ℒ → S} [haff : Affine μ] {I : StrictIntvl ℒ} :
+{μ : PayoffFunction ℒ S} [haff : Affine μ] {I : StrictIntvl ℒ} :
 Affine (Resμ I μ) where
   affine := fun a b h ↦ haff.affine a b h
 
@@ -189,7 +189,7 @@ This instance packages the standard implication by reducing to the internal conv
 -/
 instance {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-{μ : StrictIntvl ℒ → S} [haff : Affine μ] : Convex μ := by
+{μ : PayoffFunction ℒ S} [haff : Affine μ] : Convex μ := by
   rw [← ConvexI_top_iff_Convex]
   refine { convex := ?_ }
   intro x y hx hy hxy
@@ -203,7 +203,7 @@ filtration.
 -/
 instance {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLinearOrder S]
-{μ : StrictIntvl ℒ → S}
+{μ : PayoffFunction ℒ S}
 [hftp : FiniteTotalPayoff μ] [hsl : SlopeLike μ] [hst : Semistable μ]
 [hsdcc' : StrongDescendingChainCondition' μ] {x : ℒ} {hx : ⊥ < x} :
 FiniteTotalPayoff (Resμ ⟨⊥, x, hx⟩ μ) := by

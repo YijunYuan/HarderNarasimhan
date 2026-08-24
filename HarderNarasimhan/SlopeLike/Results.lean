@@ -34,7 +34,7 @@ definition.
 -/
 lemma seesaw {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : StrictIntvl ℒ → S) :
+(μ : PayoffFunction ℒ S) :
 ------------
 SlopeLike μ ↔
 ∀ (x y z : ℒ), (h : x < y ∧ y < z) → (
@@ -81,7 +81,7 @@ remaining relations need to be derived.
 -/
 lemma seesaw' {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : StrictIntvl ℒ → S) :
+(μ : PayoffFunction ℒ S) :
 ------------
 SlopeLike μ → ∀ (x y z : ℒ), (h : x < y ∧ y < z) →
 (

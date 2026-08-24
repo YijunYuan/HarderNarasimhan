@@ -44,7 +44,7 @@ API design:
 -/
 class SlopeLike {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : StrictIntvl ℒ → S) : Prop where
+(μ : PayoffFunction ℒ S) : Prop where
   slopelike : ∀ (x y z : ℒ), (h : x < y ∧ y < z) →
 (
   μ ⟨x, y, h.1⟩ ≤ μ ⟨x, z, lt_trans h.1 h.2⟩ ∨ μ ⟨y, z, h.2⟩ < μ ⟨x, z, lt_trans h.1 h.2⟩
@@ -74,8 +74,8 @@ noncomputable def μQuotient {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [
 [PosSMulStrictMono ℝ V]
 (r : StrictIntvl ℒ → NNReal)
 (d : StrictIntvl ℒ → V) :
-StrictIntvl ℒ → DedekindCut V :=
-  fun z ↦ if _ : r z > 0 then .principal ((r z)⁻¹ • d z) else ⊤
+PayoffFunction ℒ (DedekindCut V) :=
+  ⟨fun z ↦ if _ : r z > 0 then .principal ((r z)⁻¹ • d z) else ⊤⟩
 
 
 /--
@@ -87,7 +87,7 @@ elements.
 -/
 instance {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-{μ : StrictIntvl ℒ → S} [hsl : SlopeLike μ]
+{μ : PayoffFunction ℒ S} [hsl : SlopeLike μ]
 {z : StrictIntvl ℒ} : SlopeLike (Resμ z μ)
 := { slopelike := fun x y z h ↦ hsl.slopelike x.val y.val z.val h }
 

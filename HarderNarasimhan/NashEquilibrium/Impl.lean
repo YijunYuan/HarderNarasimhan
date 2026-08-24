@@ -35,7 +35,7 @@ namespace impl
 -/
 lemma rmk4d10₀ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : StrictIntvl ℒ → S) :
+(μ : PayoffFunction ℒ S) :
 ∀ I : StrictIntvl ℒ, μmin μ I ≤ μ I ∧ μ I ≤ μmax μ I :=
   fun I ↦ ⟨iInf₂_le I.left ⟨le_rfl, I.lt⟩,
     le_iSup₂_of_le I.right ⟨I.lt, le_rfl⟩ le_rfl⟩
@@ -48,7 +48,7 @@ lemma rmk4d10₀ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder
 -/
 lemma rmk4d10₁ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : StrictIntvl ℒ → S) :
+(μ : PayoffFunction ℒ S) :
 μBstar μ ≤ μAstar μ ↔
   ∀ x : ℒ, (hx : x ≠ ⊤) → ∀ y : ℒ, (hy : ⊥ < y) →
     μmin μ ⟨⊥, y,hy⟩ ≤ μmax μ ⟨x, ⊤,lt_top_iff_ne_top.2 hx⟩ := by
@@ -68,7 +68,7 @@ lemma rmk4d10₁ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder
 -/
 lemma rmk4d10₂ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : StrictIntvl ℒ → S)
+(μ : PayoffFunction ℒ S)
 (h₁ : WeakAscendingChainCondition μ) (h₂ : WeakSlopeLike₁ μ) :
 NashEquilibrium μ ↔
   ∀ y : ℒ, (hy : y ≠ ⊥) → μmin μ ⟨⊥, y,bot_lt_iff_ne_bot.2 hy⟩ ≤ μmin μ ⊤ := by
@@ -94,7 +94,7 @@ NashEquilibrium μ ↔
 -/
 lemma rmk4d10₃ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : StrictIntvl ℒ → S)
+(μ : PayoffFunction ℒ S)
 (h₁ : StrongDescendingChainCondition μ) (h₂ : WeakSlopeLike₂ μ) :
 NashEquilibrium μ ↔
   ∀ y : ℒ, (hy : y ≠ ⊤) → μmax μ ⊤ ≤ μmax μ ⟨y, ⊤,lt_top_iff_ne_top.2 hy⟩ := by
@@ -117,7 +117,7 @@ NashEquilibrium μ ↔
 -/
 lemma prop4d11₁ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : StrictIntvl ℒ → S) :
+(μ : PayoffFunction ℒ S) :
 μmin μ ⊤ = μmax μ ⊤ → μBstar μ ≤ μAstar μ := by
   have h₁ : μBstar μ ≤ μmax μ ⊤ :=
     iSup₂_le fun b hb ↦ le_trans (rmk4d10₀ μ ⟨⊥, b, hb.1⟩).1 <|
@@ -134,7 +134,7 @@ lemma prop4d11₁ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrde
 -/
 lemma prop4d11₂ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : StrictIntvl ℒ → S)
+(μ : PayoffFunction ℒ S)
 (h₁ : WeakAscendingChainCondition μ) (h₂ : WeakSlopeLike₁ μ)
 (h₁' : StrongDescendingChainCondition μ) (h₂' : WeakSlopeLike₂ μ) :
 μBstar μ ≤ μAstar μ → μmin μ ⊤ = μmax μ ⊤ :=
@@ -150,7 +150,7 @@ lemma prop4d11₂ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrde
 -/
 lemma prop4d12 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : StrictIntvl ℒ → S)
+(μ : PayoffFunction ℒ S)
 (h : ∀ x : ℒ, (hx : x ≠ ⊥ ∧ x ≠ ⊤) → ¬ μ ⟨⊥, x,bot_lt_iff_ne_bot.2 hx.1⟩ ≤ μ ⊤ ∨
   μ ⊤ ≤ μ ⟨x, ⊤,lt_top_iff_ne_top.2 hx.2⟩) :
 μmax μ ⊤ = μ ⊤ → μmin μ ⊤ = μmax μ ⊤ := by
@@ -169,7 +169,7 @@ lemma prop4d12 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder �
 -/
 lemma rmk4d13 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : StrictIntvl ℒ → S) (hμ : SlopeLike μ) :
+(μ : PayoffFunction ℒ S) (hμ : SlopeLike μ) :
 ∀ x : ℒ, (hx : x ≠ ⊥ ∧ x ≠ ⊤) → ¬ μ ⟨⊥, x,bot_lt_iff_ne_bot.2 hx.1⟩ ≤ μ ⊤ ∨
   μ ⊤ ≤ μ ⟨x, ⊤,lt_top_iff_ne_top.2 hx.2⟩ :=
   fun x hx ↦ ((hμ.slopelike ⊥ x ⊤
@@ -182,7 +182,7 @@ lemma rmk4d13 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder �
 -/
 lemma prop4d14 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : StrictIntvl ℒ → S)
+(μ : PayoffFunction ℒ S)
 (h : ∀ x : ℒ, (hx : x ≠ ⊥ ∧ x ≠ ⊤) → μ ⟨⊥, x,bot_lt_iff_ne_bot.2 hx.1⟩ ≤ μ ⊤ ∨
   ¬ μ ⊤ ≤ μ ⟨x, ⊤,lt_top_iff_ne_top.2 hx.2⟩) :
 μmin μ ⊤ = μ ⊤ → μmax μ ⊤ = μmin μ ⊤ := by
@@ -201,7 +201,7 @@ lemma prop4d14 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder �
 -/
 lemma rmk4d15 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : StrictIntvl ℒ → S) (hμ : SlopeLike μ) :
+(μ : PayoffFunction ℒ S) (hμ : SlopeLike μ) :
 ∀ x : ℒ, (hx : x ≠ ⊥ ∧ x ≠ ⊤) → μ ⟨⊥, x,bot_lt_iff_ne_bot.2 hx.1⟩ ≤ μ ⊤ ∨
   ¬ μ ⊤ ≤ μ ⟨x, ⊤,lt_top_iff_ne_top.2 hx.2⟩ :=
   fun x hx ↦ ((hμ.slopelike ⊥ x ⊤
@@ -215,7 +215,7 @@ lemma rmk4d15 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder �
 -/
 lemma prop4d16₁ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : StrictIntvl ℒ → S) (hμ : SlopeLike μ) :
+(μ : PayoffFunction ℒ S) (hμ : SlopeLike μ) :
 List.TFAE [
   μmax μ ⊤ = μ ⊤, μmin μ ⊤ = μ ⊤, μmin μ ⊤ = μmax μ ⊤
   ] := by
@@ -235,7 +235,7 @@ List.TFAE [
 -/
 lemma prop4d16₂ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : StrictIntvl ℒ → S) (hμ : SlopeLike μ)
+(μ : PayoffFunction ℒ S) (hμ : SlopeLike μ)
 (h₁ : WeakAscendingChainCondition μ) (h₂ : StrongDescendingChainCondition μ) :
 μmin μ ⊤ = μmax μ ⊤ ↔ NashEquilibrium μ := by
   have : ∀ (z : StrictIntvl ℒ) (hz : z.right < ⊤), μ z ≤
@@ -255,7 +255,7 @@ lemma prop4d16₂ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrde
 -/
 lemma prop4d18₁ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLinearOrder S]
-(μ : StrictIntvl ℒ → S) (hμ : Semistable μ) : μBstar μ ≤ μAstar μ := by
+(μ : PayoffFunction ℒ S) (hμ : Semistable μ) : μBstar μ ≤ μAstar μ := by
   rw [semistable_iff] at hμ
   have hstep : ∀ (x : ℒ) (hx : ⊥ < x), μA μ ⟨⊥, x, hx⟩ ≤ μAstar μ := fun x hx ↦
     le_of_not_gt <|
@@ -270,7 +270,7 @@ lemma prop4d18₁ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ
 -/
 lemma prop4d18₂ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLinearOrder S]
-(μ : StrictIntvl ℒ → S) (hμ : Semistable μ)
+(μ : PayoffFunction ℒ S) (hμ : Semistable μ)
 (h : (WeakAscendingChainCondition μ ∧ WeakSlopeLike₁ μ) ∨
   (StrongDescendingChainCondition μ ∧ WeakSlopeLike₂ μ)) :
 NashEquilibrium μ :=
@@ -286,7 +286,7 @@ NashEquilibrium μ :=
 -/
 lemma prop4d20 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : StrictIntvl ℒ → S)
+(μ : PayoffFunction ℒ S)
 (h₁ : ∀ x : ℒ, (hx : x ≠ ⊥) → WeakAscendingChainCondition (Resμ ⟨⊥, x,bot_lt_iff_ne_bot.2 hx⟩ μ))
 (h₂ :  ∀ x : ℒ, (hx : x ≠ ⊥) → WeakSlopeLike₁ (Resμ ⟨⊥, x,bot_lt_iff_ne_bot.2 hx⟩ μ)) :
 NashEquilibrium μ → Semistable μ := by
@@ -318,7 +318,7 @@ NashEquilibrium μ → Semistable μ := by
 -/
 theorem thm4d21 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLinearOrder S]
-(μ : StrictIntvl ℒ → S) (hμ : SlopeLike μ)
+(μ : PayoffFunction ℒ S) (hμ : SlopeLike μ)
 (h₁ : WeakAscendingChainCondition μ) (h₂ : StrongDescendingChainCondition μ) :
 List.TFAE [
   μmax μ ⊤ = μ ⊤, μmin μ ⊤ = μ ⊤, μmin μ ⊤ = μmax μ ⊤, NashEquilibrium μ,

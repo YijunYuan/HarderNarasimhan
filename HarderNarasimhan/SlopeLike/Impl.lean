@@ -43,7 +43,7 @@ like) a linear order.
 -/
 lemma prop4d6 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : StrictIntvl ℒ → S) :
+(μ : PayoffFunction ℒ S) :
 SlopeLike μ ↔ ∀ (x y z : ℒ), (h : x < y ∧ y < z) → (
   μ ⟨x, y, h.1⟩ < μ ⟨x, z, lt_trans h.1 h.2⟩ ∧ μ ⟨x, z, lt_trans h.1 h.2⟩ < μ ⟨y, z, h.2⟩
   ∨
@@ -138,14 +138,16 @@ lemma prop4d8 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder �
       · -- `r (x,y) = 0 < r (y,z)`: the strictly decreasing pattern
         refine Or.inr <| Or.inl ⟨hlt.trans_eq (etop _ hxy).symm, ?_⟩
         have h4 : r ⟨x, z, lt_trans h.1 h.2⟩ = r ⟨y, z, h.2⟩ := by rw [hr, hxy, zero_add]
-        simp only [μQuotient, gt_iff_lt, h', hyz, ↓reduceDIte, DedekindCut.principal_lt_principal]
+        simp only [μQuotient, PayoffFunction.coe_mk, gt_iff_lt, h', hyz, ↓reduceDIte,
+          DedekindCut.principal_lt_principal]
         exact h4 ▸ ((smul_lt_smul_iff_of_pos_left (inv_pos.2 h')).2 <|
           hd ▸ lt_add_of_pos_left (d ⟨y, z, h.2⟩) <| h₂ x y h.1 hxy)
     · rcases eq_zero_or_pos (r ⟨y, z, h.2⟩) with hyz | hyz
       · -- `r (y,z) = 0 < r (x,y)`: the strictly increasing pattern
         refine Or.inl ⟨?_, hlt.trans_eq (etop _ hyz).symm⟩
         have h4 : r ⟨x, z, lt_trans h.1 h.2⟩ = r ⟨x, y, h.1⟩ := by rw [hr, hyz, add_zero]
-        simp only [μQuotient, gt_iff_lt, h', hxy, ↓reduceDIte, DedekindCut.principal_lt_principal]
+        simp only [μQuotient, PayoffFunction.coe_mk, gt_iff_lt, h', hxy, ↓reduceDIte,
+          DedekindCut.principal_lt_principal]
         exact h4 ▸ ((smul_lt_smul_iff_of_pos_left (inv_pos.2 h')).2 <|
           hd ▸ lt_add_of_pos_right (d ⟨x, y, h.1⟩) <| h₂ y z h.2 hyz)
       · -- both short ranks positive: compare the underlying vectors directly
