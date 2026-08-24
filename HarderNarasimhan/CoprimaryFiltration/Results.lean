@@ -85,7 +85,7 @@ lemma proposition_3_13 {R : Type*} [CommRing R] [IsNoetherianRing R]
 {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] :
 ------------
 WellFoundedGT (ℒ R M) ∧
-μA_DescendingChainCondition (μ R M)
+(μ R M).ADCC
 ------------
 := ⟨inferInstance,inferInstance⟩
 
@@ -107,7 +107,7 @@ lemma remark_3_14 {R : Type*} [CommRing R] [IsNoetherianRing R]
 {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] :
 ------------
 List.TFAE [
-Semistable (μ R M),
+PayoffFunction.IsSemistable (μ R M),
 ∀ N : (ℒ R M), (hN : ⊥ < N) →
   μA (μ R M) ⟨⊥, N,hN⟩ = ({(((_μ R M) ⊤).toFinset.min' (μ_nonempty _))} : S₀ R),
 ∃! p, p ∈ associatedPrimes R M

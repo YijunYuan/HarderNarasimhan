@@ -7,7 +7,8 @@ import HarderNarasimhan.NashEquilibrium.Defs
 import HarderNarasimhan.FirstMoverAdvantage.Impl
 import HarderNarasimhan.FirstMoverAdvantage.Defs
 import HarderNarasimhan.SlopeLike.Defs
-import HarderNarasimhan.Semistability.Translation
+import HarderNarasimhan.PayoffFunction.Semistable.Breakpoints
+import HarderNarasimhan.Interval
 import Mathlib.Tactic.TFAE
 import Mathlib.Data.List.TFAE
 
@@ -255,11 +256,11 @@ lemma prop4d16₂ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrde
 -/
 lemma prop4d18₁ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLinearOrder S]
-(μ : PayoffFunction ℒ S) (hμ : Semistable μ) : μBstar μ ≤ μAstar μ := by
-  rw [semistable_iff] at hμ
+(μ : PayoffFunction ℒ S) (hμ : μ.IsSemistable) : μBstar μ ≤ μAstar μ := by
+  rw [PayoffFunction.isSemistable_iff_isBreakpoint_top] at hμ
   have hstep : ∀ (x : ℒ) (hx : ⊥ < x), μA μ ⟨⊥, x, hx⟩ ≤ μAstar μ := fun x hx ↦
     le_of_not_gt <|
-      hμ.out.choose_spec.choose_spec.1 x (StrictIntvl.mem_top x) (Ne.symm <| bot_lt_iff_ne_bot.1 hx)
+      hμ.not_lt x (StrictIntvl.mem_top x) (Ne.symm <| bot_lt_iff_ne_bot.1 hx)
   refine iSup₂_le fun x hx ↦ le_trans ?_ (hstep x hx.1)
   exact le_iInf₂ fun y hy ↦ iInf₂_le_of_le y hy (rmk4d10₀ μ ⟨y, x, hy.2⟩).2
 
@@ -270,7 +271,7 @@ lemma prop4d18₁ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ
 -/
 lemma prop4d18₂ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLinearOrder S]
-(μ : PayoffFunction ℒ S) (hμ : Semistable μ)
+(μ : PayoffFunction ℒ S) (hμ : μ.IsSemistable)
 (h : (WeakAscendingChainCondition μ ∧ WeakSlopeLike₁ μ) ∨
   (StrongDescendingChainCondition μ ∧ WeakSlopeLike₂ μ)) :
 NashEquilibrium μ :=
@@ -289,7 +290,7 @@ lemma prop4d20 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 (μ : PayoffFunction ℒ S)
 (h₁ : ∀ x : ℒ, (hx : x ≠ ⊥) → WeakAscendingChainCondition (Resμ ⟨⊥, x,bot_lt_iff_ne_bot.2 hx⟩ μ))
 (h₂ :  ∀ x : ℒ, (hx : x ≠ ⊥) → WeakSlopeLike₁ (Resμ ⟨⊥, x,bot_lt_iff_ne_bot.2 hx⟩ μ)) :
-NashEquilibrium μ → Semistable μ := by
+NashEquilibrium μ → μ.IsSemistable := by
   intro h
   replace h := h.nash_eq
   have key : ∀ (x : ℒ) (hx : ⊥ < x), μA μ ⟨⊥, x, hx⟩ = μmin μ ⟨⊥, x, hx⟩ := by
@@ -306,7 +307,7 @@ NashEquilibrium μ → Semistable μ := by
     intro x hx
     rw [← this]
     exact le_iSup₂_of_le x (bot_lt_iff_ne_bot.2 hx) le_rfl
-  exact {semistable := fun x hx ↦ (this x hx.ne').not_gt}
+  exact { not_lt := fun x hx ↦ (this x hx.ne').not_gt}
 
 
 
@@ -323,10 +324,10 @@ theorem thm4d21 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 List.TFAE [
   μmax μ ⊤ = μ ⊤, μmin μ ⊤ = μ ⊤, μmin μ ⊤ = μmax μ ⊤, NashEquilibrium μ,
   ] ∧
-(Semistable μ → NashEquilibrium μ) ∧
+(μ.IsSemistable → NashEquilibrium μ) ∧
 ((∀ x : ℒ, (hx : x ≠ ⊥) →
   WeakAscendingChainCondition (Resμ ⟨⊥, x,bot_lt_iff_ne_bot.2 hx⟩ μ)) →
-  NashEquilibrium μ → Semistable μ)
+  NashEquilibrium μ → μ.IsSemistable)
   := by
   constructor
   · have h16 := prop4d16₁ μ hμ

@@ -10,10 +10,8 @@ import HarderNarasimhan.Basic
 import HarderNarasimhan.Interval
 
 import HarderNarasimhan.PayoffFunction.Convex
-
-import HarderNarasimhan.Semistability.Defs
-import HarderNarasimhan.Semistability.Results
-import HarderNarasimhan.Semistability.Translation
+import HarderNarasimhan.PayoffFunction.Semistable.Defs
+import HarderNarasimhan.PayoffFunction.Semistable.Breakpoints
 
 import HarderNarasimhan.Filtration.Defs
 import HarderNarasimhan.Filtration.Results

@@ -52,7 +52,7 @@ greatest elements.
 -/
 noncomputable def HNFil {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : PayoffFunction ℒ S) [hμ : μA_DescendingChainCondition μ] [hμcvx : μ.IsConvexOn ⊤]
+(μ : PayoffFunction ℒ S) [hμ : μ.ADCC] [hμcvx : μ.IsConvexOn ⊤]
 [h : μAdmissible μ]
 (k : Nat) : ℒ :=
   match k with
@@ -63,7 +63,7 @@ noncomputable def HNFil {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrd
       ⊤
     else
       let I' := (⟨prev_term, ⊤ , lt_top_iff_ne_top.2 htop⟩ : StrictIntvl ℒ)
-      (impl.prop3d8₁' μ hμ I' (hμcvx.mono le_top)
+      (PayoffFunction.exists_isGreatest_breakpoints (hμcvx.mono le_top)
       (Or.casesOn h.μ_adm (fun h ↦ Or.inl h) fun h ↦
        Or.inr fun z hzI hz ↦ h ⟨I'.left, z ,  lt_of_le_of_ne hzI.left hz⟩)).choose
 
@@ -78,13 +78,13 @@ noncomputable def HNFil {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrd
 -/
 lemma HNFil_prop_of_def {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : PayoffFunction ℒ S) [hμ : μA_DescendingChainCondition μ] [hμcvx : μ.IsConvexOn ⊤]
+(μ : PayoffFunction ℒ S) [hμ : μ.ADCC] [hμcvx : μ.IsConvexOn ⊤]
 [h : μAdmissible μ] :
 ∀ n : Nat, (h' : HNFil μ n ≠ ⊤) →
-IsGreatest (StI μ ⟨HNFil μ n, ⊤, lt_top_iff_ne_top.2 h'⟩) (HNFil μ (n + 1)) := by
+IsGreatest (μ.breakpoints ⟨HNFil μ n, ⊤, lt_top_iff_ne_top.2 h'⟩) (HNFil μ (n + 1)) := by
   intro n h'
   simp only [HNFil, h']
-  exact (impl.prop3d8₁' μ hμ ⟨HNFil μ n, ⊤, h'.lt_top⟩
+  exact (PayoffFunction.exists_isGreatest_breakpoints (I := ⟨HNFil μ n, ⊤, h'.lt_top⟩)
     (hμcvx.mono le_top)
     (Or.casesOn h.μ_adm (fun h ↦ Or.inl h) fun h ↦
      Or.inr fun z hzI hz ↦ h ⟨HNFil μ n, z, lt_of_le_of_ne hzI.left hz⟩)).choose_spec
@@ -98,10 +98,10 @@ the “greatest element” property in `HNFil_prop_of_def`.
 -/
 lemma HNFil_is_strict_mono {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : PayoffFunction ℒ S) [hμ : μA_DescendingChainCondition μ] [hμcvx : μ.IsConvexOn ⊤]
+(μ : PayoffFunction ℒ S) [hμ : μ.ADCC] [hμcvx : μ.IsConvexOn ⊤]
 [h : μAdmissible μ] :
 ∀ n : Nat, HNFil μ n ≠ ⊤ → HNFil μ n < HNFil μ (n + 1) := fun
-    n hn ↦ lt_of_le_of_ne (HNFil_prop_of_def μ n hn).1.1.1 (HNFil_prop_of_def μ n hn).1.2.1
+    n hn ↦ lt_of_le_of_ne (HNFil_prop_of_def μ n hn).1.1.1 (HNFil_prop_of_def μ n hn).1.2
 
 
 /--
@@ -112,7 +112,7 @@ descending chain in the `>` well-founded order, contradicting `WellFoundedGT ℒ
 -/
 lemma HNFil_of_fin_len {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 [inst_3 : WellFoundedGT ℒ] {S : Type*} [CompleteLattice S]
-(μ : PayoffFunction ℒ S) [hμ : μA_DescendingChainCondition μ] [hμcvx : μ.IsConvexOn ⊤]
+(μ : PayoffFunction ℒ S) [hμ : μ.ADCC] [hμcvx : μ.IsConvexOn ⊤]
 [h : μAdmissible μ]
 : ∃ N : Nat, HNFil μ N = ⊤ := by
   by_contra!
@@ -126,7 +126,7 @@ open Classical in
 -/
 noncomputable def HNlen {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : PayoffFunction ℒ S) [hμ : μA_DescendingChainCondition μ] [hμcvx : μ.IsConvexOn ⊤]
+(μ : PayoffFunction ℒ S) [hμ : μ.ADCC] [hμcvx : μ.IsConvexOn ⊤]
 [h : μAdmissible μ] : Nat := Nat.find (HNFil_of_fin_len μ)
 
 open Classical in
@@ -137,7 +137,7 @@ open Classical in
   -/
 lemma HNFil_ne_top_iff_lt_len {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 [WellFoundedGT ℒ] {S : Type*} [CompleteLattice S]
-(μ : PayoffFunction ℒ S) [hμ : μA_DescendingChainCondition μ] [hμcvx : μ.IsConvexOn ⊤]
+(μ : PayoffFunction ℒ S) [hμ : μ.ADCC] [hμcvx : μ.IsConvexOn ⊤]
 [h : μAdmissible μ] :
   ∀ n : Nat, HNFil μ n ≠ ⊤ ↔ n < HNlen μ := by
   intro n
@@ -154,7 +154,7 @@ If `i < j ≤ HNlen μ`, then `HNFil μ i < HNFil μ j`.
 -/
 lemma HNFil_is_strict_mono' {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 [WellFoundedGT ℒ] {S : Type*} [CompleteLattice S]
-(μ : PayoffFunction ℒ S) [hμ : μA_DescendingChainCondition μ] [hμcvx : μ.IsConvexOn ⊤]
+(μ : PayoffFunction ℒ S) [hμ : μ.ADCC] [hμcvx : μ.IsConvexOn ⊤]
 [h : μAdmissible μ] :
 StrictMonoOn (HNFil μ) (Set.Iic (HNlen μ)) := by
   have key : ∀ i j : ℕ, i < j → j ≤ HNlen μ → HNFil μ i < HNFil μ j := fun i ↦
@@ -176,15 +176,12 @@ translation lemma `semistableI_iff`.
 lemma HNFil_piecewise_semistable {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 [WellFoundedGT ℒ] {S : Type*} [CompleteLattice S]
 (μ : PayoffFunction ℒ S)
-[hμ : μA_DescendingChainCondition μ] [hμcvx : μ.IsConvexOn ⊤] [h : μAdmissible μ] :
+[hμ : μ.ADCC] [hμcvx : μ.IsConvexOn ⊤] [h : μAdmissible μ] :
 ∀ i : ℕ, (h: i < Nat.find (HNFil_of_fin_len μ)) →
-    Semistable (Resμ ⟨HNFil μ i, HNFil μ (i+1),
+    PayoffFunction.IsSemistable (Resμ ⟨HNFil μ i, HNFil μ (i+1),
       HNFil_is_strict_mono' μ h.le h (lt_add_one i)⟩ μ) :=
-  fun i hi ↦ (semistableI_iff μ ⟨HNFil μ i, HNFil μ (i+1),
-    HNFil_is_strict_mono' μ hi.le hi (lt_add_one i)⟩).1 <|
-    impl.prop3d7₁ μ ⟨HNFil μ i, ⊤, lt_top_iff_ne_top.2 <|
-    Nat.find_min (HNFil_of_fin_len μ) hi⟩ (HNFil μ (i + 1))
-    (HNFil_prop_of_def μ i (Nat.find_min (HNFil_of_fin_len μ) hi)).1
+  fun i hi ↦ (PayoffFunction.mem_breakpoints.1
+    (HNFil_prop_of_def μ i (Nat.find_min (HNFil_of_fin_len μ) hi)).1).isSemistable_restrict
 
 open Classical in
 /--
@@ -198,7 +195,7 @@ The proof is an application of the internal obstruction lemma `prop3d7₂`.
 lemma HNFil_μA_pseudo_strict_anti {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 [WellFoundedGT ℒ] {S : Type*} [CompleteLattice S]
 (μ : PayoffFunction ℒ S)
-[hμ : μA_DescendingChainCondition μ] [hμcvx : μ.IsConvexOn ⊤] [h : μAdmissible μ] :
+[hμ : μ.ADCC] [hμcvx : μ.IsConvexOn ⊤] [h : μAdmissible μ] :
 ∀ i : ℕ, (hi : i + 1 < Nat.find (HNFil_of_fin_len μ)) →
   ¬ μA μ ⟨HNFil μ i, HNFil μ (i+1),
       HNFil_is_strict_mono μ i (Nat.find_min (HNFil_of_fin_len μ) (Nat.lt_of_succ_lt hi))⟩ ≤
@@ -208,9 +205,8 @@ lemma HNFil_μA_pseudo_strict_anti {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] 
   have hi : HNFil μ i ≠ ⊤ := Nat.find_min (HNFil_of_fin_len μ) (lt_trans (lt_add_one i) hj)
   have hi' : HNFil μ (i + 1) < HNFil μ (i + 1 + 1) :=
     HNFil_is_strict_mono μ (i + 1) (Nat.find_min (HNFil_of_fin_len μ) hj)
-  exact impl.prop3d7₂ μ ⟨HNFil μ i, ⊤, lt_top_iff_ne_top.2 hi⟩
+  exact (PayoffFunction.mem_breakpoints.1 (HNFil_prop_of_def μ i hi).1).not_A_le
     (hμcvx.mono le_top)
-    (HNFil μ (i + 1)) (HNFil_prop_of_def μ i hi).1 (HNFil μ (i + 1 + 1))
     ⟨le_of_lt <| lt_trans (HNFil_is_strict_mono μ i hi) hi', le_top⟩ hi'
 
 open Classical in
@@ -231,19 +227,19 @@ the unique one satisfying the expected axioms.
 -/
 theorem theorem3d10 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLinearOrder S]
-(μ : PayoffFunction ℒ S) (hμ : μA_DescendingChainCondition μ) (hμcvx : μ.IsConvexOn ⊤)
+(μ : PayoffFunction ℒ S) (hμ : μ.ADCC) (hμcvx : μ.IsConvexOn ⊤)
 (f : ℕ → ℒ) (hf0 : f 0 = ⊥)
 (hffin : ∃ n : ℕ, f n = ⊤)
 (hfsi : ∀ i : ℕ, ∀ j : ℕ, i < j → j ≤ Nat.find hffin → f i < f j)
 (ffst : ∀ i : ℕ, i ≥ Nat.find hffin → f i = ⊤)
 (hss : ∀ j : ℕ, (hj : j < Nat.find hffin) →
-  Semistable (Resμ ⟨f j, f (j+1), hfsi j (j+1) (lt_add_one j) hj⟩ μ))
+  PayoffFunction.IsSemistable (Resμ ⟨f j, f (j+1), hfsi j (j+1) (lt_add_one j) hj⟩ μ))
 (hmua: ∀ i : ℕ, ∀ j : ℕ, (hij : i < j) → (hj : j < Nat.find hffin) →
   μA μ ⟨f i, f (i+1), hfsi i (i+1) (lt_add_one i) <| (by omega)⟩ >
   μA μ ⟨f j, f (j+1), hfsi j (j+1) (lt_add_one j) <| hj⟩)
 : f = HNFil μ := by
-  have hss := fun j hj ↦ (semistableI_iff μ ⟨f j, f (j+1), hfsi j (j+1) (lt_add_one j) hj⟩).2
-    <| hss j hj
+  have hss := fun j hj ↦ (PayoffFunction.isBreakpoint_right_iff
+    (I := ⟨f j, f (j+1), hfsi j (j+1) (lt_add_one j) hj⟩)).2 <| hss j hj
   let HNFilt := HNFil μ
   funext k
   induction k with
@@ -281,27 +277,27 @@ theorem theorem3d10 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
       have h₁₀ : μA μ ⟨HNFilt n, HNFilt (n+1), h₃⟩ ≤ μA μ ⟨f (i-1), f i, h₇⟩ := by
         have h₁₁ := hss (i-1) h₈
         simp only [Nat.sub_one_add_one h₉.ne'] at h₁₁
-        exact le_trans h₆ <| le_of_not_gt (h₁₁.out.choose_spec.2.1 (HNFilt (n + 1) ⊔ f (i - 1))
+        exact le_trans h₆ <| le_of_not_gt (h₁₁.not_lt (HNFilt (n + 1) ⊔ f (i - 1))
           ⟨le_sup_right,sup_le_iff.2 ⟨(Nat.find_spec h₂).2,le_of_lt h₇⟩⟩
           <| ne_of_lt <|right_lt_sup.2 h₄)
-      have hspec := (HNFil_prop_of_def μ n
-        (ne_of_lt (lt_of_lt_of_le h₃ le_top))).1.out.choose_spec.choose_spec
+      have hspec := PayoffFunction.mem_breakpoints.1 (HNFil_prop_of_def μ n
+        (ne_of_lt (lt_of_lt_of_le h₃ le_top))).1
       have h₁₂ : i = n + 1 := by
         refine eq_of_le_of_not_lt' h₁₅ ?_
         by_contra! hlt
         have hlt' : HNFilt n < f (n+1) := hn.ge.trans_lt (hfsi n (n+1) (lt_add_one n) h₁)
         have h₁₃ := hmua n (i-1) (Nat.lt_sub_of_add_lt hlt) h₈
         simp only [hn, Nat.sub_one_add_one h₉.ne', gt_iff_lt] at h₁₃
-        exact hspec.1 (f (n+1)) ⟨le_of_lt hlt', le_top⟩ (ne_of_lt hlt')
+        exact hspec.not_lt (f (n+1)) ⟨le_of_lt hlt', le_top⟩ (ne_of_lt hlt')
           (lt_of_le_of_lt h₁₀ h₁₃)
       have h₁₄ := le_of_le_of_eq (Nat.find_spec h₂).2 (congrArg f h₁₂)
       have h₁₉ : HNFilt n < f (n+1) := lt_of_lt_of_le h₃ h₁₄
       have h₁₆ : f n < HNFilt (n + 1) := hn.le.trans_lt h₃
-      have h₁₇ := le_of_not_gt <| (hss n h₁).out.choose_spec.choose_spec.1
+      have h₁₇ := le_of_not_gt <| (hss n h₁).not_lt
         (HNFilt (n+1)) ⟨le_of_lt h₁₆,h₁₄⟩ <| ne_of_lt h₁₆
       simp only [hn] at h₁₇
-      exact eq_of_le_of_ge (hspec.2 (f (n+1)) ⟨le_of_lt h₁₉,le_top⟩ (ne_of_lt h₁₉)
-        (eq_of_le_of_not_lt h₁₇ <| hspec.1 (f (n+1)) ⟨le_of_lt h₁₉,le_top⟩ <|
+      exact eq_of_le_of_ge (hspec.le_of_eq (f (n+1)) ⟨le_of_lt h₁₉,le_top⟩ (ne_of_lt h₁₉)
+        (eq_of_le_of_not_lt h₁₇ <| hspec.not_lt (f (n+1)) ⟨le_of_lt h₁₉,le_top⟩ <|
           ne_of_lt h₁₉).symm) h₁₄
     · apply Nat.gt_of_not_le at h₁
       rw [ffst (n+1) (Nat.le_of_succ_le h₁),eq_comm]

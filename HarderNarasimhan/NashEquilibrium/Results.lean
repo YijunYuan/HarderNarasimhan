@@ -161,7 +161,7 @@ follows from either one-sided hypothesis package.
 -/
 lemma proposition_4_18 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLinearOrder S]
-(μ : PayoffFunction ℒ S) (hμ : Semistable μ) :
+(μ : PayoffFunction ℒ S) (hμ : μ.IsSemistable) :
 (
   μBstar μ ≤ μAstar μ
 ) ∧ (
@@ -183,7 +183,7 @@ lemma proposition_4_20 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrde
   WeakAscendingChainCondition (Resμ ⟨⊥, x,bot_lt_iff_ne_bot.2 hx⟩ μ))
 (h₂ :  ∀ x : ℒ, (hx : x ≠ ⊥) →
   WeakSlopeLike₁ (Resμ ⟨⊥, x,bot_lt_iff_ne_bot.2 hx⟩ μ)) :
-NashEquilibrium μ → Semistable μ
+NashEquilibrium μ → μ.IsSemistable
 := impl.prop4d20 μ h₁ h₂
 
 
@@ -201,10 +201,10 @@ List.TFAE [
   μmax μ ⊤ = μ ⊤, μmin μ ⊤ = μ ⊤, μmin μ ⊤ = μmax μ ⊤, NashEquilibrium μ
   ]
 ∧ (
-  Semistable μ → NashEquilibrium μ
+  μ.IsSemistable → NashEquilibrium μ
 ) ∧ (
   (∀ x : ℒ, (hx : x ≠ ⊥) → WeakAscendingChainCondition (Resμ ⟨⊥, x,bot_lt_iff_ne_bot.2 hx⟩ μ)) →
-  NashEquilibrium μ → Semistable μ
+  NashEquilibrium μ → μ.IsSemistable
 )
 := impl.thm4d21 μ hμ h₁ h₂
 

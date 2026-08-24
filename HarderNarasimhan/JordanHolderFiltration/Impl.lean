@@ -5,7 +5,8 @@ Authors: Yijun Yuan
 -/
 import Mathlib.Order.CompleteLattice.Defs
 import Mathlib.Order.BoundedOrder.Basic
-import HarderNarasimhan.Semistability.Defs
+import HarderNarasimhan.PayoffFunction.Semistable.Defs
+import HarderNarasimhan.Interval
 import HarderNarasimhan.SlopeLike.Impl
 import HarderNarasimhan.NashEquilibrium.Impl
 import Mathlib.Data.List.TFAE
@@ -69,7 +70,7 @@ noncomputable def JHFil
 {S : Type*} [CompleteLinearOrder S]
 (μ : PayoffFunction ℒ S)
 (hμ : μ ⊤ ≠ ⊤)
-(hμsl : SlopeLike μ) (hst : Semistable μ)
+(hμsl : SlopeLike μ) (hst : μ.IsSemistable)
 (hdc : ∀ x : ℕ → ℒ, (sax : StrictAnti x) →
   ∃ N : ℕ, μ ⟨x (N +1), x N, sax <| lt_add_one N⟩ = ⊤) (k : ℕ) : ℒ :=
   match k with
@@ -94,7 +95,7 @@ lemma JHFil_anti_mono
 {S : Type*} [CompleteLinearOrder S]
 (μ : PayoffFunction ℒ S)
 (hμ : μ ⊤ ≠ ⊤)
-(hμsl : SlopeLike μ) (hst : Semistable μ)
+(hμsl : SlopeLike μ) (hst : μ.IsSemistable)
 (hdc : ∀ x : ℕ → ℒ, (sax : StrictAnti x) → ∃ N : ℕ, μ ⟨x (N +1), x N, sax <| lt_add_one N⟩ = ⊤) :
 ∀ k : ℕ, JHFil μ hμ hμsl hst hdc k > ⊥ →
   JHFil μ hμ hμsl hst hdc k > JHFil μ hμ hμsl hst hdc (k + 1) := by
@@ -117,7 +118,7 @@ lemma JHFil_step_payoff_eq_tot
 {S : Type*} [CompleteLinearOrder S]
 (μ : PayoffFunction ℒ S)
 (hμ : μ ⊤ ≠ ⊤)
-(hμsl : SlopeLike μ) (hst : Semistable μ)
+(hμsl : SlopeLike μ) (hst : μ.IsSemistable)
 (hdc : ∀ x : ℕ → ℒ, (sax : StrictAnti x) → ∃ N : ℕ, μ ⟨x (N + 1), x N, sax <| lt_add_one N⟩ = ⊤) :
 ∀ k : ℕ,  (hk : JHFil μ hμ hμsl hst hdc k > ⊥) → μ ⟨JHFil μ hμ hμsl hst hdc (k + 1),
   JHFil μ hμ hμsl hst hdc k,JHFil_anti_mono μ hμ hμsl hst hdc k hk⟩ = μ ⊤ := by
@@ -241,7 +242,7 @@ lemma JHFil_fin_len {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder �
 {S : Type*} [CompleteLinearOrder S]
 (μ : PayoffFunction ℒ S)
 (hμ : μ ⊤ ≠ ⊤)
-(hμsl : SlopeLike μ) (hst : Semistable μ)
+(hμsl : SlopeLike μ) (hst : μ.IsSemistable)
 (hdc : ∀ x : ℕ → ℒ, (sax : StrictAnti x) → ∃ N : ℕ, μ ⟨x (N +1), x N, sax <| lt_add_one N⟩ = ⊤) :
 ∃ N : ℕ, JHFil μ hμ hμsl hst hdc N = ⊥ := by
   by_contra! hc
@@ -262,7 +263,7 @@ lemma JHFil_refine_lt_step_payoff
 {S : Type*} [CompleteLinearOrder S]
 (μ : PayoffFunction ℒ S) [hsdcc' : StrongDescendingChainCondition' μ]
 (hμ : μ ⊤ ≠ ⊤)
-(hμsl : SlopeLike μ) (hst : Semistable μ)
+(hμsl : SlopeLike μ) (hst : μ.IsSemistable)
 (hdc : ∀ x : ℕ → ℒ, (sax : StrictAnti x) → ∃ N : ℕ, μ ⟨x (N +1), x N, sax <| lt_add_one N⟩ = ⊤) :
 ∀ k : ℕ,  (hk : JHFil μ hμ hμsl hst hdc k > ⊥) → ∀ z : ℒ, (h' : JHFil μ hμ hμsl hst hdc (k + 1) < z)
   → (h'' : z < JHFil μ hμ hμsl hst hdc k) →
@@ -616,7 +617,8 @@ lemma semistable_of_step_cond₂
     μ ⟨filtration (i+1), z, h'⟩ < μ ⟨filtration (i+1), filtration i,
       strict_anti i (i+1) (lt_add_one i) hi⟩)
 → (
-∀ i : ℕ, (hi : i < Nat.find fin_len) → Semistable (Resμ ⟨filtration (i+1), filtration i,
+∀ i : ℕ, (hi : i < Nat.find fin_len) →
+  PayoffFunction.IsSemistable (Resμ ⟨filtration (i+1), filtration i,
   strict_anti i (i+1) (lt_add_one i) hi⟩ μ)
 ) := by
   intro h i hi
@@ -656,18 +658,20 @@ lemma stable_of_step_cond₂
     μ ⟨filtration (i+1), z, h'⟩ < μ ⟨filtration (i+1), filtration i,
       strict_anti i (i+1) (lt_add_one i) hi⟩)
 → (
-∀ i : ℕ, (hi : i < Nat.find fin_len) → Stable (Resμ ⟨filtration (i+1), filtration i,
+∀ i : ℕ, (hi : i < Nat.find fin_len) →
+  PayoffFunction.IsStable (Resμ ⟨filtration (i+1), filtration i,
   strict_anti i (i+1) (lt_add_one i) hi⟩ μ)
 ) := by
     intro h i hi
     refine {
-      toSemistable := semistable_of_step_cond₂ μ filtration fin_len strict_anti h i hi,
-      stable := ?_ }
+      toIsSemistable := semistable_of_step_cond₂ μ filtration fin_len strict_anti h i hi,
+      ne := ?_ }
     · intro x hx hx'
       let stepI : StrictIntvl ℒ :=
         ⟨filtration (i + 1), filtration i, strict_anti i (i + 1) (lt_add_one i) hi⟩
       have hx_left : filtration (i + 1) < x.val :=
         lt_of_le_of_ne x.prop.1 fun hc ↦ hx.ne' <| Subtype.coe_inj.1 hc.symm
+      change μA (Resμ stepI μ) ⟨⊥, x, hx⟩ ≠ μA (Resμ stepI μ) ⊤
       have hAstar_step := (proposition_4_1 (Resμ stepI μ) inferInstance inferInstance).1
       have hAstar_x := (proposition_4_1 (Resμ ⟨filtration (i + 1), x.val, hx_left⟩ μ)
         inferInstance inferInstance).1
@@ -698,7 +702,8 @@ lemma step_cond₂_of_stable {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [Bound
 (filtration : ℕ → ℒ) (fin_len : ∃ N : ℕ, filtration N = ⊥)
 (strict_anti : ∀ i j : ℕ, i < j → j ≤ Nat.find (fin_len) → filtration j < filtration i):
 (
-∀ i : ℕ, (hi : i < Nat.find fin_len) → Stable (Resμ ⟨filtration (i+1), filtration i,
+∀ i : ℕ, (hi : i < Nat.find fin_len) →
+  PayoffFunction.IsStable (Resμ ⟨filtration (i+1), filtration i,
   strict_anti i (i+1) (lt_add_one i) hi⟩ μ)
 )
 → (∀ i : ℕ, (hi : i < Nat.find fin_len) →
@@ -712,9 +717,10 @@ lemma step_cond₂_of_stable {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [Bound
   let midI : ↥stepI := ⟨z, le_of_lt hz, le_of_lt hz'⟩
   have hmid_ne_bot : ⊥ < midI := bot_lt_iff_ne_bot.2 fun hc ↦ ne_of_gt hz (congrArg Subtype.val hc)
   have hmid_ne_top : midI < ⊤ := lt_top_iff_ne_top.2 fun hc ↦ ne_of_lt hz' (congrArg Subtype.val hc)
-  have hss := (hst i hi).toSemistable.semistable midI hmid_ne_bot
-  simp only [gt_iff_lt, not_lt] at hss
-  have hst' := lt_of_le_of_ne hss ((hst i hi).stable midI hmid_ne_bot hmid_ne_top)
+  have hss := (hst i hi).toIsSemistable.not_lt midI hmid_ne_bot
+  simp only [not_lt] at hss
+  have hst' : μA (Resμ stepI μ) ⟨⊥, midI, hmid_ne_bot⟩ < μA (Resμ stepI μ) ⊤ :=
+    lt_of_le_of_ne hss ((hst i hi).ne midI hmid_ne_bot hmid_ne_top)
   have hAstar_step := (proposition_4_1 (Resμ stepI μ) inferInstance inferInstance).1
   unfold μAstar at hAstar_step
   rw [hAstar_step] at hst'
@@ -728,7 +734,7 @@ lemma step_cond₂_of_stable {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [Bound
     rfl
   rw [hb, hAstar_mid] at hst'
   have hNash_step := (impl.thm4d21 (Resμ stepI μ) inferInstance inferInstance inferInstance).2.1
-    (hst i hi).toSemistable
+    (hst i hi).toIsSemistable
   have hμmin_step := (List.TFAE.out
     (impl.thm4d21 (Resμ stepI μ) inferInstance inferInstance inferInstance).1 1 3).2 hNash_step
   rw [hμmin_step] at hst'
@@ -772,10 +778,10 @@ lemma semistable_resμ_of_jordanHolderFiltration
 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLinearOrder S]
 {μ : PayoffFunction ℒ S}
-[FiniteTotalPayoff μ] [SlopeLike μ] [Semistable μ]
+[FiniteTotalPayoff μ] [SlopeLike μ] [μ.IsSemistable]
 [StrongDescendingChainCondition' μ] [μ.IsAffine] (JH : JordanHolderFiltration μ)
 (h : JH.filtration (JH.length - 1) < ⊤) :
-Semistable (Resμ ⟨JH.filtration (JH.length - 1), ⊤,h⟩ μ) := by
+PayoffFunction.IsSemistable (Resμ ⟨JH.filtration (JH.length - 1), ⊤,h⟩ μ) := by
   apply (thm4d21 (Resμ ⟨JH.filtration (JH.length - 1), ⊤,h⟩ μ) inferInstance
     inferInstance inferInstance).2.2 (fun _ _ ↦ inferInstance)
   apply (List.TFAE.out (thm4d21 (Resμ ⟨JH.filtration (JH.length - 1), ⊤,h⟩ μ)
@@ -810,7 +816,7 @@ lemma induction_on_length_of_JordanHolderFiltration (n : ℕ) :
       [WellFoundedGT ℒ] [IsModularLattice ℒ]
       {S : Type*} [CompleteLinearOrder S]
       {μ : PayoffFunction ℒ S}
-      [FiniteTotalPayoff μ] [SlopeLike μ] [Semistable μ]
+      [FiniteTotalPayoff μ] [SlopeLike μ] [μ.IsSemistable]
       [StrongDescendingChainCondition' μ] [μ.IsAffine],
       (∃ JH : JordanHolderFiltration μ, JH.length ≤ n) →
       ∀ JH' : JordanHolderFiltration μ, JH'.length ≤ n := by
@@ -1123,7 +1129,7 @@ lemma induction_on_length_of_JordanHolderFiltration (n : ℕ) :
         simp only [JHfun]
         simp only [hi', ↓reduceDIte, le_of_lt <| hhard ▸ hi, gt_iff_lt]
         exact JHx.step_cond₂ i (Nat.lt_of_lt_pred <| hhard ▸ hi) z htemp htemp2
-    let : Semistable (Resμ Ires μ) := semistable_resμ_of_jordanHolderFiltration _ _
+    let : PayoffFunction.IsSemistable (Resμ Ires μ) := semistable_resμ_of_jordanHolderFiltration _ _
     exact Nat.le_add_of_sub_le <| hhard ▸ hn (μ := Resμ Ires μ)
       ⟨JH_FINAL, Nat.le_of_lt_succ <| Nat.lt_of_lt_of_le ha hJHy⟩ JHres
 

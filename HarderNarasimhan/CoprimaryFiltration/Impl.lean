@@ -5,7 +5,8 @@ Authors: Yijun Yuan
 -/
 import Mathlib.Algebra.Module.Torsion.Basic
 
-import HarderNarasimhan.Semistability.Translation
+import HarderNarasimhan.PayoffFunction.Semistable.Breakpoints
+import HarderNarasimhan.Interval
 import HarderNarasimhan.Filtration.Results
 import HarderNarasimhan.CoprimaryFiltration.CommutativeAlgebra
 import HarderNarasimhan.CoprimaryFiltration.Defs
@@ -372,9 +373,10 @@ associated primes of a fixed finitely generated module, contradicting finiteness
 -/
 instance prop3d13₂ {R : Type*} [CommRing R] [IsNoetherianRing R]
 {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] :
-μA_DescendingChainCondition (μ R M) where
-  μ_dcc := by
+(μ R M).ADCC where
+  dcc := by
     intro N x hx1 hx2
+    change ∃ N' : ℕ, ¬ μA (μ R M) ⟨N, x N', hx1 N'⟩ < μA (μ R M) ⟨N, x (N' + 1), hx1 (N' + 1)⟩
     by_contra hc
     simp only [not_exists, prop3d12, DedekindCut.principal_lt_principal, not_lt, not_le] at hc
     replace hc := fun w ↦ S₀_order'.mpr (hc w)
@@ -400,35 +402,36 @@ This is the main algebraic input behind Remark 3.14 in the public results.
 -/
 lemma rmk4d14₁ {R : Type*} [CommRing R] [IsNoetherianRing R]
 {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] :
-Semistable (μ R M) ↔ ∀ N : (ℒ R M), (hN : ⊥ < N) → μA (μ R M) ⟨⊥, N,hN⟩ =
+PayoffFunction.IsSemistable (μ R M) ↔ ∀ N : (ℒ R M), (hN : ⊥ < N) → μA (μ R M) ⟨⊥, N,hN⟩ =
   ({(((_μ R M) ⊤).toFinset.min' (μ_nonempty _))} : S₀ R) := by
   constructor
   · intro hst N hN
-    replace hst := hst.semistable N hN
+    replace hst : ¬ μA (μ R M) ⊤ < μA (μ R M) ⟨⊥, N, hN⟩ := hst.not_lt N hN
     rw [prop3d12 ⟨⊥, N,hN⟩, prop3d12 (⊤ : StrictIntvl (ℒ R M))] at hst
     rw [prop3d12 ⟨⊥, N,hN⟩]
     simp only [DedekindCut.principal_inj, Finset.singleton_inj]
-    simp only [gt_iff_lt, DedekindCut.principal_lt_principal, not_lt] at hst
+    simp only [DedekindCut.principal_lt_principal, not_lt] at hst
     apply (S₀_order.2 _ _).2 at hst
     exact eq_of_le_of_ge hst <| Finset.min'_subset (μ_nonempty _) <|
       Set.toFinset_subset_toFinset.mpr <| _μ_mono_right hN le_top
   · intro h
-    refine { semistable := fun N hN ↦ ?_ }
+    refine { not_lt := fun N hN ↦ ?_ }
     specialize h N hN
     rw [prop3d12 ⟨⊥, N, hN⟩] at h
     simp only [DedekindCut.principal_inj, Finset.singleton_inj] at h
+    change ¬ μA (μ R M) ⊤ < μA (μ R M) ⟨⊥, N, hN⟩
     rw [prop3d12 ⟨⊥, N, hN⟩, prop3d12 (⊤ : StrictIntvl (ℒ R M))]
-    simp only [gt_iff_lt, DedekindCut.principal_lt_principal, not_lt]
+    simp only [DedekindCut.principal_lt_principal, not_lt]
     exact (S₀_order.2 _ _).1 h.le
 
 /-- Second characterization of semistability: semistable iff unique associated prime.
 
-  Combining `rmk4d14₁` with the explicit formula for `μA`, we show that `Semistable (μ R M)`
+  Combining `rmk4d14₁` with the explicit formula for `μA`, we show that `(μ R M).IsSemistable`
   is equivalent to the classical condition `∃! p, p ∈ associatedPrimes R M`.
 -/
 lemma rmk4d14₂ {R : Type*} [CommRing R] [IsNoetherianRing R]
 {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] :
-Semistable (μ R M) ↔ ∃! p, p ∈ associatedPrimes R M := by
+PayoffFunction.IsSemistable (μ R M) ↔ ∃! p, p ∈ associatedPrimes R M := by
   rw [rmk4d14₁]
   let p0 := ((_μ R M ⊤).toFinset.min' (μ_nonempty _))
   have hbot (N : ℒ R M) : Submodule.submoduleOf (⊥ : ℒ R M) N = ⊥ :=
@@ -582,22 +585,26 @@ This lemma is the key “translation” step for coprimary filtrations:
 * restricting the slope `μ R M` to an interval `(N₁, N₂)` corresponds to
 * the induced slope on the submodule lattice of the quotient module `N₂ / N₁`.
 
-The statement is phrased as an equivalence between `Semistable (Resμ ...)` and a
+The statement is phrased as an equivalence between `PayoffFunction.IsSemistable (Resμ ...)` and a
 `Semistable` predicate on the quotient lattice; the `Nontrivial` instance for the
 quotient is provided by `quot_ntl`.
 -/
 lemma semistable_res_iff_semistable_quot {R : Type*} [CommRing R] [IsNoetherianRing R]
 {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]
     (N₁ N₂ : ℒ R M) (hN : N₁ < N₂) :
-    Semistable (Resμ ⟨N₁, N₂, hN⟩ (μ R M)) ↔
+    PayoffFunction.IsSemistable (Resμ ⟨N₁, N₂, hN⟩ (μ R M)) ↔
       letI : Nontrivial (↥N₂ ⧸ N₁.submoduleOf N₂) := quot_ntl hN
-      Semistable (μ R (↥N₂ ⧸ N₁.submoduleOf N₂)) := by
+      PayoffFunction.IsSemistable (μ R (↥N₂ ⧸ N₁.submoduleOf N₂)) := by
   refine ⟨?_, ?_⟩
   · intro h
     let : Nontrivial (↥N₂ ⧸ N₁.submoduleOf N₂) := quot_ntl hN
-    refine { semistable := ?_ }
+    refine { not_lt := ?_ }
     intro X hX
-    have hres := h.semistable
+    change ¬ μA (μ R (↥N₂ ⧸ N₁.submoduleOf N₂)) ⊤ < μA (μ R (↥N₂ ⧸ N₁.submoduleOf N₂)) ⟨⊥, X, hX⟩
+    have hres : ¬ μA (Resμ ⟨N₁, N₂, hN⟩ (μ R M)) ⊤ < μA (Resμ ⟨N₁, N₂, hN⟩ (μ R M))
+        ⟨⊥, ⟨lift_quot N₁ N₂ X, lift_quot_middle N₁ N₂ (le_of_lt hN) X⟩,
+          bot_lt_iff_ne_bot.2 fun hc ↦
+            lift_quot_not_bot N₁ N₂ X hX.ne' (Subtype.coe_inj.mpr hc)⟩ := h.not_lt
       ⟨lift_quot N₁ N₂ X, lift_quot_middle N₁ N₂ (le_of_lt hN) X⟩
       (bot_lt_iff_ne_bot.2 fun hc ↦
         lift_quot_not_bot N₁ N₂ X hX.ne' (Subtype.coe_inj.mpr hc))
@@ -614,10 +621,13 @@ lemma semistable_res_iff_semistable_quot {R : Type*} [CommRing R] [IsNoetherianR
       Submodule.map_comap_eq_self, Submodule.range_mkQ] using hres'
   · intro h
     let : Nontrivial (↥N₂ ⧸ N₁.submoduleOf N₂) := quot_ntl hN
-    refine { semistable := ?_ }
+    refine { not_lt := ?_ }
     intro W hW
     have hW' : W.val ≠ N₁ := fun hEq ↦ hW.ne' (Subtype.ext hEq)
-    have hquot := h.semistable
+    have hquot : ¬ μA (μ R (↥N₂ ⧸ N₁.submoduleOf N₂)) ⊤ <
+        μA (μ R (↥N₂ ⧸ N₁.submoduleOf N₂))
+          ⟨⊥, Submodule.map (N₁.submoduleOf N₂).mkQ (Submodule.comap N₂.subtype W.val),
+            bot_lt_iff_ne_bot.2 <| map_comap_ne_bot W.prop.1 W.prop.2 hW'⟩ := h.not_lt
       (Submodule.map (N₁.submoduleOf N₂).mkQ (Submodule.comap N₂.subtype W.val))
       (bot_lt_iff_ne_bot.2 <| map_comap_ne_bot W.prop.1 W.prop.2 hW')
     have hquot' :
@@ -628,6 +638,7 @@ lemma semistable_res_iff_semistable_quot {R : Type*} [CommRing R] [IsNoetherianR
         muA_eq_quot_muA (N₁ := N₁) (N₂ := N₂) (W := N₂)
           (le_of_lt hN) le_rfl hN.ne.symm,
         Submodule.comap_top, Submodule.map_top, Submodule.range_mkQ] using hquot
+    change ¬ μA (Resμ ⟨N₁, N₂, hN⟩ (μ R M)) ⊤ < μA (Resμ ⟨N₁, N₂, hN⟩ (μ R M)) ⟨⊥, W, hW⟩
     simp only [μA_res_intvl]
     exact hquot'
 

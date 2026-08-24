@@ -15,7 +15,8 @@ import Mathlib.RingTheory.Ideal.AssociatedPrime.Finiteness
 import Mathlib.Order.Completion
 
 import HarderNarasimhan.Basic
-import HarderNarasimhan.Semistability.Defs
+import HarderNarasimhan.PayoffFunction.Semistable.Defs
+import HarderNarasimhan.Interval
 import HarderNarasimhan.Filtration.Results
 import Mathlib.Combinatorics.Colex
 

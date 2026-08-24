@@ -177,13 +177,13 @@ filtration.
 instance {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLinearOrder S]
 {μ : PayoffFunction ℒ S}
-[hftp : FiniteTotalPayoff μ] [hsl : SlopeLike μ] [hst : Semistable μ]
+[hftp : FiniteTotalPayoff μ] [hsl : SlopeLike μ] [hst : μ.IsSemistable]
 [hsdcc' : StrongDescendingChainCondition' μ] {x : ℒ} {hx : ⊥ < x} :
 FiniteTotalPayoff (Resμ ⟨⊥, x, hx⟩ μ) := by
   refine { fin_tot_payoff := ?_ }
   simp only [Resμ]
   by_contra h
-  have : Semistable μ → μmax μ ⊤ = μ ⊤ :=
+  have : μ.IsSemistable → μmax μ ⊤ = μ ⊤ :=
     fun a ↦ (List.TFAE.out (impl.thm4d21 μ hsl inferInstance inferInstance).1 0 3).2
       ((impl.thm4d21 μ hsl inferInstance inferInstance).2.1 a)
   have := this hst

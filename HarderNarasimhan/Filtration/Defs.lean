@@ -3,7 +3,8 @@ Copyright (c) 2026 Yijun Yuan. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yijun Yuan
 -/
-import HarderNarasimhan.Semistability.Results
+import HarderNarasimhan.PayoffFunction.Semistable.Breakpoints
+import HarderNarasimhan.Interval
 import Mathlib.Order.RelSeries
 import Mathlib.Data.Rel
 
@@ -95,7 +96,8 @@ structure HarderNarasimhanFiltration
   fin_len              : ∃ n : ℕ, filtration n = ⊤
   strict_mono          : StrictMonoOn filtration (Set.Iic (Nat.find fin_len))
   piecewise_semistable : ∀ i : ℕ, (h: i < Nat.find (fin_len)) →
-    Semistable (Resμ ⟨filtration i, filtration (i+1), strict_mono h.le h (lt_add_one i)⟩ μ)
+    PayoffFunction.IsSemistable
+      (Resμ ⟨filtration i, filtration (i+1), strict_mono h.le h (lt_add_one i)⟩ μ)
   μA_pseudo_strict_anti: ∀ i : ℕ, (hi : i + 1 < Nat.find fin_len) →
     ¬ μA μ ⟨filtration i, filtration (i+1),
         strict_mono (Nat.le_of_succ_le hi.le) hi.le (lt_add_one i)⟩ ≤
@@ -140,5 +142,5 @@ def IntervalSemistableRel {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedO
 {S : Type*} [CompleteLattice S]
 (μ : PayoffFunction ℒ S)
 : SetRel ℒ ℒ :=
-{(x, y) | ∃ h : x < y, Semistable (Resμ ⟨x, y, h⟩ μ)}
+{(x, y) | ∃ h : x < y, PayoffFunction.IsSemistable (Resμ ⟨x, y, h⟩ μ)}
 end HarderNarasimhan

@@ -52,7 +52,7 @@ noncomputable instance instInhabitedHarderNarasimhanFiltration
 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLattice S]
 {μ : PayoffFunction ℒ S}
-[hμ : μA_DescendingChainCondition μ] [hμcvx : μ.IsConvex] [h : μAdmissible μ] :
+[hμ : μ.ADCC] [hμcvx : μ.IsConvex] [h : μAdmissible μ] :
 ------------
 Inhabited (HarderNarasimhanFiltration μ) where
 ------------
@@ -90,7 +90,7 @@ after extensionality, so you can treat the HN filtration as canonical.
 noncomputable instance instUniqueHarderNarasimhanFiltration
 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLinearOrder S]
-{μ : PayoffFunction ℒ S} [hμ : μA_DescendingChainCondition μ] [hμcvx : μ.IsConvex] :
+{μ : PayoffFunction ℒ S} [hμ : μ.ADCC] [hμcvx : μ.IsConvex] :
 ------------
 Unique (HarderNarasimhanFiltration μ)
 ------------
@@ -130,7 +130,7 @@ theorem exists_relSeries_isIntervalSemistable
 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : PayoffFunction ℒ S)
-[hμ : μA_DescendingChainCondition μ] [hμcvx : μ.IsConvex] [h : μAdmissible μ] :
+[hμ : μ.ADCC] [hμcvx : μ.IsConvex] [h : μAdmissible μ] :
 ------------
 ∃ s : RelSeries (IntervalSemistableRel μ),
   s.head = ⊥ ∧ s.last = ⊤ ∧
@@ -169,7 +169,7 @@ theorem exists_unique_relSeries_isIntervalSemistable_of_completeLinearOrder
 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLinearOrder S]
 (μ : PayoffFunction ℒ S)
-[hμ : μA_DescendingChainCondition μ] [hμcvx : μ.IsConvex] :
+[hμ : μ.ADCC] [hμcvx : μ.IsConvex] :
 ------------
 ∃! s : RelSeries (IntervalSemistableRel μ),
   s.head = ⊥ ∧ s.last = ⊤ ∧

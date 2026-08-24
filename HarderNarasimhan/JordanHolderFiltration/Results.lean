@@ -39,7 +39,7 @@ API note: this instance is the main entry point for “there exists a JH filtrat
 instance {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLinearOrder S]
 {μ : PayoffFunction ℒ S} [hftp : FiniteTotalPayoff μ] [hsl : SlopeLike μ]
-[hst : Semistable μ] [hsdcc' : StrongDescendingChainCondition' μ] :
+[hst : μ.IsSemistable] [hsdcc' : StrongDescendingChainCondition' μ] :
 Nonempty (JordanHolderFiltration μ)
 := Nonempty.intro <|
   have hanti : Antitone (impl.JHFil μ hftp.fin_tot_payoff hsl hst hsdcc'.sdcc') :=
@@ -84,7 +84,7 @@ theorem exists_JordanHolderSeries
 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLinearOrder S]
 {μ : PayoffFunction ℒ S} [hftp : FiniteTotalPayoff μ] [hsl : SlopeLike μ]
-[hst : Semistable μ] [hsdcc' : StrongDescendingChainCondition' μ] :
+[hst : μ.IsSemistable] [hsdcc' : StrongDescendingChainCondition' μ] :
 ∃ s : RelSeries (JordanHolderRel μ), s.head = ⊤ ∧ s.last = ⊥
 := by
   have := (inferInstance : Nonempty (JordanHolderFiltration μ)).some
@@ -112,7 +112,8 @@ theorem piecewise_stable_iff
 (strict_anti : ∀ i j : ℕ, i < j → j ≤ Nat.find (fin_len) → filtration j < filtration i) :
 (
 ∀ i : ℕ, (hi : i < Nat.find fin_len) →
-  Stable (Resμ ⟨filtration (i+1), filtration i, strict_anti i (i+1) (lt_add_one i) hi⟩ μ)
+  PayoffFunction.IsStable
+    (Resμ ⟨filtration (i+1), filtration i, strict_anti i (i+1) (lt_add_one i) hi⟩ μ)
 )
 ↔ (∀ i : ℕ, (hi : i < Nat.find fin_len) →
     ∀ z : ℒ, (h' : filtration (i+1) < z) → (h'' : z < filtration i) →
@@ -134,7 +135,7 @@ theorem length_eq_of_JordanHolderFiltration
 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ] [IsModularLattice ℒ]
 {S : Type*} [CompleteLinearOrder S]
 {μ : PayoffFunction ℒ S}
-[FiniteTotalPayoff μ] [SlopeLike μ] [Semistable μ]
+[FiniteTotalPayoff μ] [SlopeLike μ] [μ.IsSemistable]
 [StrongDescendingChainCondition' μ] [μ.IsAffine] :
 ∀ JH1 JH2 : JordanHolderFiltration μ, JH1.length = JH2.length
 := fun JH1 JH2 ↦ eq_of_le_of_ge
