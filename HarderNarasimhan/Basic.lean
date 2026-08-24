@@ -5,6 +5,7 @@ Authors: Yijun Yuan
 -/
 import Mathlib.Order.CompleteLattice.Defs
 import Mathlib.Order.BoundedOrder.Basic
+import Mathlib.Order.Interval.Set.Defs
 
 /-!
 This file provides the basic interval language and the core “extremal value” constructions derived
@@ -29,8 +30,9 @@ Core API:
 - `IsAttained` records that the infimum defining `μA` is realized by some `a`.
 
 Design notes:
-All constructions are expressed using `sSup`/`sInf` over explicit set comprehensions so that they
-work uniformly for any `CompleteLattice S`.
+All constructions are expressed as bounded suprema/infima (`⨆ x ∈ Set.Ioc …` / `⨅ x ∈ Set.Ico …`,
+in the dependent `⨆ (x) (hx : _), …` form so the interval can use the membership proof), matching
+the mathlib `iSup₂`/`iInf₂` API and working uniformly for any `CompleteLattice S`.
 -/
 
 namespace HarderNarasimhan
@@ -119,14 +121,15 @@ Intuition: this is a “best possible” value obtained by moving the right endp
 left endpoint fixed.
 
 API design:
-- We quantify over `u : ℒ` together with a proof `h : u ∈ I ∧ I.left ≠ u`.
-- The strictness of `(I.left, u)` is derived from `I.left ≤ u` and `I.left ≠ u`.
-- The result lives in any complete lattice `S` via `sSup`.
+- We take a bounded supremum `⨆ (u) (hu : u ∈ Set.Ioc I.left I.right), …`, so proofs interface
+  through the `iSup₂` lemma family (`le_iSup₂`, `iSup₂_le`, …).
+- The strictness of `(I.left, u)` is exactly `hu.1`.
+- The result lives in any complete lattice `S`.
 -/
 def μmax {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : Intvl ℒ → S) (I : Intvl ℒ) : S :=
-sSup {μ ⟨I.left, u, lt_of_le_of_ne h.1.1 h.2⟩ | (u : ℒ) (h : u ∈ I ∧ I.left ≠ u)}
+⨆ (u : ℒ) (hu : u ∈ Set.Ioc I.left I.right), μ ⟨I.left, u, hu.1⟩
 
 /--
 `μA μ I` is the infimum, over `a` in the interval distinct from the right endpoint, of `μmax`
@@ -136,13 +139,14 @@ Intuition: this is an “optimal value” after allowing the left endpoint to va
 capturing the inner optimization.
 
 API design:
-- We use `sInf` in a complete lattice.
-- Strictness of `(a, I.right)` is obtained from `a ≤ I.right` and `a ≠ I.right`.
+- We take a bounded infimum `⨅ (a) (ha : a ∈ Set.Ico I.left I.right), …`, so proofs interface
+  through the `iInf₂` lemma family (`iInf₂_le`, `le_iInf₂`, …).
+- Strictness of `(a, I.right)` is exactly `ha.2`.
 -/
 def μA {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : Intvl ℒ → S) (I : Intvl ℒ) : S :=
-sInf {μmax μ ⟨a, I.right, lt_of_le_of_ne ha.1.2 ha.2⟩ | (a : ℒ) (ha : a ∈ I ∧ a ≠ I.right)}
+⨅ (a : ℒ) (ha : a ∈ Set.Ico I.left I.right), μmax μ ⟨a, I.right, ha.2⟩
 
 /--
 `μAstar μ` is `μA μ` evaluated on the total interval `(⊥, ⊤)`.
@@ -163,7 +167,7 @@ This is the dual construction to `μmax`.
 def μmin {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : Intvl ℒ → S) (I : Intvl ℒ) : S :=
-sInf {μ ⟨u, I.right, lt_of_le_of_ne h.1.2 h.2⟩ | (u : ℒ) (h : u ∈ I ∧ u ≠ I.right)}
+⨅ (u : ℒ) (hu : u ∈ Set.Ico I.left I.right), μ ⟨u, I.right, hu.2⟩
 
 /--
 `μB μ I` is the supremum, over `a` in the interval distinct from the left endpoint, of `μmin`
@@ -174,7 +178,7 @@ This is the dual counterpart of `μA` (sup over an outer parameter, inf as the i
 def μB {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : Intvl ℒ → S) (I : Intvl ℒ) : S :=
-sSup {μmin μ ⟨I.left, a, lt_of_le_of_ne ha.1.1 ha.2⟩ | (a : ℒ) (ha : a ∈ I ∧ I.left ≠ a)}
+⨆ (a : ℒ) (ha : a ∈ Set.Ioc I.left I.right), μmin μ ⟨I.left, a, ha.1⟩
 
 /--
 `μBstar μ` is `μB μ` evaluated on the total interval `(⊥, ⊤)`.
@@ -187,16 +191,17 @@ def μBstar {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 /--
 `IsAttained μ I` asserts that the infimum defining `μA μ I` is realized by some `a` in the interval.
 
-More precisely, there exists `a` with `a ∈ I` and `a ≠ I.right` such that
+More precisely, there exists `a ∈ Set.Ico I.left I.right` such that
 `μmax μ ⟨a, I.right, _⟩ = μA μ I`.
 
 API note: this is phrased as an existential proposition rather than a structure, since we typically
-only need existence to extract a witness in proofs.
+only need existence to extract a witness in proofs. The membership condition matches the index of
+the bounded infimum defining `μA`.
 -/
 def IsAttained {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : Intvl ℒ → S) (I : Intvl ℒ) : Prop :=
-  ∃ (a : ℒ) (haI : a ∈ I) (ha : a ≠ I.right),
-    μmax μ ⟨a, I.right, lt_of_le_of_ne haI.2 ha⟩ = μA μ I
+  ∃ (a : ℒ) (ha : a ∈ Set.Ico I.left I.right),
+    μmax μ ⟨a, I.right, ha.2⟩ = μA μ I
 
 end HarderNarasimhan

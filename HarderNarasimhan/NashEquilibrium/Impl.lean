@@ -31,14 +31,14 @@ namespace HarderNarasimhan
 namespace impl
 
 /-- `rmk4d10₀` records the basic bounds: for any interval `I`, `μmin μ I ≤ μ I ≤ μmax μ I`.
-  This is a direct consequence of the defining `sInf`/`sSup` characterisations.
+  This is a direct consequence of the defining bounded-infimum/supremum characterisations.
 -/
 lemma rmk4d10₀ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : Intvl ℒ → S) :
 ∀ I : Intvl ℒ, μmin μ I ≤ μ I ∧ μ I ≤ μmax μ I :=
-  fun I ↦ ⟨sInf_le ⟨I.left, ⟨I.left_mem, I.lt.ne⟩, rfl⟩,
-    le_sSup ⟨I.right, ⟨I.right_mem, I.lt.ne⟩, rfl⟩⟩
+  fun I ↦ ⟨iInf₂_le I.left ⟨le_rfl, I.lt⟩,
+    le_iSup₂_of_le I.right ⟨I.lt, le_rfl⟩ le_rfl⟩
 
 
 
@@ -54,17 +54,9 @@ lemma rmk4d10₁ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder
     μmin μ ⟨⊥, y,hy⟩ ≤ μmax μ ⟨x, ⊤,lt_top_iff_ne_top.2 hx⟩ := by
   constructor
   · intro h x hx y hy
-    simp only [μBstar, μAstar] at h
-    unfold μA μB at h
-    apply sSup_le_iff.1 at h
-    simp only [ne_eq, Set.mem_ofPred_eq, le_sInf_iff, forall_exists_index] at h
-    exact h (μmin μ ⟨⊥, y, hy⟩) y ⟨Intvl.mem_top y, ne_of_lt hy⟩ rfl
-      (μmax μ ⟨x, ⊤, lt_top_iff_ne_top.2 hx⟩) x ⟨Intvl.mem_top x, hx⟩ rfl
-  · refine fun h ↦ sSup_le_iff.2 ?_
-    simp only [ne_eq, Set.mem_ofPred_eq, forall_exists_index]
-    refine fun b x hx h' ↦ h' ▸ le_sInf_iff.2 ?_
-    simp only [ne_eq, Set.mem_ofPred_eq, forall_exists_index]
-    exact fun _ x' _ h'' ↦ h'' ▸ h x' (by tauto) x _
+    exact le_trans (le_iSup₂_of_le y ⟨hy, le_top⟩ le_rfl) <|
+      h.trans (iInf₂_le x ⟨bot_le, lt_top_iff_ne_top.2 hx⟩)
+  · exact fun h ↦ iSup₂_le fun y hy ↦ le_iInf₂ fun x hx ↦ h x hx.2.ne y hy.1
 
 
 
@@ -84,15 +76,13 @@ NashEquilibrium μ ↔
   · intro h y hy
     replace h := h.nash_eq
     rw [impl.prop4d1₁ ℒ S μ (h₁ := h₁) (h₂ := h₂)] at h
-    simp only [Intvl.left_top, μBstar, μB, ne_eq] at h
     rw [h]
-    exact le_sSup ⟨y, ⟨Intvl.mem_top y, Ne.symm hy⟩, rfl⟩
+    exact le_iSup₂_of_le y ⟨bot_lt_iff_ne_bot.2 hy, le_top⟩ le_rfl
   · intro h
     refine {nash_eq := ?_}
     rw [impl.prop4d1₁ ℒ S μ (h₁ := h₁) (h₂ := h₂)]
-    simp only [μBstar, μB, ne_eq]
-    exact eq_of_le_of_ge (le_sSup ⟨⊤, ⟨Intvl.mem_top ⊤, bot_ne_top⟩, rfl⟩)
-      (sSup_le fun b ⟨h1, h2, h3⟩ ↦ h3 ▸ (h h1 <| Ne.symm h2.2))
+    exact eq_of_le_of_ge (le_iSup₂_of_le ⊤ ⟨bot_lt_top, le_rfl⟩ le_rfl)
+      (iSup₂_le fun b hb ↦ h b hb.1.ne')
 
 
 
@@ -113,14 +103,12 @@ NashEquilibrium μ ↔
     replace h := h.nash_eq
     rw [impl.prop4d3₁ μ (h₁ := h₁) (h₂ := h₂)] at h
     rw [← h]
-    unfold μAstar μA
-    exact sInf_le ⟨y, ⟨Intvl.mem_top y, hy⟩, rfl⟩
+    exact iInf₂_le y ⟨bot_le, lt_top_iff_ne_top.2 hy⟩
   · intro h
     refine {nash_eq := ?_}
     rw [impl.prop4d3₁ μ (h₁ := h₁) (h₂ := h₂)]
-    simp only [μAstar, μA, ne_eq]
-    exact eq_of_le_of_ge (sInf_le ⟨⊥, ⟨Intvl.mem_top ⊥, bot_ne_top⟩, rfl⟩)
-      (le_sInf fun b ⟨h1, h2, h3⟩ ↦ h3 ▸ (h h1 h2.2))
+    exact eq_of_le_of_ge (iInf₂_le ⊥ ⟨le_rfl, bot_lt_top⟩)
+      (le_iInf₂ fun b hb ↦ h b hb.2.ne)
 
 
 
@@ -131,16 +119,11 @@ lemma prop4d11₁ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrde
 {S : Type*} [CompleteLattice S]
 (μ : Intvl ℒ → S) :
 μmin μ ⊤ = μmax μ ⊤ → μBstar μ ≤ μAstar μ := by
-  have h₁ : μBstar μ ≤ μmax μ ⊤ := by
-    unfold μBstar μB μmax
-    exact sSup_le fun b ⟨hb1, hb2, hb3⟩ ↦ hb3 ▸ le_trans
-      (rmk4d10₀ μ ⟨⊥, hb1, bot_lt_iff_ne_bot.2 <| Ne.symm hb2.2⟩).1 <|
-      le_sSup ⟨hb1, ⟨Intvl.mem_top hb1, hb2.2⟩, rfl⟩
-  have h₂ : μmin μ ⊤ ≤ μAstar μ := by
-    unfold μAstar μA μmin
-    exact le_sInf fun b ⟨hb1, hb2, hb3⟩ ↦ hb3 ▸ le_trans
-      (sInf_le ⟨hb1, ⟨Intvl.mem_top hb1, hb2.2⟩, rfl⟩)
-      (rmk4d10₀ μ ⟨hb1, ⊤, lt_top_iff_ne_top.2 <| hb2.2⟩).2
+  have h₁ : μBstar μ ≤ μmax μ ⊤ :=
+    iSup₂_le fun b hb ↦ le_trans (rmk4d10₀ μ ⟨⊥, b, hb.1⟩).1 <|
+      le_iSup₂_of_le b hb le_rfl
+  have h₂ : μmin μ ⊤ ≤ μAstar μ :=
+    le_iInf₂ fun b hb ↦ le_trans (iInf₂_le b hb) (rmk4d10₀ μ ⟨b, ⊤, hb.2⟩).2
   exact fun h ↦ h₁.trans (h ▸ h₂)
 
 
@@ -172,12 +155,12 @@ lemma prop4d12 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder �
   μ ⊤ ≤ μ ⟨x, ⊤,lt_top_iff_ne_top.2 hx.2⟩) :
 μmax μ ⊤ = μ ⊤ → μmin μ ⊤ = μmax μ ⊤ := by
   refine fun h' ↦ h' ▸ eq_of_le_of_ge (rmk4d10₀ μ ⊤).1
-    (le_sInf fun b ⟨hb1, hb2, hb3⟩ ↦ hb3 ▸ ?_)
-  by_cases hbot : hb1 = ⊥
+    (le_iInf₂ fun b hb ↦ ?_)
+  by_cases hbot : b = ⊥
   · subst hbot
     exact le_rfl
-  refine Or.resolve_left (h hb1 ⟨hbot, hb2.2⟩) (not_not.2 ?_)
-  exact h' ▸ le_sSup ⟨hb1, ⟨Intvl.mem_top hb1, Ne.symm hbot⟩, rfl⟩
+  refine Or.resolve_left (h b ⟨hbot, hb.2.ne⟩) (not_not.2 ?_)
+  exact h' ▸ le_iSup₂_of_le b ⟨bot_lt_iff_ne_bot.2 hbot, le_top⟩ le_rfl
 
 
 
@@ -204,12 +187,12 @@ lemma prop4d14 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder �
   ¬ μ ⊤ ≤ μ ⟨x, ⊤,lt_top_iff_ne_top.2 hx.2⟩) :
 μmin μ ⊤ = μ ⊤ → μmax μ ⊤ = μmin μ ⊤ := by
   refine fun h' ↦ h' ▸ eq_of_le_of_ge
-    (sSup_le fun b ⟨hb1, hb2, hb3⟩ ↦ hb3 ▸ ?_) (rmk4d10₀ μ ⊤).2
-  by_cases htop : hb1 = ⊤
+    (iSup₂_le fun b hb ↦ ?_) (rmk4d10₀ μ ⊤).2
+  by_cases htop : b = ⊤
   · subst htop
     exact le_rfl
-  refine Or.resolve_right (h hb1 ⟨Ne.symm hb2.2, htop⟩) (not_not.2 ?_)
-  exact h' ▸ sInf_le ⟨hb1, ⟨Intvl.mem_top hb1, htop⟩, rfl⟩
+  refine Or.resolve_right (h b ⟨hb.1.ne', htop⟩) (not_not.2 ?_)
+  exact h' ▸ iInf₂_le b ⟨bot_le, lt_top_iff_ne_top.2 htop⟩
 
 
 
@@ -274,16 +257,11 @@ lemma prop4d18₁ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ
 {S : Type*} [CompleteLinearOrder S]
 (μ : Intvl ℒ → S) (hμ : Semistable μ) : μBstar μ ≤ μAstar μ := by
   rw [semistable_iff] at hμ
-  have : sSup {μA μ ⟨⊥, x,hx⟩ | (x : ℒ) (hx : ⊥ < x)} ≤ μAstar μ :=
-    sSup_le fun b ⟨hb1, hb2, hb3⟩ ↦ le_of_not_gt <| hb3 ▸
-      hμ.out.choose_spec.choose_spec.1 hb1 (Intvl.mem_top hb1) (Ne.symm <| bot_lt_iff_ne_bot.1 hb2)
-  refine le_trans (sSup_le_sSup_of_isCofinalFor ?_) this
-  rintro x ⟨hx1,⟨hx2,hx3⟩⟩
-  refine ⟨μA μ ⟨⊥, hx1, bot_lt_iff_ne_bot.2 <| Ne.symm hx2.2⟩,
-    ⟨hx1, bot_lt_iff_ne_bot.2 <| Ne.symm hx2.2, rfl⟩, hx3 ▸ sInf_le_sInf_of_isCoinitialFor ?_⟩
-  rintro y ⟨hy1,⟨hy2,hy3⟩⟩
-  exact ⟨μ ⟨hy1, hx1, lt_of_le_of_ne hy2.1.2 hy2.2⟩, ⟨hy1, hy2, rfl⟩,
-    hy3 ▸ (rmk4d10₀ μ ⟨hy1, hx1, lt_of_le_of_ne hy2.1.2 hy2.2⟩).2⟩
+  have hstep : ∀ (x : ℒ) (hx : ⊥ < x), μA μ ⟨⊥, x, hx⟩ ≤ μAstar μ := fun x hx ↦
+    le_of_not_gt <|
+      hμ.out.choose_spec.choose_spec.1 x (Intvl.mem_top x) (Ne.symm <| bot_lt_iff_ne_bot.1 hx)
+  refine iSup₂_le fun x hx ↦ le_trans ?_ (hstep x hx.1)
+  exact le_iInf₂ fun y hy ↦ iInf₂_le_of_le y hy (rmk4d10₀ μ ⟨y, x, hy.2⟩).2
 
 
 
@@ -314,86 +292,20 @@ lemma prop4d20 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 NashEquilibrium μ → Semistable μ := by
   intro h
   replace h := h.nash_eq
-  have : sSup {μA μ ⟨⊥, x,bot_lt_iff_ne_bot.2 hx⟩ | (x : ℒ) (hx : x ≠ ⊥)} = μBstar μ := by
-    unfold μBstar μB
-    congr 1; ext
-    constructor
-    · simp only [ne_eq, Set.mem_ofPred_eq, forall_exists_index]
-      intro x hx hx'
-      rw [← hx']
-      use x, ⟨Intvl.mem_top _,Ne.symm hx⟩
-      refine Eq.trans ?_ <| Eq.trans (Eq.symm <| impl.prop4d1₁
-        ↥(⟨⊥, x, bot_lt_iff_ne_bot.2 hx⟩ : Intvl ℒ) S (Resμ ⟨⊥, x, bot_lt_iff_ne_bot.2 hx⟩ μ)
-        (h₁ := h₁ x hx) (h₂ := h₂ x hx)) ?_
-      · simp only [μmin, ne_eq]
-        congr 1; ext
-        constructor
-        · rintro ⟨ha1,⟨ha2,ha3⟩⟩
-          exact ⟨⟨ha1,ha2.1⟩, ⟨Intvl.mem_top _,Subtype.coe_ne_coe.1 ha2.2⟩, ha3⟩
-        · rintro ⟨ha1,⟨ha2,ha3⟩⟩
-          exact ⟨ha1, ⟨Intvl.mem_top ha1,Subtype.coe_ne_coe.2 ha2.2⟩, ha3⟩
-      · simp only [μAstar, μA, ne_eq]
-        congr 1; ext
-        constructor
-        · rintro ⟨ha1,⟨ha2,ha3⟩⟩
-          refine ⟨ha1, ⟨Intvl.mem_top ha1,Subtype.coe_ne_coe.2 ha2.2⟩, ha3 ▸ ?_⟩
-          simp only [μmax, ne_eq]
-          congr 1; ext
-          constructor
-          · rintro ⟨hb1,⟨hb2,hb3⟩⟩
-            exact ⟨⟨hb1, ⟨bot_le,hb2.1.2⟩⟩, ⟨hb2.1,Subtype.coe_ne_coe.1 hb2.2⟩, hb3⟩
-          · rintro ⟨hb1,⟨hb2,hb3⟩⟩
-            exact ⟨hb1, ⟨hb2.1,Subtype.coe_ne_coe.2 hb2.2⟩, hb3⟩
-        · rintro ⟨ha1,⟨ha2,ha3⟩⟩
-          refine ⟨⟨ha1,ha2.1⟩, ⟨Intvl.mem_top _,Subtype.coe_ne_coe.1 ha2.2⟩, ha3 ▸ ?_⟩
-          simp only [μmax, ne_eq]
-          congr 1; ext
-          constructor
-          · rintro ⟨hb1,⟨hb2,hb3⟩⟩
-            exact ⟨hb1, ⟨hb2.1,Subtype.coe_ne_coe.2 hb2.2⟩, hb3⟩
-          · rintro ⟨hb1,⟨hb2,hb3⟩⟩
-            exact ⟨⟨hb1,⟨bot_le,hb2.1.2⟩⟩, ⟨hb2.1,Subtype.coe_ne_coe.1 hb2.2⟩, hb3⟩
-    · simp only [ne_eq, Set.mem_ofPred_eq, forall_exists_index]
-      intro x hx hx'
-      rw [← hx']
-      use x, Ne.symm hx.2
-      refine Eq.trans ?_ <| Eq.trans (impl.prop4d1₁ ↥(⟨⊥, x, bot_lt_iff_ne_bot.2 <|
-        Ne.symm hx.2⟩ : Intvl ℒ) S (Resμ ⟨⊥, x, bot_lt_iff_ne_bot.2 <| Ne.symm hx.2⟩ μ)
-        (h₁ := h₁ x <| Ne.symm hx.2) (h₂ := h₂ x <| Ne.symm hx.2)) ?_
-      · simp only [μA, ne_eq, μAstar]
-        congr 1; ext
-        constructor
-        · rintro ⟨ha1,⟨ha2,ha3⟩⟩
-          refine ⟨⟨ha1,ha2.1⟩, ⟨Intvl.mem_top _,Subtype.coe_ne_coe.1 ha2.2⟩, ha3 ▸ ?_⟩
-          simp only [μmax, ne_eq]
-          congr 1; ext
-          constructor
-          · rintro ⟨hb1,⟨hb2,hb3⟩⟩
-            exact ⟨hb1, ⟨hb2.1,Subtype.coe_ne_coe.2 hb2.2⟩, hb3⟩
-          · rintro ⟨hb1,⟨hb2,hb3⟩⟩
-            exact ⟨⟨hb1,⟨bot_le,hb2.1.2⟩⟩, ⟨hb2.1,Subtype.coe_ne_coe.1 hb2.2⟩, hb3⟩
-        · rintro ⟨ha1,⟨ha2,ha3⟩⟩
-          refine ⟨ha1, ⟨Intvl.mem_top ha1,Subtype.coe_ne_coe.2 ha2.2⟩, ha3 ▸ ?_⟩
-          simp only [μmax, ne_eq]
-          congr 1; ext
-          constructor
-          · rintro ⟨hb1,⟨hb2,hb3⟩⟩
-            exact ⟨⟨hb1, ⟨bot_le,hb2.1.2⟩⟩, ⟨hb2.1,Subtype.coe_ne_coe.1 hb2.2⟩, hb3⟩
-          · rintro ⟨hb1,⟨hb2,hb3⟩⟩
-            exact ⟨hb1, ⟨hb2.1,Subtype.coe_ne_coe.2 hb2.2⟩, hb3⟩
-      · simp only [μmin, ne_eq]
-        congr 1; ext
-        constructor
-        · rintro ⟨ha1,⟨ha2,ha3⟩⟩
-          exact ⟨ha1, ⟨Intvl.mem_top ha1,Subtype.coe_ne_coe.2 ha2.2⟩, ha3⟩
-        · rintro ⟨ha1,⟨ha2,ha3⟩⟩
-          exact ⟨⟨ha1,ha2.1⟩, ⟨Intvl.mem_top _,Subtype.coe_ne_coe.1 ha2.2⟩, ha3⟩
+  have key : ∀ (x : ℒ) (hx : ⊥ < x), μA μ ⟨⊥, x, hx⟩ = μmin μ ⟨⊥, x, hx⟩ := by
+    intro x hx
+    have := impl.prop4d1₁ ↥(⟨⊥, x, hx⟩ : Intvl ℒ) S (Resμ ⟨⊥, x, hx⟩ μ)
+      (h₁ := h₁ x hx.ne') (h₂ := h₂ x hx.ne')
+    rwa [μAstar, μA_res_intvl, μmin_res_intvl, Intvl.ofSub_top] at this
+  have : (⨆ (x : ℒ) (hx : ⊥ < x), μA μ ⟨⊥, x, hx⟩) = μBstar μ :=
+    le_antisymm (iSup₂_le fun x hx ↦ le_iSup₂_of_le x ⟨hx, le_top⟩ (key x hx).le)
+      (iSup₂_le fun x hx ↦ le_iSup₂_of_le x hx.1 (key x hx.1).ge)
   replace : ∀ x : ℒ, (hx : x ≠ ⊥) → μA μ ⟨⊥, x,bot_lt_iff_ne_bot.2 hx⟩ ≤ μA μ ⊤ := by
     rw [← h] at this
-    simp only [ne_eq, μAstar] at this
+    simp only [μAstar] at this
     intro x hx
     rw [← this]
-    exact le_sSup ⟨x, hx, rfl⟩
+    exact le_iSup₂_of_le x (bot_lt_iff_ne_bot.2 hx) le_rfl
   exact {semistable := fun x hx ↦ (this x hx.ne').not_gt}
 
 

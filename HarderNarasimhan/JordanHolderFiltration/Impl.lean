@@ -273,11 +273,8 @@ lemma JHFil_refine_lt_step_payoff
   have this_new : μmax μ ⊤ = μ ⊤ :=
     (List.TFAE.out (impl.thm4d21 μ hμsl inferInstance inferInstance).1 0 3).2
       ((impl.thm4d21 μ hμsl inferInstance inferInstance).2.1 hst)
-  simp only [μmax, Intvl.left_top, ne_eq] at this_new
-  have this_q: μ ⟨⊥, z, lt_of_le_of_lt bot_le h'⟩ ≤ μ ⊤ := by
-    rw [← this_new]
-    exact le_sSup ⟨z, ⟨Intvl.mem_top z,
-      Ne.symm <| bot_lt_iff_ne_bot.1 <| lt_of_le_of_lt bot_le h'⟩, rfl⟩
+  have this_q : μ ⟨⊥, z, lt_of_le_of_lt bot_le h'⟩ ≤ μ ⊤ :=
+    this_new ▸ le_iSup₂_of_le z ⟨lt_of_le_of_lt bot_le h', le_top⟩ le_rfl
   by_cases hfp1bot : JHFil μ hμ hμsl hst hdc (k + 1) = ⊥
   · simp only [hfp1bot]
     have : ¬ {p | ∃ (h : ⊥ < p), p < JHFil μ hμ hμsl hst hdc k ∧ μ ⟨⊥, p, h⟩ =
@@ -626,10 +623,8 @@ lemma semistable_of_step_cond₂
   apply (List.TFAE.out (impl.thm4d21 (Resμ ⟨filtration (i+1), filtration i, strict_anti i (i+1)
     (lt_add_one i) hi⟩ μ) inferInstance inferInstance inferInstance).1 1 3).1
   apply eq_of_le_of_ge ?_ ?_
-  · exact sInf_le ⟨⊥, ⟨Intvl.mem_top _, bot_ne_top⟩, rfl⟩
-  · apply le_sInf
-    rintro b ⟨u,hu1,hu2⟩
-    rw [← hu2]
+  · exact iInf₂_le ⊥ ⟨le_rfl, bot_lt_top⟩
+  · refine le_iInf₂ fun u hu1 ↦ ?_
     simp only [μ_res_intvl]
     if hu : u = ⊥ then
       subst hu
@@ -638,7 +633,7 @@ lemma semistable_of_step_cond₂
     have hul : filtration (i + 1) < u.val :=
       lt_of_le_of_ne u.prop.1 fun hc ↦ hu <| Subtype.coe_inj.1 hc.symm
     have hur : u.val < filtration i :=
-      lt_of_le_of_ne u.prop.2 fun hc ↦ hu1.2 <| Subtype.coe_inj.1 hc
+      lt_of_le_of_ne u.prop.2 fun hc ↦ hu1.2.ne <| Subtype.coe_inj.1 hc
     exact le_of_lt ((seesaw' μ inferInstance (filtration (i + 1)) u.val (filtration i)
       ⟨hul, hur⟩).1.1 (h i hi u.val hul hur)).2
 
@@ -738,13 +733,11 @@ lemma step_cond₂_of_stable {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [Bound
   have hμmax_step := (List.TFAE.out
     (impl.thm4d21 (Resμ stepI μ) inferInstance inferInstance inferInstance).1 0 3).2 hNash_step
   simp only [μmin_res_intvl,μ_res_intvl] at hst'
-  unfold μmax at hμmax_step
-  have hsSup_step := sSup_le_iff.1 <| le_of_eq hμmax_step
-  simp only [ne_eq, Set.mem_ofPred_eq, forall_exists_index] at hsSup_step
+  have hsSup_step : ∀ (u : ↥stepI) (hu : (⊥ : ↥stepI) < u),
+      Resμ stepI μ ⟨⊥, u, hu⟩ ≤ Resμ stepI μ ⊤ := fun u hu ↦
+    hμmax_step ▸ le_iSup₂_of_le u ⟨hu, le_top⟩ le_rfl
   have hsSup_step_bak := hsSup_step
-  have hsSup_mid := hsSup_step (Resμ ⟨filtration (i + 1), filtration i, gt_trans hz' hz⟩
-    μ ⟨⊥, midI, hmid_ne_bot⟩)
-    midI ⟨Intvl.mem_top _, hmid_ne_bot.ne⟩ rfl
+  have hsSup_mid := hsSup_step midI hmid_ne_bot
   have hsSup_mid' : μ ⟨filtration (i + 1), z, hz⟩ ≤ μ ⟨filtration (i + 1), filtration i,
       strict_anti i (i + 1) (lt_add_one i) hi⟩ := hsSup_mid
   refine lt_of_le_of_ne hsSup_mid' ?_
@@ -752,29 +745,18 @@ lemma step_cond₂_of_stable {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [Bound
   replace hst' : μmin μ ⟨filtration (i + 1), z, hz⟩ <
       μ ⟨filtration (i + 1), filtration i, gt_trans hz' hz⟩ := hst'
   rw [← hc] at hst'
-  unfold μmin at hst'
-  rcases sInf_lt_iff.1 hst' with ⟨s,⟨y,hy1,hy2⟩,hs⟩
-  rw [← hy2] at hs
+  obtain ⟨y, hy⟩ := iInf_lt_iff.1 hst'
+  obtain ⟨hy1, hs⟩ := iInf_lt_iff.1 hy
   have := ((seesaw' μ inferInstance (filtration (i + 1)) y z
-    ⟨lt_of_le_of_ne hy1.1.1 fun hc ↦ by simp only [hc, lt_self_iff_false] at hs,
-      lt_of_le_of_ne hy1.1.2 hy1.2⟩).2.1.2.2 hs).1
+    ⟨lt_of_le_of_ne hy1.1 fun hc ↦ by simp only [hc, lt_self_iff_false] at hs,
+      hy1.2⟩).2.1.2.2 hs).1
   simp only [hc, gt_iff_lt] at this
-  have res := hsSup_step_bak (Resμ ⟨filtration (i + 1), filtration i, gt_trans hz' hz⟩
-    μ ⟨⊥, ⟨y,hy1.1.1,le_of_lt <| lt_of_le_of_lt hy1.1.2 hz'⟩, by
-    refine lt_of_le_of_ne hy1.1.1 ?_
+  have res := hsSup_step_bak ⟨y, hy1.1, le_of_lt <| lt_of_le_of_lt hy1.2.le hz'⟩ (by
+    refine lt_of_le_of_ne hy1.1 ?_
     by_contra hc
     apply Subtype.coe_inj.2 at hc
     simp only at hc
-    simp only [← hc, Intvl.val_bot, lt_self_iff_false] at hs⟩)
-      ⟨y,hy1.1.1,le_of_lt <| lt_of_le_of_lt hy1.1.2 hz'⟩ ⟨Intvl.mem_top _, by
-      by_contra hc
-      apply Subtype.coe_inj.2 at hc
-      simp only [Intvl.left_top] at hc
-      have hy_bot : y = filtration (i + 1) := by
-        simpa only [Intvl.val_bot] using hc.symm
-      exact (lt_self_iff_false (μ ⟨filtration (i + 1), z, hz⟩)).mp <| by
-        simpa only [hy_bot] using hs
-    ⟩ rfl
+    simp only [← hc, Intvl.val_bot, stepI, lt_self_iff_false] at hs)
   simp only [stepI, μ_res_intvl] at res
   exact (not_le_of_gt this) res
 
@@ -797,18 +779,14 @@ Semistable (Resμ ⟨JH.filtration (JH.length - 1), ⊤,h⟩ μ) := by
   apply (List.TFAE.out (thm4d21 (Resμ ⟨JH.filtration (JH.length - 1), ⊤,h⟩ μ)
     inferInstance inferInstance inferInstance).1 1 3).1
   rw [μmin_res_intvl, μ_res_intvl]
-  simp only [μmin]
   apply eq_of_le_of_ge ?_ ?_
-  · exact sInf_le ⟨JH.filtration (JH.length - 1), ⟨⟨le_rfl,le_top⟩,
-      lt_top_iff_ne_top.1 h⟩, rfl⟩
-  · apply le_sInf
-    rintro z ⟨u, hu1, hu2⟩
-    rw [← hu2]
+  · exact iInf₂_le (JH.filtration (JH.length - 1)) ⟨le_rfl, h⟩
+  · refine le_iInf₂ fun u hu1 ↦ ?_
     have := (thm4d21 μ inferInstance inferInstance inferInstance).2.1 inferInstance
     replace := (List.TFAE.out (thm4d21 μ inferInstance inferInstance inferInstance).1 1 3).2 this
-    have this' : μ ⟨u, ⊤,lt_top_iff_ne_top.2 hu1.2⟩ ≥ μ ⊤ := by
+    have this' : μ ⟨u, ⊤, lt_top_iff_ne_top.2 hu1.2.ne⟩ ≥ μ ⊤ := by
       rw [← this]
-      exact sInf_le ⟨u, ⟨Intvl.mem_top _,hu1.2⟩, rfl⟩
+      exact iInf₂_le u ⟨bot_le, hu1.2⟩
     replace := μ_bot_JH_eq_μ_tot JH (JH.length - 1) (Nat.sub_one_lt <| JH_pos_len JH)
     have hEq := ((seesaw' μ inferInstance ⊥ (JH.filtration (JH.length - 1)) ⊤
       ⟨bot_lt_iff_ne_bot.2 <| JH.ne_bot_of_lt_length <| Nat.sub_one_lt <| JH_pos_len JH,
@@ -892,25 +870,20 @@ lemma induction_on_length_of_JordanHolderFiltration (n : ℕ) :
       rw [← μA_eq_μmin μ]
       have hess := μ_bot_JH_eq_μ_tot JH k hk
       rw [← hess]
-      unfold μmin
       refine eq_of_le_of_ge ?_ ?_
-      · apply le_sInf
-        rintro h ⟨u, hu1, hu2⟩
-        rw [← hu2]
+      · refine le_iInf₂ fun u hu1 ↦ ?_
         if hubot : u = ⊥ then simp only [hubot, le_refl]
         else
           by_contra! hc
           replace := seesaw' μ hsl ⊥ u (JH.filtration k)
-            ⟨bot_lt_iff_ne_bot.2 hubot, lt_of_le_of_ne hu1.1.2 hu1.2⟩
+            ⟨bot_lt_iff_ne_bot.2 hubot, hu1.2⟩
           replace hc := (this.2.1.2.2 hc).1
           rw [hess] at hc
           have hμu : μ ⟨⊥, u, bot_lt_iff_ne_bot.mpr hubot⟩ ≤ μ ⊤ := by
             rw [← hμmax]
-            exact le_sSup ⟨u, ⟨Intvl.mem_top _, Ne.symm hubot⟩, rfl⟩
+            exact le_iSup₂_of_le u ⟨bot_lt_iff_ne_bot.2 hubot, le_top⟩ le_rfl
           exact not_le_of_gt hc hμu
-      · simpa [μmin, hess] using
-          (rmk4d10₀ μ ⟨⊥, JH.filtration k,
-            JH.filtration_length ▸ JH.strict_anti hk.le (le_rfl : JH.length ≤ _) hk⟩).1
+      · exact (rmk4d10₀ μ _).1
     have hcond1 : ∀ i < Nat.find atRaw, ∀ hfi : JH_raw (i + 1) < JH_raw i,
       (fun z ↦ Resμ Ires μ z = Resμ Ires μ ⊤)
               ⟨JH_raw (i + 1), JH_raw i, hfi⟩ := by
@@ -920,8 +893,8 @@ lemma induction_on_length_of_JordanHolderFiltration (n : ℕ) :
         le_sup_left⟩ = μ ⊤ := by
         refine fun j hj ↦ eq_of_le_of_ge ?_ ?_
         · rw [← hμmax]
-          exact le_sSup ⟨x0 ⊔ JHy.filtration j, ⟨Intvl.mem_top _, Ne.symm <|
-            bot_lt_iff_ne_bot.1 <| lt_of_lt_of_le hx0_bot le_sup_left⟩, rfl⟩
+          exact le_iSup₂_of_le (x0 ⊔ JHy.filtration j)
+            ⟨lt_of_lt_of_le hx0_bot le_sup_left, le_top⟩ le_rfl
         · refine le_trans ?_ (rmk4d10₀ μ ⟨⊥, x0 ⊔ JHy.filtration j,
             lt_of_lt_of_le hx0_bot le_sup_left⟩).1
           rw [μA_eq_μmin μ ⟨⊥, x0 ⊔ JHy.filtration j,
@@ -929,17 +902,14 @@ lemma induction_on_length_of_JordanHolderFiltration (n : ℕ) :
           if hjbot : ⊥ = JHy.filtration j  then
             simp only [← hjbot, bot_le, sup_of_le_left]
             rw [← μA_eq_μmin μ, ← JHx.step_cond₁ (lenx - 1) (Nat.sub_one_lt (JH_pos_len JHx))]
-            unfold μmin
-            apply le_sInf
-            rintro b ⟨u,hu1,hu2⟩
-            rw [← hu2]
+            refine le_iInf₂ fun u hu1 ↦ ?_
             replace := JHx.step_cond₂ (lenx - 1) (Nat.sub_one_lt (JH_pos_len JHx)) u
             simp only [lenx, Nat.sub_one_add_one <| JH_pos_len JHx, JHx.filtration_length] at *
             if ubot : u = ⊥ then simpa only [ubot] using le_rfl
             else
-              replace := this (bot_lt_iff_ne_bot.2 ubot) (lt_of_le_of_ne hu1.1.2 hu1.2)
+              replace := this (bot_lt_iff_ne_bot.2 ubot) hu1.2
               exact le_of_lt <| ((seesaw' μ hsl ⊥ u x0
-                ⟨bot_lt_iff_ne_bot.2 ubot, lt_of_le_of_ne hu1.1.2 hu1.2⟩).1.1 this).2
+                ⟨bot_lt_iff_ne_bot.2 ubot, hu1.2⟩).1.1 this).2
           else
           replace := (proposition_2_8 μ inferInstance x0 (JHy.filtration j) ⊥
             ⟨hx0_bot, Ne.bot_lt' hjbot⟩).1

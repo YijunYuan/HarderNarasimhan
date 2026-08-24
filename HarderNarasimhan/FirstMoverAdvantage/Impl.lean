@@ -65,16 +65,15 @@ noncomputable def prop4d1₁_seq {ℒ : Type*} [Nontrivial ℒ] [PartialOrder �
 
 
 
-/-- `prop4d1_helper` rewrites the “top-anchored” sInf that appears naturally in the
+/-- `prop4d1_helper` rewrites the “top-anchored” infimum that appears naturally in the
   proof of Proposition 4.1 as `μmin μ ⊤`.
 -/
 lemma prop4d1_helper {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : Intvl ℒ → S) :
-sInf {x | ∃ x_1, ∃ (hx : x_1 < ⊤), μ ⟨x_1, ⊤, hx⟩ = x} = μmin μ ⊤ :=
-  congrArg sInf <| Set.ext fun _ ↦
-    ⟨fun ⟨w, hw, hw'⟩ ↦ ⟨w, ⟨Intvl.mem_top w, ne_top_of_lt hw⟩, hw'⟩,
-     fun ⟨w, hw, hw'⟩ ↦ ⟨w, lt_top_iff_ne_top.2 hw.2, hw'⟩⟩
+⨅ (x : ℒ) (hx : x < ⊤), μ ⟨x, ⊤, hx⟩ = μmin μ ⊤ :=
+  le_antisymm (le_iInf₂ fun u hu ↦ iInf₂_le u hu.2)
+    (le_iInf₂ fun x hx ↦ iInf₂_le x ⟨bot_le, hx⟩)
 
 
 
@@ -101,13 +100,11 @@ lemma prop4d1₁ (ℒ : Type*) [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder
     obtain ⟨N, hN⟩ := h₁.wacc (fun n ↦ Y n) hsmf
     exact hfinal N hN
   refine le_antisymm ?_ ?_
-  · refine le_sInf fun y ⟨yA, hyA, h⟩ ↦ ?_
+  · refine le_iInf₂ fun yA hyA ↦ ?_
     obtain ⟨xA, hxA, h'⟩ := this yA hyA
-    exact h.symm ▸ sInf_le_of_le ⟨xA, ⟨Intvl.mem_top xA, ne_top_of_lt hxA⟩, rfl⟩
-      (sSup_le fun _ ⟨xB, hxB, hxB'⟩ ↦ hxB' ▸ h' xB (lt_of_le_of_ne hxB.1.1 hxB.2))
-  · refine le_sInf fun t ⟨x, hx, h⟩ ↦ h.symm ▸
-      sInf_le_of_le ⟨x, lt_top_iff_ne_top.2 hx.2, rfl⟩
-      (le_sSup ⟨⊤, ⟨⟨le_top, le_top⟩, hx.2⟩, rfl⟩)
+    exact iInf₂_le_of_le xA ⟨bot_le, hxA⟩ (iSup₂_le fun xB hxB ↦ h' xB hxB.1)
+  · exact le_iInf₂ fun x hx ↦ iInf₂_le_of_le x hx.2
+      (le_iSup₂_of_le ⊤ ⟨hx.2, le_rfl⟩ le_rfl)
 
 
 
@@ -120,7 +117,7 @@ lemma prop4d1₂ (ℒ : Type*) [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder
 (μ : Intvl ℒ → S)
 [h₁ : WeakAscendingChainCondition μ] [h₂ : WeakSlopeLike₁ μ] :
 μAstar μ ≤ μBstar μ :=
-  (prop4d1₁ ℒ S μ).trans_le <| le_sSup ⟨⊤, ⟨⟨bot_le, le_rfl⟩, ne_of_lt bot_lt_top⟩, rfl⟩
+  (prop4d1₁ ℒ S μ).trans_le <| le_iSup₂_of_le ⊤ ⟨bot_lt_top, le_rfl⟩ le_rfl
 
 
 
@@ -151,27 +148,19 @@ WeakSlopeLike₁ (fun (p : Intvl ℒᵒᵈ) ↦
 /-- `dualμAstar_eq_μBstar` identifies `μAstar` computed for the dualised `μ` with
   `μBstar μ`.
 
-  This is an explicit unfolding of definitions and a reindexing of the `sInf`/`sSup`
-  expressions.
+  This is a reindexing of the bounded suprema/infima along the order-dual correspondence.
 -/
 lemma dualμAstar_eq_μBstar {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : Intvl ℒ → S) :
 OrderDual.ofDual <| μAstar (fun (p : Intvl ℒᵒᵈ) ↦
   OrderDual.toDual <| μ ⟨p.right, p.left, p.lt⟩) = μBstar μ
-:= by
-  simp only [μAstar, μA, sInf, ne_eq, OrderDual.exists, μBstar, μB]
-  refine congrArg (@sSup S _) <| Set.ext fun x ↦ ?_
-  constructor
-  · rintro ⟨a, ha, ha'⟩
-    refine ⟨a, ⟨Intvl.mem_top a, Ne.symm ha.2⟩, ha' ▸ congrArg sInf (Set.ext fun r ↦ ?_)⟩
-    exact ⟨fun ⟨b, hb, hb'⟩ ↦ ⟨b, ⟨⟨hb.1.2, hb.1.1⟩, Ne.symm hb.2⟩, hb'⟩,
-      fun ⟨b, hb, hb'⟩ ↦ ⟨b, ⟨⟨hb.1.2, hb.1.1⟩, Ne.symm hb.2⟩, hb'⟩⟩
-  · rintro ⟨a, ha, ha'⟩
-    refine ⟨a, ⟨Intvl.mem_top (OrderDual.toDual a), Ne.symm ha.2⟩,
-      ha' ▸ congrArg sSup (Set.ext fun r ↦ ?_)⟩
-    exact ⟨fun ⟨b, hb, hb'⟩ ↦ ⟨b, ⟨⟨hb.1.2, hb.1.1⟩, Ne.symm hb.2⟩, hb'⟩,
-      fun ⟨b, hb, hb'⟩ ↦ ⟨b, ⟨⟨hb.1.2, hb.1.1⟩, Ne.symm hb.2⟩, hb'⟩⟩
+:=
+  le_antisymm
+    (iSup₂_le fun a ha ↦ le_iSup₂_of_le (OrderDual.ofDual a) ⟨ha.2, ha.1⟩
+      (le_iInf₂ fun b hb ↦ iInf₂_le b ⟨hb.2, hb.1⟩))
+    (iSup₂_le fun a ha ↦ le_iSup₂_of_le (OrderDual.toDual a) ⟨ha.2, ha.1⟩
+      (le_iInf₂ fun b hb ↦ iInf₂_le b ⟨hb.2, hb.1⟩))
 
 
 
@@ -182,32 +171,24 @@ lemma dualμBstar_eq_μAstar {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [
 (μ : Intvl ℒ → S) :
 OrderDual.ofDual <| μBstar (fun (p : Intvl ℒᵒᵈ) ↦
   OrderDual.toDual <| μ ⟨p.right, p.left, p.lt⟩) = μAstar μ
-:= by
-  simp only [μBstar, μB, sSup, ne_eq, OrderDual.exists, μAstar, μA]
-  refine congrArg (@sInf S _) <| Set.ext fun x ↦ ?_
-  constructor
-  · rintro ⟨a, ha, ha'⟩
-    refine ⟨a, ⟨Intvl.mem_top a, Ne.symm ha.2⟩, ha' ▸ congrArg sSup (Set.ext fun r ↦ ?_)⟩
-    exact ⟨fun ⟨b, hb, hb'⟩ ↦ ⟨b, ⟨⟨hb.1.2, hb.1.1⟩, Ne.symm hb.2⟩, hb'⟩,
-      fun ⟨b, hb, hb'⟩ ↦ ⟨b, ⟨⟨hb.1.2, hb.1.1⟩, Ne.symm hb.2⟩, hb'⟩⟩
-  · rintro ⟨a, ha, ha'⟩
-    refine ⟨a, ⟨Intvl.mem_top (OrderDual.toDual a), Ne.symm ha.2⟩,
-      ha'.symm ▸ congrArg sInf (Set.ext fun r ↦ ?_)⟩
-    exact ⟨fun ⟨b, hb, hb'⟩ ↦ ⟨b, ⟨⟨hb.1.2, hb.1.1⟩, Ne.symm hb.2⟩, hb'⟩,
-      fun ⟨b, hb, hb'⟩ ↦ ⟨b, ⟨⟨hb.1.2, hb.1.1⟩, Ne.symm hb.2⟩, hb'⟩⟩
+:=
+  le_antisymm
+    (le_iInf₂ fun a ha ↦ iInf₂_le_of_le (OrderDual.toDual a) ⟨ha.2, ha.1⟩
+      (iSup₂_le fun b hb ↦ le_iSup₂_of_le b ⟨hb.2, hb.1⟩ le_rfl))
+    (le_iInf₂ fun a ha ↦ iInf₂_le_of_le (OrderDual.ofDual a) ⟨ha.2, ha.1⟩
+      (iSup₂_le fun b hb ↦ le_iSup₂_of_le b ⟨hb.2, hb.1⟩ le_rfl))
 
 
 
-/-- `prop4d3_helper` rewrites the “bottom-anchored” sSup that appears naturally in the
+/-- `prop4d3_helper` rewrites the “bottom-anchored” supremum that appears naturally in the
   dual argument as `μmax μ ⊤`.
 -/
 lemma prop4d3_helper {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : Intvl ℒ → S) :
-sSup {μ ⟨⊥, y,hy⟩ | (y : ℒ) (hy : ⊥ < y) } = μmax μ ⊤ :=
-  congrArg sSup <| Set.ext fun _ ↦
-    ⟨fun ⟨w, hw, hw'⟩ ↦ ⟨w, ⟨Intvl.mem_top w, ne_of_lt hw⟩, hw'⟩,
-     fun ⟨w, hw, hw'⟩ ↦ ⟨w, bot_lt_iff_ne_bot.2 (Ne.symm hw.2), hw'⟩⟩
+⨆ (y : ℒ) (hy : ⊥ < y), μ ⟨⊥, y, hy⟩ = μmax μ ⊤ :=
+  le_antisymm (iSup₂_le fun y hy ↦ le_iSup₂_of_le y ⟨hy, le_top⟩ le_rfl)
+    (iSup₂_le fun y hy ↦ le_iSup₂_of_le y hy.1 le_rfl)
 
 
 

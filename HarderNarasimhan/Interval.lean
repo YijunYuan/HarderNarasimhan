@@ -112,30 +112,6 @@ def Resμ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 Intvl ↥I → S := fun J ↦ μ ↑J
 
 /--
-Common index-set bijection behind the `_res_intvl` lemmas below: interior points of a strict
-interval `J` inside `↥I` (cut out by a side condition `D`) correspond to interior points of
-`↑J` in `ℒ` (cut out by the corresponding ambient condition `C`).
-
-The value function `f` may depend on the ambient membership proof; all proof positions are
-handled by proof irrelevance.
--/
-private lemma res_intvl_set_eq {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
-{I : Intvl ℒ} {S : Type*} [CompleteLattice S]
-{J : Intvl ↥I}
-{D : ↥I → Prop} {C : ℒ → Prop}
-(hDC : ∀ u : ↥I, u ∈ J → (D u ↔ C u.val))
-(f : (a : ℒ) → a ∈ (↑J : Intvl ℒ) ∧ C a → S) :
-{x | ∃ (u : ↥I) (h : u ∈ J ∧ D u), f u.val ⟨⟨h.1.1, h.1.2⟩, (hDC u h.1).1 h.2⟩ = x} =
-{x | ∃ (a : ℒ) (h : a ∈ (↑J : Intvl ℒ) ∧ C a), f a h = x} := by
-  ext x
-  constructor
-  · rintro ⟨u, h, rfl⟩
-    exact ⟨u.val, ⟨⟨h.1.1, h.1.2⟩, (hDC u h.1).1 h.2⟩, rfl⟩
-  · rintro ⟨a, h, rfl⟩
-    exact ⟨⟨a, le_trans J.left.prop.1 h.1.1, le_trans h.1.2 J.right.prop.2⟩,
-      ⟨⟨h.1.1, h.1.2⟩, (hDC _ ⟨h.1.1, h.1.2⟩).2 h.2⟩, rfl⟩
-
-/--
 Unfolding lemma for restriction: evaluating `Resμ` is definitionally `μ` on the underlying strict
 interval.
 
@@ -165,12 +141,11 @@ lemma μmax_res_intvl {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [Bounded
 ------------
 μmax (Resμ I μ) J = μmax μ ↑J
 ------------
-:= by
-  unfold μmax
-  simp only [μ_res_intvl, ne_eq]
-  exact congrArg sSup <| res_intvl_set_eq (D := fun u ↦ ¬J.left = u)
-    (C := fun a ↦ ¬(Intvl.ofSub J).left = a) (fun u _ ↦ not_congr Subtype.ext_iff)
-    fun a h ↦ μ ⟨(Intvl.ofSub J).left, a, lt_of_le_of_ne h.1.1 h.2⟩
+:=
+  le_antisymm
+    (iSup₂_le fun u hu ↦ le_iSup₂_of_le u.val ⟨hu.1, hu.2⟩ le_rfl)
+    (iSup₂_le fun a ha ↦ le_iSup₂_of_le
+      ⟨a, le_trans J.left.prop.1 ha.1.le, le_trans ha.2 J.right.prop.2⟩ ⟨ha.1, ha.2⟩ le_rfl)
 
 /--
 Restriction commutes with the “right-anchored infimum” construction `μmin` from `Basic.lean`.
@@ -185,12 +160,11 @@ lemma μmin_res_intvl {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [Bounded
 ------------
 μmin (Resμ I μ) J = μmin μ ↑J
 ------------
-:= by
-  unfold μmin
-  simp only [μ_res_intvl, ne_eq]
-  exact congrArg sInf <| res_intvl_set_eq (D := fun u ↦ ¬u = J.right)
-    (C := fun a ↦ ¬a = (Intvl.ofSub J).right) (fun u _ ↦ not_congr Subtype.ext_iff)
-    fun a h ↦ μ ⟨a, (Intvl.ofSub J).right, lt_of_le_of_ne h.1.2 h.2⟩
+:=
+  le_antisymm
+    (le_iInf₂ fun a ha ↦ iInf₂_le_of_le
+      ⟨a, le_trans J.left.prop.1 ha.1, le_trans ha.2.le J.right.prop.2⟩ ⟨ha.1, ha.2⟩ le_rfl)
+    (le_iInf₂ fun u hu ↦ iInf₂_le_of_le u.val ⟨hu.1, hu.2⟩ le_rfl)
 
 /--
 Restriction commutes with `μA`, the infimum over right-endpoints of `μmax` values.
@@ -205,12 +179,13 @@ lemma μA_res_intvl {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOr
 ------------
 μA (Resμ I μ) J = μA μ ↑J
 ------------
-:= by
-  unfold μA
-  simp only [μmax_res_intvl, ne_eq]
-  exact congrArg sInf <| res_intvl_set_eq (D := fun u ↦ ¬u = J.right)
-    (C := fun a ↦ ¬a = (Intvl.ofSub J).right) (fun u _ ↦ not_congr Subtype.ext_iff)
-    fun a h ↦ μmax μ ⟨a, (Intvl.ofSub J).right, lt_of_le_of_ne h.1.2 h.2⟩
+:=
+  le_antisymm
+    (le_iInf₂ fun a ha ↦ iInf₂_le_of_le
+      ⟨a, le_trans J.left.prop.1 ha.1, le_trans ha.2.le J.right.prop.2⟩ ⟨ha.1, ha.2⟩
+      μmax_res_intvl.le)
+    (le_iInf₂ fun u hu ↦ iInf₂_le_of_le u.val ⟨hu.1, hu.2⟩
+      (μmax_res_intvl (J := ⟨u, J.right, hu.2⟩)).ge)
 
 /--
 Restriction commutes with `μB`, the supremum over left-endpoints of `μmin` values.
@@ -225,12 +200,13 @@ lemma μB_res_intvl {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOr
 ------------
 μB (Resμ I μ) J = μB μ ↑J
 ------------
-:= by
-  unfold μB
-  simp only [μmin_res_intvl, ne_eq]
-  exact congrArg sSup <| res_intvl_set_eq (D := fun u ↦ ¬J.left = u)
-    (C := fun a ↦ ¬(Intvl.ofSub J).left = a) (fun u _ ↦ not_congr Subtype.ext_iff)
-    fun a h ↦ μmin μ ⟨(Intvl.ofSub J).left, a, lt_of_le_of_ne h.1.1 h.2⟩
+:=
+  le_antisymm
+    (iSup₂_le fun u hu ↦ le_iSup₂_of_le u.val ⟨hu.1, hu.2⟩ μmin_res_intvl.le)
+    (iSup₂_le fun a ha ↦
+      have hmem : a ∈ I := ⟨le_trans J.left.prop.1 ha.1.le, le_trans ha.2 J.right.prop.2⟩
+      le_iSup₂_of_le ⟨a, hmem⟩ ⟨ha.1, ha.2⟩
+        (μmin_res_intvl (J := ⟨J.left, ⟨a, hmem⟩, ha.1⟩)).ge)
 
 /--
 Projection lemma: the bottom element of the points type `↥I` is the left endpoint of `I`.

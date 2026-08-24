@@ -101,12 +101,9 @@ lemma μmax_eq_μ {R : Type*} [CommRing R] [IsNoetherianRing R]
 {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] :
 ∀ I : Intvl (ℒ R M), μmax (μ R M) I = (μ R M) I := by
   intro I
-  unfold μmax
-  refine IsGreatest.csSup_eq
-    ⟨Set.mem_ofPred.mpr ⟨I.right, ⟨I.right_mem, I.lt.ne⟩, rfl⟩, ?_⟩
-  rintro x ⟨u, hu1, rfl⟩
+  refine le_antisymm (iSup₂_le fun u hu ↦ ?_) (le_iSup₂_of_le I.right ⟨I.lt, le_rfl⟩ le_rfl)
   exact DedekindCut.principal_le_principal.mpr <| S₀_order.1 _ _ <|
-    Set.toFinset_subset_toFinset.mpr <| _μ_mono_right (lt_of_le_of_ne hu1.1.1 hu1.2) hu1.1.2
+    Set.toFinset_subset_toFinset.mpr <| _μ_mono_right hu.1 hu.2
 
 /--
 Proposition 3.11 (internal form): convexity of `μ R M` on the total interval.
@@ -336,27 +333,24 @@ lemma prop3d12 {R : Type*} [CommRing R] [IsNoetherianRing R]
   ({(((_μ R M) I).toFinset.min' (μ_nonempty I))} : S₀ R) := by
   intro I
   unfold μA
-  simp only [μmax_eq_μ, ne_eq]
+  simp only [μmax_eq_μ]
   unfold μ
   have hne : lift_quot I.left I.right (locKer I) ≠ I.right := fun hc ↦ by
     have : Subsingleton (↥I.right ⧸ (lift_quot I.left I.right (locKer I)).submoduleOf I.right) :=
       Submodule.Quotient.subsingleton_iff.mpr (Submodule.submoduleOf_eq_top.mpr hc.ge)
     exact Set.singleton_ne_empty _
       ((associatedPrimes_quot_lift_locKer I).symm.trans associatedPrimes.eq_empty_of_subsingleton)
-  have res1 : (DedekindCut.principal {(_μ R M I).toFinset.min' (μ_nonempty I)} : S R) ∈
-    {x | ∃ a, ∃ (h : a ∈ I ∧ ¬a = I.right), DedekindCut.principal
-    (_μ R M ⟨a, I.right, lt_of_le_of_ne h.1.2 h.2⟩).toFinset = x} := by
-    simp only [Set.mem_ofPred_eq, DedekindCut.principal_inj]
-    refine ⟨lift_quot I.left I.right (locKer I),
-      ⟨lift_quot_middle I.left I.right I.lt.le (locKer I), hne⟩, ?_⟩
-    refine (Set.toFinset_congr ?_).trans (Set.toFinset_singleton _)
-    ext w
-    rw [Set.mem_ofPred_eq, associatedPrimes_quot_lift_locKer I, Set.mem_singleton_iff,
-      Set.mem_singleton_iff]
-    exact ⟨fun h ↦ PrimeSpectrum.ext h, fun h ↦ congrArg PrimeSpectrum.asIdeal h⟩
-  refine IsLeast.csInf_eq ⟨res1, ?_⟩
-  rintro N ⟨a, ha1, rfl⟩
-  exact DedekindCut.principal_le_principal.mpr <| prop3d12p2 I a ha1.1 ha1.2
+  refine le_antisymm ?_ (le_iInf₂ fun a ha ↦
+    DedekindCut.principal_le_principal.mpr <| prop3d12p2 I a ⟨ha.1, ha.2.le⟩ ha.2.ne)
+  refine iInf₂_le_of_le (lift_quot I.left I.right (locKer I))
+    ⟨(lift_quot_middle I.left I.right I.lt.le (locKer I)).1,
+     lt_of_le_of_ne (lift_quot_middle I.left I.right I.lt.le (locKer I)).2 hne⟩ (le_of_eq ?_)
+  simp only [DedekindCut.principal_inj]
+  refine (Set.toFinset_congr ?_).trans (Set.toFinset_singleton _)
+  ext w
+  rw [Set.mem_ofPred_eq, associatedPrimes_quot_lift_locKer I, Set.mem_singleton_iff,
+    Set.mem_singleton_iff]
+  exact ⟨fun h ↦ PrimeSpectrum.ext h, fun h ↦ congrArg PrimeSpectrum.asIdeal h⟩
 
 /--
 Proposition 3.13 (part 1): the strict order on `ℒ R M` is well-founded.

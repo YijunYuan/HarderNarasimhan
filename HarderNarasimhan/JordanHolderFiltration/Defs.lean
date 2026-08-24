@@ -214,10 +214,7 @@ FiniteTotalPayoff (Resμ ⟨⊥, x, hx⟩ μ) := by
     fun a ↦ (List.TFAE.out (impl.thm4d21 μ hsl inferInstance inferInstance).1 0 3).2
       ((impl.thm4d21 μ hsl inferInstance inferInstance).2.1 a)
   have := this hst
-  simp only [μmax, Intvl.left_top, ne_eq] at this
-  have this_q: μ ⟨⊥, x, hx⟩ ≤ μ ⊤ := by
-    rw [← this]
-    exact le_sSup ⟨x, ⟨Intvl.mem_top x, Ne.symm <| bot_lt_iff_ne_bot.1 hx⟩, rfl⟩
+  have this_q : μ ⟨⊥, x, hx⟩ ≤ μ ⊤ := this ▸ le_iSup₂_of_le x ⟨hx, le_top⟩ le_rfl
   exact (not_le_of_gt <| h ▸ lt_top_iff_ne_top.2 hftp.fin_tot_payoff) this_q
 
 
