@@ -83,13 +83,13 @@ NashEquilibrium μ ↔
   constructor
   · intro h y hy
     replace h := h.nash_eq
-    rw [impl.prop4d1₁ ℒ S μ h₁.wacc h₂.wsl₁] at h
+    rw [impl.prop4d1₁ ℒ S μ (h₁ := h₁) (h₂ := h₂)] at h
     simp only [Intvl.left_top, μBstar, μB, ne_eq] at h
     rw [h]
     exact le_sSup ⟨y, ⟨Intvl.mem_top y, Ne.symm hy⟩, rfl⟩
   · intro h
     refine {nash_eq := ?_}
-    rw [impl.prop4d1₁ ℒ S μ h₁.wacc h₂.wsl₁]
+    rw [impl.prop4d1₁ ℒ S μ (h₁ := h₁) (h₂ := h₂)]
     simp only [μBstar, μB, ne_eq]
     exact eq_of_le_of_ge (le_sSup ⟨⊤, ⟨Intvl.mem_top ⊤, bot_ne_top⟩, rfl⟩)
       (sSup_le fun b ⟨h1, h2, h3⟩ ↦ h3 ▸ (h h1 <| Ne.symm h2.2))
@@ -111,13 +111,13 @@ NashEquilibrium μ ↔
   constructor
   · intro h y hy
     replace h := h.nash_eq
-    rw [impl.prop4d3₁ μ h₁.wdcc h₂.wsl₂] at h
+    rw [impl.prop4d3₁ μ (h₁ := h₁) (h₂ := h₂)] at h
     rw [← h]
     unfold μAstar μA
     exact sInf_le ⟨y, ⟨Intvl.mem_top y, hy⟩, rfl⟩
   · intro h
     refine {nash_eq := ?_}
-    rw [impl.prop4d3₁ μ h₁.wdcc h₂.wsl₂]
+    rw [impl.prop4d3₁ μ (h₁ := h₁) (h₂ := h₂)]
     simp only [μAstar, μA, ne_eq]
     exact eq_of_le_of_ge (sInf_le ⟨⊥, ⟨Intvl.mem_top ⊥, bot_ne_top⟩, rfl⟩)
       (le_sInf fun b ⟨h1, h2, h3⟩ ↦ h3 ▸ (h h1 h2.2))
@@ -156,7 +156,8 @@ lemma prop4d11₂ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrde
 (h₁' : StrongDescendingChainCondition μ) (h₂' : WeakSlopeLike₂ μ) :
 μBstar μ ≤ μAstar μ → μmin μ ⊤ = μmax μ ⊤ :=
   fun h ↦ eq_of_le_of_ge (le_trans (rmk4d10₀ μ ⊤).1 (rmk4d10₀ μ ⊤).2) <|
-    (impl.prop4d3₁ μ h₁'.wdcc h₂'.wsl₂) ▸ (impl.prop4d1₁ ℒ S μ h₁.wacc h₂.wsl₁) ▸ h
+    (impl.prop4d3₁ μ (h₁ := h₁') (h₂ := h₂')) ▸
+      (impl.prop4d1₁ ℒ S μ (h₁ := h₁) (h₂ := h₂)) ▸ h
 
 
 
@@ -258,7 +259,8 @@ lemma prop4d16₂ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrde
     μ ⟨z.left, ⊤, lt_trans z.lt hz⟩ ∨
     μ ⟨z.right, ⊤, hz⟩ ≤ μ ⟨z.left, ⊤, lt_trans z.lt hz⟩ :=
     fun z hz ↦ (hμ.slopelike z.left z.right ⊤ ⟨z.lt, hz⟩).1.imp_right le_of_lt
-  exact ⟨fun h ↦ {nash_eq := eq_of_le_of_ge (impl.prop4d1₂ ℒ S μ h₁.wacc this) <| prop4d11₁ μ h},
+  have hle : μAstar μ ≤ μBstar μ := impl.prop4d1₂ ℒ S μ (h₁ := h₁) (h₂ := {wsl₁ := this})
+  exact ⟨fun h ↦ {nash_eq := eq_of_le_of_ge hle <| prop4d11₁ μ h},
     fun h ↦ prop4d11₂ μ h₁ {wsl₁ := this} h₂ {wsl₂ := fun z hz ↦
       ((hμ.slopelike ⊥ z.left z.right ⟨hz, z.lt⟩).2.2.1.imp_left le_of_lt).symm}
       h.nash_eq.symm.le⟩
@@ -295,8 +297,8 @@ lemma prop4d18₂ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ
   (StrongDescendingChainCondition μ ∧ WeakSlopeLike₂ μ)) :
 NashEquilibrium μ :=
   {nash_eq := eq_of_le_of_ge
-    (h.elim (fun h ↦ impl.prop4d1₂ ℒ S μ h.1.wacc h.2.wsl₁)
-      (fun h ↦ impl.prop4d3₂ μ h.1.wdcc h.2.wsl₂))
+    (h.elim (fun h ↦ impl.prop4d1₂ ℒ S μ (h₁ := h.1) (h₂ := h.2))
+      (fun h ↦ impl.prop4d3₂ μ (h₁ := h.1) (h₂ := h.2)))
     (prop4d18₁ μ hμ)}
 
 
@@ -322,7 +324,7 @@ NashEquilibrium μ → Semistable μ := by
       use x, ⟨Intvl.mem_top _,Ne.symm hx⟩
       refine Eq.trans ?_ <| Eq.trans (Eq.symm <| impl.prop4d1₁
         ↥(⟨⊥, x, bot_lt_iff_ne_bot.2 hx⟩ : Intvl ℒ) S (Resμ ⟨⊥, x, bot_lt_iff_ne_bot.2 hx⟩ μ)
-        (h₁ x hx).wacc (h₂ x hx).wsl₁) ?_
+        (h₁ := h₁ x hx) (h₂ := h₂ x hx)) ?_
       · simp only [μmin, ne_eq]
         congr 1; ext
         constructor
@@ -357,7 +359,7 @@ NashEquilibrium μ → Semistable μ := by
       use x, Ne.symm hx.2
       refine Eq.trans ?_ <| Eq.trans (impl.prop4d1₁ ↥(⟨⊥, x, bot_lt_iff_ne_bot.2 <|
         Ne.symm hx.2⟩ : Intvl ℒ) S (Resμ ⟨⊥, x, bot_lt_iff_ne_bot.2 <| Ne.symm hx.2⟩ μ)
-        (h₁ x <| Ne.symm hx.2).wacc (h₂ x <| Ne.symm hx.2).wsl₁) ?_
+        (h₁ := h₁ x <| Ne.symm hx.2) (h₂ := h₂ x <| Ne.symm hx.2)) ?_
       · simp only [μA, ne_eq, μAstar]
         congr 1; ext
         constructor

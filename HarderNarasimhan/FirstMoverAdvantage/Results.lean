@@ -3,7 +3,7 @@ Copyright (c) 2026 Yijun Yuan. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yijun Yuan
 -/
-import HarderNarasimhan.FirstMoverAdvantage.Defs
+import HarderNarasimhan.FirstMoverAdvantage.Impl
 
 /-!
 # First-mover advantage: public statements
@@ -39,7 +39,7 @@ lemma proposition_4_1 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [Bounded
 ) ∧ (
   μAstar μ ≤ μBstar μ
 )
-:= ⟨impl.prop4d1₁ ℒ S μ h₁.wacc h₂.wsl₁, impl.prop4d1₂ ℒ S μ h₁.wacc h₂.wsl₁⟩
+:= ⟨impl.prop4d1₁ ℒ S μ (h₁ := h₁) (h₂ := h₂), impl.prop4d1₂ ℒ S μ (h₁ := h₁) (h₂ := h₂)⟩
 
 
 /--
@@ -86,7 +86,7 @@ lemma proposition_4_3 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [Bounded
 ) ∧ (
   μAstar μ ≤ μBstar μ
 )
-:= ⟨impl.prop4d3₁ μ h₁.wdcc h₂.wsl₂, impl.prop4d3₂ μ h₁.wdcc h₂.wsl₂⟩
+:= ⟨impl.prop4d3₁ μ (h₁ := h₁) (h₂ := h₂), impl.prop4d3₂ μ (h₁ := h₁) (h₂ := h₂)⟩
 
 
 /--

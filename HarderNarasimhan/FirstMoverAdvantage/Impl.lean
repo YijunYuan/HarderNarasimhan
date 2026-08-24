@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yijun Yuan
 -/
 import HarderNarasimhan.Semistability.Results
+import HarderNarasimhan.FirstMoverAdvantage.Defs
 import Mathlib.Data.Real.Basic
 
 /-!
@@ -27,6 +28,17 @@ namespace HarderNarasimhan
 
 namespace impl
 
+/-- `prop4d1_badSet μ` is the set of “bad” first moves for player A: elements `YA < ⊤`
+  such that every `xA < ⊤` admits a follow-up `xB` whose payoff is not bounded by
+  `μ ⟨YA, ⊤, _⟩`.
+
+  Proposition 4.1 is proved by showing this set is empty.
+-/
+def prop4d1_badSet {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
+{S : Type*} [CompleteLattice S]
+(μ : Intvl ℒ → S) : Set ℒ :=
+  {YA | ∃ (h : YA < ⊤), ∀ xA < ⊤, ∃ xB, ∃ (hAB : xA < xB), ¬μ ⟨xA, xB, hAB⟩ ≤ μ ⟨YA, ⊤, h⟩}
+
 /-- `prop4d1₁_seq` is the auxiliary sequence used in the contradiction argument for
   Proposition 4.1.
 
@@ -35,28 +47,20 @@ namespace impl
 -/
 noncomputable def prop4d1₁_seq {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : Intvl ℒ → S)
-(h₁ : ∀ x : ℕ → ℒ, (smf : StrictMono x) →
-  ∃ N : ℕ, μ ⟨x N, x (N+1), smf <| Nat.lt_add_one N⟩ ≤
-    μ ⟨x N, ⊤, lt_of_lt_of_le (smf <| Nat.lt_add_one N) le_top⟩)
-(h₂ : ∀ z : Intvl ℒ, (hz :z.right < ⊤) →
-  μ z ≤ μ ⟨z.left, ⊤,lt_trans z.lt hz⟩ ∨ μ ⟨z.right, ⊤,hz⟩ ≤
-  μ ⟨z.left, ⊤,lt_trans z.lt hz⟩)
-(h₃ : {YA | ∃ (h : YA < ⊤), ∀ xA < ⊤, ∃ xB, ∃ (hAB : xA < xB),
-  ¬μ ⟨xA, xB, hAB⟩ ≤ μ ⟨YA, ⊤, h⟩}.Nonempty) (k : ℕ)
-: {YA | ∃ (h : YA < ⊤), ∀ xA < ⊤, ∃ xB, ∃ (hAB : xA < xB), ¬μ ⟨xA, xB, hAB⟩ ≤ μ ⟨YA, ⊤, h⟩} :=
+(μ : Intvl ℒ → S) [h₂ : WeakSlopeLike₁ μ]
+(h₃ : (prop4d1_badSet μ).Nonempty) (k : ℕ) : prop4d1_badSet μ :=
   match k with
   | 0 => ⟨h₃.choose,h₃.choose_spec⟩
   | k + 1 => by
-    let prop4d1₁_seqkp1 := (prop4d1₁_seq μ h₁ h₂ h₃ k).prop.out.choose_spec
-      (prop4d1₁_seq μ h₁ h₂ h₃ k) (prop4d1₁_seq μ h₁ h₂ h₃ k).prop.out.choose
+    let prop4d1₁_seqkp1 := (prop4d1₁_seq μ h₃ k).prop.out.choose_spec
+      (prop4d1₁_seq μ h₃ k) (prop4d1₁_seq μ h₃ k).prop.out.choose
     have h''' := prop4d1₁_seqkp1.choose_spec.choose_spec
     have h' : prop4d1₁_seqkp1.choose < ⊤ := lt_top_iff_ne_top.2 fun hcon ↦
       h''' (le_of_eq <| congrArg μ <| Intvl.ext rfl hcon)
-    have hle := (h₂ ⟨prop4d1₁_seq μ h₁ h₂ h₃ k, prop4d1₁_seqkp1.choose,
+    have hle := (h₂.wsl₁ ⟨prop4d1₁_seq μ h₃ k, prop4d1₁_seqkp1.choose,
       prop4d1₁_seqkp1.choose_spec.choose⟩ h').resolve_left h'''
     refine ⟨prop4d1₁_seqkp1.choose, h', fun xA hxA ↦ ?_⟩
-    obtain ⟨xB, hAB, con⟩ := (prop4d1₁_seq μ h₁ h₂ h₃ k).prop.out.choose_spec xA hxA
+    obtain ⟨xB, hAB, con⟩ := (prop4d1₁_seq μ h₃ k).prop.out.choose_spec xA hxA
     exact ⟨xB, hAB, fun hcon ↦ con (hcon.trans hle)⟩
 
 
@@ -82,24 +86,19 @@ sInf {x | ∃ x_1, ∃ (hx : x_1 < ⊤), μ ⟨x_1, ⊤, hx⟩ = x} = μmin μ �
 lemma prop4d1₁ (ℒ : Type*) [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 (S : Type*) [CompleteLattice S]
 (μ : Intvl ℒ → S)
-(h₁ : ∀ x : ℕ → ℒ, (smf : StrictMono x) →
-  ∃ N : ℕ, μ ⟨x N, x (N+1), smf <| Nat.lt_add_one N⟩ ≤
-    μ ⟨x N, ⊤, lt_of_lt_of_le (smf <| Nat.lt_add_one N) le_top⟩)
-(h₂ : ∀ z : Intvl ℒ, (hz :z.right < ⊤) →
-  μ z ≤ μ ⟨z.left, ⊤,lt_trans z.lt hz⟩ ∨ μ ⟨z.right, ⊤,hz⟩ ≤
-  μ ⟨z.left, ⊤,lt_trans z.lt hz⟩) :
+[h₁ : WeakAscendingChainCondition μ] [h₂ : WeakSlopeLike₁ μ] :
 μAstar μ = μmin μ ⊤ := by
   rw [← prop4d1_helper]
   have : ∀ yA : ℒ, (hyA : yA < ⊤) → ∃ xA : ℒ, xA < ⊤ ∧ (∀ xB : ℒ, (hAB : xA < xB) →
     μ ⟨xA, xB, hAB⟩ ≤ μ ⟨yA, ⊤, hyA⟩) := by
     by_contra!
-    let Y := prop4d1₁_seq μ h₁ h₂ this
+    let Y := prop4d1₁_seq μ this
     have hsmf : StrictMono (fun n ↦ Y n) := strictMono_nat_of_lt_succ fun n ↦
       ((Y n).prop.out.choose_spec (Y n) (Y n).prop.out.choose).choose_spec.choose
     have hfinal : ∀ n : ℕ, ¬ μ ⟨Y n, Y (n+1), hsmf (Nat.lt_add_one n)⟩ ≤
         μ ⟨Y n, ⊤, lt_of_lt_of_le (hsmf (Nat.lt_add_one n)) le_top⟩ := fun n ↦
       ((Y n).prop.out.choose_spec (Y n) (Y n).prop.out.choose).choose_spec.choose_spec
-    obtain ⟨N, hN⟩ := h₁ (fun n ↦ Y n) hsmf
+    obtain ⟨N, hN⟩ := h₁.wacc (fun n ↦ Y n) hsmf
     exact hfinal N hN
   refine le_antisymm ?_ ?_
   · refine le_sInf fun y ⟨yA, hyA, h⟩ ↦ ?_
@@ -119,73 +118,33 @@ lemma prop4d1₁ (ℒ : Type*) [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder
 lemma prop4d1₂ (ℒ : Type*) [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 (S : Type*) [CompleteLattice S]
 (μ : Intvl ℒ → S)
-(h₁ : ∀ x : ℕ → ℒ, (smf : StrictMono x) →
-  ∃ N : ℕ, μ ⟨x N, x (N+1), smf <| Nat.lt_add_one N⟩ ≤
-    μ ⟨x N, ⊤, lt_of_lt_of_le (smf <| Nat.lt_add_one N) le_top⟩)
-(h₂ : ∀ z : Intvl ℒ, (hz :z.right < ⊤) → μ z ≤
-  μ ⟨z.left, ⊤,lt_trans z.lt hz⟩ ∨ μ ⟨z.right, ⊤,hz⟩ ≤ μ ⟨z.left, ⊤,lt_trans z.lt hz⟩) :
+[h₁ : WeakAscendingChainCondition μ] [h₂ : WeakSlopeLike₁ μ] :
 μAstar μ ≤ μBstar μ :=
-  (prop4d1₁ ℒ S μ h₁ h₂).trans_le <| le_sSup ⟨⊤, ⟨⟨bot_le, le_rfl⟩, ne_of_lt bot_lt_top⟩, rfl⟩
+  (prop4d1₁ ℒ S μ).trans_le <| le_sSup ⟨⊤, ⟨⟨bot_le, le_rfl⟩, ne_of_lt bot_lt_top⟩, rfl⟩
 
 
 
-/-- Coercion sending an interval in `ℒ` to the corresponding interval in the order dual.
-  This swaps the endpoints.
+/-- `dual_wacc_of_sdcc` transports a strong descending chain condition on `μ` to the
+  weak ascending chain condition for the dualised slope on `ℒᵒᵈ`.
 -/
-instance {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ] :
-Coe (Intvl ℒ) (Intvl ℒᵒᵈ) where
-  coe p := ⟨p.right, p.left, p.lt⟩
-
-
-/-- Coercion sending an interval in `ℒᵒᵈ` back to an interval in `ℒ`.
-  This is the same endpoint swap, viewed in the opposite direction.
--/
-instance {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ] :
-Coe (Intvl ℒᵒᵈ) (Intvl ℒ) where
-  coe p := ⟨p.right, p.left, p.lt⟩
-
-
-/-- Coercion transporting a function `μ` on intervals of `ℒ` to a function on intervals
-  of `ℒᵒᵈ`, with values in the order dual `Sᵒᵈ`.
-
-  This is a notational convenience for duality arguments.
--/
-instance {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
-{S : Type*} [CompleteLattice S] :
-Coe (Intvl ℒ → S) (Intvl ℒᵒᵈ → Sᵒᵈ) where
-  coe f := fun p ↦ f p
-
-
-/-- `h₁_dual_of_h₁` transports the “descending-chain” hypothesis `h₁` on `ℒ` to the
-  corresponding “ascending-chain” hypothesis on the order dual `ℒᵒᵈ`.
--/
-lemma h₁_dual_of_h₁ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
+lemma dual_wacc_of_sdcc {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S] {μ : Intvl ℒ → S}
-(h₁ : ∀ x : ℕ → ℒ, (saf : StrictAnti x) →
-  ∃ N : ℕ, μ ⟨⊥, x N, lt_of_le_of_lt bot_le <| saf <| Nat.lt_add_one N⟩ ≤
-    μ ⟨x (N+1), x N, saf <| Nat.lt_add_one N⟩) :
-(∀ x : ℕ → ℒᵒᵈ, (smf : StrictMono x) →
-  ∃ N : ℕ, @LE.le Sᵒᵈ (OrderDual.instLE S) ((↑μ : Intvl ℒᵒᵈ → Sᵒᵈ)
-  ⟨x N, x (N+1), smf <| Nat.lt_add_one N⟩)  ((↑μ : Intvl ℒᵒᵈ → Sᵒᵈ)
-  ⟨x N, ⊤, lt_of_lt_of_le (smf <| Nat.lt_add_one N) le_top⟩)) :=
-  fun xd smf ↦ h₁ (fun n ↦ (xd n).ofDual) fun _ _ hab ↦ smf hab
+[h₁ : StrongDescendingChainCondition μ] :
+WeakAscendingChainCondition (fun (p : Intvl ℒᵒᵈ) ↦
+  OrderDual.toDual <| μ ⟨p.right, p.left, p.lt⟩) :=
+  ⟨fun xd smf ↦ h₁.wdcc (fun n ↦ (xd n).ofDual) fun _ _ hab ↦ smf hab⟩
 
 
 
-/-- `h₂_dual_of_h₂` transports the “bottom-anchored” weak alternative `h₂` to the
-  corresponding “top-anchored” alternative on `ℒᵒᵈ`.
+/-- `dual_wsl₁_of_wsl₂` transports the second weak slope-like axiom on `μ` to the
+  first weak slope-like axiom for the dualised slope on `ℒᵒᵈ`.
 -/
-lemma h₂_dual_of_h₂ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
+lemma dual_wsl₁_of_wsl₂ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S] {μ : Intvl ℒ → S}
-(h₂ : ∀ z : Intvl ℒ, (hz : ⊥ < z.left) →
-  μ ⟨⊥, z.right,lt_trans hz z.lt⟩ ≤ μ z ∨ μ ⟨⊥, z.right,lt_trans hz z.lt⟩ ≤
-  μ ⟨⊥, z.left,hz⟩) :
-∀ z : Intvl ℒᵒᵈ, (hz :z.right < ⊤) →
-  @LE.le Sᵒᵈ (OrderDual.instLE S) ((↑μ : Intvl ℒᵒᵈ → Sᵒᵈ) z)
-    ((↑μ : Intvl ℒᵒᵈ → Sᵒᵈ) ⟨z.left, ⊤,lt_trans z.lt hz⟩) ∨
-  @LE.le Sᵒᵈ (OrderDual.instLE S) ((↑μ : Intvl ℒᵒᵈ → Sᵒᵈ)
-    ⟨z.right, ⊤,hz⟩) ((↑μ : Intvl ℒᵒᵈ → Sᵒᵈ)
-    ⟨z.left, ⊤,lt_trans z.lt hz⟩) := fun z hz ↦ h₂ z hz
+[h₂ : WeakSlopeLike₂ μ] :
+WeakSlopeLike₁ (fun (p : Intvl ℒᵒᵈ) ↦
+  OrderDual.toDual <| μ ⟨p.right, p.left, p.lt⟩) :=
+  ⟨fun z hz ↦ h₂.wsl₂ ⟨z.right, z.left, z.lt⟩ hz⟩
 
 
 
@@ -262,15 +221,12 @@ sSup {μ ⟨⊥, y,hy⟩ | (y : ℒ) (hy : ⊥ < y) } = μmax μ ⊤ :=
 lemma prop4d3₁ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : Intvl ℒ → S)
-(h₁ : ∀ x : ℕ → ℒ, (saf : StrictAnti x) →
-  ∃ N : ℕ, μ ⟨⊥, x N, lt_of_le_of_lt bot_le <| saf <| Nat.lt_add_one N⟩ ≤
-    μ ⟨x (N+1), x N, saf <| Nat.lt_add_one N⟩)
-(h₂ : ∀ z : Intvl ℒ, (hz : ⊥ < z.left) →
-  μ ⟨⊥, z.right,lt_trans hz z.lt⟩ ≤ μ z ∨ μ ⟨⊥, z.right,lt_trans hz z.lt⟩ ≤
-  μ ⟨⊥, z.left,hz⟩) :
+[h₁ : StrongDescendingChainCondition μ] [h₂ : WeakSlopeLike₂ μ] :
 μBstar μ = μmax μ ⊤ := by
+  have := dual_wacc_of_sdcc (μ := μ)
+  have := dual_wsl₁_of_wsl₂ (μ := μ)
   have := prop4d1₁ ℒᵒᵈ Sᵒᵈ (fun (p : Intvl ℒᵒᵈ) ↦ OrderDual.toDual <|
-    μ ⟨p.right, p.left, p.lt⟩) (h₁_dual_of_h₁ h₁) (h₂_dual_of_h₂ h₂)
+    μ ⟨p.right, p.left, p.lt⟩)
   rw [← prop4d1_helper] at this
   rw [← prop4d3_helper, ← dualμAstar_eq_μBstar, this]
   rfl
@@ -283,12 +239,12 @@ lemma prop4d3₁ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder
 lemma prop4d3₂ {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : Intvl ℒ → S)
-(h₁ : ∀ x : ℕ → ℒ, (saf : StrictAnti x) → ∃ N : ℕ, μ ⟨⊥, x N, lt_of_le_of_lt bot_le <| saf <|
-  Nat.lt_add_one N⟩ ≤ μ ⟨x (N+1), x N, saf <| Nat.lt_add_one N⟩)
-(h₂ : ∀ z : Intvl ℒ, (hz : ⊥ < z.left) → μ ⟨⊥, z.right,lt_trans hz z.lt⟩ ≤ μ z ∨
-  μ ⟨⊥, z.right,lt_trans hz z.lt⟩ ≤ μ ⟨⊥, z.left,hz⟩) :
-μAstar μ ≤ μBstar μ := (dualμAstar_eq_μBstar μ) ▸ (dualμBstar_eq_μAstar μ) ▸
-  prop4d1₂ ℒᵒᵈ Sᵒᵈ (↑μ : Intvl ℒᵒᵈ → Sᵒᵈ) (h₁_dual_of_h₁ h₁) (h₂_dual_of_h₂ h₂)
+[h₁ : StrongDescendingChainCondition μ] [h₂ : WeakSlopeLike₂ μ] :
+μAstar μ ≤ μBstar μ := by
+  have := dual_wacc_of_sdcc (μ := μ)
+  have := dual_wsl₁_of_wsl₂ (μ := μ)
+  exact (dualμAstar_eq_μBstar μ) ▸ (dualμBstar_eq_μAstar μ) ▸
+    prop4d1₂ ℒᵒᵈ Sᵒᵈ (fun (p : Intvl ℒᵒᵈ) ↦ OrderDual.toDual <| μ ⟨p.right, p.left, p.lt⟩)
 
 
 
