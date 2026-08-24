@@ -41,7 +41,7 @@ API note: formulated as a class so it can be assumed as an implicit hypothesis i
 theorems.
 -/
 class μA_DescendingChainCondition {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-{S : Type*} [CompleteLattice S] (μ : Intvl ℒ → S) : Prop where
+{S : Type*} [CompleteLattice S] (μ : StrictIntvl ℒ → S) : Prop where
   μ_dcc : ∀ a : ℒ, ∀ f : ℕ → ℒ, (h₁ : ∀ n : ℕ, f n > a) → StrictAnti f →
     ∃ N : ℕ, ¬ μA μ ⟨a, f N, h₁ N⟩ < μA μ ⟨a, f <| N + 1, h₁ <| N + 1⟩
 
@@ -58,8 +58,8 @@ API note: the predicate is written in a negated `>` form to match later rewritin
 -/
 def S₁I {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : Intvl ℒ → S)
-(I : Intvl ℒ)
+(μ : StrictIntvl ℒ → S)
+(I : StrictIntvl ℒ)
 (x : ℒ) (hxI : x ∈ I) (hx : I.left ≠ x) : Prop :=
 ∀ y : ℒ, (hyI : y ∈ I) → (hy : I.left ≠ y) →
   ¬ μA μ ⟨I.left, y , lt_of_le_of_ne hyI.left hy⟩ >
@@ -77,8 +77,8 @@ This tie-breaking condition is important for uniqueness/canonical choice argumen
 -/
 def S₂I {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : Intvl ℒ → S)
-(I : Intvl ℒ)
+(μ : StrictIntvl ℒ → S)
+(I : StrictIntvl ℒ)
 (x : ℒ) (hxI : x ∈ I) (hx : I.left ≠ x) : Prop :=
 ∀ y : ℒ, (hyI : y ∈ I) → (hy : I.left ≠ y) →
   μA μ ⟨I.left, y , lt_of_le_of_ne hyI.left hy⟩ =
@@ -93,8 +93,8 @@ selection properties `S₁I` and `S₂I`. This packages the notion of a canonica
 -/
 def StI {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : Intvl ℒ → S)
-(I : Intvl ℒ) : Set ℒ :=
+(μ : StrictIntvl ℒ → S)
+(I : StrictIntvl ℒ) : Set ℒ :=
 {l : ℒ | ∃ hlI : l ∈ I , ∃ hl : I.left ≠ l ,  (S₁I μ I l hlI hl) ∧ (S₂I μ I l hlI hl)}
 
 
@@ -105,7 +105,7 @@ This is simply `StI μ ⊤`, but provided as a convenient abbreviation for state
 -/
 def St {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : Intvl ℒ → S) : Set ℒ :=
+(μ : StrictIntvl ℒ → S) : Set ℒ :=
 StI μ ⊤
 
 
@@ -116,8 +116,8 @@ In other words, `I` is semistable if `I.right ∈ StI μ I`.
 -/
 def semistableI {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : Intvl ℒ → S)
-(I : Intvl ℒ) : Prop := I.right ∈ StI μ I
+(μ : StrictIntvl ℒ → S)
+(I : StrictIntvl ℒ) : Prop := I.right ∈ StI μ I
 
 
 /--
@@ -131,7 +131,7 @@ API note: formulated as a class with a single field `semistable`.
 -/
 class Semistable {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : Intvl ℒ → S) : Prop where
+(μ : StrictIntvl ℒ → S) : Prop where
   semistable : ∀ x : ℒ, (hx : ⊥ < x) →
     ¬ μA μ ⟨⊥, x, hx⟩ > μA μ ⊤
 
@@ -146,7 +146,7 @@ accept `Stable μ` where `Semistable μ` is required.
 -/
 class Stable {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : Intvl ℒ → S) : Prop extends Semistable μ where
+(μ : StrictIntvl ℒ → S) : Prop extends Semistable μ where
   stable : ∀ x : ℒ, (hx : ⊥ < x) → x < ⊤ →
     μA μ ⟨⊥, x, hx⟩ ≠ μA μ ⊤
 

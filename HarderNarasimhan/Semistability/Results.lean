@@ -41,7 +41,7 @@ notation `Convex`.
 -/
 lemma proposition_3_2 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   {S : Type*} [CompleteLattice S]
-  (μ : Intvl ℒ → S) (hμcvx : Convex μ)
+  (μ : StrictIntvl ℒ → S) (hμcvx : Convex μ)
   (x : ℒ) (z : ℒ) (h : x < z)
   (h' : μA μ ⟨x, z, h⟩ = ⊤)
   (a : ℒ) (hax : a < x) :
@@ -50,8 +50,8 @@ lemma proposition_3_2 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder
 ------------
   := by
     rw [← ConvexI_top_iff_Convex] at hμcvx
-    exact impl.prop3d2 ⊤ μ hμcvx x (Intvl.mem_top x) z
-      (Intvl.mem_top z) h h' a (Intvl.mem_top a) hax
+    exact impl.prop3d2 ⊤ μ hμcvx x (StrictIntvl.mem_top x) z
+      (StrictIntvl.mem_top z) h h' a (StrictIntvl.mem_top a) hax
 
 
 /-- Re-export of the internal corollary `impl.cor3d3` under the name used in the paper.
@@ -72,7 +72,7 @@ API note: this is a common starting point for constructing filtrations.
 -/
 lemma proposition_3_4 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
   {S : Type*} [CompleteLattice S]
-  (μ : Intvl ℒ → S)
+  (μ : StrictIntvl ℒ → S)
   (hμDCC : μA_DescendingChainCondition μ) (hμcvx : Convex μ) :
 ------------
   (St μ).Nonempty
@@ -90,7 +90,7 @@ most one element, hence any two chosen stable points must be equal.
 -/
 lemma remark_3_5 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
   {S : Type*} [CompleteLinearOrder S]
-  (μ : Intvl ℒ → S)
+  (μ : StrictIntvl ℒ → S)
   (x : ℒ) (hxSt : x ∈ St μ)
   (y : ℒ) (hySt : y ∈ St μ) :
 ------------
@@ -113,7 +113,7 @@ API note: this lemma is a key interface for working with `St μ`.
 -/
 lemma proposition_3_7 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   {S : Type*} [CompleteLattice S]
-  (μ : Intvl ℒ → S) (hμcvx : Convex μ)
+  (μ : StrictIntvl ℒ → S) (hμcvx : Convex μ)
   (x : ℒ) (hxSt : x ∈ St μ) :
 ------------
   /- `(1)` -/
@@ -128,7 +128,7 @@ lemma proposition_3_7 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder
     rw [← ConvexI_top_iff_Convex] at hμcvx
     exact ⟨(semistableI_iff μ ⟨⊥, x, lt_of_le_of_ne bot_le hxSt.out.choose_spec.choose⟩).1 <|
         impl.prop3d7₁ μ ⊤ x hxSt,
-      fun y hy ↦ impl.prop3d7₂ μ ⊤ hμcvx x hxSt y (Intvl.mem_top y) hy⟩
+      fun y hy ↦ impl.prop3d7₂ μ ⊤ hμcvx x hxSt y (StrictIntvl.mem_top y) hy⟩
 
 
 /--
@@ -147,7 +147,7 @@ breakpoint is chosen.
 -/
 lemma proposition_3_8 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
   {S : Type*} [CompleteLattice S]
-  (μ : Intvl ℒ → S) (hμcvx : Convex μ)
+  (μ : StrictIntvl ℒ → S) (hμcvx : Convex μ)
   (h : (@Std.Total S (· ≤ ·)) ∨
      ∀ z : ℒ, (hz : ⊥ ≠ z) → IsAttained μ ⟨⊥, z , lt_of_le_of_ne bot_le hz⟩) :
 ------------
@@ -173,8 +173,8 @@ lemma proposition_3_8 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder
       · exact impl.prop3d8₁' μ hμDCC ⊤ hμcvx (Or.inr fun z _ hz ↦ c2 z hz)
   · intro x hxSt y hxy
     rcases h with c1 | c2
-    · exact impl.prop3d8₂ μ ⊤ hμcvx (Or.inl c1) x hxSt y (Intvl.mem_top y) hxy
+    · exact impl.prop3d8₂ μ ⊤ hμcvx (Or.inl c1) x hxSt y (StrictIntvl.mem_top y) hxy
     · exact impl.prop3d8₂ μ ⊤ hμcvx (Or.inr fun z _ hz ↦ c2 z hz)
-        x hxSt y (Intvl.mem_top y) hxy
+        x hxSt y (StrictIntvl.mem_top y) hxy
 
 end HarderNarasimhan

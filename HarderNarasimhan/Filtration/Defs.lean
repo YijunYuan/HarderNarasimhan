@@ -50,8 +50,8 @@ API note: this is the main extra hypothesis needed for the existence theorem.
 -/
 class μAdmissible {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : Intvl ℒ → S) : Prop where
-  μ_adm : (Std.Total (· ≤ · : S → S → Prop)) ∨ ∀ I : Intvl ℒ,  IsAttained μ I
+(μ : StrictIntvl ℒ → S) : Prop where
+  μ_adm : (Std.Total (· ≤ · : S → S → Prop)) ∨ ∀ I : StrictIntvl ℒ,  IsAttained μ I
 
 /--
 In a complete linear order, admissibility is automatic.
@@ -60,7 +60,7 @@ This instance uses the fact that linearity implies totality of `≤`.
 -/
 instance {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLinearOrder S]
-{μ : Intvl ℒ → S} :
+{μ : StrictIntvl ℒ → S} :
 μAdmissible μ where
   μ_adm := Or.inl Std.instTotalLeOfIsLinearPreorder
 
@@ -88,7 +88,7 @@ API note: this structure is the central user-facing object of the filtration lay
 structure HarderNarasimhanFiltration
 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : Intvl ℒ → S) where
+(μ : StrictIntvl ℒ → S) where
   filtration : ℕ → ℒ
   monotone             : Monotone filtration
   first_eq_bot         : filtration 0 = ⊥
@@ -105,7 +105,7 @@ structure HarderNarasimhanFiltration
 namespace HarderNarasimhanFiltration
 
 variable {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-  {S : Type*} [CompleteLattice S] {μ : Intvl ℒ → S}
+  {S : Type*} [CompleteLattice S] {μ : StrictIntvl ℒ → S}
 
 open Classical in
 /--
@@ -138,7 +138,7 @@ end HarderNarasimhanFiltration
 -/
 def IntervalSemistableRel {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : Intvl ℒ → S)
+(μ : StrictIntvl ℒ → S)
 : SetRel ℒ ℒ :=
 {(x, y) | ∃ h : x < y, Semistable (Resμ ⟨x, y, h⟩ μ)}
 end HarderNarasimhan

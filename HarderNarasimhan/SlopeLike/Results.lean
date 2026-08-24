@@ -34,7 +34,7 @@ definition.
 -/
 lemma seesaw {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : Intvl ℒ → S) :
+(μ : StrictIntvl ℒ → S) :
 ------------
 SlopeLike μ ↔
 ∀ (x y z : ℒ), (h : x < y ∧ y < z) → (
@@ -58,8 +58,8 @@ given additivity of rank `r` and degree `d` on composable intervals and a positi
 theorem SlopeLike_of_μQuotient {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {V : Type*} [AddCommGroup V] [Module ℝ V] [LinearOrder V] [IsOrderedAddMonoid V]
 [PosSMulStrictMono ℝ V] [Nontrivial V]
-(r : Intvl ℒ → NNReal)
-(d : Intvl ℒ → V)
+(r : StrictIntvl ℒ → NNReal)
+(d : StrictIntvl ℒ → V)
 (h₁ : ∀ (x y z : ℒ), (h : x < y ∧ y < z) →
   d ⟨x, z, lt_trans h.1 h.2⟩ = d ⟨x, y, h.1⟩ + d ⟨y, z, h.2⟩ ∧
   r ⟨x, z, lt_trans h.1 h.2⟩ = r ⟨x, y, h.1⟩ + r ⟨y, z, h.2⟩)
@@ -81,7 +81,7 @@ remaining relations need to be derived.
 -/
 lemma seesaw' {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : Intvl ℒ → S) :
+(μ : StrictIntvl ℒ → S) :
 ------------
 SlopeLike μ → ∀ (x y z : ℒ), (h : x < y ∧ y < z) →
 (

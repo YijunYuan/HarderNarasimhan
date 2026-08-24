@@ -44,7 +44,7 @@ API design:
 -/
 class SlopeLike {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : Intvl ℒ → S) : Prop where
+(μ : StrictIntvl ℒ → S) : Prop where
   slopelike : ∀ (x y z : ℒ), (h : x < y ∧ y < z) →
 (
   μ ⟨x, y, h.1⟩ ≤ μ ⟨x, z, lt_trans h.1 h.2⟩ ∨ μ ⟨y, z, h.2⟩ < μ ⟨x, z, lt_trans h.1 h.2⟩
@@ -72,9 +72,9 @@ elsewhere.
 noncomputable def μQuotient {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {V : Type*} [AddCommGroup V] [Module ℝ V] [LinearOrder V] [IsOrderedAddMonoid V]
 [PosSMulStrictMono ℝ V]
-(r : Intvl ℒ → NNReal)
-(d : Intvl ℒ → V) :
-Intvl ℒ → DedekindCut V :=
+(r : StrictIntvl ℒ → NNReal)
+(d : StrictIntvl ℒ → V) :
+StrictIntvl ℒ → DedekindCut V :=
   fun z ↦ if _ : r z > 0 then .principal ((r z)⁻¹ • d z) else ⊤
 
 
@@ -87,8 +87,8 @@ elements.
 -/
 instance {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-{μ : Intvl ℒ → S} [hsl : SlopeLike μ]
-{z : Intvl ℒ} : SlopeLike (Resμ z μ)
+{μ : StrictIntvl ℒ → S} [hsl : SlopeLike μ]
+{z : StrictIntvl ℒ} : SlopeLike (Resμ z μ)
 := { slopelike := fun x y z h ↦ hsl.slopelike x.val y.val z.val h }
 
 end HarderNarasimhan

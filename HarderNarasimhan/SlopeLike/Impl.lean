@@ -43,7 +43,7 @@ like) a linear order.
 -/
 lemma prop4d6 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : Intvl ℒ → S) :
+(μ : StrictIntvl ℒ → S) :
 SlopeLike μ ↔ ∀ (x y z : ℒ), (h : x < y ∧ y < z) → (
   μ ⟨x, y, h.1⟩ < μ ⟨x, z, lt_trans h.1 h.2⟩ ∧ μ ⟨x, z, lt_trans h.1 h.2⟩ < μ ⟨y, z, h.2⟩
   ∨
@@ -90,8 +90,8 @@ API note: this provides a convenient witness for rewriting inequalities in the �
 lemma μQuotient_helper {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {V : Type*} [AddCommGroup V] [Module ℝ V] [LinearOrder V] [IsOrderedAddMonoid V]
 [PosSMulStrictMono ℝ V]
-(r : Intvl ℒ → NNReal)
-(d : Intvl ℒ → V) : ∀ z : Intvl ℒ, r z > 0 →
+(r : StrictIntvl ℒ → NNReal)
+(d : StrictIntvl ℒ → V) : ∀ z : StrictIntvl ℒ, r z > 0 →
   ∃ (μ : V), (μQuotient r d) z = DedekindCut.principal μ ∧ (r z) • μ = (d z) :=
   fun z h ↦ ⟨(r z)⁻¹ • d z, dif_pos h, smul_inv_smul₀ h.ne' (d z)⟩
 
@@ -113,15 +113,15 @@ the Dedekind–MacNeille completion to model “infinite slope” as `⊤`.
 lemma prop4d8 {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {V : Type*} [AddCommGroup V] [Module ℝ V] [LinearOrder V] [IsOrderedAddMonoid V]
 [PosSMulStrictMono ℝ V] [Nontrivial V]
-(r : Intvl ℒ → NNReal)
-(d : Intvl ℒ → V)
+(r : StrictIntvl ℒ → NNReal)
+(d : StrictIntvl ℒ → V)
 (h₁ : ∀ (x y z : ℒ), (h : x < y ∧ y < z) → d ⟨x, z, lt_trans h.1 h.2⟩ = d ⟨x, y, h.1⟩ +
   d ⟨y, z, h.2⟩ ∧ r ⟨x, z, lt_trans h.1 h.2⟩ = r ⟨x, y, h.1⟩ + r ⟨y, z, h.2⟩)
 (h₂ : ∀ (x y : ℒ), (h : x < y) → r ⟨x, y, h⟩ = 0 → d ⟨x, y, h⟩ > 0)
 : SlopeLike (μQuotient r d) := by
   refine (prop4d6 (μQuotient r d)).2 fun x y z h ↦ ?_
   obtain ⟨hd, hr⟩ := h₁ x y z h
-  have etop : ∀ w : Intvl ℒ, r w = 0 → μQuotient r d w = ⊤ :=
+  have etop : ∀ w : StrictIntvl ℒ, r w = 0 → μQuotient r d w = ⊤ :=
     fun w hw ↦ dif_neg (by simp [hw])
   rcases eq_zero_or_pos (r ⟨x, z, lt_trans h.1 h.2⟩) with h' | h'
   · -- all ranks vanish: all three slopes are `⊤`, the constant pattern

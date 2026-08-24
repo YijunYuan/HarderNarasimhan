@@ -4,23 +4,17 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yijun Yuan
 -/
 import Mathlib.Order.CompleteLattice.Defs
-import Mathlib.Order.BoundedOrder.Basic
-import Mathlib.Order.Interval.Set.Defs
+import HarderNarasimhan.StrictIntvl
 
 /-!
-This file provides the basic interval language and the core “extremal value” constructions derived
-from an interval-indexed function `μ : Intvl ℒ → S`.
+This file provides the core “extremal value” constructions derived from an interval-indexed
+function `μ : StrictIntvl ℒ → S`.
 
-The intended picture is that `ℒ` is a bounded poset (often a lattice in later files), `S` is a
-complete lattice (typically a linearly ordered type or an ordered commutative group in
-applications), and `μ I` measures some quantity associated to the strict interval
-`(I.left, I.right)`.
+NOTE (refactor in progress): this transitional file will be replaced by
+`HarderNarasimhan.PayoffFunction.Defs`, where these constructions become `PayoffFunction.max`,
+`PayoffFunction.min`, `PayoffFunction.A` and `PayoffFunction.B`.
 
 Core API:
-- `Intvl ℒ` is the type of strict intervals: ordered pairs `left < right`.
-- `x ∈ I` is the membership predicate `I.left ≤ x ≤ I.right`.
-- `Intvl ℒ` is partially ordered by inclusion; when `ℒ` is a nontrivial bounded poset the total
-  interval `(⊥, ⊤)` is its top element `⊤`.
 - `μmax μ I` is a supremum of `μ ⟨I.left, u, _⟩` over interior points `u` of `I` (excluding the
   left endpoint).
 - `μmin μ I` is the dual infimum of `μ ⟨u, I.right, _⟩` over interior points `u` (excluding the
@@ -28,156 +22,52 @@ Core API:
 - `μA` and `μB` iterate these extremal operations in the two directions; `μAstar`/`μBstar`
   specialize to the total interval `⊤`.
 - `IsAttained` records that the infimum defining `μA` is realized by some `a`.
-
-Design notes:
-All constructions are expressed as bounded suprema/infima (`⨆ x ∈ Set.Ioc …` / `⨅ x ∈ Set.Ico …`,
-in the dependent `⨆ (x) (hx : _), …` form so the interval can use the membership proof), matching
-the mathlib `iSup₂`/`iInf₂` API and working uniformly for any `CompleteLattice S`.
 -/
 
 namespace HarderNarasimhan
 
 /--
-A strict interval in `ℒ`: an ordered pair of endpoints `left < right`.
-
-This is the index type of every interval-indexed invariant `μ` in the development.
-Strictness is part of the data, so no use site ever needs to carry a nondegeneracy
-side condition.
--/
-@[ext]
-structure Intvl (ℒ : Type*) [LT ℒ] where
-  /-- The left endpoint. -/
-  left : ℒ
-  /-- The right endpoint. -/
-  right : ℒ
-  /-- The endpoints are in strict order. -/
-  lt : left < right
-
-namespace Intvl
-
-/--
-Membership in a strict interval: `x ∈ I` means `I.left ≤ x ∧ x ≤ I.right`.
--/
-instance {ℒ : Type*} [LT ℒ] [LE ℒ] : Membership ℒ (Intvl ℒ) :=
-  ⟨fun I x ↦ I.left ≤ x ∧ x ≤ I.right⟩
-
-lemma mem_def {ℒ : Type*} [LT ℒ] [LE ℒ] {I : Intvl ℒ} {x : ℒ} :
-    x ∈ I ↔ I.left ≤ x ∧ x ≤ I.right := Iff.rfl
-
-/-- Membership agrees with membership in the closed interval `Set.Icc I.left I.right`. -/
-lemma mem_iff_mem_Icc {ℒ : Type*} [Preorder ℒ] {I : Intvl ℒ} {x : ℒ} :
-    x ∈ I ↔ x ∈ Set.Icc I.left I.right := Iff.rfl
-
-@[simp] lemma left_mem {ℒ : Type*} [Preorder ℒ] (I : Intvl ℒ) : I.left ∈ I :=
-  ⟨le_rfl, I.lt.le⟩
-
-@[simp] lemma right_mem {ℒ : Type*} [Preorder ℒ] (I : Intvl ℒ) : I.right ∈ I :=
-  ⟨I.lt.le, le_rfl⟩
-
-/--
-Strict intervals are partially ordered by inclusion: `I ≤ J` means `I` is a subinterval of `J`,
-i.e. `J.left ≤ I.left ∧ I.right ≤ J.right`.
--/
-instance {ℒ : Type*} [PartialOrder ℒ] : PartialOrder (Intvl ℒ) where
-  le I J := J.left ≤ I.left ∧ I.right ≤ J.right
-  le_refl _ := ⟨le_rfl, le_rfl⟩
-  le_trans _ _ _ hIJ hJK := ⟨hJK.1.trans hIJ.1, hIJ.2.trans hJK.2⟩
-  le_antisymm _ _ hIJ hJI := Intvl.ext (le_antisymm hJI.1 hIJ.1) (le_antisymm hIJ.2 hJI.2)
-
-lemma le_def {ℒ : Type*} [PartialOrder ℒ] {I J : Intvl ℒ} :
-    I ≤ J ↔ J.left ≤ I.left ∧ I.right ≤ J.right := Iff.rfl
-
-/--
-When `ℒ` is a nontrivial bounded poset, the total interval `(⊥, ⊤)` is the greatest strict
-interval with respect to inclusion.
--/
-instance {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ] : OrderTop (Intvl ℒ) where
-  top := ⟨⊥, ⊤, bot_lt_top⟩
-  le_top _ := ⟨bot_le, le_top⟩
-
-@[simp] lemma left_top {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ] :
-    (⊤ : Intvl ℒ).left = ⊥ := rfl
-
-@[simp] lemma right_top {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ] :
-    (⊤ : Intvl ℒ).right = ⊤ := rfl
-
-/--
-Every element lies in the total interval `⊤`.
--/
-@[simp] lemma mem_top {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ] (x : ℒ) :
-    x ∈ (⊤ : Intvl ℒ) := ⟨bot_le, le_top⟩
-
-/-- An interval with endpoints `⊥` and `⊤` is the total interval `⊤`, whatever the proof. -/
-@[simp] lemma mk_bot_top {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
-    (h : (⊥ : ℒ) < ⊤) : (⟨⊥, ⊤, h⟩ : Intvl ℒ) = ⊤ := rfl
-
-end Intvl
-
-/--
 `μmax μ I` is the supremum of `μ ⟨I.left, u, _⟩` as `u` ranges over points in `I` distinct from the
 left endpoint.
-
-Intuition: this is a “best possible” value obtained by moving the right endpoint while keeping the
-left endpoint fixed.
-
-API design:
-- We take a bounded supremum `⨆ (u) (hu : u ∈ Set.Ioc I.left I.right), …`, so proofs interface
-  through the `iSup₂` lemma family (`le_iSup₂`, `iSup₂_le`, …).
-- The strictness of `(I.left, u)` is exactly `hu.1`.
-- The result lives in any complete lattice `S`.
 -/
 def μmax {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : Intvl ℒ → S) (I : Intvl ℒ) : S :=
+(μ : StrictIntvl ℒ → S) (I : StrictIntvl ℒ) : S :=
 ⨆ (u : ℒ) (hu : u ∈ Set.Ioc I.left I.right), μ ⟨I.left, u, hu.1⟩
 
 /--
 `μA μ I` is the infimum, over `a` in the interval distinct from the right endpoint, of `μmax`
 computed on the right-anchored subinterval `(a, I.right)`.
-
-Intuition: this is an “optimal value” after allowing the left endpoint to vary, with `μmax`
-capturing the inner optimization.
-
-API design:
-- We take a bounded infimum `⨅ (a) (ha : a ∈ Set.Ico I.left I.right), …`, so proofs interface
-  through the `iInf₂` lemma family (`iInf₂_le`, `le_iInf₂`, …).
-- Strictness of `(a, I.right)` is exactly `ha.2`.
 -/
 def μA {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : Intvl ℒ → S) (I : Intvl ℒ) : S :=
+(μ : StrictIntvl ℒ → S) (I : StrictIntvl ℒ) : S :=
 ⨅ (a : ℒ) (ha : a ∈ Set.Ico I.left I.right), μmax μ ⟨a, I.right, ha.2⟩
 
 /--
 `μAstar μ` is `μA μ` evaluated on the total interval `(⊥, ⊤)`.
-
-This is a common global invariant used in later semistability and equilibrium statements.
 -/
 def μAstar {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : Intvl ℒ → S) : S :=
+(μ : StrictIntvl ℒ → S) : S :=
 μA μ ⊤
 
 /--
 `μmin μ I` is the infimum of `μ ⟨u, I.right, _⟩` as `u` ranges over points in `I` distinct from the
-right endpoint.
-
-This is the dual construction to `μmax`.
+right endpoint.  This is the dual construction to `μmax`.
 -/
 def μmin {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : Intvl ℒ → S) (I : Intvl ℒ) : S :=
+(μ : StrictIntvl ℒ → S) (I : StrictIntvl ℒ) : S :=
 ⨅ (u : ℒ) (hu : u ∈ Set.Ico I.left I.right), μ ⟨u, I.right, hu.2⟩
 
 /--
 `μB μ I` is the supremum, over `a` in the interval distinct from the left endpoint, of `μmin`
-computed on the left-anchored subinterval `(I.left, a)`.
-
-This is the dual counterpart of `μA` (sup over an outer parameter, inf as the inner optimization).
+computed on the left-anchored subinterval `(I.left, a)`.  This is the dual counterpart of `μA`.
 -/
 def μB {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : Intvl ℒ → S) (I : Intvl ℒ) : S :=
+(μ : StrictIntvl ℒ → S) (I : StrictIntvl ℒ) : S :=
 ⨆ (a : ℒ) (ha : a ∈ Set.Ioc I.left I.right), μmin μ ⟨I.left, a, ha.1⟩
 
 /--
@@ -185,22 +75,16 @@ def μB {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 -/
 def μBstar {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : Intvl ℒ → S) : S :=
+(μ : StrictIntvl ℒ → S) : S :=
 μB μ ⊤
 
 /--
-`IsAttained μ I` asserts that the infimum defining `μA μ I` is realized by some `a` in the interval.
-
-More precisely, there exists `a ∈ Set.Ico I.left I.right` such that
-`μmax μ ⟨a, I.right, _⟩ = μA μ I`.
-
-API note: this is phrased as an existential proposition rather than a structure, since we typically
-only need existence to extract a witness in proofs. The membership condition matches the index of
-the bounded infimum defining `μA`.
+`IsAttained μ I` asserts that the infimum defining `μA μ I` is realized by some `a` in the
+interval: there exists `a ∈ Set.Ico I.left I.right` such that `μmax μ ⟨a, I.right, _⟩ = μA μ I`.
 -/
 def IsAttained {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : Intvl ℒ → S) (I : Intvl ℒ) : Prop :=
+(μ : StrictIntvl ℒ → S) (I : StrictIntvl ℒ) : Prop :=
   ∃ (a : ℒ) (ha : a ∈ Set.Ico I.left I.right),
     μmax μ ⟨a, I.right, ha.2⟩ = μA μ I
 

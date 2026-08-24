@@ -68,7 +68,7 @@ open Classical in
 noncomputable def JHFil
 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [hacc : WellFoundedGT ℒ]
 {S : Type*} [CompleteLinearOrder S]
-(μ : Intvl ℒ → S)
+(μ : StrictIntvl ℒ → S)
 (hμ : μ ⊤ ≠ ⊤)
 (hμsl : SlopeLike μ) (hst : Semistable μ)
 (hdc : ∀ x : ℕ → ℒ, (sax : StrictAnti x) →
@@ -93,7 +93,7 @@ noncomputable def JHFil
 lemma JHFil_anti_mono
 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [hacc : WellFoundedGT ℒ]
 {S : Type*} [CompleteLinearOrder S]
-(μ : Intvl ℒ → S)
+(μ : StrictIntvl ℒ → S)
 (hμ : μ ⊤ ≠ ⊤)
 (hμsl : SlopeLike μ) (hst : Semistable μ)
 (hdc : ∀ x : ℕ → ℒ, (sax : StrictAnti x) → ∃ N : ℕ, μ ⟨x (N +1), x N, sax <| lt_add_one N⟩ = ⊤) :
@@ -116,7 +116,7 @@ open Classical in
 lemma JHFil_step_payoff_eq_tot
 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [hacc : WellFoundedGT ℒ]
 {S : Type*} [CompleteLinearOrder S]
-(μ : Intvl ℒ → S)
+(μ : StrictIntvl ℒ → S)
 (hμ : μ ⊤ ≠ ⊤)
 (hμsl : SlopeLike μ) (hst : Semistable μ)
 (hdc : ∀ x : ℕ → ℒ, (sax : StrictAnti x) → ∃ N : ℕ, μ ⟨x (N + 1), x N, sax <| lt_add_one N⟩ = ⊤) :
@@ -240,7 +240,7 @@ lemma JHFil_step_payoff_eq_tot
 -/
 lemma JHFil_fin_len {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [hacc : WellFoundedGT ℒ]
 {S : Type*} [CompleteLinearOrder S]
-(μ : Intvl ℒ → S)
+(μ : StrictIntvl ℒ → S)
 (hμ : μ ⊤ ≠ ⊤)
 (hμsl : SlopeLike μ) (hst : Semistable μ)
 (hdc : ∀ x : ℕ → ℒ, (sax : StrictAnti x) → ∃ N : ℕ, μ ⟨x (N +1), x N, sax <| lt_add_one N⟩ = ⊤) :
@@ -261,7 +261,7 @@ open Classical in
 lemma JHFil_refine_lt_step_payoff
 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [hacc : WellFoundedGT ℒ]
 {S : Type*} [CompleteLinearOrder S]
-(μ : Intvl ℒ → S) [hsdcc' : StrongDescendingChainCondition' μ]
+(μ : StrictIntvl ℒ → S) [hsdcc' : StrongDescendingChainCondition' μ]
 (hμ : μ ⊤ ≠ ⊤)
 (hμsl : SlopeLike μ) (hst : Semistable μ)
 (hdc : ∀ x : ℕ → ℒ, (sax : StrictAnti x) → ∃ N : ℕ, μ ⟨x (N +1), x N, sax <| lt_add_one N⟩ = ⊤) :
@@ -341,7 +341,7 @@ open Classical in
 -/
 lemma JH_pos_len {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLinearOrder S]
-{μ : Intvl ℒ → S} : ∀ JH : JordanHolderFiltration μ, JH.length ≠ 0 := by
+{μ : StrictIntvl ℒ → S} : ∀ JH : JordanHolderFiltration μ, JH.length ≠ 0 := by
   intro JH h
   have := JH.filtration_length
   rw [h, JH.first_eq_top] at this
@@ -512,7 +512,7 @@ the values selected by `subseqIdx`.
 -/
 lemma subseqIdx_inherit_step_predicate {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 (f : ℕ → ℒ) (hf0 : f 0 = ⊤) (atf : ∃ k, f k = ⊥) (hfat : Antitone f)
-(P : Intvl ℒ → Prop)
+(P : StrictIntvl ℒ → Prop)
 (ho : ∀ i : ℕ, i < Nat.find atf → (hfi :f (i + 1) < f i) → P ⟨f (i+1), f i,hfi⟩) :
 ∀ i : ℕ, (hi : i < Nat.find (subseqIdx_hits_bot f atf hfat hf0)) →
   P ⟨f (subseqIdx f atf hfat (i + 1)), f (subseqIdx f atf hfat i),
@@ -553,8 +553,8 @@ lemma subseqIdx_inherit_step_predicate {ℒ : Type*} [Nontrivial ℒ] [Lattice �
 -/
 lemma μA_eq_μmin {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLinearOrder S]
-(μ : Intvl ℒ → S)
-[SlopeLike μ] (I : Intvl ℒ) :
+(μ : StrictIntvl ℒ → S)
+[SlopeLike μ] (I : StrictIntvl ℒ) :
 μmin μ I = μA μ I := by
   convert Eq.symm <| (proposition_4_1 (Resμ I μ) inferInstance inferInstance).1
   · simpa only [μmin_res_intvl] using by rfl
@@ -568,7 +568,7 @@ open Classical in
 -/
 lemma μ_bot_JH_eq_μ_tot {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLinearOrder S]
-{μ : Intvl ℒ → S}
+{μ : StrictIntvl ℒ → S}
 [hsl : SlopeLike μ] (JH : JordanHolderFiltration μ) :
 ∀ i : ℕ, (hi : i < JH.length) → μ ⟨⊥, JH.filtration i, by
   rw [← JH.filtration_length]
@@ -576,13 +576,13 @@ lemma μ_bot_JH_eq_μ_tot {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedO
   ⟩ = μ ⊤ := by
   intro i hi
   induction i with
-  | zero => simp only [JH.first_eq_top, Intvl.mk_bot_top]
+  | zero => simp only [JH.first_eq_top, StrictIntvl.mk_bot_top]
   | succ i hi' =>
     have := seesaw' μ hsl ⊥ (JH.filtration (i + 1)) ⊤
       ⟨JH.filtration_length ▸ JH.strict_anti hi.le (le_rfl : JH.length ≤ _) hi,
         JH.first_eq_top ▸ JH.strict_anti (Nat.zero_le _) (le_of_lt hi) (Nat.zero_lt_succ i)⟩
     refine (this.2.2.2.2 ?_).1
-    simp only [Intvl.mk_bot_top]
+    simp only [StrictIntvl.mk_bot_top]
     rw [← JH.step_cond₁ i <| Nat.lt_of_succ_lt hi]
     if htop : JH.filtration i = ⊤ then
       simp only [htop]
@@ -609,7 +609,7 @@ open Classical in
 lemma semistable_of_step_cond₂
 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLinearOrder S]
-(μ : Intvl ℒ → S) [SlopeLike μ] [sdc : StrongDescendingChainCondition' μ]
+(μ : StrictIntvl ℒ → S) [SlopeLike μ] [sdc : StrongDescendingChainCondition' μ]
 (filtration : ℕ → ℒ) (fin_len : ∃ N : ℕ, filtration N = ⊥)
 (strict_anti : ∀ i j : ℕ, i < j → j ≤ Nat.find (fin_len) → filtration j < filtration i) :
 (∀ i : ℕ, (hi : i < Nat.find fin_len) →
@@ -649,7 +649,7 @@ open Classical in
 lemma stable_of_step_cond₂
 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLinearOrder S]
-(μ : Intvl ℒ → S) [SlopeLike μ] [sdc : StrongDescendingChainCondition' μ]
+(μ : StrictIntvl ℒ → S) [SlopeLike μ] [sdc : StrongDescendingChainCondition' μ]
 (filtration : ℕ → ℒ) (fin_len : ∃ N : ℕ, filtration N = ⊥)
 (strict_anti : ∀ i j : ℕ, i < j → j ≤ Nat.find (fin_len) → filtration j < filtration i) :
 (∀ i : ℕ, (hi : i < Nat.find fin_len) →
@@ -665,7 +665,7 @@ lemma stable_of_step_cond₂
       toSemistable := semistable_of_step_cond₂ μ filtration fin_len strict_anti h i hi,
       stable := ?_ }
     · intro x hx hx'
-      let stepI : Intvl ℒ :=
+      let stepI : StrictIntvl ℒ :=
         ⟨filtration (i + 1), filtration i, strict_anti i (i + 1) (lt_add_one i) hi⟩
       have hx_left : filtration (i + 1) < x.val :=
         lt_of_le_of_ne x.prop.1 fun hc ↦ hx.ne' <| Subtype.coe_inj.1 hc.symm
@@ -674,8 +674,8 @@ lemma stable_of_step_cond₂
         inferInstance inferInstance).1
       simp only [μAstar, μA_res_intvl,μmin_res_intvl] at *
       rw [hAstar_step]
-      replace hAstar_x : μA μ (Intvl.ofSub ⟨⊥, x, hx⟩) =
-        μmin μ (Intvl.ofSub ⟨⊥, x, hx⟩) := hAstar_x
+      replace hAstar_x : μA μ (StrictIntvl.ofSub ⟨⊥, x, hx⟩) =
+        μmin μ (StrictIntvl.ofSub ⟨⊥, x, hx⟩) := hAstar_x
       rw [hAstar_x]
       have hss := semistable_of_step_cond₂ μ filtration fin_len strict_anti h i hi
       have hNash_step :=
@@ -695,7 +695,7 @@ open Classical in
 -/
 lemma step_cond₂_of_stable {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLinearOrder S]
-(μ : Intvl ℒ → S) [SlopeLike μ] [sdc : StrongDescendingChainCondition' μ]
+(μ : StrictIntvl ℒ → S) [SlopeLike μ] [sdc : StrongDescendingChainCondition' μ]
 (filtration : ℕ → ℒ) (fin_len : ∃ N : ℕ, filtration N = ⊥)
 (strict_anti : ∀ i j : ℕ, i < j → j ≤ Nat.find (fin_len) → filtration j < filtration i):
 (
@@ -708,7 +708,7 @@ lemma step_cond₂_of_stable {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [Bound
       strict_anti i (i+1) (lt_add_one i) hi⟩
 ) := by
   intro hst i hi z hz hz'
-  let stepI : Intvl ℒ :=
+  let stepI : StrictIntvl ℒ :=
     ⟨filtration (i + 1), filtration i, strict_anti i (i + 1) (lt_add_one i) hi⟩
   let midI : ↥stepI := ⟨z, le_of_lt hz, le_of_lt hz'⟩
   have hmid_ne_bot : ⊥ < midI := bot_lt_iff_ne_bot.2 fun hc ↦ ne_of_gt hz (congrArg Subtype.val hc)
@@ -759,7 +759,7 @@ lemma step_cond₂_of_stable {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [Bound
     by_contra hc
     apply Subtype.coe_inj.2 at hc
     simp only at hc
-    simp only [← hc, Intvl.val_bot, stepI, lt_self_iff_false] at hs)
+    simp only [← hc, StrictIntvl.val_bot, stepI, lt_self_iff_false] at hs)
   simp only [stepI, μ_res_intvl] at res
   exact (not_le_of_gt this) res
 
@@ -772,7 +772,7 @@ open Classical in
 lemma semistable_resμ_of_jordanHolderFiltration
 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLinearOrder S]
-{μ : Intvl ℒ → S}
+{μ : StrictIntvl ℒ → S}
 [FiniteTotalPayoff μ] [SlopeLike μ] [Semistable μ]
 [StrongDescendingChainCondition' μ] [Affine μ] (JH : JordanHolderFiltration μ)
 (h : JH.filtration (JH.length - 1) < ⊤) :
@@ -794,18 +794,8 @@ Semistable (Resμ ⟨JH.filtration (JH.length - 1), ⊤,h⟩ μ) := by
     have hEq := ((seesaw' μ inferInstance ⊥ (JH.filtration (JH.length - 1)) ⊤
       ⟨bot_lt_iff_ne_bot.2 <| JH.ne_bot_of_lt_length <| Nat.sub_one_lt <| JH_pos_len JH,
         h⟩).2.2.1 this).2
-    rw [Intvl.mk_bot_top] at hEq
+    rw [StrictIntvl.mk_bot_top] at hEq
     rwa [hEq] at this'
-
-/-- Intervals in a modular lattice inherit modularity.
-
-  This instance transports `IsModularLattice` from `ℒ` to the interval type `↥I`.
--/
-instance {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [iml : IsModularLattice ℒ]
-{I : Intvl ℒ} : IsModularLattice ↥I where
-  sup_inf_le_assoc_of_le := by
-    intro x y z hxz
-    exact iml.sup_inf_le_assoc_of_le y.val hxz
 
 open Classical in
 /-- `induction_on_length_of_JordanHolderFiltration` is the main internal induction principle.
@@ -820,7 +810,7 @@ lemma induction_on_length_of_JordanHolderFiltration (n : ℕ) :
     ∀ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
       [WellFoundedGT ℒ] [IsModularLattice ℒ]
       {S : Type*} [CompleteLinearOrder S]
-      {μ : Intvl ℒ → S}
+      {μ : StrictIntvl ℒ → S}
       [FiniteTotalPayoff μ] [SlopeLike μ] [Semistable μ]
       [StrongDescendingChainCondition' μ] [Affine μ],
       (∃ JH : JordanHolderFiltration μ, JH.length ≤ n) →
@@ -838,7 +828,7 @@ lemma induction_on_length_of_JordanHolderFiltration (n : ℕ) :
     else
     have hlenx_ne_zero : lenx ≠ 0 := JH_pos_len JHx
     have hlenx : 0 < lenx - 1 := by omega
-    let Ires : Intvl ℒ :=
+    let Ires : StrictIntvl ℒ :=
       ⟨x0, ⊤, (JHx.first_eq_top) ▸ JHx.strict_anti (Nat.zero_le _) (Nat.sub_le lenx 1) hlenx⟩
     have hx0_bot : ⊥ < x0 :=
       bot_lt_iff_ne_bot.2 <| JHx.ne_bot_of_lt_length <| Nat.sub_one_lt <| JH_pos_len JHx
@@ -891,7 +881,7 @@ lemma induction_on_length_of_JordanHolderFiltration (n : ℕ) :
       (fun z ↦ Resμ Ires μ z = Resμ Ires μ ⊤)
               ⟨JH_raw (i + 1), JH_raw i, hfi⟩ := by
       intro j hj hfj
-      simp only [Resμ, Intvl.ofSub, JH_raw]
+      simp only [Resμ, StrictIntvl.ofSub, JH_raw]
       have hj' : ∀ j : ℕ, j ≤ leny → μ ⟨⊥, x0 ⊔ JHy.filtration j, lt_of_lt_of_le hx0_bot
         le_sup_left⟩ = μ ⊤ := by
         refine fun j hj ↦ eq_of_le_of_ge ?_ ?_
@@ -949,7 +939,7 @@ lemma induction_on_length_of_JordanHolderFiltration (n : ℕ) :
           (fun j hj hfj w hw1 hw2 ↦ ((seesaw' μ hsl ↑(JH_raw (j + 1)) w ↑(JH_raw j)
               ⟨hw1, hw2⟩).1.2.2 ?_).1) i hi
         have := hcond1 j hj hfj
-        simp only [Resμ, Intvl.ofSub] at this
+        simp only [Resμ, StrictIntvl.ofSub] at this
         have this' := JHx.step_cond₁ (JHx.length - 1) (Nat.sub_one_lt (JH_pos_len JHx))
         simp only [Nat.sub_one_add_one <| JH_pos_len JHx, JHx.filtration_length] at this'
         replace this' := ((seesaw' μ hsl ⊥ x0 ⊤ ⟨hx0_bot, nt⟩).2.2.1 this').2
@@ -991,9 +981,9 @@ lemma induction_on_length_of_JordanHolderFiltration (n : ℕ) :
                 le_refl, sup_of_le_left, sup_le_iff, le_sup_right, true_and, ge_iff_le, JH_raw] at *
               exact hw2
           simp only [this]
-        simp only [Intvl.left_top, Intvl.right_top]
+        simp only [StrictIntvl.left_top, StrictIntvl.right_top]
         rw [heqs, ((by rfl) : μ ⟨↑(⊥ : ↥Ires), ↑(⊤ : ↥Ires), nt⟩ =
-          μ ⟨x0, ⊤, nt⟩), ← this', Intvl.mk_bot_top, ← JHy.step_cond₁ j <|
+          μ ⟨x0, ⊤, nt⟩), ← this', StrictIntvl.mk_bot_top, ← JHy.step_cond₁ j <|
           lt_of_lt_of_le hj <| Nat.find_le JH_raw_fin_len]
         have hlt : JHy.filtration (j+1) < JHy.filtration j ⊓ w := by
           refine lt_of_le_of_ne (le_inf (JHy.antitone <| Nat.le_add_right j 1) ?_) hproblem

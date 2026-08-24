@@ -40,9 +40,9 @@ It is marked `[simp]` so that typeclass conversions can be reduced automatically
 @[simp]
 lemma ConvexI_top_iff_Convex {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : Intvl ℒ → S) : ConvexI ⊤ μ ↔
+(μ : StrictIntvl ℒ → S) : ConvexI ⊤ μ ↔
 Convex μ :=
-  ⟨fun h ↦ ⟨fun x y hxy ↦ h.convex x y (Intvl.mem_top _) (Intvl.mem_top _) hxy⟩,
+  ⟨fun h ↦ ⟨fun x y hxy ↦ h.convex x y (StrictIntvl.mem_top _) (StrictIntvl.mem_top _) hxy⟩,
     fun h ↦ ⟨fun x y _ _ hxy ↦ h.convex x y hxy⟩⟩
 
 /--
@@ -52,7 +52,7 @@ This is a convenience instance so that `Convex μ` can be used wherever `ConvexI
 expected.
 -/
 instance {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-{S : Type*} [CompleteLattice S] {μ : Intvl ℒ → S} [Convex μ] :
+{S : Type*} [CompleteLattice S] {μ : StrictIntvl ℒ → S} [Convex μ] :
 ConvexI ⊤ μ :=
   (ConvexI_top_iff_Convex μ).mpr inferInstance
 
@@ -62,7 +62,7 @@ Typeclass instance: interval-local convexity on the total interval implies globa
 This is the reverse direction of the previous instance.
 -/
 instance {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-{S : Type*} [CompleteLattice S] {μ : Intvl ℒ → S} [ConvexI ⊤ μ] :
+{S : Type*} [CompleteLattice S] {μ : StrictIntvl ℒ → S} [ConvexI ⊤ μ] :
 Convex μ :=
   (ConvexI_top_iff_Convex μ).mp inferInstance
 
@@ -80,7 +80,7 @@ It is written in a general lattice/complete lattice setting, and is later specia
 interval.
 -/
 lemma lem2d4₁
-  (μ : Intvl ℒ → S)
+  (μ : StrictIntvl ℒ → S)
   (x : ℒ) (w : ℒ) (hxw : ¬ x ≤ w)
   (u : ℒ) (huxw : u ≤ x ⊓ w) :
   μA μ ⟨u, x, lt_of_le_of_lt huxw (inf_lt_left.2 hxw)⟩
@@ -97,8 +97,8 @@ non-comparable pair `x,w`.
 API note: the conclusion is stated as an inequality between `μmax` on two strict pairs in `ℒ`.
 -/
 lemma lem2d4₂I
-  (I : Intvl ℒ)
-  (μ : Intvl ℒ → S) (hμcvx : ConvexI I μ)
+  (I : StrictIntvl ℒ)
+  (μ : StrictIntvl ℒ → S) (hμcvx : ConvexI I μ)
   (x : ℒ) (hxI : x ∈ I)
   (w : ℒ) (hwI : w ∈ I)
   (hxw : ¬ x ≤ w)
@@ -126,8 +126,8 @@ This combines `lem2d4₁` and `lem2d4₂I` to compare `μA` values on two differ
 by the non-comparable pair `x,w`.
 -/
 lemma lem2d4₃I
-  (I : Intvl ℒ)
-  (μ : Intvl ℒ → S) (hμcvx : ConvexI I μ)
+  (I : StrictIntvl ℒ)
+  (μ : StrictIntvl ℒ → S) (hμcvx : ConvexI I μ)
   (x : ℒ) (hxI : x ∈ I)
   (w : ℒ) (hwI : w ∈ I)
   (hxw : ¬ x ≤ w)
@@ -149,8 +149,8 @@ The result returns a triple of inequalities as a nested conjunction, matching th
 the public-facing statement `lemma_2_4` in `Convexity/Results.lean`.
 -/
 lemma lem2d4I
-  (I : Intvl ℒ)
-  (μ : Intvl ℒ → S) (hμcvx : ConvexI I μ)
+  (I : StrictIntvl ℒ)
+  (μ : StrictIntvl ℒ → S) (hμcvx : ConvexI I μ)
   (x : ℒ) (hxI : x ∈ I) --(hx : I.left ≠ x)
   (w : ℒ) (hwI : w ∈ I) --(hw : I.left ≠ w)
   (hxw : ¬ x ≤ w)
@@ -173,8 +173,8 @@ Remark 2.5 (part 1), interval-local form: `μmax μ` inherits convexity from `μ
 This is a key closure property: convexity is preserved by the `μmax` construction.
 -/
 lemma rmk2d5₁
-  (I : Intvl ℒ)
-  (μ : Intvl ℒ → S) (hμcvx : ConvexI I μ) :
+  (I : StrictIntvl ℒ)
+  (μ : StrictIntvl ℒ → S) (hμcvx : ConvexI I μ) :
   ConvexI I (μmax μ)  :=
   ⟨fun x y hxI hyI hxy ↦ lem2d4₂I I μ hμcvx x hxI y hyI hxy (x ⊔ y) le_rfl⟩
 
@@ -186,8 +186,8 @@ The statement `μmax μ I = μmax (μmax μ) I` says that applying `μmax` twice
 result. Convexity is used to relate the two suprema.
 -/
 lemma rmk2d5₂
-  (I : Intvl ℒ)
-  (μ : Intvl ℒ → S) (hμcvx : ConvexI I μ) :
+  (I : StrictIntvl ℒ)
+  (μ : StrictIntvl ℒ → S) (hμcvx : ConvexI I μ) :
   μmax μ I = μmax (μmax μ) I := by
   apply eq_of_le_of_ge
   · exact le_iSup₂_of_le I.right ⟨I.lt, le_rfl⟩ le_rfl
@@ -204,8 +204,8 @@ Together with `rmk2d5₂`, this shows that the outer optimization `μA` is stabl
 closure.
 -/
 lemma rmk2d5₃
-  (I : Intvl ℒ)
-  (μ : Intvl ℒ → S) (hμcvx : ConvexI I μ) :
+  (I : StrictIntvl ℒ)
+  (μ : StrictIntvl ℒ → S) (hμcvx : ConvexI I μ) :
   μA μ I = μA (μmax μ) I := by
   have key : ∀ a, I.left ≤ a → ∀ h : a < I.right,
       μmax μ ⟨a, I.right, h⟩ = μmax (μmax μ) ⟨a, I.right, h⟩ :=
@@ -222,7 +222,7 @@ Proposition 2.6 (monotonicity part): `μA (x,z) ≤ μA (y,z)` when `x<y<z`.
 This does not use convexity; it is a formal consequence of the definition of `μA` as an infimum.
 -/
 lemma prop2d6₀
-  (μ : Intvl ℒ → S)
+  (μ : StrictIntvl ℒ → S)
   (x : ℒ) (y : ℒ) (z : ℒ)
   (h : x < y ∧ y < z) :
   μA μ ⟨x, z, lt_trans h.1 h.2⟩ ≤ μA μ ⟨y, z, h.2⟩  :=
@@ -235,8 +235,8 @@ Proposition 2.6 (a): a lower bound on `μA (x,z)` by the infimum of the two adja
 This is the first convexity-dependent inequality in Proposition 2.6.
 -/
 lemma prop2d6₁I
-  (I : Intvl ℒ)
-  (μ : Intvl ℒ → S) (hμcvx : ConvexI I μ)
+  (I : StrictIntvl ℒ)
+  (μ : StrictIntvl ℒ → S) (hμcvx : ConvexI I μ)
   (x : ℒ) (hxI : x ∈ I)
   (y : ℒ) (hyI : y ∈ I)
   (z : ℒ) (hzI : z ∈ I)
@@ -256,8 +256,8 @@ Proposition 2.6 (b), case 1: if `μA (x,y) ≥ μA (y,z)` then `μA (y,z) = μA 
 This is a clean equality criterion extracted from the general inequality chain.
 -/
 lemma prop2d6₂I₁
-  (I : Intvl ℒ)
-  (μ : Intvl ℒ → S) (hμcvx : ConvexI I μ)
+  (I : StrictIntvl ℒ)
+  (μ : StrictIntvl ℒ → S) (hμcvx : ConvexI I μ)
   (x : ℒ) (hxI : x ∈ I)
   (y : ℒ) (hyI : y ∈ I)
   (z : ℒ) (hzI : z ∈ I)
@@ -274,8 +274,8 @@ Proposition 2.6 (b), case 2: if `μA (x,y) < μA (y,z)` then `μA (x,y) ≤ μA 
 This provides the comparison bounds needed for the strict-inequality branch.
 -/
 lemma prop2d6₂I₂
-  (I : Intvl ℒ)
-  (μ : Intvl ℒ → S) (hμcvx : ConvexI I μ)
+  (I : StrictIntvl ℒ)
+  (μ : StrictIntvl ℒ → S) (hμcvx : ConvexI I μ)
   (x : ℒ) (hxI : x ∈ I)
   (y : ℒ) (hyI : y ∈ I)
   (z : ℒ) (hzI : z ∈ I)
@@ -295,8 +295,8 @@ infimum defining `μA (x,z)`. The conclusion then provides a dichotomy between e
 improvement.
 -/
 lemma prop2d6₃I
-  (I : Intvl ℒ)
-  (μ : Intvl ℒ → S) (hμcvx : ConvexI I μ)
+  (I : StrictIntvl ℒ)
+  (μ : StrictIntvl ℒ → S) (hμcvx : ConvexI I μ)
   (x : ℒ) (hxI : x ∈ I)
   (y : ℒ) (hyI : y ∈ I)
   (z : ℒ) (hzI : z ∈ I)
@@ -331,12 +331,12 @@ This is a specialization of `prop2d6₃I` to the total interval and uses totalit
 -/
 lemma rmk2d7
   {S : Type*} [CompleteLinearOrder S]
-  (μ : Intvl ℒ → S) (hμcvx : ConvexI ⊤ μ)
+  (μ : StrictIntvl ℒ → S) (hμcvx : ConvexI ⊤ μ)
   (x : ℒ) (h : ⊥ < x ∧ x < ⊤)
   (h' : μA μ ⟨⊥, x, h.1⟩ > μA μ ⊤) :
   μA μ ⟨x, ⊤, h.2⟩ = μA μ ⊤ :=
-  (prop2d6₃I ⊤ μ hμcvx ⊥ (Intvl.mem_top ⊥)
-      x (Intvl.mem_top x) ⊤ (Intvl.mem_top ⊤) h
+  (prop2d6₃I ⊤ μ hμcvx ⊥ (StrictIntvl.mem_top ⊥)
+      x (StrictIntvl.mem_top x) ⊤ (StrictIntvl.mem_top ⊤) h
       (Or.inl <| le_total _ _)).resolve_right
     fun h₃ ↦ not_le_of_gt h' h₃.1
 
@@ -347,8 +347,8 @@ Proposition 2.8 (auxiliary step): a disjunction bounding one of two `μA` values
 This is an interval-local statement used to derive the “meet” inequality in Proposition 2.8.
 -/
 lemma prop2d8₀I
-  (I : Intvl ℒ)
-  (μ : Intvl ℒ → S) (hμcvx : ConvexI I μ)
+  (I : StrictIntvl ℒ)
+  (μ : StrictIntvl ℒ → S) (hμcvx : ConvexI I μ)
   (x : ℒ) (hxI : x ∈ I)
   (y : ℒ) (hyI : y ∈ I)
   (u : ℒ) (h : u < x ∧ u < y)
@@ -369,8 +369,8 @@ Proposition 2.8 (a): `μA (u, x ⊔ y)` dominates the meet `μA (u,x) ⊓ μA (u
 This is obtained by taking an infimum and using `prop2d8₀I` to select the relevant branch.
 -/
 lemma prop2d8₁I
-  (I : Intvl ℒ)
-  (μ : Intvl ℒ → S) (hμcvx : ConvexI I μ)
+  (I : StrictIntvl ℒ)
+  (μ : StrictIntvl ℒ → S) (hμcvx : ConvexI I μ)
   (x : ℒ) (hxI : x ∈ I)
   (y : ℒ) (hyI : y ∈ I)
   (u : ℒ) (huI : u ∈ I)
@@ -388,8 +388,8 @@ Proposition 2.8 (b): under comparability or attainment, one of the two `μA` val
 This is a “one-sided dominance” conclusion that matches the alternative in the paper statement.
 -/
 lemma prop2d8₂I
-  (I : Intvl ℒ)
-  (μ : Intvl ℒ → S) (hμcvx : ConvexI I μ)
+  (I : StrictIntvl ℒ)
+  (μ : StrictIntvl ℒ → S) (hμcvx : ConvexI I μ)
   (x : ℒ) (hxI : x ∈ I)
   (y : ℒ) (hyI : y ∈ I)
   (u : ℒ) (huI : u ∈ I)

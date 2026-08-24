@@ -179,7 +179,7 @@ This is later turned into a finset and then coerced into the complete lattice `S
 -/
 abbrev _μ (R : Type*) [CommRing R]
 (M : Type*) [AddCommGroup M] [Module R M]
-(I : Intvl (ℒ R M)) :
+(I : StrictIntvl (ℒ R M)) :
 ------------
 Set (LinearExtension (PrimeSpectrum R))
 ------------
@@ -196,7 +196,7 @@ finitely generated module is finite; since `_μ` is its preimage under the injec
 -/
 noncomputable instance {R : Type*} [CommRing R] [IsNoetherianRing R]
 {M : Type*} [AddCommGroup M] [Module R M] [Module.Finite R M]
-{I : Intvl (ℒ R M)} :
+{I : StrictIntvl (ℒ R M)} :
 ------------
 Fintype ((_μ R M) I)
 ------------
@@ -216,7 +216,7 @@ API note: this is the primary slope map exported by the coprimary layer.
 noncomputable abbrev μ (R : Type*) [CommRing R] [IsNoetherianRing R]
 (M : Type*) [AddCommGroup M] [Module R M] [Module.Finite R M] :
 ------------
-Intvl (ℒ R M) → (S R)
+StrictIntvl (ℒ R M) → (S R)
 ------------
 := fun I ↦ .principal ((_μ R M) I).toFinset
 

@@ -47,8 +47,8 @@ API note: this lemma is used to derive a descending chain condition by contradic
 -/
 lemma prop3d2 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(I : Intvl ℒ)
-(μ : Intvl ℒ → S) (hμcvx : ConvexI I μ)
+(I : StrictIntvl ℒ)
+(μ : StrictIntvl ℒ → S) (hμcvx : ConvexI I μ)
 (x : ℒ) (hxI : x ∈ I)
 (z : ℒ) (hzI : z ∈ I)
 (h : x < z)
@@ -69,14 +69,14 @@ API note: this turns a “top occurs along chains” assumption into the formal 
 -/
 lemma cor3d3 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 (S : Type*) [CompleteLattice S]
-(μ : Intvl ℒ → S) (hμcvx : ConvexI ⊤ μ)
+(μ : StrictIntvl ℒ → S) (hμcvx : ConvexI ⊤ μ)
 (h : ∀ f : ℕ → ℒ, (h : StrictAnti f) →  ∃N : ℕ, μA μ ⟨f <| N + 1, f N,h (lt_add_one N)⟩ = ⊤)
 : μA_DescendingChainCondition μ := by
   refine { μ_dcc := fun a f h₁ h₂ ↦ ?_ }
   obtain ⟨N, hN⟩ := h f h₂
   exact ⟨N, not_lt_of_ge <| prop3d2 ⊤ μ hμcvx (f <| N + 1)
-    (Intvl.mem_top <| f <| N + 1) (f N) (Intvl.mem_top <| f N)
-    (h₂ (lt_add_one N)) hN a (Intvl.mem_top <| a) (h₁ <| N + 1)⟩
+    (StrictIntvl.mem_top <| f <| N + 1) (f N) (StrictIntvl.mem_top <| f N)
+    (h₂ (lt_add_one N)) hN a (StrictIntvl.mem_top <| a) (h₁ <| N + 1)⟩
 
 
 /--
@@ -92,8 +92,8 @@ This set is used to define an iterative process that searches for better breakpo
 -/
 def ℒₛ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : Intvl ℒ → S)
-(I : Intvl ℒ)
+(μ : StrictIntvl ℒ → S)
+(I : StrictIntvl ℒ)
 (x : ↥I) (hx : I.left ≠ x) : Set ℒ :=
 {p : ℒ | ∃ h₁ : p ∈ I, ∃ h₂ : I.left ≠ p ∧ p < x,
   μA μ ⟨I.left, p,lt_of_le_of_ne h₁.1 h₂.1⟩ >
@@ -117,8 +117,8 @@ API note: the definition is noncomputable due to classical choice and well-found
 noncomputable def prop3d4₀func
 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [h : WellFoundedGT ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : Intvl ℒ → S)
-(I : Intvl ℒ)
+(μ : StrictIntvl ℒ → S)
+(I : StrictIntvl ℒ)
 (k : ℕ) : ↥I :=
   match k with
   | 0 => ⟨I.right, I.right_mem⟩
@@ -141,8 +141,8 @@ This is used repeatedly to justify that the “improvement set” `ℒₛ` is we
 -/
 lemma prop3d4₀func_helper {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : Intvl ℒ → S)
-(I : Intvl ℒ)
+(μ : StrictIntvl ℒ → S)
+(I : StrictIntvl ℒ)
 (i : ℕ) (hi : I.left ≠ (prop3d4₀func μ I (i + 1)).val) :
 I.left ≠ (prop3d4₀func μ I i).val := by
   by_contra hcontra
@@ -158,8 +158,8 @@ This is extracted directly from the choice of a minimal “improving” element 
 lemma prop3d4₀func_defprop1
 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [inst_3 : WellFoundedGT ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : Intvl ℒ → S)
-(I : Intvl ℒ)
+(μ : StrictIntvl ℒ → S)
+(I : StrictIntvl ℒ)
 (i : ℕ) (hi : I.left ≠ (prop3d4₀func μ I (i + 1)).val) :
 μA μ ⟨I.left, (prop3d4₀func μ I (i+1)).val , lt_of_le_of_ne (prop3d4₀func μ I (i+1)).prop.1 hi⟩
   > μA μ ⟨I.left, (prop3d4₀func μ I i).val , lt_of_le_of_ne ((prop3d4₀func μ I i)).prop.1 <|
@@ -184,8 +184,8 @@ choice.
 lemma prop3d4₀func_defprop2
 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [inst_3 : WellFoundedGT ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : Intvl ℒ → S)
-(I : Intvl ℒ)
+(μ : StrictIntvl ℒ → S)
+(I : StrictIntvl ℒ)
 (i : ℕ) (hi : I.left ≠ (prop3d4₀func μ I (i + 1)).val) :
 ∀ z : ℒ, (hz : (prop3d4₀func μ I (i+1)).val < z ∧ z ≤ (prop3d4₀func μ I i).val) →
     ¬ μA μ ⟨I.left, z,lt_of_le_of_lt (prop3d4₀func μ I (i+1)).prop.1 hz.1⟩ ≥
@@ -225,8 +225,8 @@ More precisely: if step `i` is not the left endpoint, then `(prop3d4₀func μ I
 lemma prop3d4₀func_strict_decreasing
 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [inst_3 : WellFoundedGT ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : Intvl ℒ → S)
-(I : Intvl ℒ) :
+(μ : StrictIntvl ℒ → S)
+(I : StrictIntvl ℒ) :
 ∀ i : ℕ, I.left ≠ (prop3d4₀func μ I i).val →
 (prop3d4₀func μ I i).val > (prop3d4₀func μ I (i+1)).val := by
   intro i hi
@@ -258,8 +258,8 @@ and simultaneously a strict increase in `μA`, contradicting DCC if it never hit
 lemma prop3d4₀func_fin_len
 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : Intvl ℒ → S)
-(I : Intvl ℒ)
+(μ : StrictIntvl ℒ → S)
+(I : StrictIntvl ℒ)
 (hμDCC : μA_DescendingChainCondition μ) :
 ∃ i : ℕ, (prop3d4₀func μ I i).val = I.left := by
   by_contra!
@@ -279,8 +279,8 @@ This is the `Nat.find` of the termination statement `prop3d4₀func_fin_len`.
 noncomputable def prop3d4₀func_len
 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : Intvl ℒ → S)
-(I : Intvl ℒ)
+(μ : StrictIntvl ℒ → S)
+(I : StrictIntvl ℒ)
 (hμDCC : μA_DescendingChainCondition μ) : ℕ :=
   Nat.find (prop3d4₀func_fin_len μ I hμDCC)
 
@@ -294,8 +294,8 @@ endpoint for a strict interval.
 lemma prop3d4₀func_len_nonzero
 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : Intvl ℒ → S)
-(I : Intvl ℒ) (hμDCC : μA_DescendingChainCondition μ) :
+(μ : StrictIntvl ℒ → S)
+(I : StrictIntvl ℒ) (hμDCC : μA_DescendingChainCondition μ) :
 prop3d4₀func_len μ I hμDCC ≠ 0 := by
   classical
   by_contra hcontra
@@ -313,8 +313,8 @@ This lemma is phrased as a strict inequality `I.left < (prop3d4₀func μ I i).v
 lemma prop3d4₀func_defprop3₀
 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : Intvl ℒ → S)
-(I : Intvl ℒ) (hμDCC : μA_DescendingChainCondition μ)
+(μ : StrictIntvl ℒ → S)
+(I : StrictIntvl ℒ) (hμDCC : μA_DescendingChainCondition μ)
 (i : ℕ) (hi : i < (prop3d4₀func_len μ I hμDCC)) :
 I.left < (prop3d4₀func μ I i).val := by
   classical
@@ -334,8 +334,8 @@ This is used to show that the final candidate satisfies the selection predicate 
 lemma prop3d4₀func_defprop3
 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [inst_3 : WellFoundedGT ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : Intvl ℒ → S)
-(I : Intvl ℒ) (hμDCC : μA_DescendingChainCondition μ)
+(μ : StrictIntvl ℒ → S)
+(I : StrictIntvl ℒ) (hμDCC : μA_DescendingChainCondition μ)
 (y : ℒ) (hy : I.left < y ∧ y ≤ (prop3d4₀func μ I <| (prop3d4₀func_len μ I hμDCC) - 1).val) :
 ¬ μA μ ⟨I.left, y,hy.1⟩ >
   μA μ ⟨I.left, (prop3d4₀func μ I <| (prop3d4₀func_len μ I hμDCC) - 1).val ,
@@ -374,8 +374,8 @@ API note: this provides the key existential input for later uniqueness/maximalit
 -/
 lemma prop3d4 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : Intvl ℒ → S) (hμDCC : μA_DescendingChainCondition μ)
-(I : Intvl ℒ) (hμcvx : ConvexI I μ)
+(μ : StrictIntvl ℒ → S) (hμDCC : μA_DescendingChainCondition μ)
+(I : StrictIntvl ℒ) (hμcvx : ConvexI I μ)
 : (StI μ I).Nonempty := by
   classical
   let len := prop3d4₀func_len μ I hμDCC
@@ -459,8 +459,8 @@ This uses the tie-breaking predicate `S₂I` together with totality of compariso
 -/
 lemma rmk3d5 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLinearOrder S]
-(μ : Intvl ℒ → S)
-(I : Intvl ℒ)
+(μ : StrictIntvl ℒ → S)
+(I : StrictIntvl ℒ)
 (x : ℒ) (hxSt : x ∈ StI μ I)
 (y : ℒ) (hySt : y ∈ StI μ I) : x = y := by
   rcases hxSt with ⟨hxI, hx, hxS₁, hxS₂⟩
@@ -478,8 +478,8 @@ If `x ∈ StI μ I`, then the interval `(I.left, x)` is semistable in the interv
 -/
 lemma prop3d7₁ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : Intvl ℒ → S)
-(I : Intvl ℒ)
+(μ : StrictIntvl ℒ → S)
+(I : StrictIntvl ℒ)
 (x : ℒ) (hxSt : x ∈ StI μ I) :
 semistableI μ ⟨I.left, x, lt_of_le_of_ne hxSt.out.choose.1 hxSt.out.choose_spec.choose⟩ := by
   rcases hxSt with ⟨hxI,⟨hx',⟨hx'',hxS₂I⟩⟩⟩
@@ -498,8 +498,8 @@ Intuition: above the chosen breakpoint, the interval `(x,y)` cannot dominate the
 -/
 lemma prop3d7₂ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : Intvl ℒ → S)
-(I : Intvl ℒ) (hμcvx : ConvexI I μ)
+(μ : StrictIntvl ℒ → S)
+(I : StrictIntvl ℒ) (hμcvx : ConvexI I μ)
 (x : ℒ) (hxSt : x ∈ StI μ I) :
 ∀ y : ℒ, (hyI : y ∈ I) → (hy : y > x) → ¬ μA μ ⟨I.left, x ,
   lt_of_le_of_ne hxSt.out.choose.1 hxSt.out.choose_spec.choose⟩ ≤ μA μ ⟨x, y, hy⟩ := by
@@ -523,8 +523,8 @@ API note: this produces an instance of `Std.Total` for the subtype `StI μ I`.
 -/
 lemma prop3d8₁ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : Intvl ℒ → S)-- (hμ : μDCC μ)
-(I : Intvl ℒ) (hμcvx : ConvexI I μ)
+(μ : StrictIntvl ℒ → S)-- (hμ : μDCC μ)
+(I : StrictIntvl ℒ) (hμcvx : ConvexI I μ)
 (h : (@Std.Total S (· ≤ ·)) ∨
      ∀ z : ℒ, (hzI : z ∈ I) → (hz : I.left ≠ z) →
        IsAttained μ ⟨I.left, z , lt_of_le_of_ne hzI.left hz⟩) :
@@ -563,8 +563,8 @@ API note: the proof uses `has_min` on `StI μ I` together with the totality lemm
 -/
 lemma prop3d8₁' {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [inst_3 : WellFoundedGT ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : Intvl ℒ → S) (hμ : μA_DescendingChainCondition μ)
-(I : Intvl ℒ) (hμcvx : ConvexI I μ)
+(μ : StrictIntvl ℒ → S) (hμ : μA_DescendingChainCondition μ)
+(I : StrictIntvl ℒ) (hμcvx : ConvexI I μ)
 (h : (@Std.Total S (· ≤ ·)) ∨
      ∀ z : ℒ, (hzI : z ∈ I) → (hz : I.left ≠ z) →
        IsAttained μ ⟨I.left, z , lt_of_le_of_ne hzI.left hz⟩)  :
@@ -586,8 +586,8 @@ by the subinterval starting at `x`.
 -/
 lemma prop3d8₂ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : Intvl ℒ → S)-- (hμ : μDCC μ)
-(I : Intvl ℒ) (hμcvx : ConvexI I μ)
+(μ : StrictIntvl ℒ → S)-- (hμ : μDCC μ)
+(I : StrictIntvl ℒ) (hμcvx : ConvexI I μ)
 (h : (@Std.Total S (· ≤ ·)) ∨
      ∀ z : ℒ, (hzI : z ∈ I) → (hz : I.left ≠ z) →
        IsAttained μ ⟨I.left, z , lt_of_le_of_ne hzI.left hz⟩)
@@ -619,14 +619,14 @@ later modules and the predicate `semistableI μ ⊤` defined via `StI`.
 -/
 theorem semistable_iff {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : Intvl ℒ → S) :
+(μ : StrictIntvl ℒ → S) :
   Semistable μ ↔ semistableI μ ⊤ := by
-  simp only [semistableI, StI, S₁I, Intvl.left_top, Intvl.right_top, ne_eq, gt_iff_lt, S₂I,
-    Set.mem_ofPred_eq, le_top,
+  simp only [semistableI, StI, S₁I, StrictIntvl.left_top, StrictIntvl.right_top, ne_eq,
+    gt_iff_lt, S₂I, Set.mem_ofPred_eq, le_top,
     implies_true, and_true, bot_ne_top, not_false_eq_true, exists_true_left]
   constructor
-  · exact fun h ↦ ⟨Intvl.mem_top _, fun y hyI hy ↦ h.semistable y <| bot_le.lt_of_ne hy⟩
-  · exact fun h ↦ {semistable := fun y hyI hy ↦ (h.choose_spec y (Intvl.mem_top _) hyI.ne) hy}
+  · exact fun h ↦ ⟨StrictIntvl.mem_top _, fun y hyI hy ↦ h.semistable y <| bot_le.lt_of_ne hy⟩
+  · exact fun h ↦ {semistable := fun y hyI hy ↦ (h.choose_spec y (StrictIntvl.mem_top _) hyI.ne) hy}
 
 
 /--
@@ -642,20 +642,20 @@ and the “interval as a bounded lattice” viewpoint.
 -/
 theorem semistableI_iff {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-(μ : Intvl ℒ → S)
-(I : Intvl ℒ) : semistableI μ I ↔ Semistable (Resμ I μ) := by
+(μ : StrictIntvl ℒ → S)
+(I : StrictIntvl ℒ) : semistableI μ I ↔ Semistable (Resμ I μ) := by
   rw [semistable_iff (μ := Resμ I μ)]
-  simp only [semistableI, StI, S₁I, S₂I, Intvl.left_top, Intvl.right_top, Set.mem_ofPred_eq,
-    gt_iff_lt,
+  simp only [semistableI, StI, S₁I, S₂I, StrictIntvl.left_top, StrictIntvl.right_top,
+    Set.mem_ofPred_eq, gt_iff_lt,
     μA_res_intvl]
   constructor
   · rintro ⟨hI, hne, h₁, h₂⟩
-    exact ⟨Intvl.mem_top _, ne_of_lt bot_lt_top,
+    exact ⟨StrictIntvl.mem_top _, ne_of_lt bot_lt_top,
       fun y hyI hy ↦ h₁ y y.prop (fun h => hy <| Subtype.ext h),
       fun y hyI hy hy' ↦ h₂ y y.prop (fun h => hy <| Subtype.ext h) hy'⟩
   · rintro ⟨hI, hne, h₁, h₂⟩
     exact ⟨I.right_mem, I.lt.ne,
-      fun y hyI hy ↦ h₁ ⟨y, hyI⟩ (Intvl.mem_top _) (fun h => hy <| congrArg Subtype.val h),
+      fun y hyI hy ↦ h₁ ⟨y, hyI⟩ (StrictIntvl.mem_top _) (fun h => hy <| congrArg Subtype.val h),
       fun y hyI hy hy' ↦ hyI.2⟩
 
 
