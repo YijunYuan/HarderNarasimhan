@@ -17,7 +17,7 @@ import Mathlib.Order.Completion
 import HarderNarasimhan.Basic
 import HarderNarasimhan.PayoffFunction.Semistable.Defs
 import HarderNarasimhan.Interval
-import HarderNarasimhan.Filtration.Results
+import HarderNarasimhan.Filtration.Defs
 import Mathlib.Combinatorics.Colex
 
 /-!

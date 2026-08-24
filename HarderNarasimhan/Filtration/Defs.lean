@@ -4,143 +4,210 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yijun Yuan
 -/
 import HarderNarasimhan.PayoffFunction.Semistable.Breakpoints
-import HarderNarasimhan.Interval
 import Mathlib.Order.RelSeries
 import Mathlib.Data.Rel
 
 /-!
-Definitions for Harder–Narasimhan filtrations.
+# Harder–Narasimhan filtrations
 
-This module introduces:
+This file defines the Harder–Narasimhan filtrations of a payoff function
+`μ : PayoffFunction ℒ S`: finite chains `⊥ = F 0 < F 1 < ⋯ < F F.length = ⊤` whose successive
+steps are semistable and whose `μ.A`-slopes strictly decrease.  The canonical construction of
+such a filtration is `μ.hnFiltration` in `HarderNarasimhan.Filtration.Exists`; its uniqueness
+over a complete linear order is proved in `HarderNarasimhan.Filtration.Unique`.
 
-* `μAdmissible μ`: a mild hypothesis ensuring that the “stable breakpoint” machinery
-  from semistability can be iterated (either because the codomain order is total, or
-  because `μ` attains its relevant suprema),
-* `HarderNarasimhanFiltration μ`: the record packaging a finite increasing chain
-  from `⊥` to `⊤` whose successive subquotients are semistable and whose `μA`-slopes
-  satisfy a strict anti-monotonicity condition, and
-* `IntervalSemistableRel μ`: the relation on `ℒ` used to view a filtration as a
-  `RelSeries` in later developments.
+The length of the chain is stored as a `length` field, but it carries no extra information:
+it is provably the least index at which the chain reaches `⊤` (`length_le_of_eq_top`), hence
+it is determined by the chain itself; accordingly extensionality (`ext`) only requires the
+underlying functions to agree.
 
-The actual construction of the canonical filtration is carried out in
-`HarderNarasimhan.Filtration.Impl`.
+The side condition `PayoffFunction.Admissible` records the two standard hypotheses under
+which the greatest-breakpoint machinery of
+`HarderNarasimhan.PayoffFunction.Semistable.Breakpoints` can be iterated: either the codomain
+order is total, or all the infima defining `μ.A` are attained.
 
-API overview:
+Finally, `μ.semistableRel` is the relation "`x < y` and the game on `(x, y)` is semistable",
+which lets a Harder–Narasimhan filtration be repackaged as a `RelSeries`; see
+`exists_relSeries_semistableRel` in `HarderNarasimhan.Filtration.Unique`.
 
-* Import this file for the core types `μAdmissible`, `HarderNarasimhanFiltration`, and the
-  relation `IntervalSemistableRel` used to view filtrations as `RelSeries`.
-* Import `HarderNarasimhan.Filtration.Results` for the canonical inhabitant/uniqueness statements
-  and for the “ready-to-use” `RelSeries` packaging.
+## Main definitions
+
+* `PayoffFunction.Admissible` : the codomain order is total, or `μ` attains the infima
+  defining `μ.A`.
+* `PayoffFunction.HarderNarasimhanFiltration` : the structure packaging a Harder–Narasimhan
+  filtration for `μ`, applied to indices via the `FunLike` coercion.
+* `PayoffFunction.semistableRel` : the semistable-interval relation on `ℒ` used for the
+  `RelSeries` packaging.
+
+## Main results
+
+* `HarderNarasimhanFiltration.length_le_of_eq_top`, `ne_top_of_lt`, `eq_top_of_length_le` :
+  the `length` field is the least index at which the chain reaches `⊤`.
+* `HarderNarasimhanFiltration.ext` : two filtrations with the same underlying chain are
+  equal.
+
+## References
+
+* [Chen–Jeannin, *Harder–Narasimhan game*][ChenJeannin]
 -/
 
 namespace HarderNarasimhan
 
-/--
-Admissibility hypothesis for building Harder–Narasimhan filtrations.
-If your codomain `S` is a complete linear order, you typically get `μAdmissible μ` for free.
+namespace PayoffFunction
 
-We allow two common ways to ensure the “maximal stable element exists” steps needed
-in the construction:
+variable {ℒ S : Type*}
 
-* `S` has a total order (`Std.Total (· ≤ ·)`), or
-* for every interval `I`, the `μ`-values relevant to `IsAttained μ I` are achieved.
+section Admissible
 
-This is phrased as a typeclass so later theorems can assume it implicitly.
+variable [Preorder ℒ] [CompleteLattice S]
 
-API note: this is the main extra hypothesis needed for the existence theorem.
--/
-class μAdmissible {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
-{S : Type*} [CompleteLattice S]
-(μ : PayoffFunction ℒ S) : Prop where
-  μ_adm : (Std.Total (· ≤ · : S → S → Prop)) ∨ ∀ I : StrictIntvl ℒ,  IsAttained μ I
+/-- A payoff function is *admissible* when the greatest-breakpoint machinery behind the
+construction of Harder–Narasimhan filtrations can be iterated: either the order on the
+codomain `S` is total, or the infimum defining `μ.A I` is attained on every interval `I`.
+Over a complete linear order admissibility is automatic. -/
+class Admissible (μ : PayoffFunction ℒ S) : Prop where
+  /-- Either `≤` is total on the codomain, or every defining infimum of `μ.A` is attained. -/
+  total_or_attained : Std.Total (· ≤ · : S → S → Prop) ∨ ∀ I : StrictIntvl ℒ, μ.IsAttained I
 
-/--
-In a complete linear order, admissibility is automatic.
+end Admissible
 
-This instance uses the fact that linearity implies totality of `≤`.
--/
-instance {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
-{S : Type*} [CompleteLinearOrder S]
-{μ : PayoffFunction ℒ S} :
-μAdmissible μ where
-  μ_adm := Or.inl Std.instTotalLeOfIsLinearPreorder
+section AdmissibleLinearOrder
 
-open Classical in
-/--
-A Harder–Narasimhan filtration as a finite increasing chain.
-For the canonical inhabitant and uniqueness theorems, prefer importing
-`HarderNarasimhan.Filtration.Results`.
+variable [Preorder ℒ] [CompleteLinearOrder S]
 
-Fields:
+/-- Over a complete linear order every payoff function is admissible, since `≤` is total. -/
+instance (μ : PayoffFunction ℒ S) : μ.Admissible where
+  total_or_attained := Or.inl inferInstance
 
-* `filtration : ℕ → ℒ` is the underlying chain.
-* `monotone`, `first_eq_bot`, `fin_len` enforce that it starts at `⊥` and eventually
-  reaches `⊤`.
-* `strict_mono` provides strictness up to the (chosen) finite length.
-* `piecewise_semistable` asserts that each successive interval is semistable.
-* `μA_pseudo_strict_anti` encodes the strict decrease condition on successive
-  `μA`-slopes (the “HN slopes are strictly decreasing” property).
+end AdmissibleLinearOrder
 
-The filtration is expressed using restrictions `Resμ` to successive intervals.
+section HarderNarasimhanFiltration
 
-API note: this structure is the central user-facing object of the filtration layer.
--/
-@[ext]
-structure HarderNarasimhanFiltration
-{ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-{S : Type*} [CompleteLattice S]
-(μ : PayoffFunction ℒ S) where
-  filtration : ℕ → ℒ
-  monotone             : Monotone filtration
-  first_eq_bot         : filtration 0 = ⊥
-  fin_len              : ∃ n : ℕ, filtration n = ⊤
-  strict_mono          : StrictMonoOn filtration (Set.Iic (Nat.find fin_len))
-  piecewise_semistable : ∀ i : ℕ, (h: i < Nat.find (fin_len)) →
-    PayoffFunction.IsSemistable
-      (Resμ ⟨filtration i, filtration (i+1), strict_mono h.le h (lt_add_one i)⟩ μ)
-  μA_pseudo_strict_anti: ∀ i : ℕ, (hi : i + 1 < Nat.find fin_len) →
-    ¬ μA μ ⟨filtration i, filtration (i+1),
-        strict_mono (Nat.le_of_succ_le hi.le) hi.le (lt_add_one i)⟩ ≤
-    μA μ ⟨filtration (i+1), filtration (i+2), strict_mono hi.le hi (Nat.lt_add_one (i + 1))⟩
+variable [PartialOrder ℒ] [BoundedOrder ℒ] [CompleteLattice S]
 
+/-- A **Harder–Narasimhan filtration** for the payoff function `μ`: a finite chain
+`⊥ = F 0 < F 1 < ⋯ < F F.length = ⊤`, extended constantly by `⊤` above `length`, whose
+successive steps are semistable and whose `μ.A`-slopes strictly decrease.  This is the
+Harder–Narasimhan filtration of [ChenJeannin, §3].
+
+`length` is stored as data but carries no extra information: it is provably the *least*
+index at which the chain reaches `⊤` (`length_le_of_eq_top`), hence determined by `toFun`;
+accordingly `ext` only asks for `toFun` to agree. -/
+structure HarderNarasimhanFiltration (μ : PayoffFunction ℒ S) where
+  /-- The underlying chain; apply via the coercion, `F n`. -/
+  toFun : ℕ → ℒ
+  /-- The index at which the chain reaches `⊤`. -/
+  length : ℕ
+  /-- The chain is monotone (constantly `⊤` above `length`). -/
+  monotone : Monotone toFun
+  /-- The chain starts at `⊥`. -/
+  head_eq_bot : toFun 0 = ⊥
+  /-- The chain reaches `⊤` at index `length`. -/
+  length_eq_top : toFun length = ⊤
+  /-- The chain is strictly increasing up to `length`. -/
+  strictMonoOn : StrictMonoOn toFun (Set.Iic length)
+  /-- Each successive step `(F i, F (i + 1))` is semistable. -/
+  piecewise_isSemistable : ∀ i, (hi : i < length) →
+    (μ.restrict ⟨toFun i, toFun (i + 1), strictMonoOn hi.le hi (lt_add_one i)⟩).IsSemistable
+  /-- Successive `μ.A`-slopes strictly decrease, in the `¬ · ≤ ·` sense appropriate for a
+  possibly non-linear codomain `S`. -/
+  not_A_le_succ : ∀ i, (hi : i + 1 < length) →
+    ¬ μ.A ⟨toFun i, toFun (i + 1),
+        strictMonoOn (Nat.le_of_succ_le hi.le) hi.le (lt_add_one i)⟩ ≤
+      μ.A ⟨toFun (i + 1), toFun (i + 2), strictMonoOn hi.le hi (lt_add_one (i + 1))⟩
 
 namespace HarderNarasimhanFiltration
 
-variable {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-  {S : Type*} [CompleteLattice S] {μ : PayoffFunction ℒ S}
+variable {μ : PayoffFunction ℒ S}
 
-open Classical in
-/--
-The length of a Harder–Narasimhan filtration: the first index at which it reaches `⊤`.
+instance : FunLike (μ.HarderNarasimhanFiltration) ℕ ℒ where
+  coe := toFun
+  coe_injective := by
+    have key : ∀ F G : μ.HarderNarasimhanFiltration, F.toFun = G.toFun →
+        F.length ≤ G.length := by
+      intro F G h
+      by_contra hc
+      rw [not_le] at hc
+      have h1 := F.strictMonoOn hc.le (Set.mem_Iic.2 le_rfl) hc
+      rw [F.length_eq_top, h, G.length_eq_top] at h1
+      exact lt_irrefl ⊤ h1
+    intro F G h
+    have hlen : F.length = G.length := le_antisymm (key F G h) (key G F h.symm)
+    cases F
+    cases G
+    dsimp only at h hlen
+    subst h
+    subst hlen
+    rfl
 
-All `Nat.find`-based bookkeeping about the chain length is encapsulated here and in the
-accompanying lemmas; downstream code should use `F.length` and never touch `Nat.find` directly.
--/
-noncomputable def length (F : HarderNarasimhanFiltration μ) : ℕ := Nat.find F.fin_len
+@[simp] lemma toFun_eq_coe (F : μ.HarderNarasimhanFiltration) : F.toFun = ⇑F := rfl
 
-open Classical in
-@[simp] lemma filtration_length (F : HarderNarasimhanFiltration μ) :
-    F.filtration F.length = ⊤ := Nat.find_spec F.fin_len
+variable {F G : μ.HarderNarasimhanFiltration} {m : ℕ}
 
-open Classical in
-lemma ne_top_of_lt_length (F : HarderNarasimhanFiltration μ) {m : ℕ} (h : m < F.length) :
-    F.filtration m ≠ ⊤ := Nat.find_min F.fin_len h
+/-- Below `F.length` the chain has not yet reached `⊤`. -/
+lemma ne_top_of_lt (h : m < F.length) : F m ≠ ⊤ := fun hc ↦
+  (F.strictMonoOn h.le (Set.mem_Iic.2 le_rfl) h).ne (hc.trans F.length_eq_top.symm)
 
-open Classical in
-lemma length_le_of_eq_top (F : HarderNarasimhanFiltration μ) {m : ℕ}
-    (h : F.filtration m = ⊤) : F.length ≤ m := Nat.find_min' F.fin_len h
+/-- Minimality of the `length` field: it is the least index at which the chain reaches
+`⊤`.  In particular `length` is determined by the underlying chain. -/
+lemma length_le_of_eq_top (h : F m = ⊤) : F.length ≤ m :=
+  not_lt.1 fun hc ↦ ne_top_of_lt hc h
+
+/-- Above `F.length` the chain is constantly `⊤`. -/
+lemma eq_top_of_length_le (h : F.length ≤ m) : F m = ⊤ :=
+  top_le_iff.1 <| F.length_eq_top ▸ F.monotone h
+
+/-- The chain has reached `⊤` at an index iff the index is at least `F.length`. -/
+lemma ne_top_iff_lt_length : F m ≠ ⊤ ↔ m < F.length :=
+  ⟨fun h ↦ not_le.1 fun hc ↦ h (eq_top_of_length_le hc), ne_top_of_lt⟩
+
+/-- One-step strict growth of the chain before it reaches `⊤`. -/
+lemma lt_succ_of_ne_top (h : F m ≠ ⊤) : F m < F (m + 1) := by
+  have hm : m < F.length := ne_top_iff_lt_length.1 h
+  exact F.strictMonoOn hm.le hm (lt_add_one m)
+
+/-- Two Harder–Narasimhan filtrations with the same underlying chain are equal: the
+`length` field is determined by the chain (`length_le_of_eq_top`) and the remaining fields
+are proofs. -/
+@[ext] theorem ext (h : ∀ n, F n = G n) : F = G := DFunLike.ext F G h
 
 end HarderNarasimhanFiltration
 
-/-- The relation “there is a semistable interval from `x` to `y`”.
-  This is a `SetRel ℒ ℒ` so that a filtration can be interpreted as a `RelSeries` whose
-  successor steps certify semistability of each interval.
+end HarderNarasimhanFiltration
 
-  API note: this relation is intended for consumers who prefer `RelSeries` packaging.
--/
-def IntervalSemistableRel {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-{S : Type*} [CompleteLattice S]
-(μ : PayoffFunction ℒ S)
-: SetRel ℒ ℒ :=
-{(x, y) | ∃ h : x < y, PayoffFunction.IsSemistable (Resμ ⟨x, y, h⟩ μ)}
+section SemistableRel
+
+variable [PartialOrder ℒ] [CompleteLattice S]
+
+/-- The relation "`x < y` and the game on the interval `(x, y)` is semistable".  A
+Harder–Narasimhan filtration is precisely a `RelSeries` for this relation from `⊥` to `⊤`
+whose `μ.A`-slopes strictly decrease; see `exists_relSeries_semistableRel`. -/
+def semistableRel (μ : PayoffFunction ℒ S) : SetRel ℒ ℒ :=
+  {(x, y) | ∃ h : x < y, (μ.restrict ⟨x, y, h⟩).IsSemistable}
+
+variable {μ : PayoffFunction ℒ S}
+
+/-- The underlying function of a `RelSeries` for `μ.semistableRel` is strictly monotone,
+obtained by forgetting the semistability witnesses. -/
+lemma relSeries_strictMono (s : RelSeries μ.semistableRel) : StrictMono s.toFun :=
+  LTSeries.strictMono (s.map ⟨id, fun h ↦ h.choose⟩)
+
+open Fin.NatCast in
+/-- Consecutive elements of a `RelSeries` for `μ.semistableRel` are strictly increasing,
+expressed via `ℕ`-indexed casts so that slope conditions can be stated with indices `i`,
+`i + 1`, `i + 2`. -/
+lemma relSeries_step_lt (s : RelSeries μ.semistableRel) {i : ℕ} (hi : i + 1 < s.length) :
+    s.toFun ↑i < s.toFun ↑(i + 1) :=
+  relSeries_strictMono s (Fin.natCast_strictMono hi.le (lt_add_one i))
+
+open Fin.NatCast in
+/-- The strict inequality of `relSeries_step_lt`, shifted by one. -/
+lemma relSeries_succ_step_lt (s : RelSeries μ.semistableRel) {i : ℕ}
+    (hi : i + 1 < s.length) : s.toFun ↑(i + 1) < s.toFun ↑(i + 2) :=
+  relSeries_strictMono s (Fin.natCast_strictMono hi (lt_add_one (i + 1)))
+
+end SemistableRel
+
+end PayoffFunction
+
 end HarderNarasimhan

@@ -7,7 +7,7 @@ import Mathlib.Algebra.Module.Torsion.Basic
 
 import HarderNarasimhan.PayoffFunction.Semistable.Breakpoints
 import HarderNarasimhan.Interval
-import HarderNarasimhan.Filtration.Results
+import HarderNarasimhan.Filtration.Unique
 import HarderNarasimhan.CoprimaryFiltration.CommutativeAlgebra
 import HarderNarasimhan.CoprimaryFiltration.Defs
 
@@ -479,12 +479,12 @@ PayoffFunction.IsSemistable (μ R M) ↔ ∃! p, p ∈ associatedPrimes R M := b
 Admissibility of the slope `μ R M`.
 
 For the coprimary filtration application we only need the “totality” branch of
-`μAdmissible`: the codomain order is linear, hence total.
+`PayoffFunction.Admissible`: the codomain order is linear, hence total.
 -/
 instance {R : Type*} [CommRing R] [IsNoetherianRing R]
 {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] :
-μAdmissible (μ R M) where
-  μ_adm := Or.inl inferInstance
+PayoffFunction.Admissible (μ R M) where
+  total_or_attained := Or.inl inferInstance
 
 
 /--
@@ -653,63 +653,73 @@ semistability as having a unique associated prime.
 -/
 lemma piecewise_coprimary {R : Type*} [CommRing R] [IsNoetherianRing R]
 {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]
-(HNFil : HarderNarasimhanFiltration (μ R M)) :
+(HNFil : (μ R M).HarderNarasimhanFiltration) :
 ∀ n < HNFil.length,
-  Coprimary R (↥(HNFil.filtration (n + 1)) ⧸
-    Submodule.submoduleOf (HNFil.filtration n) (HNFil.filtration (n + 1))) := by
+  Coprimary R (↥(HNFil (n + 1)) ⧸
+    Submodule.submoduleOf (HNFil n) (HNFil (n + 1))) := by
   intro n hn
-  let hstep := HNFil.strict_mono hn.le hn (Nat.lt_add_one n)
+  let hstep := HNFil.strictMonoOn hn.le hn (Nat.lt_add_one n)
   let := quot_ntl hstep
   exact {
     coprimary := rmk4d14₂.mp <|
-      (semistable_res_iff_semistable_quot _ _ hstep).mp (HNFil.piecewise_semistable n hn)
+      (semistable_res_iff_semistable_quot _ _ hstep).mp (HNFil.piecewise_isSemistable n hn)
   }
 
 
+open Classical in
 /--
 Existence of a coprimary filtration.
 
 We build a `CoprimaryFiltration R M` from the canonical Harder–Narasimhan filtration
-for the slope `μ R M`, using `piecewise_coprimary` to certify coprimary graded pieces.
+`(μ R M).hnFiltration`, using `piecewise_coprimary` to certify coprimary graded pieces.
+The transitional `Nat.find` length of `CoprimaryFiltration` is bridged to the `length`
+field of the Harder–Narasimhan filtration via `length_le_of_eq_top`.
 -/
 noncomputable instance {R : Type*} [CommRing R] [IsNoetherianRing R]
 {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] :
 Inhabited (CoprimaryFiltration R M) := by
-  have HNFil := (inferInstance : Inhabited (HarderNarasimhanFiltration (μ R M))).default
-  refine { default :=  (
-    CoprimaryFiltration.mk HNFil.filtration HNFil.monotone HNFil.first_eq_bot HNFil.fin_len
-    HNFil.strict_mono (piecewise_coprimary HNFil) ?_)
-  }
-  intro n hn p q hp hq
-  have := lt_of_not_ge <| HNFil.μA_pseudo_strict_anti n hn
-  rw [prop3d12, prop3d12, DedekindCut.principal_lt_principal] at this
-  replace this := S₀_order'.2 this
-  rw [toLinearExtension_eq_min' ⟨HNFil.filtration (n + 1), HNFil.filtration (n + 2),
-      HNFil.strict_mono hn.le hn (Nat.lt_add_one (n + 1))⟩
-      (piecewise_coprimary HNFil (n+1) hn).coprimary hp,
-    toLinearExtension_eq_min' ⟨HNFil.filtration n, HNFil.filtration (n + 1),
-      HNFil.strict_mono (Nat.le_of_succ_le hn.le) (Nat.le_of_succ_le hn) (Nat.lt_add_one n)⟩
-      (piecewise_coprimary HNFil n <| Nat.lt_of_succ_lt hn).coprimary hq]
-  exact this
+  have F := (μ R M).hnFiltration
+  have hfin : ∃ n : ℕ, F n = ⊤ := ⟨F.length, F.length_eq_top⟩
+  have hle : Nat.find hfin ≤ F.length := Nat.find_min' hfin F.length_eq_top
+  refine { default := CoprimaryFiltration.mk (⇑F) F.monotone F.head_eq_bot hfin ?_ ?_ ?_ }
+  · exact F.strictMonoOn.mono (Set.Iic_subset_Iic.2 hle)
+  · exact fun n hn ↦ piecewise_coprimary F n (lt_of_lt_of_le hn hle)
+  · intro n hn p q hp hq
+    replace hn : n + 1 < F.length := lt_of_lt_of_le hn hle
+    have h1 : μA (μ R M) ⟨F (n + 1), F (n + 2),
+        F.strictMonoOn hn.le hn (Nat.lt_add_one (n + 1))⟩ <
+      μA (μ R M) ⟨F n, F (n + 1),
+        F.strictMonoOn (Nat.le_of_succ_le hn.le) (Nat.le_of_succ_le hn) (Nat.lt_add_one n)⟩ :=
+      lt_of_not_ge <| F.not_A_le_succ n hn
+    rw [prop3d12, prop3d12, DedekindCut.principal_lt_principal] at h1
+    replace h1 := S₀_order'.2 h1
+    rw [toLinearExtension_eq_min' ⟨F (n + 1), F (n + 2),
+        F.strictMonoOn hn.le hn (Nat.lt_add_one (n + 1))⟩
+        (piecewise_coprimary F (n + 1) hn).coprimary hp,
+      toLinearExtension_eq_min' ⟨F n, F (n + 1),
+        F.strictMonoOn (Nat.le_of_succ_le hn.le) (Nat.le_of_succ_le hn) (Nat.lt_add_one n)⟩
+        (piecewise_coprimary F n <| Nat.lt_of_succ_lt hn).coprimary hq]
+    exact h1
 
 instance {R : Type*} [CommRing R] [IsNoetherianRing R]
 {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] :
 Nonempty (CoprimaryFiltration R M) := inferInstance
 
+open Classical in
 /--
 Any coprimary filtration underlies a Harder–Narasimhan filtration.
 
-We reuse the same filtration function and verify the Harder–Narasimhan axioms:
-piecewise semistability (via `rmk4d14₂` and `semistable_res_iff_semistable_quot`) and
-strict decrease of the minimal associated primes.
+We reuse the same filtration function (with the `Nat.find` of `fin_len` as `length`) and
+verify the Harder–Narasimhan axioms: piecewise semistability (via `rmk4d14₂` and
+`semistable_res_iff_semistable_quot`) and strict decrease of the minimal associated primes.
 -/
 lemma CoprimaryFiltration.toHarderNarasimhanFiltration {R : Type*} [CommRing R] [IsNoetherianRing R]
 {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]
 (a : CoprimaryFiltration R M) :
-  ∃ HNFil : HarderNarasimhanFiltration (μ R M), a.filtration = HNFil.filtration := by
-  let ahn : HarderNarasimhanFiltration (μ R M) := by
-      refine HarderNarasimhanFiltration.mk a.filtration a.monotone
-        a.first_eq_bot a.fin_len a.strict_mono ?_ ?_
+  ∃ HNFil : (μ R M).HarderNarasimhanFiltration, a.filtration = ⇑HNFil := by
+  let ahn : (μ R M).HarderNarasimhanFiltration := by
+      refine PayoffFunction.HarderNarasimhanFiltration.mk a.filtration (Nat.find a.fin_len)
+        a.monotone a.first_eq_bot (Nat.find_spec a.fin_len) a.strict_mono ?_ ?_
       · intro i hi
         let hstep := a.strict_mono hi.le hi (Nat.lt_add_one i)
         let : Nontrivial (↥(a.filtration (i + 1)) ⧸
@@ -717,6 +727,7 @@ lemma CoprimaryFiltration.toHarderNarasimhanFiltration {R : Type*} [CommRing R] 
         exact (semistable_res_iff_semistable_quot _ _ hstep).mpr <|
           rmk4d14₂.mpr (a.piecewise_coprimary i hi).coprimary
       · intro i hi
+        change ¬ μA (μ R M) _ ≤ μA (μ R M) _
         rw [prop3d12, prop3d12]
         simp only [DedekindCut.principal_le_principal, not_le]
         apply S₀_order'.1
@@ -725,23 +736,21 @@ lemma CoprimaryFiltration.toHarderNarasimhanFiltration {R : Type*} [CommRing R] 
             a.strict_mono hi.le hi (Nat.lt_add_one (i + 1))⟩)
           (min'_asIdeal_mem ⟨a.filtration i, a.filtration (i + 1),
             a.strict_mono (Nat.le_of_succ_le hi.le) (Nat.le_of_succ_le hi) (Nat.lt_add_one i)⟩)
-  use ahn
+  exact ⟨ahn, rfl⟩
 
 /--
-All coprimary filtrations have the same underlying filtration.
+All coprimary filtrations have the same underlying filtration, namely the canonical
+Harder–Narasimhan filtration `(μ R M).hnFiltration`.
 
 This follows from uniqueness of the Harder–Narasimhan filtration for `μ R M`.
 -/
 lemma CoprimaryFiltration.filtration_eq_harderNarasimhan_filtration
 {R : Type*} [CommRing R] [IsNoetherianRing R]
 {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] :
-  ∀ CPFil : CoprimaryFiltration R M, CPFil.filtration =
-    (inferInstance : Inhabited (HarderNarasimhanFiltration (μ R M))).default.filtration := by
+  ∀ CPFil : CoprimaryFiltration R M, CPFil.filtration = ⇑((μ R M).hnFiltration) := by
   intro CPFil
   rcases (CoprimaryFiltration.toHarderNarasimhanFiltration CPFil) with ⟨HNFil, hfil⟩
-  have := @instUniqueHarderNarasimhanFiltration (ℒ R M) _ _ _ _
-    (S R) inferInstance (μ R M) (@prop3d13₂ R _ _ M _ _ _ _) _
-  rw [hfil,this.uniq HNFil, this.uniq (@default (HarderNarasimhanFiltration (μ R M)) inferInstance)]
+  rw [hfil, Subsingleton.elim HNFil ((μ R M).hnFiltration)]
 
 /--
 Uniqueness of coprimary filtrations.

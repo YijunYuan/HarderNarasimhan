@@ -14,7 +14,8 @@ import HarderNarasimhan.PayoffFunction.Semistable.Defs
 import HarderNarasimhan.PayoffFunction.Semistable.Breakpoints
 
 import HarderNarasimhan.Filtration.Defs
-import HarderNarasimhan.Filtration.Results
+import HarderNarasimhan.Filtration.Exists
+import HarderNarasimhan.Filtration.Unique
 
 import HarderNarasimhan.PayoffFunction.SlopeLike
 import HarderNarasimhan.PayoffFunction.Slope
