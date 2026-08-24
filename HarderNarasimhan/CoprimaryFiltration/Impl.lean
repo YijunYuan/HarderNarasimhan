@@ -108,14 +108,14 @@ lemma μmax_eq_μ {R : Type*} [CommRing R] [IsNoetherianRing R]
 /--
 Proposition 3.11 (internal form): convexity of `μ R M` on the total interval.
 
-We prove `ConvexI ⊤ (μ R M)` first, and later export it as global `Convex`.
+We prove `(μ R M).IsConvexOn ⊤` first, and later export it as global `Convex`.
 The key step is that subset inclusion between associated-prime sets implies `≤` in
 the chosen `S₀ R` order.
 -/
 instance prop3d11 {R : Type*} [CommRing R] [IsNoetherianRing R]
 {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] :
-ConvexI ⊤ (μ R M) := by
-  refine { convex := fun x y _ _ hxy ↦ ?_ }
+(μ R M).IsConvexOn ⊤ := by
+  refine { le := fun x y _ _ hxy ↦ ?_ }
   refine DedekindCut.principal_le_principal.mpr <| S₀_order.1 _ _ <|
     Set.toFinset_subset_toFinset.mpr ?_
   intro w hw

@@ -6,7 +6,7 @@ Authors: Yijun Yuan
 import HarderNarasimhan.NashEquilibrium.Impl
 import HarderNarasimhan.FirstMoverAdvantage.Results
 import HarderNarasimhan.SlopeLike.Results
-import HarderNarasimhan.Convexity.Results
+import HarderNarasimhan.PayoffFunction.Convex
 import Mathlib.Order.OrderIsoNat
 import Mathlib.Data.Rel
 
@@ -159,41 +159,14 @@ instance {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 
 
 /--
-Affine property for a slope.
-
-This axiom relates the payoffs of two canonical intervals built from `a` and `b`, expressing a
-compatibility of `μ` with lattice operations (`⊓` and `⊔`). It is used to derive convexity.
--/
-class Affine {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-{S : Type*} [CompleteLattice S]
-(μ : PayoffFunction ℒ S) : Prop where
-  affine : ∀ a b : ℒ, (h : ¬ a ≤ b) →
-    μ ⟨a ⊓ b, a, inf_lt_left.2 h⟩ = μ ⟨b, a ⊔ b, right_lt_sup.2 h⟩
-
-/--
-Restriction preserves the affine property.
-
-If `μ` is affine, then its restriction `Resμ I μ` to any interval `I` is affine as well.
+Restriction preserves the affine property (transitional `Resμ`-keyed copy of the
+`PayoffFunction.restrict` instance, so that instance search fires on `Resμ`).
 -/
 instance {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
-{μ : PayoffFunction ℒ S} [haff : Affine μ] {I : StrictIntvl ℒ} :
-Affine (Resμ I μ) where
-  affine := fun a b h ↦ haff.affine a b h
-
-/--
-An affine slope is convex.
-
-This instance packages the standard implication by reducing to the internal convexity predicate
-`ConvexI` and then applying the `Affine` axiom.
--/
-instance {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
-{S : Type*} [CompleteLattice S]
-{μ : PayoffFunction ℒ S} [haff : Affine μ] : Convex μ := by
-  rw [← ConvexI_top_iff_Convex]
-  refine { convex := ?_ }
-  intro x y hx hy hxy
-  rw [haff.affine x y hxy]
+{μ : PayoffFunction ℒ S} [haff : μ.IsAffine] {I : StrictIntvl ℒ} :
+(Resμ I μ).IsAffine where
+  eq := fun a b h ↦ haff.eq a b h
 
 /--
 Restriction preserves finite total payoff under semistability and slope-likeness.

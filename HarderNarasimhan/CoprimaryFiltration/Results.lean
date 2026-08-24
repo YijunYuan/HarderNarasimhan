@@ -3,7 +3,6 @@ Copyright (c) 2026 Yijun Yuan. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yijun Yuan
 -/
-import HarderNarasimhan.Convexity.Results
 import HarderNarasimhan.CoprimaryFiltration.Impl
 
 /-!
@@ -52,17 +51,14 @@ lemma μmax_eq_μ {R : Type*} [CommRing R] [IsNoetherianRing R]
 /--
 Proposition 3.11: convexity of the slope `μ R M`.
 
-Internally we build a `ConvexI ⊤` instance and then translate it to the
-global `Convex` predicate.
+Internally we build an `IsConvexOn ⊤` instance; the global `IsConvex` instance follows.
 -/
 instance proposition_3_11 {R : Type*} [CommRing R] [IsNoetherianRing R]
 {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] :
 ------------
-Convex (μ R M)
+(μ R M).IsConvex
 ------------
-:= by
-  apply (ConvexI_top_iff_Convex _).1
-  infer_instance
+:= inferInstance
 
 
 /--

@@ -3,7 +3,6 @@ Copyright (c) 2026 Yijun Yuan. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yijun Yuan
 -/
-import HarderNarasimhan.Convexity.Results
 import HarderNarasimhan.Filtration.Defs
 import HarderNarasimhan.Filtration.Impl
 
@@ -53,7 +52,7 @@ noncomputable instance instInhabitedHarderNarasimhanFiltration
 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLattice S]
 {μ : PayoffFunction ℒ S}
-[hμ : μA_DescendingChainCondition μ] [hμcvx : Convex μ] [h : μAdmissible μ] :
+[hμ : μA_DescendingChainCondition μ] [hμcvx : μ.IsConvex] [h : μAdmissible μ] :
 ------------
 Inhabited (HarderNarasimhanFiltration μ) where
 ------------
@@ -82,7 +81,7 @@ When the codomain `S` is a complete linear order, the internal uniqueness theore
 `impl.theorem3d10` shows that any filtration satisfying the defining axioms must
 coincide with the canonical one. This yields a `Unique` instance.
 
-Implementation detail: we convert `Convex μ` to the interval-indexed `ConvexI` form
+Implementation detail: we convert `μ.IsConvex` to the interval-local `IsConvexOn ⊤` form
 expected by the internal proof.
 
 API note: when this instance is available, any two filtrations are definitionally equal
@@ -91,13 +90,13 @@ after extensionality, so you can treat the HN filtration as canonical.
 noncomputable instance instUniqueHarderNarasimhanFiltration
 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLinearOrder S]
-{μ : PayoffFunction ℒ S} [hμ : μA_DescendingChainCondition μ] [hμcvx : Convex μ] :
+{μ : PayoffFunction ℒ S} [hμ : μA_DescendingChainCondition μ] [hμcvx : μ.IsConvex] :
 ------------
 Unique (HarderNarasimhanFiltration μ)
 ------------
 where
   uniq := by
-    rw [← ConvexI_top_iff_Convex] at hμcvx
+    rw [← PayoffFunction.isConvexOn_top_iff] at hμcvx
     exact fun a ↦ HarderNarasimhanFiltration.ext (funext fun n ↦ congrFun
       (impl.theorem3d10 μ hμ hμcvx a.filtration a.first_eq_bot a.fin_len
       (fun i j hij hj ↦ a.strict_mono (hij.le.trans hj) hj hij)
@@ -131,7 +130,7 @@ theorem exists_relSeries_isIntervalSemistable
 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : PayoffFunction ℒ S)
-[hμ : μA_DescendingChainCondition μ] [hμcvx : Convex μ] [h : μAdmissible μ] :
+[hμ : μA_DescendingChainCondition μ] [hμcvx : μ.IsConvex] [h : μAdmissible μ] :
 ------------
 ∃ s : RelSeries (IntervalSemistableRel μ),
   s.head = ⊥ ∧ s.last = ⊤ ∧
@@ -170,7 +169,7 @@ theorem exists_unique_relSeries_isIntervalSemistable_of_completeLinearOrder
 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLinearOrder S]
 (μ : PayoffFunction ℒ S)
-[hμ : μA_DescendingChainCondition μ] [hμcvx : Convex μ] :
+[hμ : μA_DescendingChainCondition μ] [hμcvx : μ.IsConvex] :
 ------------
 ∃! s : RelSeries (IntervalSemistableRel μ),
   s.head = ⊥ ∧ s.last = ⊤ ∧

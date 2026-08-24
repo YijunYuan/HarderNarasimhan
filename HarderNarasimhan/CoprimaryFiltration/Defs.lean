@@ -15,7 +15,6 @@ import Mathlib.RingTheory.Ideal.AssociatedPrime.Finiteness
 import Mathlib.Order.Completion
 
 import HarderNarasimhan.Basic
-import HarderNarasimhan.Convexity.Results
 import HarderNarasimhan.Semistability.Defs
 import HarderNarasimhan.Filtration.Results
 import Mathlib.Combinatorics.Colex

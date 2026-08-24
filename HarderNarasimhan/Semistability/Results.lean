@@ -3,7 +3,6 @@ Copyright (c) 2026 Yijun Yuan. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yijun Yuan
 -/
-import HarderNarasimhan.Convexity.Results
 import HarderNarasimhan.Semistability.Impl
 import HarderNarasimhan.Semistability.Translation
 
@@ -17,7 +16,7 @@ The heavy lifting is done in `HarderNarasimhan.Semistability.Impl`; here we:
 * provide short aliases that match the numbering used in the accompanying notes.
 
 All proofs are thin wrappers around the internal lemmas, mostly converting between
-`Convex` and its interval-local variant `ConvexI`.
+`IsConvex` and its interval-local variant `IsConvexOn`.
 
 API overview:
 
@@ -41,7 +40,7 @@ notation `Convex`.
 -/
 lemma proposition_3_2 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   {S : Type*} [CompleteLattice S]
-  (μ : PayoffFunction ℒ S) (hμcvx : Convex μ)
+  (μ : PayoffFunction ℒ S) (hμcvx : μ.IsConvex)
   (x : ℒ) (z : ℒ) (h : x < z)
   (h' : μA μ ⟨x, z, h⟩ = ⊤)
   (a : ℒ) (hax : a < x) :
@@ -49,7 +48,7 @@ lemma proposition_3_2 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder
   μA μ ⟨a, x , hax⟩ ≤ μA μ ⟨a, z , lt_trans hax h⟩
 ------------
   := by
-    rw [← ConvexI_top_iff_Convex] at hμcvx
+    rw [← PayoffFunction.isConvexOn_top_iff] at hμcvx
     exact impl.prop3d2 ⊤ μ hμcvx x (StrictIntvl.mem_top x) z
       (StrictIntvl.mem_top z) h h' a (StrictIntvl.mem_top a) hax
 
@@ -73,12 +72,12 @@ API note: this is a common starting point for constructing filtrations.
 lemma proposition_3_4 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
   {S : Type*} [CompleteLattice S]
   (μ : PayoffFunction ℒ S)
-  (hμDCC : μA_DescendingChainCondition μ) (hμcvx : Convex μ) :
+  (hμDCC : μA_DescendingChainCondition μ) (hμcvx : μ.IsConvex) :
 ------------
   (St μ).Nonempty
 ------------
   := by
-    rw [← ConvexI_top_iff_Convex] at hμcvx
+    rw [← PayoffFunction.isConvexOn_top_iff] at hμcvx
     exact impl.prop3d4 μ hμDCC ⊤ hμcvx
 
 
@@ -113,7 +112,7 @@ API note: this lemma is a key interface for working with `St μ`.
 -/
 lemma proposition_3_7 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
   {S : Type*} [CompleteLattice S]
-  (μ : PayoffFunction ℒ S) (hμcvx : Convex μ)
+  (μ : PayoffFunction ℒ S) (hμcvx : μ.IsConvex)
   (x : ℒ) (hxSt : x ∈ St μ) :
 ------------
   /- `(1)` -/
@@ -125,7 +124,7 @@ lemma proposition_3_7 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder
       μA μ ⟨x, y, hy⟩
 ------------
   := by
-    rw [← ConvexI_top_iff_Convex] at hμcvx
+    rw [← PayoffFunction.isConvexOn_top_iff] at hμcvx
     exact ⟨(semistableI_iff μ ⟨⊥, x, lt_of_le_of_ne bot_le hxSt.out.choose_spec.choose⟩).1 <|
         impl.prop3d7₁ μ ⊤ x hxSt,
       fun y hy ↦ impl.prop3d7₂ μ ⊤ hμcvx x hxSt y (StrictIntvl.mem_top y) hy⟩
@@ -147,7 +146,7 @@ breakpoint is chosen.
 -/
 lemma proposition_3_8 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
   {S : Type*} [CompleteLattice S]
-  (μ : PayoffFunction ℒ S) (hμcvx : Convex μ)
+  (μ : PayoffFunction ℒ S) (hμcvx : μ.IsConvex)
   (h : (@Std.Total S (· ≤ ·)) ∨
      ∀ z : ℒ, (hz : ⊥ ≠ z) → IsAttained μ ⟨⊥, z , lt_of_le_of_ne bot_le hz⟩) :
 ------------
@@ -161,7 +160,7 @@ lemma proposition_3_8 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder
     μA μ ⟨⊥, y, lt_of_le_of_lt hxSt.out.choose.1 hxy⟩ = μA μ ⟨x, y, hxy⟩)
 ------------
  := by
-  rw [← ConvexI_top_iff_Convex] at hμcvx
+  rw [← PayoffFunction.isConvexOn_top_iff] at hμcvx
   constructor
   · constructor
     · rcases h with c1 | c2

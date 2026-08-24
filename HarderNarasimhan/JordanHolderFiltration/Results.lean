@@ -135,7 +135,7 @@ theorem length_eq_of_JordanHolderFiltration
 {S : Type*} [CompleteLinearOrder S]
 {μ : PayoffFunction ℒ S}
 [FiniteTotalPayoff μ] [SlopeLike μ] [Semistable μ]
-[StrongDescendingChainCondition' μ] [Affine μ] :
+[StrongDescendingChainCondition' μ] [μ.IsAffine] :
 ∀ JH1 JH2 : JordanHolderFiltration μ, JH1.length = JH2.length
 := fun JH1 JH2 ↦ eq_of_le_of_ge
   (impl.induction_on_length_of_JordanHolderFiltration (μ := μ)

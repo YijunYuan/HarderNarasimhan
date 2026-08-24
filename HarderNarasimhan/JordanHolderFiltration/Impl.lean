@@ -13,7 +13,6 @@ import Mathlib.Order.OrderIsoNat
 import HarderNarasimhan.JordanHolderFiltration.Defs
 import HarderNarasimhan.SlopeLike.Results
 import HarderNarasimhan.FirstMoverAdvantage.Results
-import HarderNarasimhan.Convexity.Results
 import Mathlib.SetTheory.Cardinal.NatCard
 import Mathlib.Order.ModularLattice
 
@@ -774,7 +773,7 @@ lemma semistable_resμ_of_jordanHolderFiltration
 {S : Type*} [CompleteLinearOrder S]
 {μ : PayoffFunction ℒ S}
 [FiniteTotalPayoff μ] [SlopeLike μ] [Semistable μ]
-[StrongDescendingChainCondition' μ] [Affine μ] (JH : JordanHolderFiltration μ)
+[StrongDescendingChainCondition' μ] [μ.IsAffine] (JH : JordanHolderFiltration μ)
 (h : JH.filtration (JH.length - 1) < ⊤) :
 Semistable (Resμ ⟨JH.filtration (JH.length - 1), ⊤,h⟩ μ) := by
   apply (thm4d21 (Resμ ⟨JH.filtration (JH.length - 1), ⊤,h⟩ μ) inferInstance
@@ -812,7 +811,7 @@ lemma induction_on_length_of_JordanHolderFiltration (n : ℕ) :
       {S : Type*} [CompleteLinearOrder S]
       {μ : PayoffFunction ℒ S}
       [FiniteTotalPayoff μ] [SlopeLike μ] [Semistable μ]
-      [StrongDescendingChainCondition' μ] [Affine μ],
+      [StrongDescendingChainCondition' μ] [μ.IsAffine],
       (∃ JH : JordanHolderFiltration μ, JH.length ≤ n) →
       ∀ JH' : JordanHolderFiltration μ, JH'.length ≤ n := by
   induction n with
@@ -904,9 +903,11 @@ lemma induction_on_length_of_JordanHolderFiltration (n : ℕ) :
               exact le_of_lt <| ((seesaw' μ hsl ⊥ u x0
                 ⟨bot_lt_iff_ne_bot.2 ubot, hu1.2⟩).1.1 this).2
           else
-          replace := (proposition_2_8 μ inferInstance x0 (JHy.filtration j) ⊥
-            ⟨hx0_bot, Ne.bot_lt' hjbot⟩).1
-          convert this.le
+          replace : μA μ ⟨⊥, x0, hx0_bot⟩ ⊓ μA μ ⟨⊥, JHy.filtration j, Ne.bot_lt' hjbot⟩ ≤
+              μA μ ⟨⊥, x0 ⊔ JHy.filtration j, lt_sup_of_lt_left hx0_bot⟩ :=
+            (inferInstance : μ.IsConvexOn ⊤).inf_A_le_A_sup (StrictIntvl.mem_top _)
+              (StrictIntvl.mem_top _) (StrictIntvl.mem_top _) hx0_bot (Ne.bot_lt' hjbot)
+          convert this
           have t2 := hμA_eq_tot JHy j <| by
             refine lt_of_le_of_ne hj ?_
             by_contra hc
@@ -961,7 +962,7 @@ lemma induction_on_length_of_JordanHolderFiltration (n : ℕ) :
           apply le_of_lt <| lt_of_le_of_lt le_sup_left hw1
         have heqs : μ ⟨↑w, ↑(JH_raw j), hw2⟩ =
           μ ⟨JHy.filtration j ⊓ w, JHy.filtration j,inf_lt_left.2 hnle⟩ := by
-          rw [affine.affine (JHy.filtration j) w.val hnle]
+          rw [affine.eq (JHy.filtration j) w.val hnle]
           have : ↑(JH_raw j) = JHy.filtration j ⊔ w.val := by
             simp only [JH_raw]
             apply eq_of_le_of_ge ?_ ?_
@@ -1044,7 +1045,7 @@ lemma induction_on_length_of_JordanHolderFiltration (n : ℕ) :
               at otherwise
             refine (lt_iff_not_ge.1 otherwise) ?_
             rw [← JHx.step_cond₁ (JHx.length - 1) (Nat.sub_one_lt (JH_pos_len JHx))]
-            rw [(affine.affine x0 (JHy.filtration (i0 + 1)) hi0_imp).symm]
+            rw [(affine.eq x0 (JHy.filtration (i0 + 1)) hi0_imp).symm]
             if hif : JHx.filtration (JHx.length) =
               JHx.filtration (JHx.length - 1) ⊓ JHy.filtration (i0 + 1) then
               apply le_of_eq

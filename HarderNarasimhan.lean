@@ -9,8 +9,7 @@ import HarderNarasimhan.PayoffFunction.Restrict
 import HarderNarasimhan.Basic
 import HarderNarasimhan.Interval
 
-import HarderNarasimhan.Convexity.Defs
-import HarderNarasimhan.Convexity.Results
+import HarderNarasimhan.PayoffFunction.Convex
 
 import HarderNarasimhan.Semistability.Defs
 import HarderNarasimhan.Semistability.Results

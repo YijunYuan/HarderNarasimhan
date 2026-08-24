@@ -153,6 +153,13 @@ lemma min_le_apply : μ.min I ≤ μ I := min_le ⟨le_rfl, I.lt⟩
 /-- The payoff of an interval is bounded above by `μ.max`. -/
 lemma apply_le_max : μ I ≤ μ.max I := le_max ⟨I.lt, le_rfl⟩
 
+/-- `μ.A` is antitone in the left endpoint: enlarging the interval to the left can only
+decrease the first-player value.  This is a formal consequence of the definition of `μ.A` as
+an infimum and needs no convexity. -/
+lemma A_anti_left (μ : PayoffFunction ℒ S) {x y z : ℒ} (h₁ : x < y) (h₂ : y < z) :
+    μ.A ⟨x, z, h₁.trans h₂⟩ ≤ μ.A ⟨y, z, h₂⟩ :=
+  le_A fun _ hv ↦ A_le (I := ⟨x, z, h₁.trans h₂⟩) ⟨(h₁.trans_le hv.1).le, hv.2⟩
+
 end PayoffFunction
 
 end HarderNarasimhan

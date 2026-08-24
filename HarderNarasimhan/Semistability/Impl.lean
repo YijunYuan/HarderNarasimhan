@@ -3,8 +3,8 @@ Copyright (c) 2026 Yijun Yuan. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yijun Yuan
 -/
-import HarderNarasimhan.Convexity.Defs
-import HarderNarasimhan.Convexity.Impl
+import HarderNarasimhan.PayoffFunction.Convex
+import HarderNarasimhan.Interval
 import HarderNarasimhan.Semistability.Defs
 import Mathlib.Tactic.Linarith
 
@@ -48,14 +48,15 @@ API note: this lemma is used to derive a descending chain condition by contradic
 lemma prop3d2 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (I : StrictIntvl ℒ)
-(μ : PayoffFunction ℒ S) (hμcvx : ConvexI I μ)
+(μ : PayoffFunction ℒ S) (hμcvx : μ.IsConvexOn I)
 (x : ℒ) (hxI : x ∈ I)
 (z : ℒ) (hzI : z ∈ I)
 (h : x < z)
 (h' : μA μ ⟨x, z, h⟩ = ⊤)
 (a : ℒ) (haI : a ∈ I) (hax : a < x) :
 μA μ ⟨a, x , hax⟩ ≤ μA μ ⟨a, z , lt_trans hax h⟩ := by
-  have h'' := impl.prop2d6₁I I μ hμcvx a haI x hxI z hzI ⟨hax,h⟩
+  have h'' : μA μ ⟨a, x, hax⟩ ⊓ μA μ ⟨x, z, h⟩ ≤ μA μ ⟨a, z, lt_trans hax h⟩ :=
+    hμcvx.inf_le_A haI hxI hzI hax h
   rwa [h', inf_top_eq] at h''
 
 
@@ -69,7 +70,7 @@ API note: this turns a “top occurs along chains” assumption into the formal 
 -/
 lemma cor3d3 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 (S : Type*) [CompleteLattice S]
-(μ : PayoffFunction ℒ S) (hμcvx : ConvexI ⊤ μ)
+(μ : PayoffFunction ℒ S) (hμcvx : μ.IsConvexOn ⊤)
 (h : ∀ f : ℕ → ℒ, (h : StrictAnti f) →  ∃N : ℕ, μA μ ⟨f <| N + 1, f N,h (lt_add_one N)⟩ = ⊤)
 : μA_DescendingChainCondition μ := by
   refine { μ_dcc := fun a f h₁ h₂ ↦ ?_ }
@@ -375,7 +376,7 @@ API note: this provides the key existential input for later uniqueness/maximalit
 lemma prop3d4 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : PayoffFunction ℒ S) (hμDCC : μA_DescendingChainCondition μ)
-(I : StrictIntvl ℒ) (hμcvx : ConvexI I μ)
+(I : StrictIntvl ℒ) (hμcvx : μ.IsConvexOn I)
 : (StI μ I).Nonempty := by
   classical
   let len := prop3d4₀func_len μ I hμDCC
@@ -413,9 +414,9 @@ lemma prop3d4 {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [W
           Nat.one_le_iff_ne_zero.1 hi.1) ▸ hz)
       simp only [ne_eq, not_false_eq_true, Nat.sub_add_cancel, ge_iff_le, forall_const, hi,
         h₂] at h₃'''
-      exact (h₃''' (y ⊔ func i) h₃') <| inf_eq_right.2 hy'.2 ▸ impl.prop2d8₁I I μ hμcvx y hyI
-        (func i) (func i).prop I.left I.left_mem  ⟨lt_of_le_of_ne hyI.1 hy,
-        lt_of_le_of_ne (func i).prop.1 <| h₂ i hi.2⟩
+      exact (h₃''' (y ⊔ func i) h₃') <| inf_eq_right.2 hy'.2 ▸
+        hμcvx.inf_A_le_A_sup hyI (func i).prop I.left_mem
+          (lt_of_le_of_ne hyI.1 hy) (lt_of_le_of_ne (func i).prop.1 <| h₂ i hi.2)
     have h₄ : ∀ y : ℒ, (hyI : y ∈ I) → (hy : I.left ≠ y) → μA μ ⟨I.left, y ,
       lt_of_le_of_ne hyI.1 hy⟩ ≥ μA μ ⟨I.left, (func (len - 1)).val , lt_of_le_of_ne (func
       (len - 1)).prop.1 <| h₂ (len - 1) le_rfl⟩ → (∀ i : ℕ, i ≤ len - 1 → y ≤ (func i).val) := by
@@ -499,15 +500,15 @@ Intuition: above the chosen breakpoint, the interval `(x,y)` cannot dominate the
 lemma prop3d7₂ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : PayoffFunction ℒ S)
-(I : StrictIntvl ℒ) (hμcvx : ConvexI I μ)
+(I : StrictIntvl ℒ) (hμcvx : μ.IsConvexOn I)
 (x : ℒ) (hxSt : x ∈ StI μ I) :
 ∀ y : ℒ, (hyI : y ∈ I) → (hy : y > x) → ¬ μA μ ⟨I.left, x ,
   lt_of_le_of_ne hxSt.out.choose.1 hxSt.out.choose_spec.choose⟩ ≤ μA μ ⟨x, y, hy⟩ := by
   obtain ⟨hxI, hxne, hxS₁, hxS₂⟩ := hxSt.out
   intro y hyI hy hy'
   exact (not_le_of_gt hy) (hxS₂ y hyI (ne_of_lt <| lt_of_le_of_lt hxI.1 hy) <|
-    eq_of_le_of_not_lt' ((inf_eq_left.2 hy') ▸ impl.prop2d6₁I I μ hμcvx I.left
-    I.left_mem x hxI y hyI ⟨lt_of_le_of_ne hxI.1 hxne,hy⟩) <|
+    eq_of_le_of_not_lt' ((inf_eq_left.2 hy') ▸ hμcvx.inf_le_A I.left_mem hxI hyI
+      (lt_of_le_of_ne hxI.1 hxne) hy) <|
     hxS₁ y hyI <| ne_of_lt <| lt_of_le_of_lt hxI.1 hy)
 
 
@@ -524,7 +525,7 @@ API note: this produces an instance of `Std.Total` for the subtype `StI μ I`.
 lemma prop3d8₁ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : PayoffFunction ℒ S)-- (hμ : μDCC μ)
-(I : StrictIntvl ℒ) (hμcvx : ConvexI I μ)
+(I : StrictIntvl ℒ) (hμcvx : μ.IsConvexOn I)
 (h : (@Std.Total S (· ≤ ·)) ∨
      ∀ z : ℒ, (hzI : z ∈ I) → (hz : I.left ≠ z) →
        IsAttained μ ⟨I.left, z , lt_of_le_of_ne hzI.left hz⟩) :
@@ -544,8 +545,7 @@ lemma prop3d8₁ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
     · exact Or.inr <| hattained (x ⊔ x') hsI hsne
   have h₂ : μA μ ⟨I.left, x, hxlt⟩ = μA μ ⟨I.left, x ⊔ x', lt_sup_of_lt_left hxlt⟩ ∨
       μA μ ⟨I.left, x', hx'lt⟩ = μA μ ⟨I.left, x ⊔ x', lt_sup_of_lt_left hxlt⟩ := by
-    rcases impl.prop2d8₂I I μ hμcvx x hxI x' hx'I I.left
-      I.left_mem ⟨hxlt, hx'lt⟩ h₁ with c1 | c2
+    rcases hμcvx.A_le_A_sup_or hxI hx'I I.left_mem hxlt hx'lt h₁ with c1 | c2
     · exact Or.inl <| eq_of_le_of_not_lt c1 <| hxS₁ (x ⊔ x') hsI hsne
     · exact Or.inr <| eq_of_le_of_not_lt c2 <| hx'S₁ (x ⊔ x') hsI hsne
   rcases h₂ with c1 | c2
@@ -564,7 +564,7 @@ API note: the proof uses `has_min` on `StI μ I` together with the totality lemm
 lemma prop3d8₁' {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [inst_3 : WellFoundedGT ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : PayoffFunction ℒ S) (hμ : μA_DescendingChainCondition μ)
-(I : StrictIntvl ℒ) (hμcvx : ConvexI I μ)
+(I : StrictIntvl ℒ) (hμcvx : μ.IsConvexOn I)
 (h : (@Std.Total S (· ≤ ·)) ∨
      ∀ z : ℒ, (hzI : z ∈ I) → (hz : I.left ≠ z) →
        IsAttained μ ⟨I.left, z , lt_of_le_of_ne hzI.left hz⟩)  :
@@ -587,7 +587,7 @@ by the subinterval starting at `x`.
 lemma prop3d8₂ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 {S : Type*} [CompleteLattice S]
 (μ : PayoffFunction ℒ S)-- (hμ : μDCC μ)
-(I : StrictIntvl ℒ) (hμcvx : ConvexI I μ)
+(I : StrictIntvl ℒ) (hμcvx : μ.IsConvexOn I)
 (h : (@Std.Total S (· ≤ ·)) ∨
      ∀ z : ℒ, (hzI : z ∈ I) → (hz : I.left ≠ z) →
        IsAttained μ ⟨I.left, z , lt_of_le_of_ne hzI.left hz⟩)
@@ -603,8 +603,7 @@ lemma prop3d8₂ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
     rcases h with htotal | hattained
     · exact Or.inl <| htotal.total _ _
     · exact Or.inr <| hattained y hyI hyne
-  rcases impl.prop2d6₃I I μ hμcvx I.left I.left_mem x hxI y hyI
-    ⟨hxlt, hxy⟩ h with c1 | c2
+  rcases hμcvx.A_eq_or_lt I.left_mem hxI hyI hxlt hxy h with c1 | c2
   · exact c1.symm
   · exact absurd hxy <| not_lt_of_ge <| hxS₂ y hyI hyne <|
       eq_of_le_of_not_lt' c2.1 (hxS₁ y hyI hyne)
