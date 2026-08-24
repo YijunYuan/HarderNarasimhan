@@ -19,9 +19,7 @@ import HarderNarasimhan.Filtration.Results
 import HarderNarasimhan.PayoffFunction.SlopeLike
 import HarderNarasimhan.PayoffFunction.Slope
 import HarderNarasimhan.PayoffFunction.GameValue
-
-import HarderNarasimhan.NashEquilibrium.Defs
-import HarderNarasimhan.NashEquilibrium.Results
+import HarderNarasimhan.PayoffFunction.NashEquilibrium
 
 import HarderNarasimhan.JordanHolderFiltration.Defs
 import HarderNarasimhan.JordanHolderFiltration.Results

@@ -8,7 +8,7 @@ import Mathlib.Order.BoundedOrder.Basic
 import HarderNarasimhan.PayoffFunction.Semistable.Defs
 import HarderNarasimhan.Interval
 import HarderNarasimhan.PayoffFunction.SlopeLike
-import HarderNarasimhan.NashEquilibrium.Impl
+import HarderNarasimhan.PayoffFunction.NashEquilibrium
 import Mathlib.Data.List.TFAE
 import Mathlib.Order.OrderIsoNat
 import HarderNarasimhan.JordanHolderFiltration.Defs
@@ -271,8 +271,8 @@ lemma JHFil_refine_lt_step_payoff
     JHFil μ hμ hμsl hst hdc k, JHFil_anti_mono μ hμ hμsl hst hdc k hk⟩ := by
   intro k hk z h' h''
   have this_new : μmax μ ⊤ = μ ⊤ :=
-    (List.TFAE.out (impl.thm4d21 μ hμsl inferInstance inferInstance).1 0 3).2
-      ((impl.thm4d21 μ hμsl inferInstance inferInstance).2.1 hst)
+    PayoffFunction.max_top_eq_apply_iff.2
+      (PayoffFunction.min_top_eq_max_top_iff_hasNashEquilibrium.2 hst.hasNashEquilibrium)
   have this_q : μ ⟨⊥, z, lt_of_le_of_lt bot_le h'⟩ ≤ μ ⊤ :=
     this_new ▸ le_iSup₂_of_le z ⟨lt_of_le_of_lt bot_le h', le_top⟩ le_rfl
   by_cases hfp1bot : JHFil μ hμ hμsl hst hdc (k + 1) = ⊥
@@ -621,10 +621,10 @@ lemma semistable_of_step_cond₂
   strict_anti i (i+1) (lt_add_one i) hi⟩ μ)
 ) := by
   intro h i hi
-  apply (impl.thm4d21 (Resμ ⟨filtration (i+1), filtration i, strict_anti i (i+1)
-    (lt_add_one i) hi⟩ μ) inferInstance inferInstance inferInstance).2.2 (fun _ _ ↦ inferInstance)
-  apply (List.TFAE.out (impl.thm4d21 (Resμ ⟨filtration (i+1), filtration i, strict_anti i (i+1)
-    (lt_add_one i) hi⟩ μ) inferInstance inferInstance inferInstance).1 1 3).1
+  apply PayoffFunction.isSemistable_of_hasNashEquilibrium (fun _ _ ↦ inferInstance)
+    (fun _ _ ↦ inferInstance)
+  apply PayoffFunction.min_top_eq_max_top_iff_hasNashEquilibrium.1
+  apply PayoffFunction.min_top_eq_apply_iff.1
   apply eq_of_le_of_ge ?_ ?_
   · exact iInf₂_le ⊥ ⟨le_rfl, bot_lt_top⟩
   · refine le_iInf₂ fun u hu1 ↦ ?_
@@ -682,13 +682,14 @@ lemma stable_of_step_cond₂
         μmin μ (StrictIntvl.ofSub ⟨⊥, x, hx⟩) := hAstar_x
       rw [hAstar_x]
       have hss := semistable_of_step_cond₂ μ filtration fin_len strict_anti h i hi
-      have hNash_step :=
-        (impl.thm4d21 (Resμ stepI μ) inferInstance inferInstance inferInstance).2.1 hss
-      have hμmin_step := (List.TFAE.out
-        (impl.thm4d21 (Resμ stepI μ) inferInstance inferInstance inferInstance).1 1 3).2 hNash_step
+      have hNash_step := hss.hasNashEquilibrium
+      have hμmin_step : μmin (Resμ stepI μ) ⊤ = (Resμ stepI μ) ⊤ :=
+        PayoffFunction.min_top_eq_apply_iff.2
+          (PayoffFunction.min_top_eq_max_top_iff_hasNashEquilibrium.2 hNash_step)
       simp only [μmin_res_intvl,μ_res_intvl] at hμmin_step
       rw [hμmin_step]
-      exact ne_of_lt <| lt_of_le_of_lt (rmk4d10₀ μ ⟨filtration (i + 1), ↑x, hx_left⟩).1 <|
+      exact ne_of_lt <| lt_of_le_of_lt
+        (PayoffFunction.min_le_apply (μ := μ) (I := ⟨filtration (i + 1), ↑x, hx_left⟩)) <|
         h i hi x.val hx_left hx'
 
 open Classical in
@@ -734,13 +735,14 @@ lemma step_cond₂_of_stable {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [Bound
     simp only [μA_res_intvl,μmin_res_intvl] at *
     rfl
   rw [hb, hAstar_mid] at hst'
-  have hNash_step := (impl.thm4d21 (Resμ stepI μ) inferInstance inferInstance inferInstance).2.1
-    (hst i hi).toIsSemistable
-  have hμmin_step := (List.TFAE.out
-    (impl.thm4d21 (Resμ stepI μ) inferInstance inferInstance inferInstance).1 1 3).2 hNash_step
+  have hNash_step := (hst i hi).toIsSemistable.hasNashEquilibrium
+  have hμmin_step : μmin (Resμ stepI μ) ⊤ = (Resμ stepI μ) ⊤ :=
+    PayoffFunction.min_top_eq_apply_iff.2
+      (PayoffFunction.min_top_eq_max_top_iff_hasNashEquilibrium.2 hNash_step)
   rw [hμmin_step] at hst'
-  have hμmax_step := (List.TFAE.out
-    (impl.thm4d21 (Resμ stepI μ) inferInstance inferInstance inferInstance).1 0 3).2 hNash_step
+  have hμmax_step : μmax (Resμ stepI μ) ⊤ = (Resμ stepI μ) ⊤ :=
+    PayoffFunction.max_top_eq_apply_iff.2
+      (PayoffFunction.min_top_eq_max_top_iff_hasNashEquilibrium.2 hNash_step)
   simp only [μmin_res_intvl,μ_res_intvl] at hst'
   have hsSup_step : ∀ (u : ↥stepI) (hu : (⊥ : ↥stepI) < u),
       Resμ stepI μ ⟨⊥, u, hu⟩ ≤ Resμ stepI μ ⊤ := fun u hu ↦
@@ -784,16 +786,20 @@ lemma semistable_resμ_of_jordanHolderFiltration
 [StrongDescendingChainCondition' μ] [μ.IsAffine] (JH : JordanHolderFiltration μ)
 (h : JH.filtration (JH.length - 1) < ⊤) :
 PayoffFunction.IsSemistable (Resμ ⟨JH.filtration (JH.length - 1), ⊤,h⟩ μ) := by
-  apply (thm4d21 (Resμ ⟨JH.filtration (JH.length - 1), ⊤,h⟩ μ) inferInstance
-    inferInstance inferInstance).2.2 (fun _ _ ↦ inferInstance)
-  apply (List.TFAE.out (thm4d21 (Resμ ⟨JH.filtration (JH.length - 1), ⊤,h⟩ μ)
-    inferInstance inferInstance inferInstance).1 1 3).1
+  apply PayoffFunction.isSemistable_of_hasNashEquilibrium (fun _ _ ↦ inferInstance)
+    (fun _ _ ↦ inferInstance)
+  apply PayoffFunction.min_top_eq_max_top_iff_hasNashEquilibrium.1
+  apply PayoffFunction.min_top_eq_apply_iff.1
+  change μmin (Resμ ⟨JH.filtration (JH.length - 1), ⊤, h⟩ μ) ⊤ =
+    (Resμ ⟨JH.filtration (JH.length - 1), ⊤, h⟩ μ) ⊤
   rw [μmin_res_intvl, μ_res_intvl]
   apply eq_of_le_of_ge ?_ ?_
   · exact iInf₂_le (JH.filtration (JH.length - 1)) ⟨le_rfl, h⟩
   · refine le_iInf₂ fun u hu1 ↦ ?_
-    have := (thm4d21 μ inferInstance inferInstance inferInstance).2.1 inferInstance
-    replace := (List.TFAE.out (thm4d21 μ inferInstance inferInstance inferInstance).1 1 3).2 this
+    have : μmin μ ⊤ = μ ⊤ :=
+      PayoffFunction.min_top_eq_apply_iff.2
+        (PayoffFunction.min_top_eq_max_top_iff_hasNashEquilibrium.2
+          (PayoffFunction.IsSemistable.hasNashEquilibrium inferInstance))
     have this' : μ ⟨u, ⊤, lt_top_iff_ne_top.2 hu1.2.ne⟩ ≥ μ ⊤ := by
       rw [← this]
       exact iInf₂_le u ⟨bot_le, hu1.2⟩
@@ -861,8 +867,8 @@ lemma induction_on_length_of_JordanHolderFiltration (n : ℕ) :
     have JHfinal_first_top : JHfinal 0 = ⊤ := by
       simpa [JHfinal, subseqIdx] using JH_raw_first_top
     have hμmax : μmax μ ⊤ = μ ⊤ :=
-      (List.TFAE.out (impl.thm4d21 μ hsl inferInstance inferInstance).1 0 3).2
-        ((impl.thm4d21 μ hsl inferInstance inferInstance).2.1 hst)
+      PayoffFunction.max_top_eq_apply_iff.2
+        (PayoffFunction.min_top_eq_max_top_iff_hasNashEquilibrium.2 hst.hasNashEquilibrium)
     have hμA_eq_tot : ∀ (JH : JordanHolderFiltration μ) (k : ℕ), (hk : k < JH.length) →
       μ ⊤ = μA μ ⟨⊥, JH.filtration k,
         JH.filtration_length ▸ JH.strict_anti hk.le (le_rfl : JH.length ≤ _) hk⟩ := by
@@ -882,7 +888,7 @@ lemma induction_on_length_of_JordanHolderFiltration (n : ℕ) :
             rw [← hμmax]
             exact le_iSup₂_of_le u ⟨bot_lt_iff_ne_bot.2 hubot, le_top⟩ le_rfl
           exact not_le_of_gt hc hμu
-      · exact (rmk4d10₀ μ _).1
+      · exact PayoffFunction.min_le_apply
     have hcond1 : ∀ i < Nat.find atRaw, ∀ hfi : JH_raw (i + 1) < JH_raw i,
       (fun z ↦ Resμ Ires μ z = Resμ Ires μ ⊤)
               ⟨JH_raw (i + 1), JH_raw i, hfi⟩ := by
@@ -894,8 +900,9 @@ lemma induction_on_length_of_JordanHolderFiltration (n : ℕ) :
         · rw [← hμmax]
           exact le_iSup₂_of_le (x0 ⊔ JHy.filtration j)
             ⟨lt_of_lt_of_le hx0_bot le_sup_left, le_top⟩ le_rfl
-        · refine le_trans ?_ (rmk4d10₀ μ ⟨⊥, x0 ⊔ JHy.filtration j,
-            lt_of_lt_of_le hx0_bot le_sup_left⟩).1
+        · refine le_trans ?_ (PayoffFunction.min_le_apply (μ := μ)
+            (I := ⟨⊥, x0 ⊔ JHy.filtration j, lt_of_lt_of_le hx0_bot le_sup_left⟩))
+          change μ ⊤ ≤ μmin μ ⟨⊥, x0 ⊔ JHy.filtration j, lt_of_lt_of_le hx0_bot le_sup_left⟩
           rw [μA_eq_μmin μ ⟨⊥, x0 ⊔ JHy.filtration j,
             lt_of_lt_of_le hx0_bot le_sup_left⟩]
           if hjbot : ⊥ = JHy.filtration j  then

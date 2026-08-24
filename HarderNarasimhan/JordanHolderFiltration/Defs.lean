@@ -3,7 +3,7 @@ Copyright (c) 2026 Yijun Yuan. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yijun Yuan
 -/
-import HarderNarasimhan.NashEquilibrium.Impl
+import HarderNarasimhan.PayoffFunction.NashEquilibrium
 import HarderNarasimhan.PayoffFunction.GameValue
 import HarderNarasimhan.PayoffFunction.SlopeLike
 import HarderNarasimhan.PayoffFunction.Convex
@@ -184,8 +184,8 @@ FiniteTotalPayoff (Resμ ⟨⊥, x, hx⟩ μ) := by
   simp only [Resμ]
   by_contra h
   have : μ.IsSemistable → μmax μ ⊤ = μ ⊤ :=
-    fun a ↦ (List.TFAE.out (impl.thm4d21 μ hsl inferInstance inferInstance).1 0 3).2
-      ((impl.thm4d21 μ hsl inferInstance inferInstance).2.1 a)
+    fun a ↦ PayoffFunction.max_top_eq_apply_iff.2
+      (PayoffFunction.min_top_eq_max_top_iff_hasNashEquilibrium.2 a.hasNashEquilibrium)
   have := this hst
   have this_q : μ ⟨⊥, x, hx⟩ ≤ μ ⊤ := this ▸ le_iSup₂_of_le x ⟨hx, le_top⟩ le_rfl
   exact (not_le_of_gt <| h ▸ lt_top_iff_ne_top.2 hftp.fin_tot_payoff) this_q
