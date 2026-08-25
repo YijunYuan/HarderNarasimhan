@@ -10,7 +10,7 @@ public import HarderNarasimhan.PayoffFunction.Restrict
 /-!
 # Semistable payoff functions and breakpoints
 
-This file defines the (semi)stability notions of the Harder–Narasimhan game and the
+This file defines the (semi)stability notions of the Harder–Narasimhan Games and the
 *breakpoint* predicate underlying the construction of Harder–Narasimhan filtrations.
 
 A payoff function is *semistable* if no proper initial segment `(⊥, x)` beats the total
@@ -41,7 +41,7 @@ breakpoints.
 
 ## References
 
-* [Chen–Jeannin, *Harder–Narasimhan game*][ChenJeannin]
+* [Huayi Chen & Marion Jeannin, *Harder–Narasimhan Games*][ChenJeannin]
 -/
 
 @[expose] public section

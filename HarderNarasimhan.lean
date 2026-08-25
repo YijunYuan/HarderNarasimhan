@@ -35,7 +35,7 @@ public import HarderNarasimhan.Coprimary.Semistability
 # `HarderNarasimhan`: library root
 
 This module is the umbrella import for the project: importing `HarderNarasimhan` brings the
-whole formalization of the Harder–Narasimhan game of [ChenJeannin] into scope.  It declares no
+whole formalization of the Harder–Narasimhan Games of [ChenJeannin] into scope.  It declares no
 definitions or lemmas of its own.
 
 The library is organized in four blocks on top of the interval infrastructure

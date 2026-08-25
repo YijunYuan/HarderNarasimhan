@@ -44,7 +44,7 @@ Any of the nine possible one-step implications is a `.1`/`.2` of one of these (o
 
 ## References
 
-* [Chen–Jeannin, *Harder–Narasimhan game*][ChenJeannin]
+* [Huayi Chen & Marion Jeannin, *Harder–Narasimhan Games*][ChenJeannin]
 -/
 
 @[expose] public section

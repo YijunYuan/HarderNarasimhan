@@ -12,7 +12,7 @@ public import Mathlib.Order.CompleteLattice.Defs
 # Payoff functions
 
 This file defines `PayoffFunction ℒ S`, the bundled type of payoff functions of the
-Harder–Narasimhan game: functions assigning to every strict interval of `ℒ` a payoff in `S`.
+Harder–Narasimhan Games: functions assigning to every strict interval of `ℒ` a payoff in `S`.
 Payoff functions are applied via a `FunLike` coercion, so `μ ⟨a, b, h⟩` is the payoff of the
 game played on the interval `(a, b)`.
 
@@ -37,7 +37,7 @@ lemma families directly.
 
 ## References
 
-* [Chen–Jeannin, *Harder–Narasimhan game*][ChenJeannin]
+* [Huayi Chen & Marion Jeannin, *Harder–Narasimhan Games*][ChenJeannin]
 -/
 
 @[expose] public section

@@ -39,7 +39,7 @@ proved in `HarderNarasimhan.Filtration.Unique`.
 
 ## References
 
-* [Chen–Jeannin, *Harder–Narasimhan game*][ChenJeannin]
+* [Huayi Chen & Marion Jeannin, *Harder–Narasimhan Games*][ChenJeannin]
 -/
 
 @[expose] public section
@@ -151,7 +151,7 @@ private lemma HNFil_not_A_le_succ :
 term is the greatest breakpoint of `μ` on the remaining top interval
 (`hnFiltration_succ_isGreatest_breakpoints`), until the chain reaches `⊤`.
 
-The hypotheses are the standing ones of the Harder–Narasimhan game: the descending chain
+The hypotheses are the standing ones of the Harder–Narasimhan Games: the descending chain
 condition `μ.ADCC` and well-foundedness of `>` on `ℒ` make the construction terminate,
 convexity powers the breakpoint machinery, and `μ.Admissible` makes greatest breakpoints
 exist.  Over a complete linear order this filtration is the unique one; see

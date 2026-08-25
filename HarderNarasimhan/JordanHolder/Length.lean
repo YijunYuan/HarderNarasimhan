@@ -33,7 +33,7 @@ its jump values; it is kept `private` to this file.
 
 ## References
 
-* [Chen–Jeannin, *Harder–Narasimhan game*][ChenJeannin]
+* [Huayi Chen & Marion Jeannin, *Harder–Narasimhan Games*][ChenJeannin]
 -/
 
 @[expose] public section
@@ -560,7 +560,7 @@ variable [μ.FiniteTotalPayoff] [μ.IsSlopeLike] [μ.IsSemistable]
 variable [μ.EventuallyTopDCC] [μ.IsAffine]
 
 /-- Over a modular lattice, any two Jordan–Hölder filtrations of an affine payoff function
-have the same length.  This is the analogue for the Harder–Narasimhan game of the classical
+have the same length.  This is the analogue for the Harder–Narasimhan Games of the classical
 Jordan–Hölder uniqueness theorem. -/
 theorem JordanHolderFiltration.length_eq (F G : μ.JordanHolderFiltration) :
     F.length = G.length :=

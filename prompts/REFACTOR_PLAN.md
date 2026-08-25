@@ -12,7 +12,7 @@
 
 ## 0. 现状诊断
 
-当前代码库为对应 Chen–Jeannin《Harder–Narasimhan Game》逐条编号而组织，存在以下工程问题：
+当前代码库为对应 Huayi Chen & Marion Jeannin《Harder–Narasimhan Games》逐条编号而组织，存在以下工程问题：
 
 1. **Defs/Impl/Results 三分**导致大量重复：同一事实在 `impl` 命名空间和公开命名空间各有一份
    （如 `ConvexI_top_iff_Convex`、`semistable_iff`、`μ_nonempty`、`dualμAstar_eq_μBstar` 均有两份）；
@@ -719,7 +719,7 @@ under the descending chain condition `PayoffFunction.ADCC`.
 
 ## References
 
-* [Chen–Jeannin, *Harder–Narasimhan game*][ChenJeannin]
+* [Huayi Chen & Marion Jeannin, *Harder–Narasimhan Games*][ChenJeannin]
 -/
 ```
 

@@ -28,7 +28,7 @@ The proof splits into three observations:
 The file also contains `associatedPrimes_subset_of_submoduleOf_le`, a general monotonicity
 lemma for associated primes of subquotients of a fixed module.
 
-This file is pure commutative algebra: it is independent of the Harder–Narasimhan game and
+This file is pure commutative algebra: it is independent of the Harder–Narasimhan Games and
 is a candidate for upstreaming to mathlib.  Within this repository it provides the input for
 the computation of the first-player value of the coprimary payoff function in
 `HarderNarasimhan.Coprimary.Semistability`.

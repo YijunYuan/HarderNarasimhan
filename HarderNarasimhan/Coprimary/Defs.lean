@@ -15,7 +15,7 @@ public import Mathlib.RingTheory.Spectrum.Prime.Basic
 /-!
 # The coprimary payoff function and coprimary filtrations
 
-This file specializes the Harder–Narasimhan game to modules: for a finite module `M` over a
+This file specializes the Harder–Narasimhan Games to modules: for a finite module `M` over a
 Noetherian commutative ring `R`, it defines a payoff function on the lattice of submodules of
 `M` whose Harder–Narasimhan filtrations are precisely the classical *coprimary filtrations*.
 
@@ -61,7 +61,7 @@ reaches `⊤` (`CoprimaryFiltration.length_le_of_eq_top`), so extensionality
 
 ## References
 
-* [Chen–Jeannin, *Harder–Narasimhan game*][ChenJeannin]
+* [Huayi Chen & Marion Jeannin, *Harder–Narasimhan Games*][ChenJeannin]
 -/
 
 @[expose] public section

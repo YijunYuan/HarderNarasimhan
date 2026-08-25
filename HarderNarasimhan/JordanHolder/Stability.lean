@@ -24,7 +24,7 @@ equivalent to stability, in the sense of `PayoffFunction.IsStable`, of the restr
 
 ## References
 
-* [Chen–Jeannin, *Harder–Narasimhan game*][ChenJeannin]
+* [Huayi Chen & Marion Jeannin, *Harder–Narasimhan Games*][ChenJeannin]
 -/
 
 @[expose] public section

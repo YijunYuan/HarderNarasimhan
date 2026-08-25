@@ -10,9 +10,9 @@ public import Mathlib.Data.Real.Basic
 public import Mathlib.Order.OrderIsoNat
 
 /-!
-# The values of the Harder–Narasimhan game
+# The values of the Harder–Narasimhan Games
 
-This file computes the two global values of the Harder–Narasimhan game: the first-player
+This file computes the two global values of the Harder–Narasimhan Games: the first-player
 value `μ.A ⊤` and the second-player value `μ.B ⊤` (often denoted `μ_A^*` and `μ_B^*`).
 
 Under a weak ascending chain condition and a slope-like alternative towards `⊤`, player A's
@@ -39,7 +39,7 @@ follows.
 
 ## References
 
-* [Chen–Jeannin, *Harder–Narasimhan game*][ChenJeannin]
+* [Huayi Chen & Marion Jeannin, *Harder–Narasimhan Games*][ChenJeannin]
 -/
 
 @[expose] public section

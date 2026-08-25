@@ -7,7 +7,7 @@
 
 [![Graph](https://img.shields.io/badge/Dependency_graph-100000?style=for-the-badge&logo=GitHub&logoColor=white&labelColor=black&color=black)](https://yijunyuan.github.io/lean-graph/?url=https://raw.githubusercontent.com/YijunYuan/HarderNarasimhan/refs/heads/master/HarderNarasimhan.json#dark)
 
-A Lean 4 formalization of the **Harder–Narasimhan game** of Chen–Jeannin
+A Lean 4 formalization of the **Harder–Narasimhan Games** of Huayi Chen & Marion Jeannin
 (referenced throughout the source as `[ChenJeannin]`): a two-player game played on the
 strict intervals of a bounded lattice, whose optimal strategies recover
 Harder–Narasimhan filtrations, Jordan–Hölder filtrations, and — for modules over a

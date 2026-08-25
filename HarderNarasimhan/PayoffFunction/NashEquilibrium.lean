@@ -11,9 +11,9 @@ public import Mathlib.Data.List.TFAE
 public import Mathlib.Tactic.TFAE
 
 /-!
-# Nash equilibria of the Harder–Narasimhan game
+# Nash equilibria of the Harder–Narasimhan Games
 
-The Harder–Narasimhan game associated to `μ` *has a Nash equilibrium* when its two values
+The Harder–Narasimhan Games associated to `μ` *has a Nash equilibrium* when its two values
 coincide: `μ.A ⊤ = μ.B ⊤` (`HasNashEquilibrium`).  This file relates that condition to the
 global extremal values `μ.min ⊤` and `μ.max ⊤` and, over a linear order, to semistability.
 
@@ -33,7 +33,7 @@ global extremal values `μ.min ⊤` and `μ.max ⊤` and, over a linear order, t
 
 ## References
 
-* [Chen–Jeannin, *Harder–Narasimhan game*][ChenJeannin]
+* [Huayi Chen & Marion Jeannin, *Harder–Narasimhan Games*][ChenJeannin]
 -/
 
 @[expose] public section
@@ -45,7 +45,7 @@ namespace PayoffFunction
 variable {ℒ S : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ] [CompleteLattice S]
 variable {μ : PayoffFunction ℒ S}
 
-/-- The Harder–Narasimhan game of `μ` *has a Nash equilibrium* when the first-player and
+/-- The Harder–Narasimhan Games of `μ` *has a Nash equilibrium* when the first-player and
 second-player values coincide: `μ.A ⊤ = μ.B ⊤`, i.e. the minimax and maximin values agree
 and the game has a value. -/
 class HasNashEquilibrium (μ : PayoffFunction ℒ S) : Prop where

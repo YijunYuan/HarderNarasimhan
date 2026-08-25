@@ -31,7 +31,7 @@ of semistable intervals from `⊥` to `⊤` whose successive `μ.A`-slopes stric
 
 ## References
 
-* [Chen–Jeannin, *Harder–Narasimhan game*][ChenJeannin]
+* [Huayi Chen & Marion Jeannin, *Harder–Narasimhan Games*][ChenJeannin]
 -/
 
 @[expose] public section
