@@ -70,7 +70,16 @@ variable (μ : PayoffFunction ℒ S) (I : StrictIntvl ℒ)
 
 /-- `x` is a *breakpoint* of `μ` on `I`: among interior initial segments `(I.left, y)` of
 `I`, the segment cut at `x` maximises the first-player value `μ.A`, and `x` is the greatest
-point doing so.  Breakpoints are the canonical cut points of the Harder–Narasimhan theory. -/
+point doing so.  Breakpoints are the canonical cut points of the Harder–Narasimhan theory.
+
+Breakpoints play the role of the *maximal destabilising subobjects* of the classical
+Harder–Narasimhan theory of vector bundles: the first step of the classical filtration is
+the subobject that maximises the slope and is greatest among the maximisers, exactly as a
+breakpoint maximises `μ.A (I.left, ·)` and is the greatest maximiser, and such elements are
+accordingly called *maximal destabilising elements* in the literature.  The neutral name
+*breakpoint* is preferred here because for a semistable payoff function the top element `⊤`
+is itself a breakpoint of the total interval (`isSemistable_iff_isBreakpoint_top`), and
+calling it "destabilising" would then be a misnomer. -/
 structure IsBreakpoint (x : ℒ) : Prop where
   /-- A breakpoint lies in the interval. -/
   mem : x ∈ I
@@ -84,7 +93,8 @@ structure IsBreakpoint (x : ℒ) : Prop where
     μ.A ⟨I.left, y, lt_of_le_of_ne hyI.1 hy⟩ = μ.A ⟨I.left, x, lt_of_le_of_ne mem.1 ne_left⟩ →
       y ≤ x
 
-/-- The set of breakpoints of `μ` on `I`. -/
+/-- The set of breakpoints of `μ` on `I`.  See `PayoffFunction.IsBreakpoint` for the
+relation with the maximal destabilising subobjects of the classical theory. -/
 def breakpoints : Set ℒ := {x | μ.IsBreakpoint I x}
 
 variable {μ I}

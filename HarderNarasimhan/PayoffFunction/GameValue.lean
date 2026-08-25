@@ -11,8 +11,7 @@ import Mathlib.Data.Real.Basic
 # The values of the Harder–Narasimhan game
 
 This file computes the two global values of the Harder–Narasimhan game: the first-player
-value `μ.A ⊤` and the second-player value `μ.B ⊤` (denoted `μ_A^*` and `μ_B^*` in
-[ChenJeannin]).
+value `μ.A ⊤` and the second-player value `μ.B ⊤` (often denoted `μ_A^*` and `μ_B^*`).
 
 Under a weak ascending chain condition and a slope-like alternative towards `⊤`, player A's
 value collapses to `μ.min ⊤` (`A_top_eq_min_top`); dually, under a strong descending chain
@@ -29,11 +28,12 @@ follows.
 
 ## Main results
 
-* `A_top_eq_min_top`, `A_top_le_B_top` : Proposition 4.1 of [ChenJeannin].
-* `B_top_eq_max_top`, `A_top_le_B_top_of_strongDCC` : Proposition 4.3 of [ChenJeannin].
+* `A_top_eq_min_top`, `A_top_le_B_top` : player A's value collapses to `μ.min ⊤`, and the
+  first-mover advantage follows.
+* `B_top_eq_max_top`, `A_top_le_B_top_of_strongDCC` : player B's value collapses to
+  `μ.max ⊤`, and the first-mover advantage follows.
 * `A_top_dual`, `B_top_dual` : order duality exchanges the two game values.
-* `strongDCC_of_wellOrderedRank` : a well-ordered rank function yields `StrongDCC`
-  (Remark 4.4 of [ChenJeannin]).
+* `strongDCC_of_wellOrderedRank` : a well-ordered rank function yields `StrongDCC`.
 
 ## References
 
@@ -133,8 +133,7 @@ private lemma iInf_top_eq_min_top (μ : PayoffFunction ℒ S) :
     (le_iInf₂ fun x hx ↦ iInf₂_le x ⟨bot_le, hx⟩)
 
 /-- Player A's value is the global minimum: under the weak ascending chain condition and the
-weak slope-like alternative at `⊤`, the first-player value `μ.A ⊤` equals `μ.min ⊤`.
-This is Proposition 4.1 of [ChenJeannin]. -/
+weak slope-like alternative at `⊤`, the first-player value `μ.A ⊤` equals `μ.min ⊤`. -/
 theorem A_top_eq_min_top [h₁ : μ.WeakACC] [h₂ : μ.WeakSlopeLikeAtTop] :
     μ.A ⊤ = μ.min ⊤ := by
   rw [← iInf_top_eq_min_top]
@@ -195,8 +194,7 @@ private lemma iSup_bot_eq_max_top (μ : PayoffFunction ℒ S) :
     (iSup₂_le fun y hy ↦ le_iSup₂_of_le y hy.1 le_rfl)
 
 /-- Player B's value is the global maximum: under the strong descending chain condition and
-the weak slope-like alternative at `⊥`, the second-player value `μ.B ⊤` equals `μ.max ⊤`.
-This is Proposition 4.3 of [ChenJeannin]. -/
+the weak slope-like alternative at `⊥`, the second-player value `μ.B ⊤` equals `μ.max ⊤`. -/
 theorem B_top_eq_max_top [μ.StrongDCC] [μ.WeakSlopeLikeAtBot] : μ.B ⊤ = μ.max ⊤ := by
   have := A_top_eq_min_top (μ := μ.dual)
   rw [← iInf_top_eq_min_top] at this
@@ -212,8 +210,7 @@ theorem A_top_le_B_top_of_strongDCC [μ.StrongDCC] [μ.WeakSlopeLikeAtBot] : μ.
 
 omit [Nontrivial ℒ] in
 /-- A monotone real-valued rank function with well-ordered range yields the strong
-descending chain condition, provided `μ` is `⊤` on rank-constant intervals.  This is
-Remark 4.4 of [ChenJeannin]. -/
+descending chain condition, provided `μ` is `⊤` on rank-constant intervals. -/
 theorem strongDCC_of_wellOrderedRank (μ : PayoffFunction ℒ S)
     (r : ℒ → ℝ) (hr₁ : Monotone r) (hr₂ : IsWellOrder (Set.range r) (· < ·))
     (h : ∀ z : StrictIntvl ℒ, r z.left = r z.right → μ z = ⊤) :

@@ -87,8 +87,7 @@ variable [PartialOrder ℒ] [BoundedOrder ℒ] [CompleteLattice S]
 
 /-- A **Harder–Narasimhan filtration** for the payoff function `μ`: a finite chain
 `⊥ = F 0 < F 1 < ⋯ < F F.length = ⊤`, extended constantly by `⊤` above `length`, whose
-successive steps are semistable and whose `μ.A`-slopes strictly decrease.  This is the
-Harder–Narasimhan filtration of [ChenJeannin, §3].
+successive steps are semistable and whose `μ.A`-slopes strictly decrease.
 
 `length` is stored as data but carries no extra information: it is provably the *least*
 index at which the chain reaches `⊤` (`length_le_of_eq_top`), hence determined by `toFun`;

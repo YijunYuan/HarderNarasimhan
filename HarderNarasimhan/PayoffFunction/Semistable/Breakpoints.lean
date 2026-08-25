@@ -25,12 +25,13 @@ on a well-founded lattice:
 
 ## Main results
 
-* `breakpoints_nonempty` : existence of breakpoints (Proposition 3.4 of [ChenJeannin]).
-* `IsBreakpoint.eq` : uniqueness over a complete linear order (Remark 3.5 of [ChenJeannin]).
-* `IsBreakpoint.isSemistable_restrict`, `IsBreakpoint.not_A_le` : Proposition 3.7 of
-  [ChenJeannin].
+* `breakpoints_nonempty` : existence of breakpoints.
+* `IsBreakpoint.eq` : uniqueness over a complete linear order.
+* `IsBreakpoint.isSemistable_restrict`, `IsBreakpoint.not_A_le` : semistability of the
+  initial segment cut at a breakpoint, and the obstruction above a breakpoint.
 * `breakpoints_total`, `exists_isGreatest_breakpoints`, `IsBreakpoint.A_eq_A_of_lt` :
-  Proposition 3.8 of [ChenJeannin].
+  totality of the breakpoint set, existence of a greatest breakpoint, and the decomposition
+  of the first-player value at a breakpoint.
 
 ## References
 
@@ -45,8 +46,8 @@ variable {ℒ S : Type*} [Lattice ℒ] [CompleteLattice S]
 variable {μ : PayoffFunction ℒ S} {I : StrictIntvl ℒ}
 
 /-- If the first-player value on `(x, z)` is `⊤`, then enlarging an interval `(a, x)` to
-`(a, z)` cannot decrease the first-player value.  This is Proposition 3.2 of [ChenJeannin]
-and the key step in deriving the descending chain condition from `adcc_of_exists_A_eq_top`. -/
+`(a, z)` cannot decrease the first-player value.  This is the key step in deriving the
+descending chain condition in `adcc_of_exists_A_eq_top`. -/
 lemma IsConvexOn.A_le_of_A_eq_top (hμcvx : μ.IsConvexOn I) {x z : ℒ}
     (hxI : x ∈ I) (hzI : z ∈ I) (h : x < z) (h' : μ.A ⟨x, z, h⟩ = ⊤)
     {a : ℒ} (haI : a ∈ I) (hax : a < x) :
@@ -56,7 +57,7 @@ lemma IsConvexOn.A_le_of_A_eq_top (hμcvx : μ.IsConvexOn I) {x z : ℒ}
 
 /-- A convenient sufficient condition for `ADCC`: if every strictly descending chain
 eventually produces a step with first-player value `⊤`, then the descending chain condition
-holds.  This is Corollary 3.3 of [ChenJeannin]. -/
+holds. -/
 lemma adcc_of_exists_A_eq_top [Nontrivial ℒ] [BoundedOrder ℒ] (hμcvx : μ.IsConvexOn ⊤)
     (h : ∀ f : ℕ → ℒ, (h : StrictAnti f) → ∃ N : ℕ, μ.A ⟨f <| N + 1, f N, h (lt_add_one N)⟩ = ⊤) :
     μ.ADCC := by
@@ -237,8 +238,8 @@ private lemma breakpointAux_defprop3 (μ : PayoffFunction ℒ S) (I : StrictIntv
     exact lt_irrefl _ hcontra
 
 /-- The set of breakpoints is nonempty: under the descending chain condition and convexity
-on `I`, the breakpoint recursion terminates at a breakpoint.  This is Proposition 3.4 of
-[ChenJeannin] and the key existential input to the Harder–Narasimhan filtration. -/
+on `I`, the breakpoint recursion terminates at a breakpoint.  This is the key existential
+input to the Harder–Narasimhan filtration. -/
 lemma breakpoints_nonempty [hμDCC : μ.ADCC] (hμcvx : μ.IsConvexOn I) :
     (μ.breakpoints I).Nonempty := by
   classical
@@ -319,8 +320,7 @@ section LinearOrder
 
 variable {S : Type*} [CompleteLinearOrder S] {μ : PayoffFunction ℒ S} {I : StrictIntvl ℒ}
 
-/-- Over a complete linear order the breakpoint is unique.  This is Remark 3.5 of
-[ChenJeannin]. -/
+/-- Over a complete linear order the breakpoint is unique. -/
 lemma IsBreakpoint.eq {x y : ℒ} (hx : μ.IsBreakpoint I x) (hy : μ.IsBreakpoint I y) : x = y := by
   have e := eq_of_le_of_ge (le_of_not_gt <| hx.not_lt y hy.mem hy.ne_left)
     (le_of_not_gt <| hy.not_lt x hx.mem hx.ne_left)
@@ -336,15 +336,13 @@ lemma IsBreakpoint.isBreakpoint_left {x : ℒ} (hx : μ.IsBreakpoint I x) :
   not_lt := fun z hzI hz ↦ hx.not_lt z ⟨hzI.1, le_trans hzI.2 hx.mem.2⟩ hz
   le_of_eq := fun z hzI hz hz' ↦ hx.le_of_eq z ⟨hzI.1, le_trans hzI.2 hx.mem.2⟩ hz hz'
 
-/-- The initial segment cut at a breakpoint is semistable.  This is the first half of
-Proposition 3.7 of [ChenJeannin]. -/
+/-- The initial segment cut at a breakpoint is semistable. -/
 lemma IsBreakpoint.isSemistable_restrict {x : ℒ} (hx : μ.IsBreakpoint I x) :
     (μ.restrict ⟨I.left, x, hx.left_lt⟩).IsSemistable :=
   isBreakpoint_right_iff.1 hx.isBreakpoint_left
 
 /-- Above a breakpoint the first-player value cannot be dominated: for `y > x` in `I` the
-value on `(x, y)` does not dominate the value on `(I.left, x)`.  This is the second half of
-Proposition 3.7 of [ChenJeannin]. -/
+value on `(x, y)` does not dominate the value on `(I.left, x)`. -/
 lemma IsBreakpoint.not_A_le {x : ℒ} (hx : μ.IsBreakpoint I x) (hμcvx : μ.IsConvexOn I)
     {y : ℒ} (hyI : y ∈ I) (hy : x < y) :
     ¬ μ.A ⟨I.left, x, hx.left_lt⟩ ≤ μ.A ⟨x, y, hy⟩ := fun hy' ↦
@@ -358,7 +356,7 @@ section Total
 variable {μ : PayoffFunction ℒ S} {I : StrictIntvl ℒ}
 
 /-- Under convexity and a comparability or attainment hypothesis, the breakpoints of `I`
-are totally ordered.  This is the first half of Proposition 3.8 of [ChenJeannin]. -/
+are totally ordered. -/
 lemma breakpoints_total (hμcvx : μ.IsConvexOn I)
     (h : (Std.Total (· ≤ · : S → S → Prop)) ∨
       ∀ z : ℒ, (hzI : z ∈ I) → (hz : I.left ≠ z) →
@@ -400,8 +398,7 @@ lemma exists_isGreatest_breakpoints [hwf : WellFoundedGT ℒ] [μ.ADCC] (hμcvx 
     fun c2 ↦ le_of_eq <| eq_of_le_of_not_lt' c2 (hM.2 x hx)
 
 /-- Decomposition at a breakpoint: for `y` above a breakpoint `x`, the first-player value on
-`(I.left, y)` is computed on `(x, y)`.  This is the second half of Proposition 3.8 of
-[ChenJeannin]. -/
+`(I.left, y)` is computed on `(x, y)`. -/
 lemma IsBreakpoint.A_eq_A_of_lt {x : ℒ} (hx : μ.IsBreakpoint I x) (hμcvx : μ.IsConvexOn I)
     (h : (Std.Total (· ≤ · : S → S → Prop)) ∨
       ∀ z : ℒ, (hzI : z ∈ I) → (hz : I.left ≠ z) →

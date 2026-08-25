@@ -24,8 +24,7 @@ zero receive the “infinite slope” `⊤`.
 ## Main results
 
 * `PayoffFunction.isSlopeLike_slope` : if `d` and `r` are additive on composable intervals
-  and `d` is positive on rank-zero intervals, then `slope r d` is slope-like
-  (Proposition 4.8 of [ChenJeannin]).
+  and `d` is positive on rank-zero intervals, then `slope r d` is slope-like.
 
 ## References
 
@@ -64,7 +63,7 @@ private lemma slope_pos {r : StrictIntvl ℒ → NNReal} {d : StrictIntvl ℒ �
   ⟨(r I)⁻¹ • d I, dif_pos h, smul_inv_smul₀ h.ne' (d I)⟩
 
 /-- The slope of an additive degree by an additive rank is slope-like, provided the degree
-is positive on intervals of rank zero.  This is Proposition 4.8 of [ChenJeannin]. -/
+is positive on intervals of rank zero. -/
 theorem isSlopeLike_slope [Nontrivial V] (r : StrictIntvl ℒ → NNReal) (d : StrictIntvl ℒ → V)
     (hd : ∀ (x y z : ℒ), (h₁ : x < y) → (h₂ : y < z) →
       d ⟨x, z, h₁.trans h₂⟩ = d ⟨x, y, h₁⟩ + d ⟨y, z, h₂⟩)

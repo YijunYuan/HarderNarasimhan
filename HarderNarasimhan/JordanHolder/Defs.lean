@@ -123,8 +123,7 @@ variable [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ] [CompleteLattice
 /-- A **Jordan–Hölder filtration** for the payoff function `μ`: a finite chain
 `⊤ = F 0 > F 1 > ⋯ > F F.length = ⊥`, extended constantly by `⊥` above `length`, whose
 successive steps all carry the total payoff `μ ⊤` and are *stable*: refining a step through
-any strictly intermediate point strictly decreases the payoff.  This is the Jordan–Hölder
-filtration of [ChenJeannin, §4].
+any strictly intermediate point strictly decreases the payoff.
 
 `length` is stored as data but carries no extra information: it is provably the *least*
 index at which the chain reaches `⊥` (`length_le_of_eq_bot`), hence determined by `toFun`;

@@ -18,14 +18,13 @@ next term is a minimal element among the points `p` strictly between `⊥` and t
 term with `μ (⊥, p) = μ ⊤`.  Semistability and the seesaw property show that each step
 carries the total payoff and that minimality forces stability of the steps; the chain
 condition `μ.EventuallyTopDCC` forces the chain to reach `⊥` after finitely many steps.
-This is Theorem 4.25 of [ChenJeannin], exposed as a `Nonempty` instance (in contrast to the
+The existence result is exposed as a `Nonempty` instance (in contrast to the
 Harder–Narasimhan filtration, a Jordan–Hölder filtration is not unique, so there is no
 canonical choice).
 
 ## Main results
 
-* `Nonempty (μ.JordanHolderFiltration)` : Jordan–Hölder filtrations exist (Theorem 4.25 of
-  [ChenJeannin]).
+* `Nonempty (μ.JordanHolderFiltration)` : Jordan–Hölder filtrations exist.
 * `PayoffFunction.exists_relSeries_jordanHolderRel` : the `RelSeries` repackaging; a finite
   chain for `μ.jordanHolderRel` from `⊤` to `⊥` exists.
 
@@ -301,9 +300,9 @@ private lemma JHFil_refine_lt_step_payoff :
       h'''' ▸ h''')) (not_and_iff_not_or_not.2 <| Or.inl <| ne_of_gt <| h'''' ▸ h''')).2 h'''
 
 /-- Existence of a Jordan–Hölder filtration: the greedy construction `JHFil` packages into
-a `JordanHolderFiltration`.  This is Theorem 4.25 of [ChenJeannin].  In contrast to the
-Harder–Narasimhan filtration, a Jordan–Hölder filtration is not unique, so existence is
-exposed as a `Nonempty` instance rather than a canonical construction. -/
+a `JordanHolderFiltration`.  In contrast to the Harder–Narasimhan filtration, a
+Jordan–Hölder filtration is not unique, so existence is exposed as a `Nonempty` instance
+rather than a canonical construction. -/
 instance : Nonempty (μ.JordanHolderFiltration) :=
   ⟨{ toFun := JHFil μ
      length := JHlen μ

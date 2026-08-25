@@ -17,8 +17,9 @@ The construction iterates the greatest-breakpoint step of
 current term `x` is not `⊤`, the next term is the greatest breakpoint of `μ` on the interval
 `(x, ⊤)`.  Well-foundedness of `>` on `ℒ` forces the chain to reach `⊤` after finitely many
 steps, and the breakpoint properties provide semistability of the successive steps and the
-strict decrease of the `μ.A`-slopes.  This is the existence half of Theorem 3.10 of
-[ChenJeannin]; the uniqueness half is proved in `HarderNarasimhan.Filtration.Unique`.
+strict decrease of the `μ.A`-slopes.  This is the existence half of the
+existence-and-uniqueness theorem for Harder–Narasimhan filtrations; the uniqueness half is
+proved in `HarderNarasimhan.Filtration.Unique`.
 
 ## Main definitions
 
@@ -148,7 +149,7 @@ The hypotheses are the standing ones of the Harder–Narasimhan game: the descen
 condition `μ.ADCC` and well-foundedness of `>` on `ℒ` make the construction terminate,
 convexity powers the breakpoint machinery, and `μ.Admissible` makes greatest breakpoints
 exist.  Over a complete linear order this filtration is the unique one; see
-`HarderNarasimhan.Filtration.Unique`.  This is Theorem 3.10 of [ChenJeannin]. -/
+`HarderNarasimhan.Filtration.Unique`. -/
 noncomputable def hnFiltration : μ.HarderNarasimhanFiltration where
   toFun := HNFil μ
   length := HNlen μ

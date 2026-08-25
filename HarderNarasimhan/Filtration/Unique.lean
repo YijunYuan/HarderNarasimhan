@@ -11,8 +11,8 @@ import HarderNarasimhan.Filtration.Exists
 Over a complete *linear* order `S`, the Harder–Narasimhan filtration of a payoff function is
 unique: any filtration satisfying the axioms of
 `PayoffFunction.HarderNarasimhanFiltration` coincides with the canonical construction
-`μ.hnFiltration`.  This is the uniqueness half of Theorem 3.10 of [ChenJeannin] and it is
-exposed as a `Unique` instance.
+`μ.hnFiltration`.  This is the uniqueness half of the existence-and-uniqueness theorem for
+Harder–Narasimhan filtrations and it is exposed as a `Unique` instance.
 
 This file also repackages existence and uniqueness in terms of `RelSeries` for the relation
 `μ.semistableRel`: a Harder–Narasimhan filtration is the same thing as a finite `RelSeries`
@@ -21,7 +21,7 @@ of semistable intervals from `⊥` to `⊤` whose successive `μ.A`-slopes stric
 ## Main results
 
 * `Unique (μ.HarderNarasimhanFiltration)` : over a complete linear order the
-  Harder–Narasimhan filtration is unique (Theorem 3.10 of [ChenJeannin]).
+  Harder–Narasimhan filtration is unique.
 * `PayoffFunction.exists_relSeries_semistableRel` : existence of a semistable `RelSeries`
   from `⊥` to `⊤` with strictly decreasing slopes.
 * `PayoffFunction.existsUnique_relSeries_semistableRel` : its uniqueness over a complete
@@ -45,7 +45,7 @@ variable [CompleteLinearOrder S] {μ : PayoffFunction ℒ S} [μ.ADCC] [μ.IsCon
 
 open Classical in
 /-- Any Harder–Narasimhan filtration coincides with the canonical one.  This is the
-uniqueness half of Theorem 3.10 of [ChenJeannin]; it is exposed through the `Unique`
+uniqueness half of the existence-and-uniqueness theorem; it is exposed through the `Unique`
 instance below. -/
 private theorem eq_hnFiltration (F : μ.HarderNarasimhanFiltration) : F = μ.hnFiltration := by
   have hμcvx : μ.IsConvexOn ⊤ := inferInstance
@@ -140,7 +140,7 @@ private theorem eq_hnFiltration (F : μ.HarderNarasimhanFiltration) : F = μ.hnF
           (by omega)
 
 /-- Over a complete linear order the Harder–Narasimhan filtration is unique; the canonical
-representative is `μ.hnFiltration`.  This is Theorem 3.10 of [ChenJeannin]. -/
+representative is `μ.hnFiltration`. -/
 noncomputable instance : Unique (μ.HarderNarasimhanFiltration) where
   uniq := eq_hnFiltration
 
@@ -244,7 +244,7 @@ private lemma exists_hnFiltration_of_relSeries (s : RelSeries μ.semistableRel)
 
 /-- Over a complete linear order, there is a *unique* `RelSeries` of semistable intervals
 from `⊥` to `⊤` with strictly decreasing `μ.A`-slopes: the `RelSeries` repackaging of the
-uniqueness of the Harder–Narasimhan filtration (Theorem 3.10 of [ChenJeannin]). -/
+uniqueness of the Harder–Narasimhan filtration. -/
 theorem existsUnique_relSeries_semistableRel (μ : PayoffFunction ℒ S)
     [μ.ADCC] [μ.IsConvex] :
     ∃! s : RelSeries μ.semistableRel,

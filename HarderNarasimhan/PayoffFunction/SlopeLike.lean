@@ -71,7 +71,7 @@ instance {I : StrictIntvl ℒ} [hsl : μ.IsSlopeLike] : (μ.restrict I).IsSlopeL
 
 /-- The slope-like axiom is equivalent to the seesaw trichotomy: for any chain `x < y < z`
 the three values `μ (x, y)`, `μ (x, z)`, `μ (y, z)` are strictly increasing, strictly
-decreasing, or all equal.  This is Proposition 4.6 of [ChenJeannin]. -/
+decreasing, or all equal. -/
 theorem isSlopeLike_iff_seesaw :
     μ.IsSlopeLike ↔ ∀ (x y z : ℒ), (h₁ : x < y) → (h₂ : y < z) →
       (μ ⟨x, y, h₁⟩ < μ ⟨x, z, h₁.trans h₂⟩ ∧ μ ⟨x, z, h₁.trans h₂⟩ < μ ⟨y, z, h₂⟩) ∨

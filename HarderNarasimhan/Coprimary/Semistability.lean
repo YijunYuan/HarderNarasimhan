@@ -40,16 +40,14 @@ Harder–Narasimhan filtration are coprimary" is extracted in
 ## Main results
 
 * `Coprimary.A_payoff` : the first-player value is the singleton on the minimal associated
-  prime of the subquotient.  This is Proposition 3.12 of [ChenJeannin].
+  prime of the subquotient.
 * `Coprimary.isSemistable_iff_A_const`, `Coprimary.isSemistable_iff_existsUnique_associatedPrime` :
   semistability of the coprimary payoff function is equivalent to constancy of the
   first-player value on initial segments, and to `M` having exactly one associated prime.
-  These are the two nontrivial equivalences of Remark 3.14 of [ChenJeannin].
 * `Coprimary.isSemistable_restrict_iff_quotient` : semistability of the restriction to an
   interval of submodules is semistability of the coprimary payoff function of the
   subquotient.
-* The `IsConvexOn ⊤` and `ADCC` instances for `Coprimary.payoff R M` (Propositions 3.11 and
-  3.13 of [ChenJeannin]).
+* The `IsConvexOn ⊤` and `ADCC` instances for `Coprimary.payoff R M`.
 
 ## References
 
@@ -222,8 +220,7 @@ lemma max_payoff : (payoff R M).max = payoff R M := by
 /-- The coprimary payoff function is convex: the payoff of `(x ⊓ y, x)` is at most the
 payoff of `(y, x ⊔ y)`, since the second isomorphism theorem embeds the first subquotient
 into the second and subset inclusion of associated primes refines the colexicographic order.
-This is Proposition 3.11 of [ChenJeannin]; the global `IsConvex` instance is derived
-automatically. -/
+The global `IsConvex` instance is derived automatically. -/
 instance [Nontrivial M] : (payoff R M).IsConvexOn ⊤ := by
   refine { le := fun x y _ _ hxy ↦ ?_ }
   simp only [payoff_apply]
@@ -323,8 +320,7 @@ private lemma associatedPrimes_quot_liftQuot_locKer (I : StrictIntvl (Submodule 
 /-- The first-player value of the coprimary payoff function on any interval is the singleton
 containing the *minimal* associated prime of its subquotient (in the fixed linear extension
 of the prime spectrum).  The optimal first move is the lift of the localization kernel
-`Coprimary.locKer`, whose subquotient has exactly the minimal prime as associated prime.
-This is Proposition 3.12 of [ChenJeannin]. -/
+`Coprimary.locKer`, whose subquotient has exactly the minimal prime as associated prime. -/
 lemma A_payoff (I : StrictIntvl (Submodule R M)) :
     (payoff R M).A I =
       .principal (toColex {(associatedPrimes I).toFinset.min' (associatedPrimes_nonempty I)}) := by
@@ -350,7 +346,7 @@ lemma A_payoff (I : StrictIntvl (Submodule R M)) :
 /-- The coprimary payoff function satisfies the descending chain condition for the
 first-player value: a strictly improving chain of submodules would produce infinitely many
 distinct associated primes of a fixed finitely generated module, contradicting finiteness of
-`associatedPrimes` over a Noetherian ring.  This is Proposition 3.13 of [ChenJeannin]. -/
+`associatedPrimes` over a Noetherian ring. -/
 instance : (payoff R M).ADCC where
   dcc := by
     intro N x hx1 hx2
@@ -371,7 +367,7 @@ instance : (payoff R M).ADCC where
 
 /-- Semistability of the coprimary payoff function is equivalent to the first-player value
 being constant on the initial segments `(⊥, N)`, equal to the singleton on the minimal
-associated prime of `M`.  This is one of the equivalences of Remark 3.14 of [ChenJeannin]. -/
+associated prime of `M`. -/
 theorem isSemistable_iff_A_const [Nontrivial M] :
     (payoff R M).IsSemistable ↔ ∀ N : Submodule R M, (hN : ⊥ < N) →
       (payoff R M).A ⟨⊥, N, hN⟩ =
@@ -397,9 +393,9 @@ theorem isSemistable_iff_A_const [Nontrivial M] :
 
 /-- **Semistable means coprimary**: the coprimary payoff function of `M` is semistable if
 and only if `M` has exactly one associated prime.  This is the core semantic equivalence of
-the chapter (Remark 3.14 of [ChenJeannin]); together with
-`Coprimary.isSemistable_restrict_iff_quotient` it identifies Harder–Narasimhan filtrations
-of `Coprimary.payoff R M` with coprimary filtrations of `M`. -/
+the theory; together with `Coprimary.isSemistable_restrict_iff_quotient` it identifies
+Harder–Narasimhan filtrations of `Coprimary.payoff R M` with coprimary filtrations of
+`M`. -/
 theorem isSemistable_iff_existsUnique_associatedPrime [Nontrivial M] :
     (payoff R M).IsSemistable ↔ ∃! p, p ∈ _root_.associatedPrimes R M := by
   rw [isSemistable_iff_A_const]

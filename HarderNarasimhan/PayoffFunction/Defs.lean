@@ -22,8 +22,7 @@ which is again a payoff function:
 * `μ.A I`, the value of the game on `I` when player A moves first (an infimum of `μ.max`
   values over left endpoints), and its companion `μ.B I` for player B.
 
-The global values of the game are `μ.A ⊤` and `μ.B ⊤` (denoted `μ_A^*` and `μ_B^*` in
-[ChenJeannin]).
+The global values of the game are `μ.A ⊤` and `μ.B ⊤` (often denoted `μ_A^*` and `μ_B^*`).
 
 Finally, `μ.IsAttained I` records that the infimum defining `μ.A I` is attained.
 

@@ -556,8 +556,8 @@ variable [μ.FiniteTotalPayoff] [μ.IsSlopeLike] [μ.IsSemistable]
 variable [μ.EventuallyTopDCC] [μ.IsAffine]
 
 /-- Over a modular lattice, any two Jordan–Hölder filtrations of an affine payoff function
-have the same length.  This is the Jordan–Hölder-style uniqueness statement of
-[ChenJeannin, §4]. -/
+have the same length.  This is the analogue for the Harder–Narasimhan game of the classical
+Jordan–Hölder uniqueness theorem. -/
 theorem JordanHolderFiltration.length_eq (F G : μ.JordanHolderFiltration) :
     F.length = G.length :=
   eq_of_le_of_ge

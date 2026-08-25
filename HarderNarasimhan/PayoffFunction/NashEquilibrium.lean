@@ -18,18 +18,16 @@ global extremal values `μ.min ⊤` and `μ.max ⊤` and, over a linear order, t
 ## Main results
 
 * `B_top_le_A_top_iff`, `hasNashEquilibrium_iff_min_le`, `hasNashEquilibrium_iff_le_max` :
-  unfolded reformulations of the equilibrium condition (Remark 4.10 of [ChenJeannin]).
-* `B_top_le_A_top_of_min_eq_max`, `min_top_eq_max_top_of_B_top_le_A_top` :
-  Proposition 4.11 of [ChenJeannin].
+  unfolded reformulations of the equilibrium condition.
+* `B_top_le_A_top_of_min_eq_max`, `min_top_eq_max_top_of_B_top_le_A_top` : the equivalence
+  between the inequality `μ.B ⊤ ≤ μ.A ⊤` and the coincidence of the global extremal values.
 * `max_top_eq_apply_iff`, `min_top_eq_apply_iff` : for a slope-like payoff the endpoint
-  equalities `μ.max ⊤ = μ ⊤`, `μ.min ⊤ = μ ⊤` and `μ.min ⊤ = μ.max ⊤` are equivalent
-  (Propositions 4.12–4.16 of [ChenJeannin]).
+  equalities `μ.max ⊤ = μ ⊤`, `μ.min ⊤ = μ ⊤` and `μ.min ⊤ = μ.max ⊤` are equivalent.
 * `min_top_eq_max_top_iff_hasNashEquilibrium`, `nashEquilibrium_tfae` : under both chain
-  conditions the above are further equivalent to `HasNashEquilibrium`
-  (Theorem 4.21 of [ChenJeannin]).
+  conditions the above are further equivalent to `HasNashEquilibrium`.
 * `IsSemistable.B_top_le_A_top`, `IsSemistable.hasNashEquilibrium`,
   `isSemistable_of_hasNashEquilibrium` : the equivalence between semistability and Nash
-  equilibrium over a complete linear order (Propositions 4.18 and 4.20 of [ChenJeannin]).
+  equilibrium over a complete linear order.
 
 ## References
 
@@ -51,8 +49,7 @@ class HasNashEquilibrium (μ : PayoffFunction ℒ S) : Prop where
   eq : μ.A ⊤ = μ.B ⊤
 
 /-- The inequality `μ.B ⊤ ≤ μ.A ⊤`, unfolded as a family of comparisons between
-bottom-anchored minima and top-anchored maxima.  This is part of Remark 4.10 of
-[ChenJeannin]. -/
+bottom-anchored minima and top-anchored maxima. -/
 theorem B_top_le_A_top_iff :
     μ.B ⊤ ≤ μ.A ⊤ ↔
       ∀ x : ℒ, (hx : x ≠ ⊤) → ∀ y : ℒ, (hy : ⊥ < y) →
@@ -64,8 +61,7 @@ theorem B_top_le_A_top_iff :
   · exact fun h ↦ iSup₂_le fun y hy ↦ le_iInf₂ fun x hx ↦ h x hx.2.ne y hy.1
 
 /-- Under the hypotheses computing player A's value, the game has a Nash equilibrium iff no
-proper initial segment has a smaller minimum than the total interval.  This is part of
-Remark 4.10 of [ChenJeannin]. -/
+proper initial segment has a smaller minimum than the total interval. -/
 theorem hasNashEquilibrium_iff_min_le [μ.WeakACC] [μ.WeakSlopeLikeAtTop] :
     μ.HasNashEquilibrium ↔
       ∀ y : ℒ, (hy : y ≠ ⊥) → μ.min ⟨⊥, y, bot_lt_iff_ne_bot.2 hy⟩ ≤ μ.min ⊤ := by
@@ -82,8 +78,7 @@ theorem hasNashEquilibrium_iff_min_le [μ.WeakACC] [μ.WeakSlopeLikeAtTop] :
       (iSup₂_le fun b hb ↦ h b hb.1.ne')
 
 /-- Under the hypotheses computing player B's value, the game has a Nash equilibrium iff no
-proper final segment has a larger maximum than the total interval.  This is part of
-Remark 4.10 of [ChenJeannin]. -/
+proper final segment has a larger maximum than the total interval. -/
 theorem hasNashEquilibrium_iff_le_max [μ.StrongDCC] [μ.WeakSlopeLikeAtBot] :
     μ.HasNashEquilibrium ↔
       ∀ y : ℒ, (hy : y ≠ ⊤) → μ.max ⊤ ≤ μ.max ⟨y, ⊤, lt_top_iff_ne_top.2 hy⟩ := by
@@ -99,8 +94,7 @@ theorem hasNashEquilibrium_iff_le_max [μ.StrongDCC] [μ.WeakSlopeLikeAtBot] :
     exact eq_of_le_of_ge (iInf₂_le ⊥ ⟨le_rfl, bot_lt_top⟩)
       (le_iInf₂ fun b hb ↦ h b hb.2.ne)
 
-/-- If the global extremal values coincide, then `μ.B ⊤ ≤ μ.A ⊤`.  This is one half of
-Proposition 4.11 of [ChenJeannin]. -/
+/-- If the global extremal values coincide, then `μ.B ⊤ ≤ μ.A ⊤`. -/
 theorem B_top_le_A_top_of_min_eq_max (h : μ.min ⊤ = μ.max ⊤) : μ.B ⊤ ≤ μ.A ⊤ := by
   have h₁ : μ.B ⊤ ≤ μ.max ⊤ :=
     iSup₂_le fun b hb ↦ le_trans (min_le_apply (I := ⟨⊥, b, hb.1⟩)) <|
@@ -110,8 +104,7 @@ theorem B_top_le_A_top_of_min_eq_max (h : μ.min ⊤ = μ.max ⊤) : μ.B ⊤ �
   exact h₁.trans (h ▸ h₂)
 
 /-- Conversely, under the hypotheses computing both game values, `μ.B ⊤ ≤ μ.A ⊤` forces the
-global extremal values to coincide.  This is the other half of Proposition 4.11 of
-[ChenJeannin]. -/
+global extremal values to coincide. -/
 theorem min_top_eq_max_top_of_B_top_le_A_top [μ.WeakACC] [μ.WeakSlopeLikeAtTop]
     [μ.StrongDCC] [μ.WeakSlopeLikeAtBot] (h : μ.B ⊤ ≤ μ.A ⊤) : μ.min ⊤ = μ.max ⊤ :=
   eq_of_le_of_ge (le_trans min_le_apply apply_le_max) <|
@@ -144,8 +137,8 @@ section SlopeLike
 variable [hμ : μ.IsSlopeLike]
 
 /-- For a slope-like payoff function, `μ.max ⊤ = μ ⊤` says exactly that the two global
-extremal values coincide.  Together with `min_top_eq_apply_iff` this packages
-Propositions 4.12–4.16 of [ChenJeannin]. -/
+extremal values coincide.  Together with `min_top_eq_apply_iff` this makes the two endpoint
+equalities `μ.max ⊤ = μ ⊤` and `μ.min ⊤ = μ ⊤` interchangeable. -/
 theorem max_top_eq_apply_iff : μ.max ⊤ = μ ⊤ ↔ μ.min ⊤ = μ.max ⊤ := by
   constructor
   · exact min_eq_max_of_max_eq fun x hx ↦
@@ -167,8 +160,8 @@ theorem min_top_eq_apply_iff : μ.min ⊤ = μ ⊤ ↔ μ.min ⊤ = μ.max ⊤ :
     exact (h.symm ▸ hb).elim eq_of_le_of_ge
 
 /-- For a slope-like payoff function satisfying both chain conditions, the game has a Nash
-equilibrium iff the two global extremal values coincide.  This is the key bridge of
-Theorem 4.21 of [ChenJeannin]. -/
+equilibrium iff the two global extremal values coincide.  This is the key bridge between the
+extremal operations and the game values. -/
 theorem min_top_eq_max_top_iff_hasNashEquilibrium [h₁ : μ.WeakACC] [h₂ : μ.StrongDCC] :
     μ.min ⊤ = μ.max ⊤ ↔ μ.HasNashEquilibrium := by
   have hwsl : μ.WeakSlopeLikeAtTop :=
@@ -195,8 +188,7 @@ section Semistable
 
 variable {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 
-/-- Over a complete linear order, semistability implies `μ.B ⊤ ≤ μ.A ⊤`.  This is
-Proposition 4.18 of [ChenJeannin]. -/
+/-- Over a complete linear order, semistability implies `μ.B ⊤ ≤ μ.A ⊤`. -/
 theorem IsSemistable.B_top_le_A_top {S : Type*} [CompleteLinearOrder S]
     {μ : PayoffFunction ℒ S} (hμ : μ.IsSemistable) : μ.B ⊤ ≤ μ.A ⊤ := by
   rw [isSemistable_iff_isBreakpoint_top] at hμ
@@ -213,8 +205,7 @@ theorem IsSemistable.hasNashEquilibrium {S : Type*} [CompleteLinearOrder S]
   ⟨eq_of_le_of_ge A_top_le_B_top hμ.B_top_le_A_top⟩
 
 /-- A Nash equilibrium forces semistability, provided every bottom-anchored restriction
-satisfies the hypotheses computing player A's value.  This is Proposition 4.20 of
-[ChenJeannin]. -/
+satisfies the hypotheses computing player A's value. -/
 theorem isSemistable_of_hasNashEquilibrium {S : Type*} [CompleteLattice S]
     {μ : PayoffFunction ℒ S}
     (h₁ : ∀ x : ℒ, (hx : x ≠ ⊥) → ((μ.restrict ⟨⊥, x, bot_lt_iff_ne_bot.2 hx⟩)).WeakACC)

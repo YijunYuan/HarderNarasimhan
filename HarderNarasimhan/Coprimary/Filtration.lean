@@ -34,7 +34,7 @@ unique, and therefore so is the coprimary filtration.
 * `CoprimaryFiltration.exists_hnFiltration` : every coprimary filtration underlies a
   Harder–Narasimhan filtration of the coprimary payoff function.
 * `Unique (CoprimaryFiltration R M)` : existence and uniqueness of the coprimary
-  filtration.  This is Theorem 3.15 of [ChenJeannin].
+  filtration.
 
 ## References
 
@@ -70,8 +70,8 @@ commutative ring `R`: the canonical Harder–Narasimhan filtration of the coprim
 function `Coprimary.payoff R M`, with the coprimarity of its subquotients supplied by
 `PayoffFunction.HarderNarasimhanFiltration.piecewise_isCoprimary` and the strict decrease of
 their associated primes extracted from the strict decrease of the first-player values via
-`Coprimary.A_payoff`.  This is the existence half of Theorem 3.15 of [ChenJeannin]; by the
-`Unique` instance below it is the *only* coprimary filtration of `M`. -/
+`Coprimary.A_payoff`.  By the `Unique` instance below it is the *only* coprimary filtration
+of `M`. -/
 noncomputable def coprimaryFiltration : CoprimaryFiltration R M :=
   let F := (payoff R M).hnFiltration
   { toFun := ⇑F
@@ -147,7 +147,8 @@ private lemma coe_eq_hnFiltration (a : CoprimaryFiltration R M) :
 
 /-- Uniqueness of the coprimary filtration: any two coprimary filtrations of `M` share the
 underlying chain of the canonical Harder–Narasimhan filtration, hence are equal.  Together
-with the `Inhabited` instance this is Theorem 3.15 of [ChenJeannin]. -/
+with the `Inhabited` instance this shows every finite module over a Noetherian commutative
+ring admits exactly one coprimary filtration. -/
 noncomputable instance : Unique (CoprimaryFiltration R M) where
   uniq a := by
     ext n

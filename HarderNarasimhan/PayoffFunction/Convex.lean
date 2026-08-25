@@ -27,15 +27,13 @@ equality of the two payoffs, implies convexity.
 
 ## Main results
 
-* `IsConvexOn.max_inf_le_max`, `IsConvexOn.A_le_A_sup` : the fundamental inequality chain
-  (Lemma 2.4 of [ChenJeannin]).
+* `IsConvexOn.max_inf_le_max`, `IsConvexOn.A_le_A_sup` : the fundamental inequality chain.
 * `IsConvexOn.max`, `IsConvexOn.max_max`, `IsConvexOn.A_max` : `μ.max` inherits convexity,
-  is idempotent, and leaves `μ.A` unchanged (Remark 2.5 of [ChenJeannin]).
+  is idempotent, and leaves `μ.A` unchanged.
 * `IsConvexOn.inf_le_A`, `IsConvexOn.A_eq_of_ge`, `IsConvexOn.A_le_A_of_lt`,
-  `IsConvexOn.A_eq_or_lt` : comparison of `μ.A` along a chain `x < y < z`
-  (Proposition 2.6 of [ChenJeannin]).
+  `IsConvexOn.A_eq_or_lt` : comparison of `μ.A` along a chain `x < y < z`.
 * `IsConvexOn.inf_A_le_A_sup`, `IsConvexOn.A_le_A_sup_or` : comparison of `μ.A` along a join
-  `x ⊔ y` (Proposition 2.8 of [ChenJeannin]).
+  `x ⊔ y`.
 
 ## References
 
@@ -116,7 +114,7 @@ instance [haff : μ.IsAffine] : (μ.restrict I).IsAffine :=
 
 /-! ### The fundamental inequality chain
 
-These are the components of Lemma 2.4 of [ChenJeannin]. -/
+Convexity propagates bounds from lower-left subintervals to upper-right ones. -/
 
 /-- For `u ≤ x ⊓ w` the first-player value on `(u, x)` is bounded by `μ.max (x ⊓ w, x)`.
 This is a formal consequence of the definition of `μ.A` and needs no convexity. -/
@@ -156,7 +154,7 @@ lemma IsConvexOn.A_le_A_sup (hμcvx : μ.IsConvexOn I) {x w u : ℒ}
 
 /-! ### Stability of the extremal operations under convexity
 
-These are the components of Remark 2.5 of [ChenJeannin]. -/
+`μ.max` inherits convexity, is idempotent, and does not change the first-player value. -/
 
 /-- `μ.max` inherits convexity from `μ`. -/
 lemma IsConvexOn.max (hμcvx : μ.IsConvexOn I) : (μ.max).IsConvexOn I :=
@@ -183,8 +181,8 @@ lemma IsConvexOn.A_max (hμcvx : μ.IsConvexOn I) : μ.max.A I = μ.A I := by
 
 /-! ### `μ.A` along a chain
 
-These are the components of Proposition 2.6 of [ChenJeannin]; the convexity-free monotonicity
-statement is `PayoffFunction.A_anti_left`. -/
+How the first-player value behaves when an interval is cut at an intermediate point; the
+convexity-free monotonicity statement is `PayoffFunction.A_anti_left`. -/
 
 /-- Under convexity on `I`, the first-player value on `(x, z)` dominates the meet of the
 values on the two subintervals cut at `y`. -/
@@ -243,8 +241,7 @@ lemma IsConvexOn.A_eq_or_lt (hμcvx : μ.IsConvexOn I) {x y z : ℒ}
       lt_of_le_of_ne (A_anti_left μ h₁ h₂) (Ne.symm hnot)⟩
 
 /-- In a complete linear order, a strict improvement of the first-player value on the left
-initial segment forces the value on the complementary segment to equal the global value.
-This is Remark 2.7 of [ChenJeannin]. -/
+initial segment forces the value on the complementary segment to equal the global value. -/
 lemma IsConvex.A_right_eq_of_A_left_gt {S : Type*} [CompleteLinearOrder S]
     [Nontrivial ℒ] [BoundedOrder ℒ] {μ : PayoffFunction ℒ S}
     (hμcvx : μ.IsConvex) {x : ℒ} (h₁ : ⊥ < x) (h₂ : x < ⊤)
@@ -256,7 +253,8 @@ lemma IsConvex.A_right_eq_of_A_left_gt {S : Type*} [CompleteLinearOrder S]
 
 /-! ### `μ.A` along a join
 
-These are the components of Proposition 2.8 of [ChenJeannin]. -/
+How the first-player value on `(u, x ⊔ y)` compares with the values on `(u, x)` and
+`(u, y)`. -/
 
 private lemma IsConvexOn.A_le_max_or (hμcvx : μ.IsConvexOn I) {x y u w : ℒ}
     (hxI : x ∈ I) (hyI : y ∈ I) (h₁ : u < x) (h₂ : u < y)
