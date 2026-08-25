@@ -3,8 +3,10 @@ Copyright (c) 2026 Yijun Yuan. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yijun Yuan
 -/
-import HarderNarasimhan.Coprimary.Semistability
-import HarderNarasimhan.Filtration.Unique
+module
+
+public import HarderNarasimhan.Coprimary.Semistability
+public import HarderNarasimhan.Filtration.Unique
 
 /-!
 # Existence and uniqueness of coprimary filtrations
@@ -42,6 +44,8 @@ unique, and therefore so is the coprimary filtration.
 
 * [Chen–Jeannin, *Harder–Narasimhan game*][ChenJeannin]
 -/
+
+@[expose] public section
 
 namespace HarderNarasimhan
 
@@ -151,6 +155,7 @@ private lemma coe_eq_hnFiltration (a : CoprimaryFiltration R M) :
 underlying chain of the canonical Harder–Narasimhan filtration, hence are equal.  Together
 with the `Inhabited` instance this shows every finite module over a Noetherian commutative
 ring admits exactly one coprimary filtration. -/
+@[no_expose]
 noncomputable instance : Unique (CoprimaryFiltration R M) where
   uniq a := by
     ext n

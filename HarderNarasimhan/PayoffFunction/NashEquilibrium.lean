@@ -3,10 +3,12 @@ Copyright (c) 2026 Yijun Yuan. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yijun Yuan
 -/
-import HarderNarasimhan.PayoffFunction.GameValue
-import HarderNarasimhan.PayoffFunction.Semistable.Defs
-import Mathlib.Tactic.TFAE
-import Mathlib.Data.List.TFAE
+module
+
+public import HarderNarasimhan.PayoffFunction.GameValue
+public import HarderNarasimhan.PayoffFunction.Semistable.Defs
+public import Mathlib.Tactic.TFAE
+public import Mathlib.Data.List.TFAE
 
 /-!
 # Nash equilibria of the Harder–Narasimhan game
@@ -33,6 +35,8 @@ global extremal values `μ.min ⊤` and `μ.max ⊤` and, over a linear order, t
 
 * [Chen–Jeannin, *Harder–Narasimhan game*][ChenJeannin]
 -/
+
+@[expose] public section
 
 namespace HarderNarasimhan
 

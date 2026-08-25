@@ -3,9 +3,11 @@ Copyright (c) 2026 Yijun Yuan. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yijun Yuan
 -/
-import HarderNarasimhan.PayoffFunction.SlopeLike
-import HarderNarasimhan.PayoffFunction.NashEquilibrium
-import Mathlib.Data.Rel
+module
+
+public import HarderNarasimhan.PayoffFunction.SlopeLike
+public import HarderNarasimhan.PayoffFunction.NashEquilibrium
+public import Mathlib.Data.Rel
 
 /-!
 # Jordan–Hölder filtrations
@@ -52,6 +54,8 @@ see `exists_relSeries_jordanHolderRel` in `HarderNarasimhan.JordanHolder.Exists`
 
 * [Chen–Jeannin, *Harder–Narasimhan game*][ChenJeannin]
 -/
+
+@[expose] public section
 
 namespace HarderNarasimhan
 

@@ -3,7 +3,9 @@ Copyright (c) 2026 Yijun Yuan. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yijun Yuan
 -/
-import HarderNarasimhan.Filtration.Exists
+module
+
+public import HarderNarasimhan.Filtration.Exists
 
 /-!
 # Uniqueness of Harder–Narasimhan filtrations
@@ -31,6 +33,8 @@ of semistable intervals from `⊥` to `⊤` whose successive `μ.A`-slopes stric
 
 * [Chen–Jeannin, *Harder–Narasimhan game*][ChenJeannin]
 -/
+
+@[expose] public section
 
 namespace HarderNarasimhan
 
@@ -141,6 +145,7 @@ private theorem eq_hnFiltration (F : μ.HarderNarasimhanFiltration) : F = μ.hnF
 
 /-- Over a complete linear order the Harder–Narasimhan filtration is unique; the canonical
 representative is `μ.hnFiltration`. -/
+@[no_expose]
 noncomputable instance : Unique (μ.HarderNarasimhanFiltration) where
   uniq := eq_hnFiltration
 

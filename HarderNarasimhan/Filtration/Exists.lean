@@ -3,7 +3,9 @@ Copyright (c) 2026 Yijun Yuan. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yijun Yuan
 -/
-import HarderNarasimhan.Filtration.Defs
+module
+
+public import HarderNarasimhan.Filtration.Defs
 
 /-!
 # Existence of Harder–Narasimhan filtrations
@@ -39,6 +41,8 @@ proved in `HarderNarasimhan.Filtration.Unique`.
 
 * [Chen–Jeannin, *Harder–Narasimhan game*][ChenJeannin]
 -/
+
+@[expose] public section
 
 namespace HarderNarasimhan
 
@@ -151,7 +155,11 @@ The hypotheses are the standing ones of the Harder–Narasimhan game: the descen
 condition `μ.ADCC` and well-foundedness of `>` on `ℒ` make the construction terminate,
 convexity powers the breakpoint machinery, and `μ.Admissible` makes greatest breakpoints
 exist.  Over a complete linear order this filtration is the unique one; see
-`HarderNarasimhan.Filtration.Unique`. -/
+`HarderNarasimhan.Filtration.Unique`.
+
+The definition is not exposed: its body is built from the module-private recursion `HNFil`,
+and downstream files interact with it through `hnFiltration_succ_isGreatest_breakpoints`. -/
+@[no_expose]
 noncomputable def hnFiltration : μ.HarderNarasimhanFiltration where
   toFun := HNFil μ
   length := HNlen μ

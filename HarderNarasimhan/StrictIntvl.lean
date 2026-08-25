@@ -3,10 +3,12 @@ Copyright (c) 2026 Yijun Yuan. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yijun Yuan
 -/
-import Mathlib.Order.BoundedOrder.Basic
-import Mathlib.Order.Interval.Set.Defs
-import Mathlib.Order.Sublattice
-import Mathlib.Order.ModularLattice
+module
+
+public import Mathlib.Order.BoundedOrder.Basic
+public import Mathlib.Order.Interval.Set.Defs
+public import Mathlib.Order.Sublattice
+public import Mathlib.Order.ModularLattice
 
 /-!
 # Strict intervals
@@ -33,6 +35,8 @@ to sort: `↥I` is the subtype of points lying between the endpoints, with `⊥ 
 * `StrictIntvl.ofSub`: reinterpret a strict interval of `↥I` as a strict interval of `ℒ`;
   the preferred spelling is the coercion `↑J`.
 -/
+
+@[expose] public section
 
 namespace HarderNarasimhan
 

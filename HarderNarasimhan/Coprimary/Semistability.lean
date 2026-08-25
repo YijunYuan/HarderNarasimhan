@@ -3,11 +3,13 @@ Copyright (c) 2026 Yijun Yuan. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yijun Yuan
 -/
-import Mathlib.Algebra.Module.Torsion.Basic
-import HarderNarasimhan.Coprimary.AssociatedPrimes
-import HarderNarasimhan.Coprimary.Defs
-import HarderNarasimhan.PayoffFunction.Convex
-import HarderNarasimhan.PayoffFunction.Semistable.Defs
+module
+
+public import Mathlib.Algebra.Module.Torsion.Basic
+public import HarderNarasimhan.Coprimary.AssociatedPrimes
+public import HarderNarasimhan.Coprimary.Defs
+public import HarderNarasimhan.PayoffFunction.Convex
+public import HarderNarasimhan.PayoffFunction.Semistable.Defs
 
 /-!
 # Semistability of the coprimary payoff function
@@ -53,6 +55,8 @@ Harder–Narasimhan filtration are coprimary" is extracted in
 
 * [Chen–Jeannin, *Harder–Narasimhan game*][ChenJeannin]
 -/
+
+@[expose] public section
 
 namespace HarderNarasimhan
 
@@ -143,8 +147,10 @@ private noncomputable def quotEquivMapComap {N₁ N₂ W : Submodule R M}
     (Submodule.quotEquivOfEq (N₁.submoduleOf W) (LinearMap.ker f) hker.symm).trans
       ((LinearMap.quotKerEquivRange f).trans (LinearEquiv.ofEq _ _ hrange))
 
-/-- The image in `N₂ ⧸ N₁` of a submodule `W` with `N₁ ≤ W ≤ N₂` and `W ≠ N₁` is nonzero. -/
-private lemma map_comap_ne_bot {N₁ N₂ W : Submodule R M} (h₁ : N₁ ≤ W) (h₂ : W ≤ N₂)
+/-- The image in `N₂ ⧸ N₁` of a submodule `W` with `N₁ ≤ W ≤ N₂` and `W ≠ N₁` is nonzero.
+This lemma is public because it supplies the nonvanishing proof in the statement of
+`Coprimary.A_restrict_eq_quotient`. -/
+lemma map_comap_ne_bot {N₁ N₂ W : Submodule R M} (h₁ : N₁ ≤ W) (h₂ : W ≤ N₂)
     (h₃ : W ≠ N₁) :
     Submodule.map (N₁.submoduleOf N₂).mkQ (Submodule.comap N₂.subtype W) ≠ ⊥ := by
   intro hbot

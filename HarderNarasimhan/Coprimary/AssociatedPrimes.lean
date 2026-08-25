@@ -3,9 +3,11 @@ Copyright (c) 2026 Yijun Yuan. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yijun Yuan
 -/
-import Mathlib.RingTheory.Ideal.AssociatedPrime.Localization
-import Mathlib.Algebra.Module.LocalizedModule.Submodule
-import Mathlib.Algebra.Module.LocalizedModule.AtPrime
+module
+
+public import Mathlib.RingTheory.Ideal.AssociatedPrime.Localization
+public import Mathlib.Algebra.Module.LocalizedModule.Submodule
+public import Mathlib.Algebra.Module.LocalizedModule.AtPrime
 
 /-!
 # Associated primes of the quotient by a localization kernel
@@ -42,6 +44,8 @@ the computation of the first-player value of the coprimary payoff function in
 
 * N. Bourbaki, *Algèbre commutative*, Ch. IV, §1, no. 2, Prop. 6
 -/
+
+@[expose] public section
 
 namespace HarderNarasimhan
 

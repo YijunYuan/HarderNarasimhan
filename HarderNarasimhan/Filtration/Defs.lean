@@ -3,9 +3,11 @@ Copyright (c) 2026 Yijun Yuan. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yijun Yuan
 -/
-import HarderNarasimhan.PayoffFunction.Semistable.Breakpoints
-import Mathlib.Order.RelSeries
-import Mathlib.Data.Rel
+module
+
+public import HarderNarasimhan.PayoffFunction.Semistable.Breakpoints
+public import Mathlib.Order.RelSeries
+public import Mathlib.Data.Rel
 
 /-!
 # Harder–Narasimhan filtrations
@@ -50,6 +52,8 @@ which lets a Harder–Narasimhan filtration be repackaged as a `RelSeries`; see
 
 * [Chen–Jeannin, *Harder–Narasimhan game*][ChenJeannin]
 -/
+
+@[expose] public section
 
 namespace HarderNarasimhan
 

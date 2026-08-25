@@ -3,31 +3,33 @@ Copyright (c) 2026 Yijun Yuan. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yijun Yuan
 -/
-import HarderNarasimhan.StrictIntvl
+module
 
-import HarderNarasimhan.PayoffFunction.Defs
-import HarderNarasimhan.PayoffFunction.Restrict
-import HarderNarasimhan.PayoffFunction.Convex
-import HarderNarasimhan.PayoffFunction.Semistable.Defs
-import HarderNarasimhan.PayoffFunction.Semistable.Breakpoints
-import HarderNarasimhan.PayoffFunction.SlopeLike
-import HarderNarasimhan.PayoffFunction.Slope
-import HarderNarasimhan.PayoffFunction.GameValue
-import HarderNarasimhan.PayoffFunction.NashEquilibrium
+public import HarderNarasimhan.StrictIntvl
 
-import HarderNarasimhan.Filtration.Defs
-import HarderNarasimhan.Filtration.Exists
-import HarderNarasimhan.Filtration.Unique
+public import HarderNarasimhan.PayoffFunction.Defs
+public import HarderNarasimhan.PayoffFunction.Restrict
+public import HarderNarasimhan.PayoffFunction.Convex
+public import HarderNarasimhan.PayoffFunction.Semistable.Defs
+public import HarderNarasimhan.PayoffFunction.Semistable.Breakpoints
+public import HarderNarasimhan.PayoffFunction.SlopeLike
+public import HarderNarasimhan.PayoffFunction.Slope
+public import HarderNarasimhan.PayoffFunction.GameValue
+public import HarderNarasimhan.PayoffFunction.NashEquilibrium
 
-import HarderNarasimhan.JordanHolder.Defs
-import HarderNarasimhan.JordanHolder.Exists
-import HarderNarasimhan.JordanHolder.Stability
-import HarderNarasimhan.JordanHolder.Length
+public import HarderNarasimhan.Filtration.Defs
+public import HarderNarasimhan.Filtration.Exists
+public import HarderNarasimhan.Filtration.Unique
 
-import HarderNarasimhan.Coprimary.AssociatedPrimes
-import HarderNarasimhan.Coprimary.Defs
-import HarderNarasimhan.Coprimary.Semistability
-import HarderNarasimhan.Coprimary.Filtration
+public import HarderNarasimhan.JordanHolder.Defs
+public import HarderNarasimhan.JordanHolder.Exists
+public import HarderNarasimhan.JordanHolder.Stability
+public import HarderNarasimhan.JordanHolder.Length
+
+public import HarderNarasimhan.Coprimary.AssociatedPrimes
+public import HarderNarasimhan.Coprimary.Defs
+public import HarderNarasimhan.Coprimary.Semistability
+public import HarderNarasimhan.Coprimary.Filtration
 
 /-!
 # `HarderNarasimhan`: library root

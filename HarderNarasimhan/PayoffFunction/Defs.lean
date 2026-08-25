@@ -3,8 +3,10 @@ Copyright (c) 2026 Yijun Yuan. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yijun Yuan
 -/
-import Mathlib.Order.CompleteLattice.Defs
-import HarderNarasimhan.StrictIntvl
+module
+
+public import Mathlib.Order.CompleteLattice.Defs
+public import HarderNarasimhan.StrictIntvl
 
 /-!
 # Payoff functions
@@ -37,6 +39,8 @@ lemma families directly.
 
 * [Chen–Jeannin, *Harder–Narasimhan game*][ChenJeannin]
 -/
+
+@[expose] public section
 
 namespace HarderNarasimhan
 

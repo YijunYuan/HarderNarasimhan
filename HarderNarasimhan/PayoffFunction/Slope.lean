@@ -3,11 +3,13 @@ Copyright (c) 2026 Yijun Yuan. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yijun Yuan
 -/
-import HarderNarasimhan.PayoffFunction.SlopeLike
-import Mathlib.Data.Real.Basic
-import Mathlib.Algebra.Module.Defs
-import Mathlib.Data.NNReal.Basic
-import Mathlib.Order.Completion
+module
+
+public import HarderNarasimhan.PayoffFunction.SlopeLike
+public import Mathlib.Data.Real.Basic
+public import Mathlib.Algebra.Module.Defs
+public import Mathlib.Data.NNReal.Basic
+public import Mathlib.Order.Completion
 
 /-!
 # Slopes as payoff functions
@@ -30,6 +32,8 @@ zero receive the “infinite slope” `⊤`.
 
 * [Chen–Jeannin, *Harder–Narasimhan game*][ChenJeannin]
 -/
+
+@[expose] public section
 
 namespace HarderNarasimhan
 

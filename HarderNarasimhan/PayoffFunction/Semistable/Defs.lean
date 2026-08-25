@@ -3,7 +3,9 @@ Copyright (c) 2026 Yijun Yuan. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yijun Yuan
 -/
-import HarderNarasimhan.PayoffFunction.Restrict
+module
+
+public import HarderNarasimhan.PayoffFunction.Restrict
 
 /-!
 # Semistable payoff functions and breakpoints
@@ -41,6 +43,8 @@ breakpoints.
 
 * [Chen–Jeannin, *Harder–Narasimhan game*][ChenJeannin]
 -/
+
+@[expose] public section
 
 namespace HarderNarasimhan
 

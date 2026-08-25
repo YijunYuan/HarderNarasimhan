@@ -3,9 +3,11 @@ Copyright (c) 2026 Yijun Yuan. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yijun Yuan
 -/
-import HarderNarasimhan.JordanHolder.Defs
-import HarderNarasimhan.PayoffFunction.Convex
-import Mathlib.SetTheory.Cardinal.NatCard
+module
+
+public import HarderNarasimhan.JordanHolder.Defs
+public import HarderNarasimhan.PayoffFunction.Convex
+public import Mathlib.SetTheory.Cardinal.NatCard
 
 /-!
 # Uniqueness of the length of Jordan–Hölder filtrations
@@ -33,6 +35,8 @@ its jump values; it is kept `private` to this file.
 
 * [Chen–Jeannin, *Harder–Narasimhan game*][ChenJeannin]
 -/
+
+@[expose] public section
 
 namespace HarderNarasimhan
 

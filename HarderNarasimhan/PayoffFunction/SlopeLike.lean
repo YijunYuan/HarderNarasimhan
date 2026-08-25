@@ -3,9 +3,11 @@ Copyright (c) 2026 Yijun Yuan. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yijun Yuan
 -/
-import HarderNarasimhan.PayoffFunction.Restrict
-import Mathlib.Tactic.Common
-import Mathlib.Tactic.Tauto
+module
+
+public import HarderNarasimhan.PayoffFunction.Restrict
+public import Mathlib.Tactic.Common
+public import Mathlib.Tactic.Tauto
 
 /-!
 # Slope-like payoff functions
@@ -44,6 +46,8 @@ Any of the nine possible one-step implications is a `.1`/`.2` of one of these (o
 
 * [Chen–Jeannin, *Harder–Narasimhan game*][ChenJeannin]
 -/
+
+@[expose] public section
 
 namespace HarderNarasimhan
 

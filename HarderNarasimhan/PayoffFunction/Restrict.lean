@@ -3,7 +3,9 @@ Copyright (c) 2026 Yijun Yuan. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yijun Yuan
 -/
-import HarderNarasimhan.PayoffFunction.Defs
+module
+
+public import HarderNarasimhan.PayoffFunction.Defs
 
 /-!
 # Restriction of payoff functions
@@ -19,6 +21,8 @@ These are key “locality” principles: computations of `μ.max`, `μ.min`, `μ
 be performed on subintervals.  Pointwise versions (`max_restrict_apply`, …) are provided for
 rewriting a single value.
 -/
+
+@[expose] public section
 
 namespace HarderNarasimhan
 

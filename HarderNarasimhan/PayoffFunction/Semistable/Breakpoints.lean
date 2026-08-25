@@ -3,9 +3,11 @@ Copyright (c) 2026 Yijun Yuan. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yijun Yuan
 -/
-import HarderNarasimhan.PayoffFunction.Convex
-import HarderNarasimhan.PayoffFunction.Semistable.Defs
-import Mathlib.Tactic.Linarith
+module
+
+public import HarderNarasimhan.PayoffFunction.Convex
+public import HarderNarasimhan.PayoffFunction.Semistable.Defs
+public import Mathlib.Tactic.Linarith
 
 /-!
 # Existence and properties of breakpoints
@@ -37,6 +39,8 @@ on a well-founded lattice:
 
 * [Chen–Jeannin, *Harder–Narasimhan game*][ChenJeannin]
 -/
+
+@[expose] public section
 
 namespace HarderNarasimhan
 

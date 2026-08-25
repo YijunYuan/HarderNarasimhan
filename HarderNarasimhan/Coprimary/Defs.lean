@@ -3,12 +3,14 @@ Copyright (c) 2026 Yijun Yuan. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yijun Yuan
 -/
-import Mathlib.Combinatorics.Colex
-import Mathlib.Order.Completion
-import Mathlib.Order.Extension.Linear
-import Mathlib.RingTheory.Spectrum.Prime.Basic
-import Mathlib.RingTheory.Ideal.AssociatedPrime.Finiteness
-import HarderNarasimhan.PayoffFunction.Defs
+module
+
+public import Mathlib.Combinatorics.Colex
+public import Mathlib.Order.Completion
+public import Mathlib.Order.Extension.Linear
+public import Mathlib.RingTheory.Spectrum.Prime.Basic
+public import Mathlib.RingTheory.Ideal.AssociatedPrime.Finiteness
+public import HarderNarasimhan.PayoffFunction.Defs
 
 /-!
 # The coprimary payoff function and coprimary filtrations
@@ -61,6 +63,8 @@ reaches `⊤` (`CoprimaryFiltration.length_le_of_eq_top`), so extensionality
 
 * [Chen–Jeannin, *Harder–Narasimhan game*][ChenJeannin]
 -/
+
+@[expose] public section
 
 namespace HarderNarasimhan
 
