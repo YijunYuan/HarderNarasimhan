@@ -28,8 +28,9 @@ associated primes of the subquotient `N₂ ⧸ N₁`, recorded as follows:
   `DedekindCut (Colex (Finset (LinearExtension (PrimeSpectrum R))))`, as required by the
   general theory.
 
-The set-valued companion `Coprimary.associatedPrimes I` records the associated primes of the
-subquotient of `I` before any bundling; it is finite (`Fintype` instance) by Noetherianity.
+The set-valued companion `Coprimary.subquotientAssociatedPrimes I` records the associated
+primes of the subquotient of `I` before any bundling; it is finite (`Fintype` instance) by
+Noetherianity.
 
 A module is *coprimary* (`IsCoprimary`) when it has exactly one associated prime.  A
 *coprimary filtration* (`CoprimaryFiltration`) of `M` is a finite chain
@@ -42,8 +43,8 @@ reaches `⊤` (`CoprimaryFiltration.length_le_of_eq_top`), so extensionality
 
 ## Main definitions
 
-* `Coprimary.associatedPrimes` : the set of associated primes of the subquotient of an interval of
-  submodules, viewed in the linear extension of the prime spectrum.
+* `Coprimary.subquotientAssociatedPrimes` : the set of associated primes of the subquotient
+  of an interval of submodules, viewed in the linear extension of the prime spectrum.
 * `Coprimary.payoff` : the coprimary payoff function on the submodule lattice.
 * `IsCoprimary` : the module has exactly one associated prime.
 * `CoprimaryFiltration` : a filtration with coprimary subquotients and strictly decreasing
@@ -71,32 +72,33 @@ instance {R : Type*} [CommRing R] (p : LinearExtension (PrimeSpectrum R)) :
 
 namespace Coprimary
 
-section AssPrimes
+section SubquotientAssociatedPrimes
 
 variable {R : Type*} [CommRing R] {M : Type*} [AddCommGroup M] [Module R M]
 
 /-- The set of associated primes of the subquotient of an interval: for an interval
-`I : N₁ < N₂` in the submodule lattice of `M`, `associatedPrimes I` is the set of points of the
-linearly extended prime spectrum whose ideals are associated primes of `N₂ ⧸ N₁`.  The
-coprimary payoff function `Coprimary.payoff` is built from this set. -/
-def associatedPrimes (I : StrictIntvl (Submodule R M)) : Set (LinearExtension (PrimeSpectrum R)) :=
-  {q | q.asIdeal ∈ _root_.associatedPrimes R (I.right ⧸ I.left.submoduleOf I.right)}
+`I : N₁ < N₂` in the submodule lattice of `M`, `subquotientAssociatedPrimes I` is the set
+of points of the linearly extended prime spectrum whose ideals are associated primes of
+`N₂ ⧸ N₁`.  The coprimary payoff function `Coprimary.payoff` is built from this set. -/
+def subquotientAssociatedPrimes (I : StrictIntvl (Submodule R M)) :
+    Set (LinearExtension (PrimeSpectrum R)) :=
+  {q | q.asIdeal ∈ associatedPrimes R (I.right ⧸ I.left.submoduleOf I.right)}
 
-@[simp] lemma mem_associatedPrimes {I : StrictIntvl (Submodule R M)}
+@[simp] lemma mem_subquotientAssociatedPrimes {I : StrictIntvl (Submodule R M)}
     {q : LinearExtension (PrimeSpectrum R)} :
-    q ∈ associatedPrimes I ↔
-      q.asIdeal ∈ _root_.associatedPrimes R (I.right ⧸ I.left.submoduleOf I.right) :=
+    q ∈ subquotientAssociatedPrimes I ↔
+      q.asIdeal ∈ associatedPrimes R (I.right ⧸ I.left.submoduleOf I.right) :=
   Iff.rfl
 
 /-- Over a Noetherian ring, a finite module has finitely many associated primes, and
-`associatedPrimes I` is the preimage of the associated primes of the subquotient of `I` under the
-injection `q ↦ q.asIdeal`; hence it is a `Fintype`. -/
+`subquotientAssociatedPrimes I` is the preimage of the associated primes of the subquotient
+of `I` under the injection `q ↦ q.asIdeal`; hence it is a `Fintype`. -/
 noncomputable instance [IsNoetherianRing R] [Module.Finite R M]
-    (I : StrictIntvl (Submodule R M)) : Fintype (associatedPrimes I) :=
+    (I : StrictIntvl (Submodule R M)) : Fintype (subquotientAssociatedPrimes I) :=
   (Set.Finite.preimage (Set.injOn_of_injective fun _ _ h ↦ PrimeSpectrum.ext h)
-    (_root_.associatedPrimes.finite R (I.right ⧸ I.left.submoduleOf I.right))).fintype
+    (associatedPrimes.finite R (I.right ⧸ I.left.submoduleOf I.right))).fintype
 
-end AssPrimes
+end SubquotientAssociatedPrimes
 
 section Payoff
 
@@ -113,10 +115,10 @@ see `HarderNarasimhan.Coprimary.Filtration`. -/
 noncomputable def payoff :
     PayoffFunction (Submodule R M)
       (DedekindCut (Colex (Finset (LinearExtension (PrimeSpectrum R))))) :=
-  ⟨fun I ↦ .principal (toColex (associatedPrimes I).toFinset)⟩
+  ⟨fun I ↦ .principal (toColex (subquotientAssociatedPrimes I).toFinset)⟩
 
 @[simp] lemma payoff_apply (I : StrictIntvl (Submodule R M)) :
-    payoff R M I = .principal (toColex (associatedPrimes I).toFinset) :=
+    payoff R M I = .principal (toColex (subquotientAssociatedPrimes I).toFinset) :=
   rfl
 
 end Payoff

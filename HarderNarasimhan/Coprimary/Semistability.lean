@@ -68,10 +68,12 @@ lemma nontrivial_quotient_of_lt {N₁ N₂ : Submodule R M} (hN : N₁ < N₂) :
   rw [Submodule.Quotient.nontrivial_iff, ne_eq, Submodule.submoduleOf_eq_top]
   exact hN.not_ge
 
-/-- Monotonicity of `Coprimary.associatedPrimes` in the right endpoint: if `N₁ < u ≤ N₃`, every
-associated prime of `u ⧸ N₁` is an associated prime of `N₃ ⧸ N₁`. -/
-lemma associatedPrimes_mono_right {N₁ u N₃ : Submodule R M} (h₁ : N₁ < u) (h₂ : u ≤ N₃) :
-    associatedPrimes ⟨N₁, u, h₁⟩ ⊆ associatedPrimes ⟨N₁, N₃, h₁.trans_le h₂⟩ :=
+/-- Monotonicity of `Coprimary.subquotientAssociatedPrimes` in the right endpoint: if
+`N₁ < u ≤ N₃`, every associated prime of `u ⧸ N₁` is an associated prime of `N₃ ⧸ N₁`. -/
+lemma subquotientAssociatedPrimes_mono_right {N₁ u N₃ : Submodule R M}
+    (h₁ : N₁ < u) (h₂ : u ≤ N₃) :
+    subquotientAssociatedPrimes ⟨N₁, u, h₁⟩ ⊆
+      subquotientAssociatedPrimes ⟨N₁, N₃, h₁.trans_le h₂⟩ :=
   fun _ hi ↦ associatedPrimes_subset_of_submoduleOf_le N₁ u N₃ h₂ hi
 
 /-- Lift a submodule of a subquotient back to a submodule of the ambient module: for
@@ -153,19 +155,19 @@ private lemma map_comap_ne_bot {N₁ N₂ W : Submodule R M} (h₁ : N₁ ≤ W)
   intro x hx
   exact hle (show (⟨x, h₂ hx⟩ : N₂) ∈ Submodule.comap N₂.subtype W from hx)
 
-/-- `Coprimary.associatedPrimes` agrees with its quotient-lattice version under the submodule
-correspondence. -/
-private lemma associatedPrimes_eq_quotient {N₁ N₂ W : Submodule R M} (h₁ : N₁ ≤ W) (h₂ : W ≤ N₂)
-    (h₃ : W ≠ N₁) :
-    associatedPrimes ⟨N₁, W, lt_of_le_of_ne h₁ (Ne.symm h₃)⟩ =
-      associatedPrimes (M := ↥N₂ ⧸ N₁.submoduleOf N₂)
+/-- `Coprimary.subquotientAssociatedPrimes` agrees with its quotient-lattice version under
+the submodule correspondence. -/
+private lemma subquotientAssociatedPrimes_eq_quotient {N₁ N₂ W : Submodule R M}
+    (h₁ : N₁ ≤ W) (h₂ : W ≤ N₂) (h₃ : W ≠ N₁) :
+    subquotientAssociatedPrimes ⟨N₁, W, lt_of_le_of_ne h₁ (Ne.symm h₃)⟩ =
+      subquotientAssociatedPrimes (M := ↥N₂ ⧸ N₁.submoduleOf N₂)
         ⟨⊥, Submodule.map (N₁.submoduleOf N₂).mkQ (Submodule.comap N₂.subtype W),
           bot_lt_iff_ne_bot.mpr <| map_comap_ne_bot h₁ h₂ h₃⟩ := by
   let X := Submodule.map (N₁.submoduleOf N₂).mkQ (Submodule.comap N₂.subtype W)
   have hX : (⊥ : Submodule R (↥N₂ ⧸ N₁.submoduleOf N₂)).submoduleOf X = ⊥ :=
     Submodule.ker_subtype X
   ext x
-  simp only [mem_associatedPrimes]
+  simp only [mem_subquotientAssociatedPrimes]
   constructor <;> intro hp
   · rw [LinearEquiv.AssociatedPrimes.eq
       ((quotEquivMapComap h₁ h₂).trans (Submodule.quotEquivOfEqBot _ hX).symm)] at hp
@@ -183,8 +185,8 @@ variable {M : Type*} [AddCommGroup M] [Module R M] [Module.Finite R M]
 
 /-- For a strict inclusion `N₁ < N₂`, the subquotient `N₂ ⧸ N₁` is nontrivial, hence has an
 associated prime: the finset of associated primes of any interval is nonempty. -/
-lemma associatedPrimes_nonempty (I : StrictIntvl (Submodule R M)) :
-    (associatedPrimes I).toFinset.Nonempty := by
+lemma subquotientAssociatedPrimes_nonempty (I : StrictIntvl (Submodule R M)) :
+    (subquotientAssociatedPrimes I).toFinset.Nonempty := by
   simp only [Set.toFinset_nonempty]
   have : Nontrivial (↥I.right ⧸ I.left.submoduleOf I.right) := nontrivial_quotient_of_lt I.lt
   obtain ⟨q, hq⟩ := associatedPrimes.nonempty R (↥I.right ⧸ I.left.submoduleOf I.right)
@@ -192,20 +194,23 @@ lemma associatedPrimes_nonempty (I : StrictIntvl (Submodule R M)) :
 
 /-- The minimal element of the associated primes of an interval is itself an associated
 prime of the subquotient. -/
-lemma min'_mem_associatedPrimes (I : StrictIntvl (Submodule R M)) :
-    (associatedPrimes I).toFinset.min' (associatedPrimes_nonempty I) ∈ associatedPrimes I :=
-  (Set.mem_toFinset (s := associatedPrimes I)).mp <|
-    (associatedPrimes I).toFinset.min'_mem (associatedPrimes_nonempty I)
+lemma min'_mem_subquotientAssociatedPrimes (I : StrictIntvl (Submodule R M)) :
+    (subquotientAssociatedPrimes I).toFinset.min' (subquotientAssociatedPrimes_nonempty I) ∈
+      subquotientAssociatedPrimes I :=
+  (Set.mem_toFinset (s := subquotientAssociatedPrimes I)).mp <|
+    (subquotientAssociatedPrimes I).toFinset.min'_mem (subquotientAssociatedPrimes_nonempty I)
 
 /-- If the subquotient of `I` has a unique associated prime, every associated prime computes
-the minimal element of `Coprimary.associatedPrimes I`.  This bridges the `IsCoprimary` predicate on
-subquotients and the minimal associated primes compared by the Harder–Narasimhan axioms. -/
+the minimal element of `Coprimary.subquotientAssociatedPrimes I`.  This bridges the
+`IsCoprimary` predicate on subquotients and the minimal associated primes compared by the
+Harder–Narasimhan axioms. -/
 lemma toLinearExtension_eq_min' (I : StrictIntvl (Submodule R M))
-    (hu : ∃! p, p ∈ _root_.associatedPrimes R (I.right ⧸ I.left.submoduleOf I.right))
+    (hu : ∃! p, p ∈ associatedPrimes R (I.right ⧸ I.left.submoduleOf I.right))
     {p : PrimeSpectrum R}
-    (hp : p.asIdeal ∈ _root_.associatedPrimes R (I.right ⧸ I.left.submoduleOf I.right)) :
-    toLinearExtension p = (associatedPrimes I).toFinset.min' (associatedPrimes_nonempty I) :=
-  PrimeSpectrum.ext (hu.unique hp (min'_mem_associatedPrimes I))
+    (hp : p.asIdeal ∈ associatedPrimes R (I.right ⧸ I.left.submoduleOf I.right)) :
+    toLinearExtension p =
+      (subquotientAssociatedPrimes I).toFinset.min' (subquotientAssociatedPrimes_nonempty I) :=
+  PrimeSpectrum.ext (hu.unique hp (min'_mem_subquotientAssociatedPrimes I))
 
 /-- For the coprimary payoff function, the `max` operation is redundant: enlarging the right
 endpoint only enlarges the set of associated primes, so the whole interval already realizes
@@ -215,7 +220,7 @@ lemma max_payoff : (payoff R M).max = payoff R M := by
     le_antisymm (PayoffFunction.max_le fun u hu ↦ ?_) PayoffFunction.apply_le_max
   simp only [payoff_apply]
   exact DedekindCut.principal_le_principal.mpr <| Finset.Colex.toColex_le_toColex_of_subset <|
-    Set.toFinset_subset_toFinset.mpr <| associatedPrimes_mono_right hu.1 hu.2
+    Set.toFinset_subset_toFinset.mpr <| subquotientAssociatedPrimes_mono_right hu.1 hu.2
 
 /-- The coprimary payoff function is convex: the payoff of `(x ⊓ y, x)` is at most the
 payoff of `(y, x ⊔ y)`, since the second isomorphism theorem embeds the first subquotient
@@ -227,20 +232,22 @@ instance [Nontrivial M] : (payoff R M).IsConvexOn ⊤ := by
   refine DedekindCut.principal_le_principal.mpr <| Finset.Colex.toColex_le_toColex_of_subset <|
     Set.toFinset_subset_toFinset.mpr ?_
   intro w hw
-  rw [mem_associatedPrimes, AssociatedPrimes.mem_iff] at hw ⊢
+  rw [mem_subquotientAssociatedPrimes, AssociatedPrimes.mem_iff] at hw ⊢
   exact (LinearEquiv.isAssociatedPrime_iff (LinearMap.quotientInfEquivSupQuotient x y)).1 hw
 
 /-- Lower bound property of the minimal associated prime: for an intermediate submodule
 `N''` of `I`, any associated prime of `I.right ⧸ N''` is at least the minimal element of
-`Coprimary.associatedPrimes I`.  Indeed, such a prime contains the annihilator of `I.right ⧸ N''`,
+`Coprimary.subquotientAssociatedPrimes I`.  Indeed, such a prime contains the annihilator
+of `I.right ⧸ N''`,
 hence the annihilator of `I.right ⧸ I.left`; a minimal prime over that annihilator below it
 is an associated prime of `I.right ⧸ I.left` (Noetherian, finite), and the chosen minimum is
 below it in the linear extension. -/
 private lemma min'_le_toLinearExtension (I : StrictIntvl (Submodule R M))
     (N'' : Submodule R M) (ha1 : N'' ∈ I) :
     ∀ p : PrimeSpectrum R,
-      p.asIdeal ∈ _root_.associatedPrimes R (I.right ⧸ N''.submoduleOf I.right) →
-      (associatedPrimes I).toFinset.min' (associatedPrimes_nonempty I) ≤ toLinearExtension p := by
+      p.asIdeal ∈ associatedPrimes R (I.right ⧸ N''.submoduleOf I.right) →
+      (subquotientAssociatedPrimes I).toFinset.min' (subquotientAssociatedPrimes_nonempty I) ≤
+        toLinearExtension p := by
   intro p hp
   have hle : I.left.submoduleOf I.right ≤ N''.submoduleOf I.right :=
     Submodule.comap_mono ha1.1
@@ -255,7 +262,8 @@ private lemma min'_le_toLinearExtension (I : StrictIntvl (Submodule R M))
         = Submodule.factor hle (a • y) := (map_smul _ a y).symm
       _ = 0 := by rw [ha y trivial, map_zero]
   obtain ⟨r, hr, hrq⟩ := Ideal.exists_minimalPrimes_le hann
-  refine le_trans ((associatedPrimes I).toFinset.min'_le (toLinearExtension ⟨r, hr.1.1⟩) <|
+  refine le_trans ((subquotientAssociatedPrimes I).toFinset.min'_le
+    (toLinearExtension ⟨r, hr.1.1⟩) <|
     Set.mem_toFinset.mpr <|
       Module.associatedPrimes.minimalPrimes_annihilator_subset_associatedPrimes _ _ hr) <|
     toLinearExtension.monotone' (hrq : (⟨r, hr.1.1⟩ : PrimeSpectrum R) ≤ p)
@@ -264,26 +272,29 @@ private lemma min'_le_toLinearExtension (I : StrictIntvl (Submodule R M))
 associated prime of `I` is below the associated primes of any right-anchored subinterval. -/
 private lemma singleton_min'_le (I : StrictIntvl (Submodule R M))
     (N'' : Submodule R M) (ha1 : N'' ∈ I) (ha2 : N'' ≠ I.right) :
-    toColex {(associatedPrimes I).toFinset.min' (associatedPrimes_nonempty I)} ≤
-      toColex (associatedPrimes ⟨N'', I.right, lt_of_le_of_ne ha1.2 ha2⟩).toFinset := by
+    toColex {(subquotientAssociatedPrimes I).toFinset.min'
+        (subquotientAssociatedPrimes_nonempty I)} ≤
+      toColex (subquotientAssociatedPrimes ⟨N'', I.right, lt_of_le_of_ne ha1.2 ha2⟩).toFinset := by
   have h1 :
-      toColex ({(associatedPrimes I).toFinset.min' (associatedPrimes_nonempty I)} : Finset _) ≤
-      toColex {(associatedPrimes ⟨N'', I.right, lt_of_le_of_ne ha1.2 ha2⟩).toFinset.min'
-        (associatedPrimes_nonempty _)} := by
+      toColex ({(subquotientAssociatedPrimes I).toFinset.min'
+        (subquotientAssociatedPrimes_nonempty I)} : Finset _) ≤
+      toColex {(subquotientAssociatedPrimes ⟨N'', I.right, lt_of_le_of_ne ha1.2 ha2⟩).toFinset.min'
+        (subquotientAssociatedPrimes_nonempty _)} := by
     rw [Finset.Colex.singleton_le_singleton]
     exact min'_le_toLinearExtension I N'' ha1 _ <|
-      min'_mem_associatedPrimes ⟨N'', I.right, lt_of_le_of_ne ha1.2 ha2⟩
+      min'_mem_subquotientAssociatedPrimes ⟨N'', I.right, lt_of_le_of_ne ha1.2 ha2⟩
   exact le_trans h1 <| Finset.Colex.toColex_le_toColex_of_subset <|
     Finset.singleton_subset_iff.mpr <|
-      (associatedPrimes ⟨N'', I.right, lt_of_le_of_ne ha1.2 ha2⟩).toFinset.min'_mem <|
-        associatedPrimes_nonempty _
+      (subquotientAssociatedPrimes ⟨N'', I.right, lt_of_le_of_ne ha1.2 ha2⟩).toFinset.min'_mem <|
+        subquotientAssociatedPrimes_nonempty _
 
 /-- The kernel of the localization map of the subquotient of `I` at (the complement of) its
 minimal associated prime.  Its lift realizes the infimum defining the first-player value. -/
 private noncomputable abbrev locKer (I : StrictIntvl (Submodule R M)) :
     Submodule R (↥I.right ⧸ I.left.submoduleOf I.right) :=
   LinearMap.ker (LocalizedModule.mkLinearMap
-    (((associatedPrimes I).toFinset.min' (associatedPrimes_nonempty I)).asIdeal.primeCompl)
+    (((subquotientAssociatedPrimes I).toFinset.min'
+      (subquotientAssociatedPrimes_nonempty I)).asIdeal.primeCompl)
     (↥I.right ⧸ I.left.submoduleOf I.right))
 
 /-- The associated primes of the witness subquotient form a singleton: quotienting by the
@@ -291,9 +302,10 @@ lifted localization kernel leaves exactly the associated primes disjoint from th
 of the minimal prime (Bourbaki), i.e. those contained in it; by minimality of the chosen
 element in the linear extension, only the minimal prime remains. -/
 private lemma associatedPrimes_quot_liftQuot_locKer (I : StrictIntvl (Submodule R M)) :
-    _root_.associatedPrimes R
+    associatedPrimes R
         (↥I.right ⧸ (liftQuot I.left I.right (locKer I)).submoduleOf I.right) =
-      {((associatedPrimes I).toFinset.min' (associatedPrimes_nonempty I)).asIdeal} := by
+      {((subquotientAssociatedPrimes I).toFinset.min'
+        (subquotientAssociatedPrimes_nonempty I)).asIdeal} := by
   rw [LinearEquiv.AssociatedPrimes.eq (quotLiftQuotEquiv I.left I.right (locKer I)),
     associatedPrimes_quot_ker_mkLinearMap]
   ext q
@@ -301,18 +313,18 @@ private lemma associatedPrimes_quot_liftQuot_locKer (I : StrictIntvl (Submodule 
   · rintro ⟨hq, hdisj⟩
     simp only [Set.mem_singleton_iff]
     have hle : (⟨q, hq.out.1⟩ : PrimeSpectrum R) ≤
-        (associatedPrimes I).toFinset.min' (associatedPrimes_nonempty I) :=
+        (subquotientAssociatedPrimes I).toFinset.min' (subquotientAssociatedPrimes_nonempty I) :=
       Set.sdiff_eq_empty.mp hdisj
     have heq : toLinearExtension ⟨q, hq.out.1⟩ =
-        (associatedPrimes I).toFinset.min' (associatedPrimes_nonempty I) :=
+        (subquotientAssociatedPrimes I).toFinset.min' (subquotientAssociatedPrimes_nonempty I) :=
       eq_of_le_of_ge (toLinearExtension.monotone' hle) <|
-        (associatedPrimes I).toFinset.min'_le (toLinearExtension ⟨q, hq.out.1⟩)
+        (subquotientAssociatedPrimes I).toFinset.min'_le (toLinearExtension ⟨q, hq.out.1⟩)
           (Set.mem_toFinset.mpr hq)
     exact congrArg PrimeSpectrum.asIdeal heq
   · rintro hq
     rw [Set.mem_singleton_iff] at hq
     subst hq
-    refine ⟨min'_mem_associatedPrimes I, ?_⟩
+    refine ⟨min'_mem_subquotientAssociatedPrimes I, ?_⟩
     · unfold Ideal.primeCompl
       simp only [Submodule.carrier_eq_coe, Submonoid.coe_set_mk, Subsemigroup.coe_set_mk,
         Set.inter_compl_self]
@@ -323,7 +335,8 @@ of the prime spectrum).  The optimal first move is the lift of the localization 
 `Coprimary.locKer`, whose subquotient has exactly the minimal prime as associated prime. -/
 lemma A_payoff (I : StrictIntvl (Submodule R M)) :
     (payoff R M).A I =
-      .principal (toColex {(associatedPrimes I).toFinset.min' (associatedPrimes_nonempty I)}) := by
+      .principal (toColex {(subquotientAssociatedPrimes I).toFinset.min'
+        (subquotientAssociatedPrimes_nonempty I)}) := by
   have hmid := liftQuot_middle I.left I.right I.lt.le (locKer I)
   have hne : liftQuot I.left I.right (locKer I) ≠ I.right := fun hc ↦ by
     have : Subsingleton (↥I.right ⧸ (liftQuot I.left I.right (locKer I)).submoduleOf I.right) :=
@@ -337,8 +350,8 @@ lemma A_payoff (I : StrictIntvl (Submodule R M)) :
   · rw [max_payoff, payoff_apply, DedekindCut.principal_inj, toColex_inj]
     refine (Set.toFinset_congr ?_).trans (Set.toFinset_singleton _)
     ext w
-    rw [mem_associatedPrimes, associatedPrimes_quot_liftQuot_locKer I, Set.mem_singleton_iff,
-      Set.mem_singleton_iff]
+    rw [mem_subquotientAssociatedPrimes, associatedPrimes_quot_liftQuot_locKer I,
+      Set.mem_singleton_iff, Set.mem_singleton_iff]
     exact ⟨fun h ↦ PrimeSpectrum.ext h, fun h ↦ congrArg PrimeSpectrum.asIdeal h⟩
   · rw [max_payoff, payoff_apply]
     exact DedekindCut.principal_le_principal.mpr <| singleton_min'_le I a ⟨ha.1, ha.2.le⟩ ha.2.ne
@@ -353,15 +366,15 @@ instance : (payoff R M).ADCC where
     by_contra hc
     simp only [not_exists, A_payoff, DedekindCut.principal_lt_principal,
       Finset.Colex.singleton_lt_singleton, not_not] at hc
-    have s1 : ∀ i, ((associatedPrimes ⟨N, x i, hx1 i⟩).toFinset.min'
-          (associatedPrimes_nonempty _)).asIdeal ∈
-        _root_.associatedPrimes R (↥(x i) ⧸ N.submoduleOf (x i)) :=
-      fun i ↦ min'_mem_associatedPrimes ⟨N, x i, hx1 i⟩
+    have s1 : ∀ i, ((subquotientAssociatedPrimes ⟨N, x i, hx1 i⟩).toFinset.min'
+          (subquotientAssociatedPrimes_nonempty _)).asIdeal ∈
+        associatedPrimes R (↥(x i) ⧸ N.submoduleOf (x i)) :=
+      fun i ↦ min'_mem_subquotientAssociatedPrimes ⟨N, x i, hx1 i⟩
     have s2 : ∀ i,
-        _root_.associatedPrimes R (↥(x i) ⧸ N.submoduleOf (x i)) ⊆
-        _root_.associatedPrimes R (↥(x 0) ⧸ N.submoduleOf (x 0)) :=
+        associatedPrimes R (↥(x i) ⧸ N.submoduleOf (x i)) ⊆
+        associatedPrimes R (↥(x 0) ⧸ N.submoduleOf (x 0)) :=
       fun i ↦ associatedPrimes_subset_of_submoduleOf_le N (x i) (x 0) (hx2.antitone i.zero_le)
-    refine (_root_.associatedPrimes.finite R ((↥(x 0) ⧸ N.submoduleOf (x 0)))).not_infinite ?_
+    refine (associatedPrimes.finite R ((↥(x 0) ⧸ N.submoduleOf (x 0)))).not_infinite ?_
     refine Set.infinite_of_injective_forall_mem ?_ <| fun i ↦ s2 i (s1 i)
     exact fun a b hab ↦ (strictMono_nat_of_lt_succ hc).injective (PrimeSpectrum.ext hab)
 
@@ -371,8 +384,9 @@ associated prime of `M`. -/
 theorem isSemistable_iff_A_const [Nontrivial M] :
     (payoff R M).IsSemistable ↔ ∀ N : Submodule R M, (hN : ⊥ < N) →
       (payoff R M).A ⟨⊥, N, hN⟩ =
-        .principal (toColex {(associatedPrimes (⊤ : StrictIntvl (Submodule R M))).toFinset.min'
-          (associatedPrimes_nonempty ⊤)}) := by
+        .principal (toColex {(subquotientAssociatedPrimes
+          (⊤ : StrictIntvl (Submodule R M))).toFinset.min'
+          (subquotientAssociatedPrimes_nonempty ⊤)}) := by
   constructor
   · intro hst N hN
     have hst' : ¬ (payoff R M).A ⊤ < (payoff R M).A ⟨⊥, N, hN⟩ := hst.not_lt N hN
@@ -380,8 +394,8 @@ theorem isSemistable_iff_A_const [Nontrivial M] :
       DedekindCut.principal_lt_principal, Finset.Colex.singleton_lt_singleton, not_lt] at hst'
     rw [A_payoff ⟨⊥, N, hN⟩]
     simp only [DedekindCut.principal_inj, toColex_inj, Finset.singleton_inj]
-    exact eq_of_le_of_ge hst' <| Finset.min'_subset (associatedPrimes_nonempty _) <|
-      Set.toFinset_subset_toFinset.mpr <| associatedPrimes_mono_right hN le_top
+    exact eq_of_le_of_ge hst' <| Finset.min'_subset (subquotientAssociatedPrimes_nonempty _) <|
+      Set.toFinset_subset_toFinset.mpr <| subquotientAssociatedPrimes_mono_right hN le_top
   · intro h
     refine { not_lt := fun N hN ↦ ?_ }
     specialize h N hN
@@ -397,17 +411,17 @@ the theory; together with `Coprimary.isSemistable_restrict_iff_quotient` it iden
 Harder–Narasimhan filtrations of `Coprimary.payoff R M` with coprimary filtrations of
 `M`. -/
 theorem isSemistable_iff_existsUnique_associatedPrime [Nontrivial M] :
-    (payoff R M).IsSemistable ↔ ∃! p, p ∈ _root_.associatedPrimes R M := by
+    (payoff R M).IsSemistable ↔ ∃! p, p ∈ associatedPrimes R M := by
   rw [isSemistable_iff_A_const]
-  let p0 := (associatedPrimes (⊤ : StrictIntvl (Submodule R M))).toFinset.min'
-    (associatedPrimes_nonempty ⊤)
+  let p0 := (subquotientAssociatedPrimes (⊤ : StrictIntvl (Submodule R M))).toFinset.min'
+    (subquotientAssociatedPrimes_nonempty ⊤)
   have hbot (N : Submodule R M) : (⊥ : Submodule R M).submoduleOf N = ⊥ :=
     Submodule.ker_subtype N
   let eTop : (↥(⊤ : Submodule R M) ⧸ (⊥ : Submodule R M).submoduleOf ⊤) ≃ₗ[R] M :=
     (Submodule.quotEquivOfEqBot _ (hbot ⊤)).trans Submodule.topEquiv
-  have hp0 : p0.asIdeal ∈ _root_.associatedPrimes R M := by
+  have hp0 : p0.asIdeal ∈ associatedPrimes R M := by
     simpa [LinearEquiv.AssociatedPrimes.eq eTop] using
-      min'_mem_associatedPrimes (⊤ : StrictIntvl (Submodule R M))
+      min'_mem_subquotientAssociatedPrimes (⊤ : StrictIntvl (Submodule R M))
   constructor
   · refine fun hs => ⟨p0.asIdeal, hp0, fun J hJ => ?_⟩
     obtain ⟨hJp, t, ht⟩ := (isAssociatedPrime_iff (R := R) (M := M)).1 <|
@@ -418,17 +432,17 @@ theorem isSemistable_iff_existsUnique_associatedPrime [Nontrivial M] :
     have hN : ⊥ < (R ∙ t : Submodule R M) := by
       rw [bot_lt_iff_ne_bot, ne_eq, Submodule.span_singleton_eq_bot]
       exact fun ht0 ↦ hJp.ne_top (by rw [ht, ht0, Submodule.colon_singleton_zero])
-    have hassN : _root_.associatedPrimes R ↥(R ∙ t : Submodule R M) = {J} := by
+    have hassN : associatedPrimes R ↥(R ∙ t : Submodule R M) = {J} := by
       rw [← LinearEquiv.AssociatedPrimes.eq (Ideal.quotTorsionOfEquivSpanSingleton R M t), htors,
         associatedPrimes.eq_singleton_of_isPrimary hJp.isPrimary, hJp.radical]
-    have hmin : (associatedPrimes ⟨⊥, R ∙ t, hN⟩).toFinset.min'
-        (associatedPrimes_nonempty _) = ⟨J, hJp⟩ := by
-      have hpN : ((associatedPrimes ⟨⊥, R ∙ t, hN⟩).toFinset.min'
-          (associatedPrimes_nonempty _)).asIdeal ∈
-          _root_.associatedPrimes R ↥(R ∙ t : Submodule R M) := by
+    have hmin : (subquotientAssociatedPrimes ⟨⊥, R ∙ t, hN⟩).toFinset.min'
+        (subquotientAssociatedPrimes_nonempty _) = ⟨J, hJp⟩ := by
+      have hpN : ((subquotientAssociatedPrimes ⟨⊥, R ∙ t, hN⟩).toFinset.min'
+          (subquotientAssociatedPrimes_nonempty _)).asIdeal ∈
+          associatedPrimes R ↥(R ∙ t : Submodule R M) := by
         simpa [LinearEquiv.AssociatedPrimes.eq
           (Submodule.quotEquivOfEqBot _ (hbot (R ∙ t)))] using
-          min'_mem_associatedPrimes (⟨⊥, R ∙ t, hN⟩ : StrictIntvl (Submodule R M))
+          min'_mem_subquotientAssociatedPrimes (⟨⊥, R ∙ t, hN⟩ : StrictIntvl (Submodule R M))
       exact PrimeSpectrum.ext (Set.mem_singleton_iff.mp (hassN ▸ hpN))
     have hs' := hs (R ∙ t) hN
     rw [A_payoff ⟨⊥, R ∙ t, hN⟩] at hs'
@@ -437,10 +451,11 @@ theorem isSemistable_iff_existsUnique_associatedPrime [Nontrivial M] :
   · rintro ⟨p, hp, hp_unique⟩ N hN
     rw [A_payoff ⟨⊥, N, hN⟩]
     simp only [DedekindCut.principal_inj, toColex_inj, Finset.singleton_inj]
-    have hq : ((associatedPrimes ⟨⊥, N, hN⟩).toFinset.min' (associatedPrimes_nonempty _)).asIdeal ∈
-        _root_.associatedPrimes R M := by
-      have hI := associatedPrimes_mono_right hN le_top <|
-        min'_mem_associatedPrimes (⟨⊥, N, hN⟩ : StrictIntvl (Submodule R M))
+    have hq : ((subquotientAssociatedPrimes ⟨⊥, N, hN⟩).toFinset.min'
+        (subquotientAssociatedPrimes_nonempty _)).asIdeal ∈
+        associatedPrimes R M := by
+      have hI := subquotientAssociatedPrimes_mono_right hN le_top <|
+        min'_mem_subquotientAssociatedPrimes (⟨⊥, N, hN⟩ : StrictIntvl (Submodule R M))
       simpa [LinearEquiv.AssociatedPrimes.eq eTop] using hI
     exact PrimeSpectrum.ext ((hp_unique _ hq).trans (hp_unique _ hp0).symm)
 
@@ -456,7 +471,7 @@ lemma A_restrict_eq_quotient {N₁ N₂ W : Submodule R M} (h₁ : N₁ ≤ W) (
           bot_lt_iff_ne_bot.mpr <| map_comap_ne_bot h₁ h₂ h₃⟩ := by
   rw [A_payoff, A_payoff]
   simp only [DedekindCut.principal_inj, toColex_inj, Finset.singleton_inj]
-  simp [associatedPrimes_eq_quotient h₁ h₂ h₃]
+  simp [subquotientAssociatedPrimes_eq_quotient h₁ h₂ h₃]
 
 /-- Semistability of the coprimary payoff function restricted to an interval `(N₁, N₂)` of
 submodules of `M` is semistability of the coprimary payoff function of the subquotient

@@ -134,9 +134,9 @@ lemma exists_hnFiltration (a : CoprimaryFiltration R M) :
        rw [Coprimary.A_payoff, Coprimary.A_payoff, not_le,
          DedekindCut.principal_lt_principal, Finset.Colex.singleton_lt_singleton]
        exact a.associatedPrime_succ_lt i hi _ _
-         (Coprimary.min'_mem_associatedPrimes ⟨a (i + 1), a (i + 2),
+         (Coprimary.min'_mem_subquotientAssociatedPrimes ⟨a (i + 1), a (i + 2),
            a.strictMonoOn hi.le hi (lt_add_one (i + 1))⟩)
-         (Coprimary.min'_mem_associatedPrimes ⟨a i, a (i + 1),
+         (Coprimary.min'_mem_subquotientAssociatedPrimes ⟨a i, a (i + 1),
            a.strictMonoOn (Nat.le_of_succ_le hi.le) (Nat.le_of_succ_le hi)
              (lt_add_one i)⟩) }, rfl⟩
 
@@ -215,10 +215,10 @@ theorem associatedPrimes_eq_iUnion (F : CoprimaryFiltration R M) :
     rw [Coprimary.A_payoff, Coprimary.A_payoff] at hchain
     simp only [DedekindCut.principal_inj, toColex_inj, Finset.singleton_inj] at hchain
     have hbotSub : (⊥ : Submodule R M).submoduleOf ⊤ = ⊥ := Submodule.ker_subtype ⊤
-    have hmem := Coprimary.associatedPrimes_mono_right hbot le_top
-      (Coprimary.min'_mem_associatedPrimes ⟨⊥, F (i + 1), hbot⟩)
-    have hmem' : ((Coprimary.associatedPrimes ⟨⊥, F (i + 1), hbot⟩).toFinset.min'
-        (Coprimary.associatedPrimes_nonempty _)).asIdeal ∈
+    have hmem := Coprimary.subquotientAssociatedPrimes_mono_right hbot le_top
+      (Coprimary.min'_mem_subquotientAssociatedPrimes ⟨⊥, F (i + 1), hbot⟩)
+    have hmem' : ((Coprimary.subquotientAssociatedPrimes ⟨⊥, F (i + 1), hbot⟩).toFinset.min'
+        (Coprimary.subquotientAssociatedPrimes_nonempty _)).asIdeal ∈
           associatedPrimes R (↥(⊤ : Submodule R M) ⧸ (⊥ : Submodule R M).submoduleOf ⊤) :=
       hmem
     rw [LinearEquiv.AssociatedPrimes.eq
