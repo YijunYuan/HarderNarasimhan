@@ -151,11 +151,13 @@ into the listed single-conclusion lemmas.
 | Semistability below and obstruction above a breakpoint | `IsBreakpoint.isSemistable_restrict`, `IsBreakpoint.not_A_le` |
 | Totality, greatest element, and decomposition for breakpoints | `breakpoints_total`, `exists_isGreatest_breakpoints`, `IsBreakpoint.A_eq_A_of_lt` |
 | Existence and uniqueness of the Harder–Narasimhan filtration | `hnFiltration`, `Unique (μ.HarderNarasimhanFiltration)`, `exists_relSeries_semistableRel`, `existsUnique_relSeries_semistableRel` |
+| Chain equalities of the first-player value along the canonical filtration | `hnFiltration_A_bot_eq_A` |
 | Convexity of the coprimary payoff function | the `IsConvexOn ⊤` instance for `Coprimary.payoff R M` |
 | First-player value of the coprimary payoff function | `Coprimary.A_payoff` |
 | Descending chain condition for the coprimary payoff function | the `ADCC` instance for `Coprimary.payoff R M` |
 | Semistable means coprimary | `Coprimary.isSemistable_iff_A_const`, `Coprimary.isSemistable_iff_existsUnique_associatedPrime` |
 | Existence and uniqueness of the coprimary filtration | `Coprimary.coprimaryFiltration`, `Unique (CoprimaryFiltration R M)` |
+| The associated primes of `M` via the coprimary filtration | `CoprimaryFiltration.associatedPrimes_eq_iUnion` |
 | Player A's value collapses to the global minimum | `A_top_eq_min_top`, `A_top_le_B_top` |
 | Player B's value collapses to the global maximum | `B_top_eq_max_top`, `A_top_le_B_top_of_strongDCC` |
 | Strong descending chain condition from a well-ordered rank | `strongDCC_of_wellOrderedRank` |

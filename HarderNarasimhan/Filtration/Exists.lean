@@ -31,6 +31,8 @@ proved in `HarderNarasimhan.Filtration.Unique`.
 * `PayoffFunction.hnFiltration_succ_isGreatest_breakpoints` : the defining property of the
   canonical filtration; each successive term is the greatest breakpoint of the remaining top
   interval.
+* `PayoffFunction.hnFiltration_A_bot_eq_A` : cutting a bottom-anchored interval at a term of
+  the canonical filtration does not change the first-player value.
 * `Inhabited (μ.HarderNarasimhanFiltration)` : Harder–Narasimhan filtrations exist.
 
 ## References
@@ -172,6 +174,26 @@ interval.  This is the main input to the uniqueness theorem of
 lemma hnFiltration_succ_isGreatest_breakpoints {n : ℕ} (h : μ.hnFiltration n ≠ ⊤) :
     IsGreatest (μ.breakpoints ⟨μ.hnFiltration n, ⊤, h.lt_top⟩) (μ.hnFiltration (n + 1)) :=
   HNFil_isGreatest μ n h
+
+/-- Cutting a bottom-anchored interval at a term of the canonical filtration does not change
+the first-player value: for any `y` above the `n`-th term, the values `μ.A ⟨⊥, y⟩` and
+`μ.A ⟨μ.hnFiltration n, y⟩` agree.  Since the terms below `μ.hnFiltration n` also lie below
+`y`, instantiating at each index up to `n` packages the chain of equalities
+`μ.A ⟨⊥, y⟩ = μ.A ⟨μ.hnFiltration 1, y⟩ = ⋯ = μ.A ⟨μ.hnFiltration n, y⟩`. -/
+theorem hnFiltration_A_bot_eq_A {n : ℕ} {y : ℒ} (hy : μ.hnFiltration n < y) :
+    μ.A ⟨⊥, y, bot_le.trans_lt hy⟩ = μ.A ⟨μ.hnFiltration n, y, hy⟩ := by
+  induction n with
+  | zero => rfl
+  | succ n ih =>
+    have hmono : μ.hnFiltration n < y :=
+      lt_of_le_of_lt ((μ.hnFiltration).monotone (Nat.le_succ n)) hy
+    have hne : μ.hnFiltration n ≠ ⊤ := fun hc ↦ absurd (hc ▸ hmono) not_top_lt
+    have hIB := mem_breakpoints.1 (hnFiltration_succ_isGreatest_breakpoints (μ := μ) hne).1
+    have hstep := hIB.A_eq_A_of_lt ((inferInstance : μ.IsConvexOn ⊤).mono le_top)
+      (hadm.total_or_attained.imp id fun h z hzI hz ↦
+        h ⟨μ.hnFiltration n, z, lt_of_le_of_ne hzI.left hz⟩)
+      ⟨hmono.le, le_top⟩ hy
+    exact (ih hmono).trans hstep
 
 end PayoffFunction
 
