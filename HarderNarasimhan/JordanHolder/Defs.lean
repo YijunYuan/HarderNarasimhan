@@ -5,8 +5,8 @@ Authors: Yijun Yuan
 -/
 module
 
-public import HarderNarasimhan.PayoffFunction.SlopeLike
 public import HarderNarasimhan.PayoffFunction.NashEquilibrium
+public import HarderNarasimhan.PayoffFunction.SlopeLike
 public import Mathlib.Data.Rel
 
 /-!

@@ -6,8 +6,8 @@ Authors: Yijun Yuan
 module
 
 public import HarderNarasimhan.PayoffFunction.SlopeLike
-public import Mathlib.Order.OrderIsoNat
 public import Mathlib.Data.Real.Basic
+public import Mathlib.Order.OrderIsoNat
 
 /-!
 # The values of the Harder–Narasimhan game

@@ -5,9 +5,9 @@ Authors: Yijun Yuan
 -/
 module
 
-public import Mathlib.RingTheory.Ideal.AssociatedPrime.Localization
-public import Mathlib.Algebra.Module.LocalizedModule.Submodule
 public import Mathlib.Algebra.Module.LocalizedModule.AtPrime
+public import Mathlib.Algebra.Module.LocalizedModule.Submodule
+public import Mathlib.RingTheory.Ideal.AssociatedPrime.Localization
 
 /-!
 # Associated primes of the quotient by a localization kernel
@@ -122,7 +122,7 @@ lemma mem_associatedPrimes_of_mem_associatedPrimes_quot_ker [IsNoetherianRing R]
     refine Submodule.span_eq_bot.mpr ?_
     rintro _ ⟨x, hx, rfl⟩
     obtain ⟨s, hsS, hsx⟩ := (LocalizedModule.mem_ker_mkLinearMap_iff (S := S) (m := x)).1 hx
-    have hsP : s ∈ p.primeCompl := fun hsp => Set.notMem_empty s (hpDisj ▸ ⟨hsp, hsS⟩)
+    have hsP : s ∈ p.primeCompl := fun hsp ↦ Set.notMem_empty s (hpDisj ▸ ⟨hsp, hsS⟩)
     exact LinearMap.mem_ker.mp
       ((LocalizedModule.mem_ker_mkLinearMap_iff (S := p.primeCompl) (m := x)).2 ⟨s, hsP, hsx⟩)
   let e : LocalizedModule p.primeCompl (M ⧸ K) ≃ₗ[Localization p.primeCompl]

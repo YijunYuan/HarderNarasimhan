@@ -7,15 +7,15 @@ module
 
 public import HarderNarasimhan.StrictIntvl
 
-public import HarderNarasimhan.PayoffFunction.Defs
-public import HarderNarasimhan.PayoffFunction.Restrict
 public import HarderNarasimhan.PayoffFunction.Convex
-public import HarderNarasimhan.PayoffFunction.Semistable.Defs
-public import HarderNarasimhan.PayoffFunction.Semistable.Breakpoints
-public import HarderNarasimhan.PayoffFunction.SlopeLike
-public import HarderNarasimhan.PayoffFunction.Slope
+public import HarderNarasimhan.PayoffFunction.Defs
 public import HarderNarasimhan.PayoffFunction.GameValue
 public import HarderNarasimhan.PayoffFunction.NashEquilibrium
+public import HarderNarasimhan.PayoffFunction.Restrict
+public import HarderNarasimhan.PayoffFunction.Semistable.Breakpoints
+public import HarderNarasimhan.PayoffFunction.Semistable.Defs
+public import HarderNarasimhan.PayoffFunction.Slope
+public import HarderNarasimhan.PayoffFunction.SlopeLike
 
 public import HarderNarasimhan.Filtration.Defs
 public import HarderNarasimhan.Filtration.Exists
@@ -23,13 +23,13 @@ public import HarderNarasimhan.Filtration.Unique
 
 public import HarderNarasimhan.JordanHolder.Defs
 public import HarderNarasimhan.JordanHolder.Exists
-public import HarderNarasimhan.JordanHolder.Stability
 public import HarderNarasimhan.JordanHolder.Length
+public import HarderNarasimhan.JordanHolder.Stability
 
 public import HarderNarasimhan.Coprimary.AssociatedPrimes
 public import HarderNarasimhan.Coprimary.Defs
-public import HarderNarasimhan.Coprimary.Semistability
 public import HarderNarasimhan.Coprimary.Filtration
+public import HarderNarasimhan.Coprimary.Semistability
 
 /-!
 # `HarderNarasimhan`: library root

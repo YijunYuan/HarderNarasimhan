@@ -5,12 +5,12 @@ Authors: Yijun Yuan
 -/
 module
 
+public import HarderNarasimhan.PayoffFunction.Defs
 public import Mathlib.Combinatorics.Colex
 public import Mathlib.Order.Completion
 public import Mathlib.Order.Extension.Linear
-public import Mathlib.RingTheory.Spectrum.Prime.Basic
 public import Mathlib.RingTheory.Ideal.AssociatedPrime.Finiteness
-public import HarderNarasimhan.PayoffFunction.Defs
+public import Mathlib.RingTheory.Spectrum.Prime.Basic
 
 /-!
 # The coprimary payoff function and coprimary filtrations

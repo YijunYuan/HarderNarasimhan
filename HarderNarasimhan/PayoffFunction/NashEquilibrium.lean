@@ -7,8 +7,8 @@ module
 
 public import HarderNarasimhan.PayoffFunction.GameValue
 public import HarderNarasimhan.PayoffFunction.Semistable.Defs
-public import Mathlib.Tactic.TFAE
 public import Mathlib.Data.List.TFAE
+public import Mathlib.Tactic.TFAE
 
 /-!
 # Nash equilibria of the Harder–Narasimhan game

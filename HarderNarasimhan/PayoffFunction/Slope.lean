@@ -6,9 +6,9 @@ Authors: Yijun Yuan
 module
 
 public import HarderNarasimhan.PayoffFunction.SlopeLike
-public import Mathlib.Data.Real.Basic
 public import Mathlib.Algebra.Module.Defs
 public import Mathlib.Data.NNReal.Basic
+public import Mathlib.Data.Real.Basic
 public import Mathlib.Order.Completion
 
 /-!

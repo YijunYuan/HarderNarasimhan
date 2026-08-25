@@ -7,8 +7,8 @@ module
 
 public import Mathlib.Order.BoundedOrder.Basic
 public import Mathlib.Order.Interval.Set.Defs
-public import Mathlib.Order.Sublattice
 public import Mathlib.Order.ModularLattice
+public import Mathlib.Order.Sublattice
 
 /-!
 # Strict intervals

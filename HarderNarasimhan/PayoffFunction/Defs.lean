@@ -5,8 +5,8 @@ Authors: Yijun Yuan
 -/
 module
 
-public import Mathlib.Order.CompleteLattice.Defs
 public import HarderNarasimhan.StrictIntvl
+public import Mathlib.Order.CompleteLattice.Defs
 
 /-!
 # Payoff functions

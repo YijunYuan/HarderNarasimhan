@@ -5,11 +5,11 @@ Authors: Yijun Yuan
 -/
 module
 
-public import Mathlib.Algebra.Module.Torsion.Basic
 public import HarderNarasimhan.Coprimary.AssociatedPrimes
 public import HarderNarasimhan.Coprimary.Defs
 public import HarderNarasimhan.PayoffFunction.Convex
 public import HarderNarasimhan.PayoffFunction.Semistable.Defs
+public import Mathlib.Algebra.Module.Torsion.Basic
 
 /-!
 # Semistability of the coprimary payoff function
@@ -155,7 +155,7 @@ lemma map_comap_ne_bot {N₁ N₂ W : Submodule R M} (h₁ : N₁ ≤ W) (h₂ :
     Submodule.map (N₁.submoduleOf N₂).mkQ (Submodule.comap N₂.subtype W) ≠ ⊥ := by
   intro hbot
   refine h₃ <| le_antisymm ?_ h₁
-  have hle : Submodule.comap N₂.subtype W ≤ N₁.submoduleOf N₂ := fun y hy => by
+  have hle : Submodule.comap N₂.subtype W ≤ N₁.submoduleOf N₂ := fun y hy ↦ by
     have : y ∈ Submodule.comap (N₁.submoduleOf N₂).mkQ ⊥ := hbot ▸ Submodule.mem_map_of_mem hy
     simpa [Submodule.comap_bot, Submodule.ker_mkQ] using this
   intro x hx
@@ -429,7 +429,7 @@ theorem isSemistable_iff_existsUnique_associatedPrime [Nontrivial M] :
     simpa [LinearEquiv.AssociatedPrimes.eq eTop] using
       min'_mem_subquotientAssociatedPrimes (⊤ : StrictIntvl (Submodule R M))
   constructor
-  · refine fun hs => ⟨p0.asIdeal, hp0, fun J hJ => ?_⟩
+  · refine fun hs ↦ ⟨p0.asIdeal, hp0, fun J hJ ↦ ?_⟩
     obtain ⟨hJp, t, ht⟩ := (isAssociatedPrime_iff (R := R) (M := M)).1 <|
       (AssociatedPrimes.mem_iff (R := R) (M := M)).1 hJ
     have htors : Ideal.torsionOf R M t = J := by
