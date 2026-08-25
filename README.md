@@ -128,52 +128,51 @@ above).
 5. `Coprimary/` shows the abstract theory at work on an honest example from commutative
    algebra.
 
-Each file carries a module docstring (`/-! # … -/`) with its main definitions and results;
-theorems corresponding to numbered statements of [ChenJeannin] say so in their docstrings
-(`This is Proposition 3.8 of [ChenJeannin].`).
+Each file carries a module docstring (`/-! # … -/`) with its main definitions and results
+and closes with a `## References` section pointing to [ChenJeannin].
 
-## Paper-to-library correspondence
+## Main results at a glance
 
 Declarations live in the namespace `HarderNarasimhan.PayoffFunction` unless qualified
-otherwise.  Statements that were packaged as conjunctions or `TFAE` blocks in the paper are
-split into the listed single-conclusion lemmas.
+otherwise.  Results that are naturally packaged as conjunctions or `TFAE` blocks are split
+into the listed single-conclusion lemmas.
 
-| [ChenJeannin] | Lean declaration(s) |
+| Result | Lean declaration(s) |
 |---|---|
-| Lemma 2.4 | `A_le_max_inf`, `IsConvexOn.max_inf_le_max`, `IsConvexOn.A_le_A_sup` |
-| Remark 2.5 | `IsConvexOn.max`, `IsConvexOn.max_max`, `IsConvexOn.A_max` |
-| Proposition 2.6 | `A_anti_left`, `IsConvexOn.inf_le_A`, `IsConvexOn.A_eq_of_ge`, `IsConvexOn.A_le_A_of_lt`, `IsConvexOn.A_eq_or_lt` |
-| Remark 2.7 | `IsConvex.A_right_eq_of_A_left_gt` |
-| Proposition 2.8 | `IsConvexOn.inf_A_le_A_sup`, `IsConvexOn.A_le_A_sup_or` |
-| Proposition 3.2 | `IsConvexOn.A_le_of_A_eq_top` |
-| Corollary 3.3 | `adcc_of_exists_A_eq_top` |
-| Proposition 3.4 | `breakpoints_nonempty` |
-| Remark 3.5 | `IsBreakpoint.eq` |
-| Proposition 3.7 | `IsBreakpoint.isSemistable_restrict`, `IsBreakpoint.not_A_le` |
-| Proposition 3.8 | `breakpoints_total`, `exists_isGreatest_breakpoints`, `IsBreakpoint.A_eq_A_of_lt` |
-| Theorem 3.10 | `hnFiltration`, `Unique (μ.HarderNarasimhanFiltration)`, `exists_relSeries_semistableRel`, `existsUnique_relSeries_semistableRel` |
-| Proposition 3.11 | the `IsConvexOn ⊤` instance for `Coprimary.payoff R M` |
-| Proposition 3.12 | `Coprimary.A_payoff` |
-| Proposition 3.13 | the `ADCC` instance for `Coprimary.payoff R M` |
-| Remark 3.14 | `Coprimary.isSemistable_iff_A_const`, `Coprimary.isSemistable_iff_existsUnique_associatedPrime` |
-| Theorem 3.15 | `Coprimary.coprimaryFiltration`, `Unique (CoprimaryFiltration R M)` |
-| Proposition 4.1 | `A_top_eq_min_top`, `A_top_le_B_top` |
-| Proposition 4.3 | `B_top_eq_max_top`, `A_top_le_B_top_of_strongDCC` |
-| Remark 4.4 | `strongDCC_of_wellOrderedRank` |
-| Proposition 4.6 | `isSlopeLike_iff_seesaw`, `IsSlopeLike.seesaw` |
-| Proposition 4.8 | `isSlopeLike_slope` |
-| Remark 4.10 | `min_le_apply`, `apply_le_max`, `B_top_le_A_top_iff`, `hasNashEquilibrium_iff_min_le`, `hasNashEquilibrium_iff_le_max` |
-| Proposition 4.11 | `B_top_le_A_top_of_min_eq_max`, `min_top_eq_max_top_of_B_top_le_A_top` |
-| Propositions 4.12–4.16 | `max_top_eq_apply_iff`, `min_top_eq_apply_iff` |
-| Proposition 4.18 | `IsSemistable.B_top_le_A_top`, `IsSemistable.hasNashEquilibrium` |
-| Proposition 4.20 | `isSemistable_of_hasNashEquilibrium` |
-| Theorem 4.21 | `min_top_eq_max_top_iff_hasNashEquilibrium`, `nashEquilibrium_tfae` |
-| Theorem 4.25 | `Nonempty (μ.JordanHolderFiltration)`, `exists_relSeries_jordanHolderRel` |
+| Fundamental inequality chain for convex payoff functions | `A_le_max_inf`, `IsConvexOn.max_inf_le_max`, `IsConvexOn.A_le_A_sup` |
+| Stability of the extremal operations under convexity | `IsConvexOn.max`, `IsConvexOn.max_max`, `IsConvexOn.A_max` |
+| Comparison of the first-player value along a chain | `A_anti_left`, `IsConvexOn.inf_le_A`, `IsConvexOn.A_eq_of_ge`, `IsConvexOn.A_le_A_of_lt`, `IsConvexOn.A_eq_or_lt` |
+| Complementary segment value after a strict improvement | `IsConvex.A_right_eq_of_A_left_gt` |
+| Comparison of the first-player value along a join | `IsConvexOn.inf_A_le_A_sup`, `IsConvexOn.A_le_A_sup_or` |
+| Interval enlargement when the first-player value is `⊤` | `IsConvexOn.A_le_of_A_eq_top` |
+| Sufficient condition for the descending chain condition | `adcc_of_exists_A_eq_top` |
+| Existence of breakpoints | `breakpoints_nonempty` |
+| Uniqueness of the breakpoint over a complete linear order | `IsBreakpoint.eq` |
+| Semistability below and obstruction above a breakpoint | `IsBreakpoint.isSemistable_restrict`, `IsBreakpoint.not_A_le` |
+| Totality, greatest element, and decomposition for breakpoints | `breakpoints_total`, `exists_isGreatest_breakpoints`, `IsBreakpoint.A_eq_A_of_lt` |
+| Existence and uniqueness of the Harder–Narasimhan filtration | `hnFiltration`, `Unique (μ.HarderNarasimhanFiltration)`, `exists_relSeries_semistableRel`, `existsUnique_relSeries_semistableRel` |
+| Convexity of the coprimary payoff function | the `IsConvexOn ⊤` instance for `Coprimary.payoff R M` |
+| First-player value of the coprimary payoff function | `Coprimary.A_payoff` |
+| Descending chain condition for the coprimary payoff function | the `ADCC` instance for `Coprimary.payoff R M` |
+| Semistable means coprimary | `Coprimary.isSemistable_iff_A_const`, `Coprimary.isSemistable_iff_existsUnique_associatedPrime` |
+| Existence and uniqueness of the coprimary filtration | `Coprimary.coprimaryFiltration`, `Unique (CoprimaryFiltration R M)` |
+| Player A's value collapses to the global minimum | `A_top_eq_min_top`, `A_top_le_B_top` |
+| Player B's value collapses to the global maximum | `B_top_eq_max_top`, `A_top_le_B_top_of_strongDCC` |
+| Strong descending chain condition from a well-ordered rank | `strongDCC_of_wellOrderedRank` |
+| The slope-like axiom as the seesaw trichotomy | `isSlopeLike_iff_seesaw`, `IsSlopeLike.seesaw` |
+| The slope of a degree by a rank is slope-like | `isSlopeLike_slope` |
+| Unfolded reformulations of the equilibrium condition | `min_le_apply`, `apply_le_max`, `B_top_le_A_top_iff`, `hasNashEquilibrium_iff_min_le`, `hasNashEquilibrium_iff_le_max` |
+| Equilibrium inequality vs. coincidence of the extremal values | `B_top_le_A_top_of_min_eq_max`, `min_top_eq_max_top_of_B_top_le_A_top` |
+| Equivalence of the endpoint equalities for slope-like payoffs | `max_top_eq_apply_iff`, `min_top_eq_apply_iff` |
+| Semistability implies Nash equilibrium | `IsSemistable.B_top_le_A_top`, `IsSemistable.hasNashEquilibrium` |
+| Nash equilibrium implies semistability | `isSemistable_of_hasNashEquilibrium` |
+| Nash equilibrium iff the global extremal values coincide | `min_top_eq_max_top_iff_hasNashEquilibrium`, `nashEquilibrium_tfae` |
+| Existence of Jordan–Hölder filtrations | `Nonempty (μ.JordanHolderFiltration)`, `exists_relSeries_jordanHolderRel` |
 
-Results with no counterpart in the paper's numbering include the uniqueness of the
-Jordan–Hölder length over a modular lattice (`JordanHolderFiltration.length_eq`), the
-piecewise-stability characterization (`piecewise_isStable_iff`), and the commutative
-algebra input `HarderNarasimhan.associatedPrimes_quot_ker_mkLinearMap`.
+Further results include the uniqueness of the Jordan–Hölder length over a modular lattice
+(`JordanHolderFiltration.length_eq`), the piecewise-stability characterization
+(`piecewise_isStable_iff`), and the commutative algebra input
+`HarderNarasimhan.associatedPrimes_quot_ker_mkLinearMap`.
 
 ## Building
 
