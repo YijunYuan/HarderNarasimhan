@@ -132,9 +132,9 @@ lemma exists_hnFiltration (a : CoprimaryFiltration R M) :
        rw [Coprimary.A_payoff, Coprimary.A_payoff, not_le,
          DedekindCut.principal_lt_principal, Finset.Colex.singleton_lt_singleton]
        exact a.associatedPrime_succ_lt i hi _ _
-         (Coprimary.min'_mem_assPrimes ⟨a (i + 1), a (i + 2),
+         (Coprimary.min'_mem_associatedPrimes ⟨a (i + 1), a (i + 2),
            a.strictMonoOn hi.le hi (lt_add_one (i + 1))⟩)
-         (Coprimary.min'_mem_assPrimes ⟨a i, a (i + 1),
+         (Coprimary.min'_mem_associatedPrimes ⟨a i, a (i + 1),
            a.strictMonoOn (Nat.le_of_succ_le hi.le) (Nat.le_of_succ_le hi)
              (lt_add_one i)⟩) }, rfl⟩
 
