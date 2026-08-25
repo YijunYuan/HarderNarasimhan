@@ -1986,20 +1986,6 @@
   "∀ {ℒ : Type u_1} {S : Type u_2} [inst : Nontrivial ℒ] [inst_1 : PartialOrder ℒ] [inst_2 : BoundedOrder ℒ]\n  [inst_3 : CompleteLattice S] {μ : HarderNarasimhan.PayoffFunction ℒ S} [hμ : μ.IsSlopeLike] [μ.WeakACC] [μ.StrongDCC],\n  [μ.max ⊤ = μ ⊤, μ.min ⊤ = μ ⊤, μ.min ⊤ = μ.max ⊤, μ.HasNashEquilibrium].TFAE",
   "constCategory": "Theorem"},
  {"references":
-  ["Lattice.toSemilatticeInf",
-   "PartialOrder.toPreorder",
-   "Lattice",
-   "Preorder.toLT",
-   "HarderNarasimhan.PayoffFunction.IsAffine",
-   "HarderNarasimhan.PayoffFunction",
-   "HarderNarasimhan.PayoffFunction.IsConvex",
-   "CompleteLattice",
-   "SemilatticeInf.toPartialOrder"],
-  "name": "HarderNarasimhan.PayoffFunction.IsAffine.isConvex",
-  "constType":
-  "∀ {ℒ : Type u_1} {S : Type u_2} [inst : Lattice ℒ] [inst_1 : CompleteLattice S]\n  {μ : HarderNarasimhan.PayoffFunction ℒ S} [haff : μ.IsAffine], μ.IsConvex",
-  "constCategory": "Theorem"},
- {"references":
   ["instAddNat",
    "HarderNarasimhan.StrictIntvl.instBoundedOrderSubtypeMem",
    "PartialOrder.toPreorder",
@@ -6748,6 +6734,20 @@
   "constType":
   "{ℒ : Type u_1} →\n  {S : Type u_2} →\n    [inst : PartialOrder ℒ] →\n      [inst_1 : BoundedOrder ℒ] →\n        [inst_2 : CompleteLattice S] →\n          {μ : HarderNarasimhan.PayoffFunction ℒ S} →\n            (toFun : ℕ → ℒ) →\n              (length : ℕ) →\n                Monotone toFun →\n                  toFun 0 = ⊥ →\n                    toFun length = ⊤ →\n                      (strictMonoOn : StrictMonoOn toFun (Set.Iic length)) →\n                        (∀ (i : ℕ) (hi : i < length),\n                            (μ.restrict { left := toFun i, right := toFun (i + 1), lt := ⋯ }).IsSemistable) →\n                          (∀ (i : ℕ) (hi : i + 1 < length),\n                              ¬μ.A { left := toFun i, right := toFun (i + 1), lt := ⋯ } ≤\n                                  μ.A { left := toFun (i + 1), right := toFun (i + 2), lt := ⋯ }) →\n                            μ.HarderNarasimhanFiltration",
   "constCategory": "Definition"},
+ {"references":
+  ["Lattice.toSemilatticeInf",
+   "PartialOrder.toPreorder",
+   "Lattice",
+   "Preorder.toLT",
+   "HarderNarasimhan.PayoffFunction.IsAffine",
+   "HarderNarasimhan.PayoffFunction",
+   "HarderNarasimhan.PayoffFunction.IsConvex",
+   "CompleteLattice",
+   "SemilatticeInf.toPartialOrder"],
+  "name": "HarderNarasimhan.PayoffFunction.IsAffine.toIsConvex",
+  "constType":
+  "∀ {ℒ : Type u_1} {S : Type u_2} [inst : Lattice ℒ] [inst_1 : CompleteLattice S]\n  {μ : HarderNarasimhan.PayoffFunction ℒ S} [haff : μ.IsAffine], μ.IsConvex",
+  "constCategory": "Theorem"},
  {"references":
   ["instAddNat",
    "HarderNarasimhan.PayoffFunction.WeakACC",

@@ -109,7 +109,7 @@ class IsAffine (μ : PayoffFunction ℒ S) : Prop where
     μ ⟨x ⊓ y, x, inf_lt_left.2 h⟩ = μ ⟨y, x ⊔ y, right_lt_sup.2 h⟩
 
 /-- An affine payoff function is convex. -/
-instance IsAffine.isConvex [haff : μ.IsAffine] : μ.IsConvex :=
+instance IsAffine.toIsConvex [haff : μ.IsAffine] : μ.IsConvex :=
   ⟨fun x y hxy ↦ (haff.eq x y hxy).le⟩
 
 /-- Restriction preserves the affine property. -/
