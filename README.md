@@ -1,4 +1,4 @@
-## ℹ️ This branch corresponds to the paper [arXiv:2509.19632v3](https://arxiv.org/abs/2509.19632v3). It will not be updated until the next version of the paper is released. For the latest development, please check the `main` branch.
+## ℹ️ This branch corresponds to the paper [arXiv:2509.19632v3](https://arxiv.org/abs/2509.19632v3). It will not be updated until the next version of the paper is released. For the latest development, please check the [master](https://github.com/YijunYuan/HarderNarasimhan/tree/master) branch.
 ------
 # HarderNarasimhan
 
