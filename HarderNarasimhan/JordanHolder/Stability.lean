@@ -60,9 +60,9 @@ private lemma piecewise_isSemistable_of_payoff_lt
       exact le_rfl
     else
     have hul : f (i + 1) < u.val :=
-      lt_of_le_of_ne u.prop.1 fun hc ↦ hu <| Subtype.coe_inj.1 hc.symm
+      u.prop.1.lt_of_ne fun hc ↦ hu <| Subtype.coe_inj.1 hc.symm
     have hur : u.val < f i :=
-      lt_of_le_of_ne u.prop.2 fun hc ↦ hu1.2.ne <| Subtype.coe_inj.1 hc
+      u.prop.2.lt_of_ne fun hc ↦ hu1.2.ne <| Subtype.coe_inj.1 hc
     exact le_of_lt <| ((inferInstance : μ.IsSlopeLike).seesaw_total_lt_right_iff hul hur).2
       (h i hi u.val hul hur)
 
@@ -83,7 +83,7 @@ theorem piecewise_isStable_of_payoff_lt
     let stepI : StrictIntvl ℒ :=
       ⟨f (i + 1), f i, hsa i (i + 1) (lt_add_one i) hi⟩
     have hx_left : f (i + 1) < x.val :=
-      lt_of_le_of_ne x.prop.1 fun hc ↦ hx.ne' <| Subtype.coe_inj.1 hc.symm
+      x.prop.1.lt_of_ne fun hc ↦ hx.ne' <| Subtype.coe_inj.1 hc.symm
     have hA_step : (μ.restrict stepI).A ⊤ = (μ.restrict stepI).min ⊤ :=
       A_top_eq_min_top
     have hA_x : (μ.restrict ⟨f (i + 1), x.val, hx_left⟩).A ⊤ =
@@ -101,9 +101,8 @@ theorem piecewise_isStable_of_payoff_lt
         (min_top_eq_max_top_iff_hasNashEquilibrium.2 hNash_step)
     simp only [min_restrict_apply, restrict_apply] at hmin_step
     rw [hmin_step]
-    exact ne_of_lt <| lt_of_le_of_lt
-      (min_le_apply (μ := μ) (I := ⟨f (i + 1), ↑x, hx_left⟩)) <|
-      h i hi x.val hx_left hx'
+    exact ((min_le_apply (μ := μ) (I := ⟨f (i + 1), ↑x, hx_left⟩)).trans_lt <|
+      h i hi x.val hx_left hx').ne
 
 omit [Nontrivial ℒ] [BoundedOrder ℒ] in
 /-- Conversely, if the restriction of `μ` to each step interval of `f` is stable, then every
@@ -117,22 +116,22 @@ theorem payoff_lt_of_piecewise_isStable
   intro i hi z hz hz'
   let stepI : StrictIntvl ℒ :=
     ⟨f (i + 1), f i, hsa i (i + 1) (lt_add_one i) hi⟩
-  let midI : ↥stepI := ⟨z, le_of_lt hz, le_of_lt hz'⟩
+  let midI : ↥stepI := ⟨z, hz.le, hz'.le⟩
   have hmid_ne_bot : ⊥ < midI :=
-    bot_lt_iff_ne_bot.2 fun hc ↦ ne_of_gt hz (congrArg Subtype.val hc)
+    bot_lt_iff_ne_bot.2 fun hc ↦ hz.ne' (congrArg Subtype.val hc)
   have hmid_ne_top : midI < ⊤ :=
-    lt_top_iff_ne_top.2 fun hc ↦ ne_of_lt hz' (congrArg Subtype.val hc)
+    lt_top_iff_ne_top.2 fun hc ↦ hz'.ne (congrArg Subtype.val hc)
   have hss := (hst i hi).toIsSemistable.not_lt midI hmid_ne_bot
   simp only [not_lt] at hss
   have hst' : (μ.restrict stepI).A ⟨⊥, midI, hmid_ne_bot⟩ < (μ.restrict stepI).A ⊤ :=
-    lt_of_le_of_ne hss ((hst i hi).ne midI hmid_ne_bot hmid_ne_top)
+    hss.lt_of_ne ((hst i hi).ne midI hmid_ne_bot hmid_ne_top)
   have hA_step : (μ.restrict stepI).A ⊤ = (μ.restrict stepI).min ⊤ :=
     A_top_eq_min_top
   rw [hA_step] at hst'
   have hA_mid : (μ.restrict ⟨f (i + 1), z, hz⟩).A ⊤ =
       (μ.restrict ⟨f (i + 1), z, hz⟩).min ⊤ :=
     A_top_eq_min_top
-  have hb : (μ.restrict ⟨f (i + 1), f i, gt_trans hz' hz⟩).A ⟨⊥, midI, hmid_ne_bot⟩ =
+  have hb : (μ.restrict ⟨f (i + 1), f i, hz.trans hz'⟩).A ⟨⊥, midI, hmid_ne_bot⟩ =
       (μ.restrict ⟨f (i + 1), z, hz⟩).A ⊤ := by
     simp only [A_restrict_apply, min_restrict_apply] at *
     rfl
@@ -153,10 +152,10 @@ theorem payoff_lt_of_piecewise_isStable
   have hsSup_mid := hsSup_step midI hmid_ne_bot
   have hsSup_mid' : μ ⟨f (i + 1), z, hz⟩ ≤ μ ⟨f (i + 1), f i,
       hsa i (i + 1) (lt_add_one i) hi⟩ := hsSup_mid
-  refine lt_of_le_of_ne hsSup_mid' ?_
+  refine hsSup_mid'.lt_of_ne ?_
   by_contra hc
   replace hst' : μ.min ⟨f (i + 1), z, hz⟩ <
-      μ ⟨f (i + 1), f i, gt_trans hz' hz⟩ := hst'
+      μ ⟨f (i + 1), f i, hz.trans hz'⟩ := hst'
   rw [← hc] at hst'
   obtain ⟨y, hy⟩ := iInf_lt_iff.1 hst'
   obtain ⟨hy1, hs⟩ := iInf_lt_iff.1 hy
@@ -165,7 +164,7 @@ theorem payoff_lt_of_piecewise_isStable
     (lt_of_le_of_ne hy1.1 fun hc ↦ by simp only [hc, lt_self_iff_false] at hs)
     hy1.2).1 hs
   simp only [hc] at this
-  have res := hsSup_step_bak ⟨y, hy1.1, le_of_lt <| lt_of_le_of_lt hy1.2.le hz'⟩ (by
+  have res := hsSup_step_bak ⟨y, hy1.1, (hy1.2.trans hz').le⟩ (by
     refine lt_of_le_of_ne hy1.1 ?_
     by_contra hc
     apply Subtype.coe_inj.2 at hc

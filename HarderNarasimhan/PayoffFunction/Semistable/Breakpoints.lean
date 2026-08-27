@@ -236,8 +236,8 @@ private lemma breakpointAux_defprop3 (μ : PayoffFunction ℒ S) (I : StrictIntv
         breakpointAux_defprop3₀ μ I hμDCC (len - 1) (Nat.sub_one_lt <|
         breakpointAux_len_nonzero μ I hμDCC))) hcontra').out.choose_spec.choose.1
         h₂.symm
-    exact h₃ ⟨y, ⟨le_of_lt hy.1, le_trans hy.2 (breakpointAux μ I (len - 1)).prop.2⟩,
-      ⟨ne_of_lt hy.1, hcases⟩, hcontra⟩
+    exact h₃ ⟨y, ⟨hy.1.le, le_trans hy.2 (breakpointAux μ I (len - 1)).prop.2⟩,
+      ⟨hy.1.ne, hcases⟩, hcontra⟩
   · simp only [eq_of_le_of_not_lt hy.2 hcases] at hcontra
     exact lt_irrefl _ hcontra
 
@@ -268,11 +268,11 @@ lemma breakpoints_nonempty [hμDCC : μ.ADCC] (hμcvx : μ.IsConvexOn I) :
       intro i hi y hyI hy hy'
       by_contra!
       have h₃' : (func i).val < y ⊔ (func i).val ∧ y ⊔ (func i).val ≤ (func (i-1)).val := by
-        refine ⟨right_lt_sup.2 this, sup_le_iff.2 ⟨le_of_lt hy'.1, ?_⟩⟩
+        refine ⟨right_lt_sup.2 this, sup_le_iff.2 ⟨hy'.1.le, ?_⟩⟩
         have h₃'' := breakpointAux_strict_decreasing μ I (i-1) (h₂ (i-1) <| le_trans (le_of_lt <|
           Nat.sub_one_lt <| Nat.one_le_iff_ne_zero.1 hi.1) hi.2)
         rw [Nat.sub_one_add_one <| Nat.one_le_iff_ne_zero.1 hi.1] at h₃''
-        exact le_of_lt h₃''
+        exact h₃''.le
       have h₃''' : ∀ (hi' : I.left ≠ (func i).val) (z : ℒ) (hz : (func i).val < z ∧
           z ≤ (func (i - 1)).val), ¬ μ.A ⟨I.left, z, lt_of_le_of_lt (func i).prop.1 hz.1⟩ ≥
           μ.A ⟨I.left, (func (i - 1 + 1)).val, lt_of_le_of_ne ((func (i - 1 + 1)).prop).1
@@ -316,7 +316,7 @@ lemma breakpoints_nonempty [hμDCC : μ.ADCC] (hμcvx : μ.IsConvexOn I) :
     intro y hyI hy
     by_contra!
     exact breakpointAux_defprop3 μ I hμDCC y ⟨lt_of_le_of_ne hyI.1 hy,
-      h₄ y hyI hy (le_of_lt this) (len - 1) le_rfl⟩ this
+      h₄ y hyI hy this.le (len - 1) le_rfl⟩ this
 
 end Recursion
 

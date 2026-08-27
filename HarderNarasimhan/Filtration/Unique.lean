@@ -104,17 +104,17 @@ private theorem eq_hnFiltration (F : μ.HarderNarasimhanFiltration) : F = μ.hnF
       have h₆ : μ.A ⟨μ.hnFiltration n, μ.hnFiltration (n + 1), h₃⟩ ≤
           μ.A ⟨F (i - 1), μ.hnFiltration (n + 1) ⊔ F (i - 1), right_lt_sup.2 h₄⟩ :=
         hμcvx.A_le_A_sup (StrictIntvl.mem_top (μ.hnFiltration (n + 1)))
-          (StrictIntvl.mem_top (F (i - 1))) h₄ (le_inf (le_of_lt h₃) h₁₃)
+          (StrictIntvl.mem_top (F (i - 1))) h₄ (le_inf h₃.le h₁₃)
       have h₇ : F (i - 1) < F i := hfsi (i - 1) i (Nat.sub_one_lt h₉.ne') hile
       have h₁₀ : μ.A ⟨μ.hnFiltration n, μ.hnFiltration (n + 1), h₃⟩ ≤
           μ.A ⟨F (i - 1), F i, h₇⟩ := by
         have h₁₁ := hbp (i - 1) h₈
         simp only [Nat.sub_one_add_one h₉.ne'] at h₁₁
         exact le_trans h₆ <| le_of_not_gt (h₁₁.not_lt (μ.hnFiltration (n + 1) ⊔ F (i - 1))
-          ⟨le_sup_right, sup_le_iff.2 ⟨(Nat.find_spec h₂).2, le_of_lt h₇⟩⟩
+          ⟨le_sup_right, sup_le_iff.2 ⟨(Nat.find_spec h₂).2, h₇.le⟩⟩
           <| ne_of_lt <| right_lt_sup.2 h₄)
       have hspec := mem_breakpoints.1
-        (hnFiltration_succ_isGreatest_breakpoints (ne_of_lt (lt_of_lt_of_le h₃ le_top))).1
+        (hnFiltration_succ_isGreatest_breakpoints (h₃.trans_le le_top).ne).1
       have h₁₂ : i = n + 1 := by
         refine eq_of_le_of_not_lt' h₁₅ ?_
         by_contra! hlt
@@ -122,17 +122,17 @@ private theorem eq_hnFiltration (F : μ.HarderNarasimhanFiltration) : F = μ.hnF
           hn.ge.trans_lt (hfsi n (n + 1) (lt_add_one n) h₁)
         have h₁₃' := hmua n (i - 1) (Nat.lt_sub_of_add_lt hlt) h₈
         simp only [hn, Nat.sub_one_add_one h₉.ne', gt_iff_lt] at h₁₃'
-        exact hspec.not_lt (F (n + 1)) ⟨le_of_lt hlt', le_top⟩ (ne_of_lt hlt')
-          (lt_of_le_of_lt h₁₀ h₁₃')
+        exact hspec.not_lt (F (n + 1)) ⟨hlt'.le, le_top⟩ hlt'.ne
+          (h₁₀.trans_lt h₁₃')
       have h₁₄ := le_of_le_of_eq (Nat.find_spec h₂).2 (congrArg (⇑F) h₁₂)
-      have h₁₉ : μ.hnFiltration n < F (n + 1) := lt_of_lt_of_le h₃ h₁₄
+      have h₁₉ : μ.hnFiltration n < F (n + 1) := h₃.trans_le h₁₄
       have h₁₆ : F n < μ.hnFiltration (n + 1) := hn.le.trans_lt h₃
       have h₁₇ := le_of_not_gt <| (hbp n h₁).not_lt (μ.hnFiltration (n + 1))
-        ⟨le_of_lt h₁₆, h₁₄⟩ <| ne_of_lt h₁₆
+        ⟨h₁₆.le, h₁₄⟩ <| h₁₆.ne
       simp only [hn] at h₁₇
-      exact eq_of_le_of_ge (hspec.le_of_eq (F (n + 1)) ⟨le_of_lt h₁₉, le_top⟩ (ne_of_lt h₁₉)
-        (eq_of_le_of_not_lt h₁₇ <| hspec.not_lt (F (n + 1)) ⟨le_of_lt h₁₉, le_top⟩ <|
-          ne_of_lt h₁₉).symm) h₁₄
+      exact eq_of_le_of_ge (hspec.le_of_eq (F (n + 1)) ⟨h₁₉.le, le_top⟩ h₁₉.ne
+        (eq_of_le_of_not_lt h₁₇ <| hspec.not_lt (F (n + 1)) ⟨h₁₉.le, le_top⟩
+          h₁₉.ne).symm) h₁₄
     · apply Nat.gt_of_not_le at h₁
       rw [F.eq_top_of_length_le (Nat.le_of_succ_le h₁), eq_comm]
       rw [F.eq_top_of_length_le (Nat.le_of_lt_succ h₁)] at hn
@@ -284,7 +284,7 @@ theorem existsUnique_relSeries_semistableRel (μ : PayoffFunction ℒ S)
       · if hx : (x : ℕ) ≤ F2.length then
           simp only [hx, ↓reduceIte]
           congr
-          refine Fin.eq_of_val_eq <| Eq.symm (Fin.val_cast_of_lt ?_)
+          refine Fin.eq_of_val_eq <| (Fin.val_cast_of_lt ?_).symm
           exact Nat.lt_add_one_of_le hx
         else
           simp only [hx, ↓reduceIte]

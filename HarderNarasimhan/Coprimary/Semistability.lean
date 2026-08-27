@@ -165,7 +165,7 @@ lemma map_comap_ne_bot {N₁ N₂ W : Submodule R M} (h₁ : N₁ ≤ W) (h₂ :
 the submodule correspondence. -/
 private lemma subquotientAssociatedPrimes_eq_quotient {N₁ N₂ W : Submodule R M}
     (h₁ : N₁ ≤ W) (h₂ : W ≤ N₂) (h₃ : W ≠ N₁) :
-    subquotientAssociatedPrimes ⟨N₁, W, lt_of_le_of_ne h₁ (Ne.symm h₃)⟩ =
+    subquotientAssociatedPrimes ⟨N₁, W, h₁.lt_of_ne' h₃⟩ =
       subquotientAssociatedPrimes (M := ↥N₂ ⧸ N₁.submoduleOf N₂)
         ⟨⊥, Submodule.map (N₁.submoduleOf N₂).mkQ (Submodule.comap N₂.subtype W),
           bot_lt_iff_ne_bot.mpr <| map_comap_ne_bot h₁ h₂ h₃⟩ := by
@@ -471,7 +471,7 @@ image of `W`.  This is the value-level translation between the restricted game a
 on the subquotient. -/
 lemma A_restrict_eq_quotient {N₁ N₂ W : Submodule R M} (h₁ : N₁ ≤ W) (h₂ : W ≤ N₂)
     (h₃ : W ≠ N₁) :
-    (payoff R M).A ⟨N₁, W, lt_of_le_of_ne h₁ (Ne.symm h₃)⟩ =
+    (payoff R M).A ⟨N₁, W, h₁.lt_of_ne' h₃⟩ =
       (payoff R (↥N₂ ⧸ N₁.submoduleOf N₂)).A
         ⟨⊥, Submodule.map (N₁.submoduleOf N₂).mkQ (Submodule.comap N₂.subtype W),
           bot_lt_iff_ne_bot.mpr <| map_comap_ne_bot h₁ h₂ h₃⟩ := by
@@ -494,18 +494,18 @@ lemma isSemistable_restrict_iff_quotient (N₁ N₂ : Submodule R M) (hN : N₁ 
     refine { not_lt := ?_ }
     intro X hX
     have hres := h.not_lt
-      ⟨liftQuot N₁ N₂ X, liftQuot_middle N₁ N₂ (le_of_lt hN) X⟩
+      ⟨liftQuot N₁ N₂ X, liftQuot_middle N₁ N₂ hN.le X⟩
       (bot_lt_iff_ne_bot.2 fun hc ↦
         liftQuot_ne_left N₁ N₂ X hX.ne' (Subtype.coe_inj.mpr hc))
-    have hmid := liftQuot_middle N₁ N₂ (le_of_lt hN) X
+    have hmid := liftQuot_middle N₁ N₂ hN.le X
     have hneq : liftQuot N₁ N₂ X ≠ N₁ := liftQuot_ne_left N₁ N₂ X hX.ne'
     have hres' :
         ¬ (payoff R M).A ⟨N₁, N₂, hN⟩ <
-          (payoff R M).A ⟨N₁, liftQuot N₁ N₂ X, lt_of_le_of_ne hmid.1 hneq.symm⟩ := by
+          (payoff R M).A ⟨N₁, liftQuot N₁ N₂ X, hmid.1.lt_of_ne' hneq⟩ := by
       simp only [PayoffFunction.A_restrict_apply] at hres
       exact hres
     rw [A_restrict_eq_quotient hmid.1 hmid.2 hneq,
-      A_restrict_eq_quotient (le_of_lt hN) le_rfl hN.ne.symm] at hres'
+      A_restrict_eq_quotient hN.le le_rfl hN.ne'] at hres'
     simpa [liftQuot, Submodule.comap_map_eq, Submodule.ker_subtype,
       Submodule.map_comap_eq_self, Submodule.range_mkQ] using hres'
   · intro h
@@ -518,11 +518,11 @@ lemma isSemistable_restrict_iff_quotient (N₁ N₂ : Submodule R M) (hN : N₁ 
       (bot_lt_iff_ne_bot.2 <| map_comap_ne_bot W.prop.1 W.prop.2 hW')
     have hquot' :
         ¬ (payoff R M).A ⟨N₁, N₂, hN⟩ <
-          (payoff R M).A ⟨N₁, W.val, lt_of_le_of_ne W.prop.1 hW'.symm⟩ := by
+          (payoff R M).A ⟨N₁, W.val, W.prop.1.lt_of_ne' hW'⟩ := by
       simpa [A_restrict_eq_quotient (N₁ := N₁) (N₂ := N₂) (W := W.val)
           W.prop.1 W.prop.2 hW',
         A_restrict_eq_quotient (N₁ := N₁) (N₂ := N₂) (W := N₂)
-          (le_of_lt hN) le_rfl hN.ne.symm,
+          hN.le le_rfl hN.ne',
         Submodule.comap_top, Submodule.map_top, Submodule.range_mkQ] using hquot
     simp only [PayoffFunction.A_restrict_apply]
     exact hquot'

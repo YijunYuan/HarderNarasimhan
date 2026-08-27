@@ -114,7 +114,7 @@ private lemma subseqIdx.const_between (f : ℕ → ℒ) (atf : ∃ k, f k = ⊥)
     intro hlt
     by_cases hm : m = subseqIdx f atf hf i
     · simp [hm] at hlt
-    · have hm' : subseqIdx f atf hf i < m := lt_of_le_of_ne hleft fun hm' ↦ hm hm'.symm
+    · have hm' : subseqIdx f atf hf i < m := hleft.lt_of_ne fun hm' ↦ hm hm'.symm
       have hfind := Nat.find_min' (subseqIdx.next_exists f atf hf i hbot) ⟨hm', hlt⟩
       omega
 
@@ -169,7 +169,7 @@ private lemma subseqLen_ne_of_plateau (f : ℕ → ℒ) (atf : ∃ k, f k = ⊥)
     else
       refine ⟨subseqIdx f atf hf t, ?_, rfl⟩
       by_contra hlt
-      exact hcond <| le_bot_iff.mp <| hk ▸ hf (le_of_lt (lt_of_not_ge hlt))
+      exact hcond <| le_bot_iff.mp <| hk ▸ hf (lt_of_not_ge hlt).le
   let Φ : Fin (A + 1) → 𝒮 := fun d ↦
     let l := (helper d).choose
     let hl := (helper d).choose_spec
@@ -389,7 +389,7 @@ private lemma length_le_of_exists_length_le (n : ℕ) :
             by_contra hc
             exact hjbot (hc ▸ JHy.apply_length).symm
           rw [← hA_eq_tot JHx (lenx - 1) (by omega), ← t2]
-          exact Eq.symm (min_self (μ ⊤))
+          exact (min_self (μ ⊤)).symm
       have tj1 := hj' j hjy.le
       have hkey := tj1 ▸ ((hsl.seesaw_total_eq_right_iff
         (lt_of_lt_of_le hx0_bot le_sup_left) hfj).2 <| tj1 ▸ hj' (j + 1) hjy)
@@ -527,13 +527,13 @@ private lemma length_le_of_exists_length_le (n : ℕ) :
         strictAntiOn := by
           intro i _ j hj hij
           rw [Set.mem_Iic] at hj
-          simp only [JHfun, hj, le_of_lt (lt_of_lt_of_le hij hj), ↓reduceDIte]
+          simp only [JHfun, hj, (hij.trans_le hj).le, ↓reduceDIte]
           exact Subtype.coe_lt_coe.1 (JHx.apply_lt_apply hij (hj.trans (Nat.sub_le lenx 1)))
         step_payoff_eq := by
           intro k1 hk1
           simp only [restrict_apply, JHfun]
           have hk1' : k1 + 1 ≤ lenx - 1 := hk1
-          simp only [le_of_lt hk1, ↓reduceDIte, hk1']
+          simp only [hk1.le, ↓reduceDIte, hk1']
           exact (JHx.step_payoff (Nat.lt_of_lt_pred hk1)).trans hstepx0.symm
         payoff_lt_of_between := by
           intro i hi z hz hz'
@@ -542,10 +542,10 @@ private lemma length_le_of_exists_length_le (n : ℕ) :
             simp only [JHfun, hi', ↓reduceDIte] at hz
             exact hz
           have htemp2 : z.val < JHx i := by
-            simp only [JHfun, le_of_lt hi, ↓reduceDIte] at hz'
+            simp only [JHfun, hi.le, ↓reduceDIte] at hz'
             exact hz'
           simp only [restrict_apply, JHfun]
-          simp only [hi', ↓reduceDIte, le_of_lt hi, gt_iff_lt]
+          simp only [hi', ↓reduceDIte, hi.le, gt_iff_lt]
           exact JHx.payoff_lt (Nat.lt_of_lt_pred hi) htemp htemp2 }
     have hres_ss : (μ.restrict Ires).IsSemistable := isSemistable_restrict_last JHx nt
     exact Nat.le_add_of_sub_le (hn (μ := μ.restrict Ires)

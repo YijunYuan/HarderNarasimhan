@@ -101,9 +101,9 @@ private lemma JHFil_step_payoff_eq_tot :
     · simp only [this, ↓reduceDIte]
       let minTop := hacc.wf.has_min _ this
       have this' := minTop.choose_spec.1.2.2
-      exact ((Or.resolve_left <| (Or.resolve_left <|
-        hsl.seesaw minTop.choose_spec.1.choose minTop.choose_spec.1.out.choose_spec.1)
-        (by aesop)) (by aesop)).2.symm
+      exact (((hsl.seesaw minTop.choose_spec.1.choose
+        minTop.choose_spec.1.out.choose_spec.1).resolve_left (by aesop)).resolve_left
+        (by aesop)).2.symm
     · simp only [this, ↓reduceDIte]
       rfl
   | succ k hk =>
@@ -131,9 +131,8 @@ private lemma JHFil_step_payoff_eq_tot :
       have hfinal : μ ⟨⊥, JHFil μ (k + 1), hk'⟩ =
           μ ⟨min2.choose, JHFil μ (k + 1),
             min2.choose_spec.1.out.choose_spec.1⟩ := by
-        refine (Or.resolve_left ((Or.resolve_left <|
-          hsl.seesaw min2.choose_spec.1.out.choose min2.choose_spec.1.out.choose_spec.1)
-          (?_)) (?_)).2
+        refine (((hsl.seesaw min2.choose_spec.1.out.choose
+          min2.choose_spec.1.out.choose_spec.1).resolve_left ?_).resolve_left ?_).2
         · apply not_and_iff_not_or_not.2
           refine Or.inl ?_
           simp only [smart]
@@ -195,10 +194,9 @@ private lemma JHFil_step_payoff_eq_tot :
         simp only [JHFil, jh_kp1_ntop]
         simp only [↓reduceDIte, exists_and_left, Set.mem_ofPred_eq, and_imp,
           forall_exists_index]
-      exact ((Or.resolve_left <| (Or.resolve_left <| hsl.seesaw hk' this)
-        (fun this_1 ↦ ne_of_lt
-        (lt_trans this_1.left this_1.right) this'')) (fun this_1 ↦ ne_of_lt
-        (gt_trans this_1.1 this_1.2) (Eq.symm this''))).1
+      exact (((hsl.seesaw hk' this).resolve_left
+        (fun this_1 ↦ (this_1.left.trans this_1.right).ne this'')).resolve_left
+        (fun this_1 ↦ (this_1.2.trans this_1.1).ne this''.symm)).1
 
 variable [hftp : μ.FiniteTotalPayoff] [hdc : μ.EventuallyTopDCC]
 
@@ -254,10 +252,10 @@ private lemma JHFil_refine_lt_step_payoff :
       simp only [↓reduceDIte, exists_and_left, Set.mem_ofPred_eq, and_imp,
         forall_exists_index] at hfp1bot
       simp only [exists_and_left, Set.mem_ofPred_eq, and_imp, forall_exists_index] at this
-      exact (ne_of_lt this) hfp1bot.symm
+      exact this.ne hfp1bot.symm
     replace this := Set.eq_empty_iff_forall_notMem.1 (Set.not_nonempty_iff_eq_empty.1 this) z
     simp only [exists_and_left, Set.mem_ofPred_eq, not_and, not_exists] at this
-    replace := lt_of_le_of_ne this_q <| this h'' (lt_of_le_of_lt bot_le h')
+    replace := this_q.lt_of_ne <| this h'' (lt_of_le_of_lt bot_le h')
     by_cases hk' : k = 0
     · simpa only [hk', JHFil]
     · conv_rhs =>
@@ -277,7 +275,7 @@ private lemma JHFil_refine_lt_step_payoff :
       simpa only [exists_and_left, Set.mem_ofPred_eq,
         gt_iff_lt, and_imp, forall_exists_index] using this
   · have h''' : μ ⟨⊥, z, lt_of_le_of_lt bot_le h'⟩ < μ ⊤ := by
-      refine lt_of_le_of_ne this_q ?_
+      refine this_q.lt_of_ne ?_
       by_contra!
       by_cases hne : {p | ∃ (h : ⊥ < p), p < JHFil μ k ∧
           μ ⟨⊥, p, h⟩ = μ ⊤}.Nonempty
@@ -298,10 +296,10 @@ private lemma JHFil_refine_lt_step_payoff :
         exact this.symm
       · simp only [JHFil, hne] at hfp1bot
         simp only [↓reduceDIte, not_true_eq_false] at hfp1bot
-    exact (JHFil_step_payoff_eq_tot μ k hk).symm ▸ lt_trans ((Or.resolve_right <|
-      (Or.resolve_left <| hsl.seesaw (bot_lt_iff_ne_bot.2 hfp1bot) h')
-      (not_and_iff_not_or_not.2 <| Or.inl <| not_lt_of_gt <|
-      h'''' ▸ h''')) (not_and_iff_not_or_not.2 <| Or.inl <| ne_of_gt <| h'''' ▸ h''')).2 h'''
+    exact (JHFil_step_payoff_eq_tot μ k hk).symm ▸ (((hsl.seesaw
+      (bot_lt_iff_ne_bot.2 hfp1bot) h').resolve_left
+      (not_and_iff_not_or_not.2 <| Or.inl <| not_lt_of_gt <| h'''' ▸ h''')).resolve_right
+      (not_and_iff_not_or_not.2 <| Or.inl <| ne_of_gt <| h'''' ▸ h''')).2.trans h'''
 
 /-- Existence of a Jordan–Hölder filtration: the greedy construction `JHFil` packages into
 a `JordanHolderFiltration`.  In contrast to the Harder–Narasimhan filtration, a

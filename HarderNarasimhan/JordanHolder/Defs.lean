@@ -277,7 +277,7 @@ lemma payoff_bot_eq_top_payoff (F : μ.JordanHolderFiltration) (i : ℕ) (hi : i
   | zero => simp only [apply_zero, StrictIntvl.mk_bot_top]
   | succ i ih =>
     refine (hsl.seesaw_total_eq_right_iff (F.bot_lt_of_lt hi)
-      (F.apply_lt_top (Nat.zero_lt_succ i) (le_of_lt hi))).1 ?_
+      (F.apply_lt_top (Nat.zero_lt_succ i) hi.le)).1 ?_
     simp only [StrictIntvl.mk_bot_top]
     rw [← F.step_payoff (Nat.lt_of_succ_lt hi)]
     if htop : F i = ⊤ then

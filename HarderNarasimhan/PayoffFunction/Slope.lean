@@ -35,6 +35,8 @@ zero receive the “infinite slope” `⊤`.
 
 @[expose] public section
 
+open scoped NNReal
+
 namespace HarderNarasimhan
 
 /-- In a nontrivial linearly ordered additive group, the principal cut of any element is
@@ -54,21 +56,21 @@ variable {V : Type*} [AddCommGroup V] [Module ℝ V] [LinearOrder V] [IsOrderedA
 degree `d`: an interval `I` with `r I > 0` receives the quotient `(r I)⁻¹ • d I` as a
 principal cut in the Dedekind–MacNeille completion, and an interval of rank zero receives
 `⊤` (“infinite slope”). -/
-noncomputable def slope (r : StrictIntvl ℒ → NNReal) (d : StrictIntvl ℒ → V) :
+noncomputable def slope (r : StrictIntvl ℒ → ℝ≥0) (d : StrictIntvl ℒ → V) :
     PayoffFunction ℒ (DedekindCut V) :=
   ⟨fun I ↦ if _ : 0 < r I then .principal ((r I)⁻¹ • d I) else ⊤⟩
 
 omit [IsOrderedAddMonoid V] [PosSMulStrictMono ℝ V] in
 /-- On an interval of positive rank, `slope r d` is the principal cut of a vector `v` with
 `r I • v = d I`. -/
-private lemma slope_pos {r : StrictIntvl ℒ → NNReal} {d : StrictIntvl ℒ → V}
+private lemma slope_pos {r : StrictIntvl ℒ → ℝ≥0} {d : StrictIntvl ℒ → V}
     {I : StrictIntvl ℒ} (h : 0 < r I) :
     ∃ v : V, slope r d I = DedekindCut.principal v ∧ r I • v = d I :=
   ⟨(r I)⁻¹ • d I, dif_pos h, smul_inv_smul₀ h.ne' (d I)⟩
 
 /-- The slope of an additive degree by an additive rank is slope-like, provided the degree
 is positive on intervals of rank zero. -/
-theorem isSlopeLike_slope [Nontrivial V] (r : StrictIntvl ℒ → NNReal) (d : StrictIntvl ℒ → V)
+theorem isSlopeLike_slope [Nontrivial V] (r : StrictIntvl ℒ → ℝ≥0) (d : StrictIntvl ℒ → V)
     (hd : ∀ (x y z : ℒ), (h₁ : x < y) → (h₂ : y < z) →
       d ⟨x, z, h₁.trans h₂⟩ = d ⟨x, y, h₁⟩ + d ⟨y, z, h₂⟩)
     (hr : ∀ (x y z : ℒ), (h₁ : x < y) → (h₂ : y < z) →
@@ -122,7 +124,7 @@ theorem isSlopeLike_slope [Nontrivial V] (r : StrictIntvl ℒ → NNReal) (d : S
             have h_eq := (add_right_inj _).mp key
             exact le_antisymm ((smul_le_smul_iff_of_pos_left hyz).1 h_eq.le)
               ((smul_le_smul_iff_of_pos_left hyz).1 h_eq.ge)
-          · have hs' : μxz < μxy := (not_lt.1 hs).lt_of_ne (Ne.symm hs')
+          · have hs' : μxz < μxy := (not_lt.1 hs).lt_of_ne' hs'
             exact Or.inr <| Or.inl ⟨hs', (smul_lt_smul_iff_of_pos_left hyz).1 <|
               (add_lt_add_iff_left <| r ⟨x, y, h₁⟩ • μxy).1 <| sub_lt_iff_lt_add.1 <|
               (eq_sub_of_add_eq key) ▸ (smul_lt_smul_iff_of_pos_left hxy).2 hs'⟩

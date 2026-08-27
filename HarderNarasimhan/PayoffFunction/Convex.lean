@@ -234,7 +234,7 @@ lemma IsConvexOn.A_eq_or_lt (hμcvx : μ.IsConvexOn I) {x y z : ℒ}
         fun hle ↦ h₃ (hμcvx.A_eq_of_ge hxI hyI hzI h₁ h₂ hle)
       exact Or.inr ⟨hμcvx.A_le_A_of_lt hxI hyI hzI h₁ h₂
           (lt_of_le_not_ge (hc.resolve_right hne) hne),
-        lt_of_le_of_ne (A_anti_left μ h₁ h₂) (Ne.symm h₃)⟩
+        (A_anti_left μ h₁ h₂).lt_of_ne' h₃⟩
   · rcases hatt with ⟨a, ha, hres⟩
     refine or_iff_not_imp_left.2 fun hnot ↦ ?_
     have hya : ¬ y ≤ a := fun hcontra ↦ hnot <|
@@ -242,7 +242,7 @@ lemma IsConvexOn.A_eq_or_lt (hμcvx : μ.IsConvexOn I) {x y z : ℒ}
     exact ⟨hres ▸ (le_trans (A_le_max_inf μ hya (le_inf h₁.le ha.1)) <|
         hμcvx.max_inf_le_max hyI ⟨le_trans hxI.1 ha.1, le_trans ha.2.le hzI.2⟩ hya
           (sup_le h₂.le ha.2.le)),
-      lt_of_le_of_ne (A_anti_left μ h₁ h₂) (Ne.symm hnot)⟩
+      (A_anti_left μ h₁ h₂).lt_of_ne' hnot⟩
 
 /-- In a complete linear order, a strict improvement of the first-player value on the left
 initial segment forces the value on the complementary segment to equal the global value. -/

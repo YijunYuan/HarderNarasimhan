@@ -122,7 +122,7 @@ private lemma min_eq_max_of_max_eq
   by_cases hbot : b = ⊥
   · subst hbot
     exact le_rfl
-  refine Or.resolve_left (h b ⟨hbot, hb.2.ne⟩) (not_not.2 ?_)
+  refine (h b ⟨hbot, hb.2.ne⟩).resolve_left (not_not.2 ?_)
   exact h' ▸ le_iSup₂_of_le b ⟨bot_lt_iff_ne_bot.2 hbot, le_top⟩ le_rfl
 
 private lemma max_eq_min_of_min_eq
@@ -133,7 +133,7 @@ private lemma max_eq_min_of_min_eq
   by_cases htop : b = ⊤
   · subst htop
     exact le_rfl
-  refine Or.resolve_right (h b ⟨hb.1.ne', htop⟩) (not_not.2 ?_)
+  refine (h b ⟨hb.1.ne', htop⟩).resolve_right (not_not.2 ?_)
   exact h' ▸ iInf₂_le b ⟨bot_le, lt_top_iff_ne_top.2 htop⟩
 
 section SlopeLike
@@ -197,7 +197,7 @@ theorem IsSemistable.B_top_le_A_top {S : Type*} [CompleteLinearOrder S]
     {μ : PayoffFunction ℒ S} (hμ : μ.IsSemistable) : μ.B ⊤ ≤ μ.A ⊤ := by
   rw [isSemistable_iff_isBreakpoint_top] at hμ
   have hstep : ∀ (x : ℒ) (hx : ⊥ < x), μ.A ⟨⊥, x, hx⟩ ≤ μ.A ⊤ := fun x hx ↦
-    le_of_not_gt <| hμ.not_lt x (StrictIntvl.mem_top x) (Ne.symm <| bot_lt_iff_ne_bot.1 hx)
+    le_of_not_gt <| hμ.not_lt x (StrictIntvl.mem_top x) hx.ne
   refine iSup₂_le fun x hx ↦ le_trans ?_ (hstep x hx.1)
   exact le_iInf₂ fun y hy ↦ iInf₂_le_of_le y hy (apply_le_max (I := ⟨y, x, hy.2⟩))
 
@@ -212,9 +212,9 @@ theorem IsSemistable.hasNashEquilibrium {S : Type*} [CompleteLinearOrder S]
 satisfies the hypotheses computing player A's value. -/
 theorem isSemistable_of_hasNashEquilibrium {S : Type*} [CompleteLattice S]
     {μ : PayoffFunction ℒ S}
-    (h₁ : ∀ x : ℒ, (hx : x ≠ ⊥) → ((μ.restrict ⟨⊥, x, bot_lt_iff_ne_bot.2 hx⟩)).WeakACC)
+    (h₁ : ∀ x : ℒ, (hx : x ≠ ⊥) → (μ.restrict ⟨⊥, x, bot_lt_iff_ne_bot.2 hx⟩).WeakACC)
     (h₂ : ∀ x : ℒ, (hx : x ≠ ⊥) →
-      ((μ.restrict ⟨⊥, x, bot_lt_iff_ne_bot.2 hx⟩)).WeakSlopeLikeAtTop)
+      (μ.restrict ⟨⊥, x, bot_lt_iff_ne_bot.2 hx⟩).WeakSlopeLikeAtTop)
     (h : μ.HasNashEquilibrium) : μ.IsSemistable := by
   have h := h.eq
   have key : ∀ (x : ℒ) (hx : ⊥ < x), μ.A ⟨⊥, x, hx⟩ = μ.min ⟨⊥, x, hx⟩ := by

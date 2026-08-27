@@ -85,12 +85,12 @@ theorem isSlopeLike_iff_seesaw :
   · intro sl x y z h₁ h₂
     have sl := sl.slopelike x y z ⟨h₁, h₂⟩
     by_cases h' : μ ⟨x, y, h₁⟩ < μ ⟨x, z, h₁.trans h₂⟩
-    · exact Or.inl ⟨h', Or.resolve_left sl.2.2.2 (not_le_of_gt h')⟩
+    · exact Or.inl ⟨h', sl.2.2.2.resolve_left (not_le_of_gt h')⟩
     · by_cases h'' : μ ⟨x, z, h₁.trans h₂⟩ < μ ⟨x, y, h₁⟩
-      · exact Or.inr <| Or.inl ⟨h'', Or.resolve_left sl.1 (not_le_of_gt h'')⟩
-      · have h₃ := not_lt_of_ge <| Or.resolve_left sl.2.1 h'
-        exact Or.inr <| Or.inr ⟨(eq_of_le_of_not_lt (Or.resolve_right sl.2.2.2 h₃) h'').symm,
-          eq_of_le_of_not_lt (Or.resolve_left sl.2.2.1 h'') h₃⟩
+      · exact Or.inr <| Or.inl ⟨h'', sl.1.resolve_left (not_le_of_gt h'')⟩
+      · have h₃ := not_lt_of_ge <| sl.2.1.resolve_left h'
+        exact Or.inr <| Or.inr ⟨(eq_of_le_of_not_lt (sl.2.2.2.resolve_right h₃) h'').symm,
+          eq_of_le_of_not_lt (sl.2.2.1.resolve_left h'') h₃⟩
   · intro seesaw
     refine ⟨fun x y z h ↦ ?_⟩
     rcases seesaw x y z h.1 h.2 with ⟨h1, h2⟩ | ⟨h1, h2⟩ | ⟨h1, h2⟩
