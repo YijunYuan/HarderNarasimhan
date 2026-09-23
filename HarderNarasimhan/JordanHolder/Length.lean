@@ -12,24 +12,19 @@ public import Mathlib.SetTheory.Cardinal.NatCard
 /-!
 # Uniqueness of the length of Jordan–Hölder filtrations
 
-This file proves that over a *modular* lattice, all Jordan–Hölder filtrations of an affine
-payoff function have the same length (`JordanHolderFiltration.length_eq`).
+For a semistable slope-like affine payoff function on a modular lattice with values in a
+complete linear order, any two Jordan–Hölder filtrations have the same length, under the chain
+conditions and finite total payoff hypothesis used in `HarderNarasimhan/JordanHolder/Exists.lean`.
 
-The proof is by induction on the length: given a filtration `F` of length `≤ n + 1` and any
-other filtration `G`, one restricts to the top interval `(G (G.length - 1), ⊤)`, pushes `F`
-into it by joining with `G (G.length - 1)`, and normalises the resulting eventually-bottom
-antitone chain to a strictly decreasing one.  Modularity and affinity make the normalised
-chain a Jordan–Hölder filtration of the restricted payoff function of *strictly smaller*
-length, which lets the induction hypothesis apply.
-
-The normalisation machinery (`subseqIdx` and friends) is a general device for converting an
-antitone chain `ℕ → ℒ` that eventually reaches `⊥` into the strictly decreasing chain of
-its jump values; it is kept `private` to this file.
+The proof compares two filtrations after restricting to the interval from the last
+nonbottom term of one filtration to `⊤`. Joining the other filtration with this term
+preserves the payoff conditions on its strict steps and introduces a repeated value.
+Removing repeated values gives a shorter filtration, to which induction applies.
 
 ## Main results
 
-* `JordanHolderFiltration.length_eq` : over a modular lattice, any two Jordan–Hölder
-  filtrations of `μ` have the same length.
+* `HarderNarasimhan.PayoffFunction.JordanHolderFiltration.length_eq`: any two
+  Jordan–Hölder filtrations have the same length.
 
 ## References
 
@@ -42,11 +37,12 @@ namespace HarderNarasimhan
 
 namespace PayoffFunction
 
-/-! ### Normalising an eventually-bottom antitone chain
+/-!
+### Removing repeated values from an antitone chain
 
-`subseqIdx f atf hf` greedily selects the indices at which the antitone chain `f` strictly
-drops, producing a strictly decreasing subchain that reaches `⊥` after `subseqLen f atf hf`
-steps.  All of this machinery is internal to the length-uniqueness proof. -/
+An antitone chain that reaches `⊥` has only finitely many distinct values. Selecting the
+first index of each new value gives a strictly decreasing chain with the same strict steps.
+-/
 
 section SubseqIdx
 
@@ -62,9 +58,8 @@ private lemma exists_next_lt (f : ℕ → ℒ) (atf : ∃ k, f k = ⊥) (hf : An
   simpa [hm] using bot_lt_iff_ne_bot.2 hcond
 
 open Classical in
-/-- The greedy index sequence underlying the normalised subchain: if the currently selected
-value is `⊥`, advance by one (to keep a genuine map `ℕ → ℕ`); otherwise jump to the first
-later index where the value drops strictly. -/
+/-- The indices of the first occurrences of successive distinct values of `f`.
+After the selected value reaches `⊥`, the indices increase by one at each step. -/
 private noncomputable def subseqIdx (f : ℕ → ℒ) (atf : ∃ k, f k = ⊥) (hf : Antitone f) :
     ℕ → ℕ
   | 0 => 0
@@ -72,8 +67,7 @@ private noncomputable def subseqIdx (f : ℕ → ℒ) (atf : ∃ k, f k = ⊥) (
       if hcond : f (subseqIdx f atf hf t) = ⊥ then subseqIdx f atf hf t + 1
       else Nat.find (exists_next_lt f atf hf (subseqIdx f atf hf t) hcond)
 
-/-- The witness that, as long as the current selected value is not `⊥`, there is a later
-index where `f` drops strictly. -/
+/-- A selected value above `⊥` is followed by a strictly smaller value. -/
 private lemma subseqIdx.next_exists (f : ℕ → ℒ) (atf : ∃ k, f k = ⊥) (hf : Antitone f)
     (t : ℕ) (hcond : f (subseqIdx f atf hf t) ≠ ⊥) :
     ∃ k : ℕ, subseqIdx f atf hf t < k ∧ f k < f (subseqIdx f atf hf t) :=
@@ -98,8 +92,7 @@ private lemma subseqIdx.ge_self (f : ℕ → ℒ) (atf : ∃ k, f k = ⊥) (hf :
   (strictMono_nat_of_lt_succ (subseqIdx.lt_succ f atf hf)).id_le
 
 open Classical in
-/-- Between two consecutive selected indices, the chain is constant.  (The `Nat.find` calls
-below need `Classical` decidability, as in the definition of `subseqIdx`.) -/
+/-- Between two consecutive selected indices, the chain is constant. -/
 private lemma subseqIdx.const_between (f : ℕ → ℒ) (atf : ∃ k, f k = ⊥) (hf : Antitone f)
     (i m : ℕ) (hleft : subseqIdx f atf hf i ≤ m) (hright : m < subseqIdx f atf hf (i + 1)) :
     f m = f (subseqIdx f atf hf i) := by
@@ -152,9 +145,8 @@ private lemma subseqIdx_strictAnti (f : ℕ → ℒ) (atf : ∃ k, f k = ⊥) (h
   exact (Nat.find_spec (subseqIdx.next_exists f atf hf i hbot)).2
 
 open Classical in
-/-- If the chain has a plateau strictly before it reaches `⊥` at index `k`, then the number
-of strict drops is not `k`: there are strictly fewer distinct values than indices.  The
-proof is a counting argument on the image set `{f t | t ≤ k}`. -/
+/-- If `f k = ⊥` and two consecutive values up to index `k` coincide, then the number of
+strict drops differs from `k`. -/
 private lemma subseqLen_ne_of_plateau (f : ℕ → ℒ) (atf : ∃ k, f k = ⊥) (hf : Antitone f)
     (k : ℕ) (hk : f k = ⊥) (htech : ∃ N : ℕ, N + 1 ≤ k ∧ f N = f (N + 1)) :
     subseqLen f atf hf ≠ k := by
@@ -195,8 +187,8 @@ private lemma subseqLen_ne_of_plateau (f : ℕ → ℒ) (atf : ∃ k, f k = ⊥)
   exact ne_of_lt <| Nat.succ_lt_succ_iff.mp <| lt_of_le_of_lt ineq1 ineq2
 
 open Classical in
-/-- Transport a stepwise predicate from the strict steps of `f` to the strict steps of the
-normalised subchain. -/
+/-- A predicate holding on the strict steps of `f` also holds on the steps of the chain
+obtained by removing repeated values. -/
 private lemma subseqIdx_inherit_step_predicate (f : ℕ → ℒ) (atf : ∃ k, f k = ⊥)
     (hf : Antitone f) (P : StrictIntvl ℒ → Prop)
     (ho : ∀ i : ℕ, (hfi : f (i + 1) < f i) → P ⟨f (i + 1), f i, hfi⟩) :
@@ -265,9 +257,8 @@ section RestrictLast
 variable {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 variable {S : Type*} [CompleteLinearOrder S] {μ : PayoffFunction ℒ S}
 
-/-- The restriction of `μ` to the last-step top interval `(F (F.length - 1), ⊤)` of a
-Jordan–Hölder filtration is semistable: its payoff on initial segments is pinned to the
-total payoff by `payoff_bot_eq_top_payoff` and the seesaw property. -/
+/-- Restricting to the interval from the last nonbottom filtration term to `⊤` preserves
+semistability. -/
 private lemma isSemistable_restrict_last [μ.IsSlopeLike] [μ.IsSemistable]
     [μ.EventuallyTopDCC] (F : μ.JordanHolderFiltration) (h : F (F.length - 1) < ⊤) :
     (μ.restrict ⟨F (F.length - 1), ⊤, h⟩).IsSemistable := by
@@ -346,7 +337,7 @@ variable {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFo
 variable {S : Type*} [CompleteLinearOrder S] {μ : PayoffFunction ℒ S}
 variable [hsl : μ.IsSlopeLike] [hst : μ.IsSemistable] [μ.EventuallyTopDCC]
 
-/-- The first-player value below any nonbottom filtration term is the total payoff. -/
+/-- The `μ.A`-value below any nonbottom filtration term is the total payoff. -/
 private lemma A_bot_eq_top_payoff (F : μ.JordanHolderFiltration) (i : ℕ)
     (hi : i < F.length) : μ.A ⟨⊥, F i, F.bot_lt_of_lt hi⟩ = μ ⊤ := by
   have hpayoff := F.payoff_bot_eq_top_payoff i hi
@@ -366,8 +357,8 @@ private lemma A_bot_eq_top_payoff (F : μ.JordanHolderFiltration) (i : ℕ)
       _ = μ ⊤ := max_top_eq_apply_iff.2
         (min_top_eq_max_top_iff_hasNashEquilibrium.2 hst.hasNashEquilibrium)
 
-/-- Joining a nonbottom term of one filtration with a term of another preserves the
-payoff of the initial segment. Convexity supplies the lower bound; semistability the upper. -/
+/-- The interval from `⊥` to the join of a nonbottom filtration term with any term of
+another filtration has the total payoff. -/
 private lemma payoff_sup_eq_top_payoff [μ.IsConvex] (F G : μ.JordanHolderFiltration)
     (i : ℕ) (hi : i < F.length) (j : ℕ) :
     μ ⟨⊥, F i ⊔ G j, lt_of_lt_of_le (F.bot_lt_of_lt hi) le_sup_left⟩ = μ ⊤ := by
@@ -398,9 +389,8 @@ variable {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [hmod :
 variable {S : Type*} [CompleteLinearOrder S] {μ : PayoffFunction ℒ S}
 variable [hsl : μ.IsSlopeLike] [haff : μ.IsAffine]
 
-/-- A strict joined step with the total payoff remains stable. Modularity transports an
-intermediate point to a strict refinement of the original step, and affinity identifies
-its payoff. -/
+/-- Joining both endpoints of a step with a fixed element preserves the strict payoff
+inequality, provided the joined step is strict and has the total payoff. -/
 private lemma joined_step_stable (G : μ.JordanHolderFiltration) {x : ℒ} {j : ℕ}
     (hj : j < G.length) (hstep : x ⊔ G (j + 1) < x ⊔ G j)
     (hpayoff : μ ⟨x ⊔ G (j + 1), x ⊔ G j, hstep⟩ = μ ⊤)
@@ -439,8 +429,8 @@ variable {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 variable {S : Type*} [CompleteLinearOrder S] {μ : PayoffFunction ℒ S}
 variable [hsl : μ.IsSlopeLike] [haff : μ.IsAffine]
 
-/-- Joining with the last nonbottom term of `F` creates a plateau in `G`: the last
-term of `G` above that point agrees with the join of its successor. -/
+/-- Joining every term of `G` with the last nonbottom term of `F` gives two equal consecutive
+terms before `G` reaches `⊥`. -/
 private lemma exists_join_plateau (F G : μ.JordanHolderFiltration) :
     ∃ i : ℕ, i + 1 ≤ G.length ∧
       F (F.length - 1) ⊔ G i = F (F.length - 1) ⊔ G (i + 1) := by
@@ -495,8 +485,8 @@ variable [IsModularLattice ℒ]
 variable {S : Type*} [CompleteLinearOrder S] {μ : PayoffFunction ℒ S}
 variable [hsl : μ.IsSlopeLike] [μ.IsSemistable] [μ.EventuallyTopDCC] [μ.IsAffine]
 
-/-- Join `G` with the last nonbottom term of `F` and remove plateaus. The strict joined
-steps retain their payoff and stability, and the plateau forces a drop in length. -/
+/-- Joining `G` with the last nonbottom term of `F` and removing repeated values gives a
+shorter filtration of the restricted payoff function. -/
 private lemma exists_shorter_join_filtration (F G : μ.JordanHolderFiltration)
     (h : F (F.length - 1) < ⊤)
     (hpayoff : μ ⟨F (F.length - 1), ⊤, h⟩ = μ ⊤) :
@@ -543,10 +533,8 @@ private lemma exists_shorter_join_filtration (F G : μ.JordanHolderFiltration)
 end JoinFiltration
 
 open Classical in
-/-- The induction engine for length uniqueness: if some Jordan–Hölder filtration has length
-`≤ n`, then every Jordan–Hölder filtration has length `≤ n`.  The lattice is quantified
-inside the induction so that the induction hypothesis can be applied to the restriction of
-`μ` to a top interval. -/
+/-- If one Jordan–Hölder filtration has length at most `n`, then every Jordan–Hölder
+filtration has length at most `n`. -/
 private lemma length_le_of_exists_length_le (n : ℕ) :
     ∀ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
       [WellFoundedGT ℒ] [IsModularLattice ℒ]
@@ -593,9 +581,8 @@ variable {S : Type*} [CompleteLinearOrder S] {μ : PayoffFunction ℒ S}
 variable [μ.FiniteTotalPayoff] [μ.IsSlopeLike] [μ.IsSemistable]
 variable [μ.EventuallyTopDCC] [μ.IsAffine]
 
-/-- Over a modular lattice, any two Jordan–Hölder filtrations of an affine payoff function
-have the same length.  This is the analogue for the Harder–Narasimhan Games of the classical
-Jordan–Hölder uniqueness theorem. -/
+/-- Any two Jordan–Hölder filtrations of a semistable slope-like affine payoff function on a
+modular lattice have the same length. -/
 theorem JordanHolderFiltration.length_eq (F G : μ.JordanHolderFiltration) :
     F.length = G.length :=
   eq_of_le_of_ge

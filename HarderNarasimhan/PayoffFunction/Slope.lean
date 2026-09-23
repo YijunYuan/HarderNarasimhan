@@ -14,19 +14,14 @@ public import Mathlib.Order.Completion
 /-!
 # Slopes as payoff functions
 
-This file constructs the prototypical slope-like payoff function: the quotient
-`PayoffFunction.slope r d` of a vector-valued *degree* `d` by a nonnegative real *rank* `r`,
-with values in the Dedekind–MacNeille completion `DedekindCut V` so that intervals of rank
-zero receive the “infinite slope” `⊤`.
+Given a nonnegative real-valued rank `r` and a degree `d` in a linearly ordered real vector
+space, the slope of an interval `I` is `(r I)⁻¹ • d I` when `r I > 0` and `⊤` when `r I = 0`.
+We take values in the Dedekind–MacNeille completion `DedekindCut V`, which is a complete
+lattice and contains the finite slopes as principal cuts.
 
-## Main definitions
-
-* `PayoffFunction.slope r d` : the payoff `(r I)⁻¹ • d I` when `r I > 0`, and `⊤` otherwise.
-
-## Main results
-
-* `PayoffFunction.isSlopeLike_slope` : if `d` and `r` are additive on composable intervals
-  and `d` is positive on rank-zero intervals, then `slope r d` is slope-like.
+The main result, `HarderNarasimhan.PayoffFunction.isSlopeLike_slope`, shows that the slope
+is slope-like when rank and degree are additive on composable intervals and the degree is
+positive on intervals of rank zero.
 
 ## References
 
@@ -52,10 +47,8 @@ variable {ℒ : Type*} [PartialOrder ℒ]
 variable {V : Type*} [AddCommGroup V] [Module ℝ V] [LinearOrder V] [IsOrderedAddMonoid V]
   [PosSMulStrictMono ℝ V]
 
-/-- The *slope* payoff function of a nonnegative real-valued rank `r` and a vector-valued
-degree `d`: an interval `I` with `r I > 0` receives the quotient `(r I)⁻¹ • d I` as a
-principal cut in the Dedekind–MacNeille completion, and an interval of rank zero receives
-`⊤` (“infinite slope”). -/
+/-- The slope of a rank `r` and degree `d`, with values in the Dedekind–MacNeille completion.
+It is the principal cut of `(r I)⁻¹ • d I` when `r I > 0`, and `⊤` when `r I = 0`. -/
 noncomputable def slope (r : StrictIntvl ℒ → ℝ≥0) (d : StrictIntvl ℒ → V) :
     PayoffFunction ℒ (DedekindCut V) :=
   ⟨fun I ↦ if _ : 0 < r I then .principal ((r I)⁻¹ • d I) else ⊤⟩

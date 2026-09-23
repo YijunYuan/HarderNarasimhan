@@ -11,24 +11,21 @@ public import Mathlib.Order.RelSeries
 /-!
 # Existence of Jordan–Hölder filtrations
 
-This file constructs a Jordan–Hölder filtration of a semistable slope-like payoff function
-`μ` on a well-founded bounded lattice, under the standing hypotheses
-`μ.FiniteTotalPayoff` (nondegeneracy) and `μ.EventuallyTopDCC` (termination).
+A semistable slope-like payoff function with finite total payoff has a Jordan–Hölder
+filtration if it satisfies the eventually-`⊤` descending chain condition, its codomain is a
+complete linear order, and `>` is well-founded on the underlying nontrivial bounded lattice.
 
-The construction is greedy: starting from `⊤`, as long as the current term is not `⊥`, the
-next term is a minimal element among the points `p` strictly between `⊥` and the current
-term with `μ (⊥, p) = μ ⊤`.  Semistability and the seesaw property show that each step
-carries the total payoff and that minimality forces stability of the steps; the chain
-condition `μ.EventuallyTopDCC` forces the chain to reach `⊥` after finitely many steps.
-The existence result is exposed as a `Nonempty` instance (in contrast to the
-Harder–Narasimhan filtration, a Jordan–Hölder filtration is not unique, so there is no
-canonical choice).
+Starting from `⊤`, we choose a maximal point `p` strictly between `⊥` and the current term
+such that the interval from `⊥` to `p` has payoff `μ ⊤`. If no such point exists, the next
+term is `⊥`. Semistability, the seesaw property, and maximality give the required payoff
+conditions on each step. The chain condition and finite total payoff ensure termination.
+The maximal point need not be unique, so the construction can depend on the choices.
 
 ## Main results
 
-* `Nonempty (μ.JordanHolderFiltration)` : Jordan–Hölder filtrations exist.
-* `PayoffFunction.exists_relSeries_jordanHolderRel` : the `RelSeries` repackaging; a finite
-  chain for `μ.jordanHolderRel` from `⊤` to `⊥` exists.
+* A `Nonempty` instance for `μ.JordanHolderFiltration`.
+* `HarderNarasimhan.PayoffFunction.exists_relSeries_jordanHolderRel`: a finite series for
+  `μ.jordanHolderRel` from `⊤` to `⊥`.
 
 ## References
 
@@ -46,9 +43,11 @@ variable {S : Type*} [CompleteLinearOrder S] (μ : PayoffFunction ℒ S)
 
 omit [CompleteLinearOrder S] in
 open Classical in
-/-- The greedy chain underlying a Jordan–Hölder filtration.  At step `k + 1`, choose a
-minimal element among the points `p` strictly between `⊥` and the previous term with
-`μ (⊥, p) = μ ⊤`, falling back to `⊥` when there is none. -/
+/-- A chain starting at `⊤`, whose next term is a maximal point `p` strictly between `⊥` and
+the current term such that the interval from `⊥` to `p` has total payoff, or `⊥` if none exists.
+
+The choice uses well-foundedness of `>`: a minimal element for this relation is maximal in
+the lattice order. -/
 private noncomputable def JHFil (k : ℕ) : ℒ :=
   match k with
   | 0 => ⊤
@@ -60,7 +59,7 @@ private noncomputable def JHFil (k : ℕ) : ℒ :=
       ⊥
 
 omit [CompleteLinearOrder S] in
-/-- One-step strict decrease of `JHFil` above `⊥`, from minimality of the chosen element. -/
+/-- Each term above `⊥` is strictly greater than its successor. -/
 private lemma JHFil_anti_mono :
     ∀ k : ℕ, JHFil μ k > ⊥ → JHFil μ k > JHFil μ (k + 1) := by
   intro k hk
@@ -87,8 +86,7 @@ private lemma JHFil_antitone : Antitone (JHFil μ) :=
 variable [hsl : μ.IsSlopeLike]
 
 open Classical in
-/-- Each step of `JHFil` above `⊥` carries the total payoff `μ ⊤`, by the seesaw property
-and the defining choice of the next term. -/
+/-- Each step of the chain before it reaches `⊥` has the total payoff. -/
 private lemma JHFil_step_payoff_eq_tot :
     ∀ k : ℕ, (hk : JHFil μ k > ⊥) →
       μ ⟨JHFil μ (k + 1), JHFil μ k, JHFil_anti_mono μ k hk⟩ = μ ⊤ := by
@@ -117,9 +115,7 @@ private lemma JHFil_step_payoff_eq_tot :
 
 variable [hftp : μ.FiniteTotalPayoff] [hdc : μ.EventuallyTopDCC]
 
-/-- The chain `JHFil` reaches `⊥` in finitely many steps: otherwise `μ.EventuallyTopDCC`
-would produce a step of payoff `⊤`, contradicting `μ.FiniteTotalPayoff` via
-`JHFil_step_payoff_eq_tot`. -/
+/-- The chain reaches `⊥` in finitely many steps. -/
 private lemma JHFil_fin_len : ∃ N : ℕ, JHFil μ N = ⊥ := by
   by_contra! hc
   rcases hdc.exists_eq_top (fun n ↦ JHFil μ n) (strictAnti_nat_of_succ_lt <|
@@ -146,8 +142,8 @@ variable [hst : μ.IsSemistable]
 
 omit hftp in
 open Classical in
-/-- Stability of the steps of `JHFil`: refining a step through a strictly intermediate
-point strictly decreases the payoff, by minimality of the chosen next term. -/
+/-- Replacing the upper endpoint of a step by a strictly intermediate point strictly
+decreases its payoff. -/
 private lemma JHFil_refine_lt_step_payoff :
     ∀ k : ℕ, (hk : JHFil μ k > ⊥) → ∀ z : ℒ, (h' : JHFil μ (k + 1) < z) →
       (h'' : z < JHFil μ k) →
@@ -184,10 +180,8 @@ private lemma JHFil_refine_lt_step_payoff :
         rwa [hnext_payoff]
       _ < μ ⊤ := hzlt
 
-/-- Existence of a Jordan–Hölder filtration: the greedy construction `JHFil` packages into
-a `JordanHolderFiltration`.  In contrast to the Harder–Narasimhan filtration, a
-Jordan–Hölder filtration is not unique, so existence is exposed as a `Nonempty` instance
-rather than a canonical construction. -/
+/-- A semistable slope-like payoff function has a Jordan–Hölder filtration under the
+finite total payoff and eventually-`⊤` descending chain hypotheses. -/
 instance : Nonempty (μ.JordanHolderFiltration) :=
   ⟨{ toFun := JHFil μ
      length := JHlen μ
@@ -199,8 +193,7 @@ instance : Nonempty (μ.JordanHolderFiltration) :=
      payoff_lt_of_between := fun i hi z h' h'' ↦
        JHFil_refine_lt_step_payoff μ i (JHFil_bot_lt μ hi) z h' h'' }⟩
 
-/-- The `RelSeries` repackaging of the existence theorem: there is a finite chain for the
-relation `μ.jordanHolderRel` whose head is `⊤` and whose last element is `⊥`. -/
+/-- There is a finite series for `μ.jordanHolderRel` from `⊤` to `⊥`. -/
 theorem exists_relSeries_jordanHolderRel :
     ∃ s : RelSeries (μ.jordanHolderRel), s.head = ⊤ ∧ s.last = ⊥ := by
   obtain ⟨F⟩ := (inferInstance : Nonempty (μ.JordanHolderFiltration))

@@ -10,32 +10,27 @@ public import Mathlib.Data.Real.Basic
 public import Mathlib.Order.OrderIsoNat
 
 /-!
-# The values of the Harder–Narasimhan Games
+# Values of the Harder–Narasimhan games
 
-This file computes the two global values of the Harder–Narasimhan Games: the first-player
-value `μ.A ⊤` and the second-player value `μ.B ⊤` (often denoted `μ_A^*` and `μ_B^*`).
+The two game values `μ.A ⊤` and `μ.B ⊤` correspond to player A and player B moving first.
+Under suitable chain conditions and weakened slope-like conditions, they can be computed
+as `μ.min ⊤` and `μ.max ⊤`, respectively. Either computation implies the first-mover
+advantage `μ.A ⊤ ≤ μ.B ⊤`.
 
-Under a weak ascending chain condition and a slope-like alternative towards `⊤`, player A's
-value collapses to `μ.min ⊤` (`A_top_eq_min_top`); dually, under a strong descending chain
-condition and the alternative towards `⊥`, player B's value collapses to `μ.max ⊤`
-(`B_top_eq_max_top`).  In both situations the *first-mover advantage* `μ.A ⊤ ≤ μ.B ⊤`
-follows.
+## Main declarations
 
-## Main definitions
+* `HarderNarasimhan.PayoffFunction.WeakACC`, `HarderNarasimhan.PayoffFunction.StrongDCC`:
+  chain conditions on the payoff function.
+* `HarderNarasimhan.PayoffFunction.WeakSlopeLikeAtTop`,
+  `HarderNarasimhan.PayoffFunction.WeakSlopeLikeAtBot`: slope-like inequalities with one
+  endpoint fixed at `⊤` or `⊥`.
+* `HarderNarasimhan.PayoffFunction.A_top_eq_min_top`: the game value when A moves first.
+* `HarderNarasimhan.PayoffFunction.B_top_eq_max_top`: the game value when B moves first.
+* `HarderNarasimhan.PayoffFunction.strongDCC_of_wellOrderedRank`: a sufficient condition for
+  the strong descending chain condition in terms of a rank function.
 
-* `PayoffFunction.WeakACC`, `PayoffFunction.StrongDCC` : the weak ascending and strong
-  descending chain conditions.
-* `PayoffFunction.WeakSlopeLikeAtTop`, `PayoffFunction.WeakSlopeLikeAtBot` : the two
-  weakenings of `IsSlopeLike` anchored at `⊤` resp. `⊥`.
-
-## Main results
-
-* `A_top_eq_min_top`, `A_top_le_B_top` : player A's value collapses to `μ.min ⊤`, and the
-  first-mover advantage follows.
-* `B_top_eq_max_top`, `A_top_le_B_top_of_strongDCC` : player B's value collapses to
-  `μ.max ⊤`, and the first-mover advantage follows.
-* `A_top_dual`, `B_top_dual` : order duality exchanges the two game values.
-* `strongDCC_of_wellOrderedRank` : a well-ordered rank function yields `StrongDCC`.
+The computation for player B follows from that for player A by reversing the orders on the
+underlying type and on the payoffs.
 
 ## References
 
@@ -52,37 +47,37 @@ variable {ℒ S : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ] 
 
 /-! ### The chain conditions and weak slope-like axioms -/
 
-/-- The *weak ascending chain condition* (`WeakACC`): along any strictly increasing chain
-there is a step whose payoff is bounded by the payoff of the corresponding tail interval.
-This is the hypothesis controlling player A's forward moves. -/
+/-- The weak ascending chain condition: every infinite strictly increasing sequence has
+an adjacent pair whose payoff is at most the payoff from its left endpoint to `⊤`. -/
 class WeakACC (μ : PayoffFunction ℒ S) : Prop where
   /-- Some step payoff is dominated by the tail payoff. -/
   exists_le : ∀ x : ℕ → ℒ, (smf : StrictMono x) →
     ∃ N : ℕ, μ ⟨x N, x (N+1), smf <| Nat.lt_add_one N⟩ ≤
       μ ⟨x N, ⊤, lt_of_lt_of_le (smf <| Nat.lt_add_one N) le_top⟩
 
-/-- In a well-founded order there are no strictly increasing chains, so `WeakACC` holds
-trivially. -/
+/-- If `>` is well-founded on `ℒ`, there is no infinite strictly increasing sequence,
+so the weak ascending chain condition holds. -/
 instance {μ : PayoffFunction ℒ S} [WellFoundedGT ℒ] : μ.WeakACC :=
   ⟨fun f smf ↦ False.elim (not_strictMono_of_wellFoundedGT f smf)⟩
 
-/-- The *strong descending chain condition* (`StrongDCC`): along any strictly decreasing
-chain there is a step whose payoff dominates the payoff of the corresponding initial
-interval.  This is the dual hypothesis controlling player B's backward moves. -/
+/-- The strong descending chain condition: every infinite strictly decreasing sequence
+has an adjacent pair whose payoff is at least the payoff from `⊥` to its larger endpoint. -/
 class StrongDCC (μ : PayoffFunction ℒ S) : Prop where
   /-- Some initial payoff is dominated by the step payoff. -/
   exists_le : ∀ x : ℕ → ℒ, (saf : StrictAnti x) →
     ∃ N : ℕ, μ ⟨⊥, x N, lt_of_le_of_lt bot_le <| saf <| Nat.lt_add_one N⟩ ≤
       μ ⟨x (N+1), x N, saf <| Nat.lt_add_one N⟩
 
-/-- The weakening of `IsSlopeLike` anchored at `⊤`, used to compute player A's value. -/
+/-- For `x < y < ⊤`, at least one of the payoffs on `(x, y)` and `(y, ⊤)` is at most the
+payoff on `(x, ⊤)`. -/
 class WeakSlopeLikeAtTop (μ : PayoffFunction ℒ S) : Prop where
   /-- The slope-like alternative towards `⊤`. -/
   le_or_le : ∀ z : StrictIntvl ℒ, (hz : z.right < ⊤) →
     μ z ≤ μ ⟨z.left, ⊤, lt_trans z.lt hz⟩ ∨
     μ ⟨z.right, ⊤, hz⟩ ≤ μ ⟨z.left, ⊤, lt_trans z.lt hz⟩
 
-/-- The weakening of `IsSlopeLike` anchored at `⊥`, used to compute player B's value. -/
+/-- For `⊥ < x < y`, the payoff on `(⊥, y)` is at most one of the payoffs on `(⊥, x)`
+and `(x, y)`. -/
 class WeakSlopeLikeAtBot (μ : PayoffFunction ℒ S) : Prop where
   /-- The slope-like alternative towards `⊥`. -/
   le_or_le : ∀ z : StrictIntvl ℒ, (hz : ⊥ < z.left) →
@@ -93,11 +88,11 @@ section LinearOrder
 
 variable {S : Type*} [CompleteLinearOrder S] {μ : PayoffFunction ℒ S}
 
-/-- Over a linear order, a slope-like payoff function satisfies the weakening at `⊤`. -/
+/-- For linearly ordered payoffs, a slope-like payoff function satisfies the weakening at `⊤`. -/
 instance [hμ : μ.IsSlopeLike] : μ.WeakSlopeLikeAtTop :=
   ⟨fun z hz ↦ (hμ.slopelike z.left z.right ⊤ ⟨z.lt, hz⟩).1.imp id le_of_lt⟩
 
-/-- Over a linear order, a slope-like payoff function satisfies the weakening at `⊥`. -/
+/-- For linearly ordered payoffs, a slope-like payoff function satisfies the weakening at `⊥`. -/
 instance [hμ : μ.IsSlopeLike] : μ.WeakSlopeLikeAtBot :=
   ⟨fun z hz ↦ (hμ.slopelike ⊥ z.left z.right ⟨hz, z.lt⟩).2.2.1.elim (Or.inr ∘ le_of_lt) Or.inl⟩
 
@@ -107,14 +102,12 @@ end LinearOrder
 
 variable {μ : PayoffFunction ℒ S}
 
-/-- The set of “bad” first moves for player A: elements `YA < ⊤` such that every `xA < ⊤`
-admits a follow-up `xB` whose payoff is not bounded by `μ (YA, ⊤)`.  The computation of
-player A's value proceeds by showing this set is empty. -/
+/-- Endpoints `y < ⊤` for which player A cannot bound all responses by `μ (y, ⊤)`. -/
 private def badSet (μ : PayoffFunction ℒ S) : Set ℒ :=
   {YA | ∃ (h : YA < ⊤), ∀ xA < ⊤, ∃ xB, ∃ (hAB : xA < xB), ¬ μ ⟨xA, xB, hAB⟩ ≤ μ ⟨YA, ⊤, h⟩}
 
-/-- The auxiliary strictly increasing sequence of bad first moves used in the contradiction
-argument for `A_top_eq_min_top`. -/
+/-- A strictly increasing sequence of bad endpoints, constructed from a nonempty set of
+bad endpoints. -/
 private noncomputable def badSeq (μ : PayoffFunction ℒ S) [h₂ : μ.WeakSlopeLikeAtTop]
     (h₃ : (badSet μ).Nonempty) (k : ℕ) : badSet μ :=
   match k with
@@ -136,8 +129,8 @@ private lemma iInf_top_eq_min_top (μ : PayoffFunction ℒ S) :
   le_antisymm (le_iInf₂ fun u hu ↦ iInf₂_le u hu.2)
     (le_iInf₂ fun x hx ↦ iInf₂_le x ⟨bot_le, hx⟩)
 
-/-- Player A's value is the global minimum: under the weak ascending chain condition and the
-weak slope-like alternative at `⊤`, the first-player value `μ.A ⊤` equals `μ.min ⊤`. -/
+/-- Under the weak ascending chain condition and the weak slope-like condition at `⊤`,
+the value when A moves first is the infimum of the payoffs on `(x, ⊤)` for `x < ⊤`. -/
 theorem A_top_eq_min_top [h₁ : μ.WeakACC] [h₂ : μ.WeakSlopeLikeAtTop] :
     μ.A ⊤ = μ.min ⊤ := by
   apply le_antisymm
@@ -158,8 +151,8 @@ theorem A_top_eq_min_top [h₁ : μ.WeakACC] [h₂ : μ.WeakSlopeLikeAtTop] :
       _ ≤ μ ⟨yA, ⊤, hyA.2⟩ := max_le fun xB hxB ↦ hbound xB hxB.1
   · exact le_A fun x hx ↦ (min_le hx).trans apply_le_max
 
-/-- The first-mover advantage `μ.A ⊤ ≤ μ.B ⊤`, under the hypotheses computing player A's
-value. -/
+/-- The first-mover advantage under the weak ascending chain condition and the weak
+slope-like condition at `⊤`. -/
 theorem A_top_le_B_top [μ.WeakACC] [μ.WeakSlopeLikeAtTop] : μ.A ⊤ ≤ μ.B ⊤ :=
   A_top_eq_min_top.trans_le <| le_iSup₂_of_le ⊤ ⟨bot_lt_top, le_rfl⟩ le_rfl
 
@@ -196,16 +189,16 @@ private lemma iSup_bot_eq_max_top (μ : PayoffFunction ℒ S) :
   le_antisymm (iSup₂_le fun y hy ↦ le_iSup₂_of_le y ⟨hy, le_top⟩ le_rfl)
     (iSup₂_le fun y hy ↦ le_iSup₂_of_le y hy.1 le_rfl)
 
-/-- Player B's value is the global maximum: under the strong descending chain condition and
-the weak slope-like alternative at `⊥`, the second-player value `μ.B ⊤` equals `μ.max ⊤`. -/
+/-- Under the strong descending chain condition and the weak slope-like condition at `⊥`,
+the value when B moves first is the supremum of the payoffs on `(⊥, x)` for `⊥ < x`. -/
 theorem B_top_eq_max_top [μ.StrongDCC] [μ.WeakSlopeLikeAtBot] : μ.B ⊤ = μ.max ⊤ := by
   calc
     μ.B ⊤ = OrderDual.ofDual (μ.dual.A ⊤) := A_top_dual.symm
     _ = OrderDual.ofDual (μ.dual.min ⊤) := congrArg OrderDual.ofDual A_top_eq_min_top
     _ = μ.max ⊤ := by rw [← iInf_top_eq_min_top, ← iSup_bot_eq_max_top]; rfl
 
-/-- The first-mover advantage `μ.A ⊤ ≤ μ.B ⊤`, under the hypotheses computing player B's
-value. -/
+/-- The first-mover advantage under the strong descending chain condition and the weak
+slope-like condition at `⊥`. -/
 theorem A_top_le_B_top_of_strongDCC [μ.StrongDCC] [μ.WeakSlopeLikeAtBot] : μ.A ⊤ ≤ μ.B ⊤ := by
   rw [← A_top_dual, ← B_top_dual]
   exact A_top_le_B_top (μ := μ.dual)
@@ -231,9 +224,8 @@ section SlopeLike
 variable {S : Type*} [CompleteLinearOrder S] {μ : PayoffFunction ℒ S}
 
 omit [Nontrivial ℒ] [BoundedOrder ℒ] in
-/-- For a slope-like payoff function over a well-founded order, the first-player value of any
-interval is the minimum payoff.  This is the interval version of `A_top_eq_min_top`, obtained
-by restricting `μ` to the interval. -/
+/-- If `>` is well-founded on `ℒ`, a slope-like payoff function satisfies
+`μ.min I = μ.A I` on every interval `I`. -/
 lemma IsSlopeLike.min_eq_A [WellFoundedGT ℒ] (hsl : μ.IsSlopeLike) (I : StrictIntvl ℒ) :
     μ.min I = μ.A I := by
   simpa only [A_restrict_apply, min_restrict_apply, StrictIntvl.ofSub_top] using

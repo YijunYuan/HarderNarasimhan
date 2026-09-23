@@ -10,32 +10,26 @@ public import HarderNarasimhan.Filtration.Defs
 /-!
 # Existence of Harder–Narasimhan filtrations
 
-This file constructs the canonical Harder–Narasimhan filtration `μ.hnFiltration` of a payoff
-function `μ` on a well-founded bounded lattice, under the standing hypotheses `μ.ADCC`
-(descending chain condition for `μ.A`), `μ.IsConvex`, and `μ.Admissible`.
+A convex admissible payoff function with values in a complete lattice has a
+Harder–Narasimhan filtration if it satisfies the descending chain condition on `μ.A` and
+`>` is well-founded on the underlying nontrivial bounded lattice.
 
-The construction iterates the greatest-breakpoint step of
-`HarderNarasimhan.PayoffFunction.Semistable.Breakpoints`: starting from `⊥`, as long as the
-current term `x` is not `⊤`, the next term is the greatest breakpoint of `μ` on the interval
-`(x, ⊤)`.  Well-foundedness of `>` on `ℒ` forces the chain to reach `⊤` after finitely many
-steps, and the breakpoint properties provide semistability of the successive steps and the
-strict decrease of the `μ.A`-slopes.  This is the existence half of the
-existence-and-uniqueness theorem for Harder–Narasimhan filtrations; the uniqueness half is
-proved in `HarderNarasimhan.Filtration.Unique`.
+Starting from `⊥`, the construction takes the greatest breakpoint of the interval with
+endpoints `x` and `⊤` as the successor of each term `x ≠ ⊤`. Well-foundedness of `>` ensures
+that this increasing chain reaches `⊤` in finitely many steps. The breakpoint properties
+give semistability of each step and `¬ aᵢ ≤ aᵢ₊₁` for successive `μ.A`-values.
 
 ## Main definitions
 
-* `PayoffFunction.hnFiltration` : the canonical Harder–Narasimhan filtration of `μ`, also
-  available as `default` via the `Inhabited` instance.
+* `HarderNarasimhan.PayoffFunction.hnFiltration`: the filtration obtained by taking greatest
+  breakpoints. It also supplies an `Inhabited` instance.
 
 ## Main results
 
-* `PayoffFunction.hnFiltration_succ_isGreatest_breakpoints` : the defining property of the
-  canonical filtration; each successive term is the greatest breakpoint of the remaining top
-  interval.
-* `PayoffFunction.hnFiltration_A_bot_eq_A` : cutting a bottom-anchored interval at a term of
-  the canonical filtration does not change the first-player value.
-* `Inhabited (μ.HarderNarasimhanFiltration)` : Harder–Narasimhan filtrations exist.
+* `HarderNarasimhan.PayoffFunction.hnFiltration_succ_isGreatest_breakpoints`: each term
+  following a term below `⊤` is the greatest breakpoint of the remaining interval.
+* `HarderNarasimhan.PayoffFunction.hnFiltration_A_bot_eq_A`: replacing the left endpoint `⊥`
+  by a filtration term below the right endpoint preserves `μ.A`.
 
 ## References
 
@@ -53,8 +47,8 @@ variable {S : Type*} [CompleteLattice S]
 variable (μ : PayoffFunction ℒ S) [μ.ADCC] [μ.IsConvex] [hadm : μ.Admissible]
 
 open Classical in
-/-- The canonical chain: starting from `⊥`, keep cutting at the greatest breakpoint of the
-remaining top interval; once the chain reaches `⊤` it stays there. -/
+/-- The chain starting at `⊥` whose successor terms are greatest breakpoints of the remaining
+intervals. It is constant once it reaches `⊤`. -/
 private noncomputable def HNFil (k : ℕ) : ℒ :=
   match k with
   | 0 => ⊥
@@ -68,8 +62,7 @@ private noncomputable def HNFil (k : ℕ) : ℒ :=
         (hadm.total_or_attained.imp id fun h z hzI hz ↦
           h ⟨prev, z, lt_of_le_of_ne hzI.left hz⟩)).choose
 
-/-- Specification of the defining choice in `HNFil`: before termination, the next term is a
-greatest breakpoint of the remaining top interval. -/
+/-- Each term following a term below `⊤` is the greatest breakpoint of the remaining interval. -/
 private lemma HNFil_isGreatest (n : ℕ) (h' : HNFil μ n ≠ ⊤) :
     IsGreatest (μ.breakpoints ⟨HNFil μ n, ⊤, h'.lt_top⟩) (HNFil μ (n + 1)) := by
   simp only [HNFil, h']
@@ -78,7 +71,7 @@ private lemma HNFil_isGreatest (n : ℕ) (h' : HNFil μ n ≠ ⊤) :
     (hadm.total_or_attained.imp id fun h z hzI hz ↦
       h ⟨HNFil μ n, z, lt_of_le_of_ne hzI.left hz⟩)).choose_spec
 
-/-- One-step strict growth of `HNFil` before termination. -/
+/-- Each term below `⊤` is strictly less than its successor. -/
 private lemma HNFil_lt_succ (n : ℕ) (hn : HNFil μ n ≠ ⊤) : HNFil μ n < HNFil μ (n + 1) :=
   lt_of_le_of_ne (HNFil_isGreatest μ n hn).1.1.1 (HNFil_isGreatest μ n hn).1.2
 
@@ -126,7 +119,7 @@ private lemma HNFil_monotone : Monotone (HNFil μ) := by
     · exact (HNFil_strictMonoOn μ (hlt.le.trans hj) hj hlt).le
     · exact (htop j (not_le.1 hj).le) ▸ le_top
 
-/-- Each successive step of `HNFil` is semistable, by the breakpoint property. -/
+/-- Each step of the chain before it reaches `⊤` is semistable. -/
 private lemma HNFil_piecewise_isSemistable :
     ∀ i : ℕ, (hi : i < HNlen μ) →
       (μ.restrict ⟨HNFil μ i, HNFil μ (i + 1),
@@ -134,8 +127,7 @@ private lemma HNFil_piecewise_isSemistable :
   fun i hi ↦ (mem_breakpoints.1
     (HNFil_isGreatest μ i ((HNFil_ne_top_iff μ i).2 hi)).1).isSemistable_restrict
 
-/-- Strict decrease of the `μ.A`-slopes of successive steps of `HNFil`, from the obstruction
-property of breakpoints. -/
+/-- No `μ.A`-value of a step is less than or equal to that of the next step. -/
 private lemma HNFil_not_A_le_succ :
     ∀ i : ℕ, (hi : i + 1 < HNlen μ) →
       ¬ μ.A ⟨HNFil μ i, HNFil μ (i + 1),
@@ -150,18 +142,12 @@ private lemma HNFil_not_A_le_succ :
     ((inferInstance : μ.IsConvexOn ⊤).mono le_top)
     ⟨(lt_trans (HNFil_lt_succ μ i hi) hi').le, le_top⟩ hi'
 
-/-- The **canonical Harder–Narasimhan filtration** of `μ`: starting from `⊥`, each successive
-term is the greatest breakpoint of `μ` on the remaining top interval
-(`hnFiltration_succ_isGreatest_breakpoints`), until the chain reaches `⊤`.
+/-- The Harder–Narasimhan filtration obtained by starting at `⊥` and successively taking the
+greatest breakpoint of the remaining interval.
 
-The hypotheses are the standing ones of the Harder–Narasimhan Games: the descending chain
-condition `μ.ADCC` and well-foundedness of `>` on `ℒ` make the construction terminate,
-convexity powers the breakpoint machinery, and `μ.Admissible` makes greatest breakpoints
-exist.  Over a complete linear order this filtration is the unique one; see
-`HarderNarasimhan.Filtration.Unique`.
-
-The definition is not exposed: its body is built from the module-private recursion `HNFil`,
-and downstream files interact with it through `hnFiltration_succ_isGreatest_breakpoints`. -/
+Use `HarderNarasimhan.PayoffFunction.hnFiltration_succ_isGreatest_breakpoints` for the
+successor terms. For a complete linearly ordered codomain, this is the unique
+Harder–Narasimhan filtration; see `HarderNarasimhan/Filtration/Unique.lean`. -/
 @[no_expose]
 noncomputable def hnFiltration : μ.HarderNarasimhanFiltration where
   toFun := HNFil μ
@@ -178,19 +164,14 @@ noncomputable instance : Inhabited (μ.HarderNarasimhanFiltration) := ⟨μ.hnFi
 
 variable {μ}
 
-/-- The defining property of the canonical filtration `μ.hnFiltration`: as long as the chain
-has not reached `⊤`, the next term is the *greatest breakpoint* of `μ` on the remaining top
-interval.  This is the main input to the uniqueness theorem of
-`HarderNarasimhan.Filtration.Unique`. -/
+/-- Each term of the canonical filtration following a term below `⊤` is the greatest
+breakpoint of the interval between that term and `⊤`. -/
 lemma hnFiltration_succ_isGreatest_breakpoints {n : ℕ} (h : μ.hnFiltration n ≠ ⊤) :
     IsGreatest (μ.breakpoints ⟨μ.hnFiltration n, ⊤, h.lt_top⟩) (μ.hnFiltration (n + 1)) :=
   HNFil_isGreatest μ n h
 
-/-- Cutting a bottom-anchored interval at a term of the canonical filtration does not change
-the first-player value: for any `y` above the `n`-th term, the values `μ.A ⟨⊥, y⟩` and
-`μ.A ⟨μ.hnFiltration n, y⟩` agree.  Since the terms below `μ.hnFiltration n` also lie below
-`y`, instantiating at each index up to `n` packages the chain of equalities
-`μ.A ⟨⊥, y⟩ = μ.A ⟨μ.hnFiltration 1, y⟩ = ⋯ = μ.A ⟨μ.hnFiltration n, y⟩`. -/
+/-- Replacing the left endpoint `⊥` by a term of the canonical filtration preserves `μ.A`,
+provided that the right endpoint lies strictly above that term. -/
 theorem hnFiltration_A_bot_eq_A {n : ℕ} {y : ℒ} (hy : μ.hnFiltration n < y) :
     μ.A ⟨⊥, y, bot_le.trans_lt hy⟩ = μ.A ⟨μ.hnFiltration n, y, hy⟩ := by
   induction n with

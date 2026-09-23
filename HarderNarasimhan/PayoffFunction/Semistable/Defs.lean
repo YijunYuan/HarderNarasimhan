@@ -8,36 +8,28 @@ module
 public import HarderNarasimhan.PayoffFunction.Restrict
 
 /-!
-# Semistable payoff functions and breakpoints
+# Semistability and breakpoints
 
-This file defines the (semi)stability notions of the Harder–Narasimhan Games and the
-*breakpoint* predicate underlying the construction of Harder–Narasimhan filtrations.
+A payoff function is semistable if no initial segment `(⊥, x)` has a strictly larger
+`μ.A`-value than the total interval. It is stable if, in addition, equality only occurs at
+`x = ⊤`.
 
-A payoff function is *semistable* if no proper initial segment `(⊥, x)` beats the total
-interval in first-player value, and *stable* if in addition no proper initial segment ties
-with it.  A *breakpoint* of `μ` on an interval `I` is a point `x` which maximises the
-first-player value `μ.A (I.left, ·)` among interior initial segments of `I` and is the
-greatest point doing so; breakpoints are the canonical cut points from which
-Harder–Narasimhan filtrations are built (see `PayoffFunction.Semistable.Breakpoints`).
-
-The descending chain condition `PayoffFunction.ADCC` rules out infinite strict improvement
-of `μ.A` along descending chains and is the standing hypothesis for the existence of
-breakpoints.
+A breakpoint of `μ` on `I` is a point `x ∈ I` above `I.left` such that the value
+`μ.A (I.left, x)` is maximal among the initial-segment values and `x` is greatest among the
+points with that value. When the payoffs are linearly ordered, this value is a maximum.
+Breakpoints give the successive cuts in Harder–Narasimhan filtrations.
 
 ## Main definitions
 
-* `PayoffFunction.IsSemistable`, `PayoffFunction.IsStable` : the (semi)stability typeclasses.
-* `PayoffFunction.IsBreakpoint`, `PayoffFunction.breakpoints` : the breakpoint predicate on
-  an interval, and the set of breakpoints.
-* `PayoffFunction.ADCC` : the descending chain condition for `μ.A`.
+* `HarderNarasimhan.PayoffFunction.IsSemistable`, `HarderNarasimhan.PayoffFunction.IsStable`:
+  semistability and stability.
+* `HarderNarasimhan.PayoffFunction.IsBreakpoint`: the breakpoint predicate.
+* `HarderNarasimhan.PayoffFunction.ADCC`: a descending chain condition excluding an infinite
+  strict increase of `μ.A` along a decreasing sequence of right endpoints.
 
-## Main results
-
-* `isSemistable_iff_isBreakpoint_top` : global semistability says exactly that `⊤` is a
-  breakpoint of the total interval.
-* `isBreakpoint_right_iff` : `I.right` is a breakpoint of `I` iff the restriction
-  `μ.restrict I` is semistable.  This is the key translation between the ambient-interval
-  and the restricted viewpoints.
+The right endpoint is a breakpoint precisely when the restriction to the interval is
+semistable; see `HarderNarasimhan.PayoffFunction.isBreakpoint_right_iff`. Existence of
+breakpoints is proved in `HarderNarasimhan/PayoffFunction/Semistable/Breakpoints.lean`.
 
 ## References
 
@@ -56,11 +48,10 @@ section Preorder
 
 variable [Preorder ℒ] [CompleteLattice S]
 
-/-- The *descending chain condition* for `μ.A` (`ADCC`): for every base point `a` and every
-strictly descending chain `f` above `a`, the values `μ.A (a, f N)` cannot strictly increase
-forever.  This is the standing termination hypothesis for the breakpoint construction. -/
+/-- The descending chain condition for `μ.A`: for every `a` and every strictly decreasing
+sequence `f` above `a`, some adjacent pair fails to give a strict increase of `μ.A (a, f n)`. -/
 class ADCC (μ : PayoffFunction ℒ S) : Prop where
-  /-- Along a strictly descending chain the `μ.A`-values eventually stop improving. -/
+  /-- Some adjacent pair fails to give a strict increase of the `μ.A`-values. -/
   dcc : ∀ a : ℒ, ∀ f : ℕ → ℒ, (h₁ : ∀ n : ℕ, f n > a) → StrictAnti f →
     ∃ N : ℕ, ¬ μ.A ⟨a, f N, h₁ N⟩ < μ.A ⟨a, f <| N + 1, h₁ <| N + 1⟩
 
@@ -72,33 +63,27 @@ variable [PartialOrder ℒ] [CompleteLattice S]
 
 variable (μ : PayoffFunction ℒ S) (I : StrictIntvl ℒ)
 
-/-- `x` is a *breakpoint* of `μ` on `I`: among interior initial segments `(I.left, y)` of
-`I`, the segment cut at `x` maximises the first-player value `μ.A`, and `x` is the greatest
-point doing so.  Breakpoints are the canonical cut points of the Harder–Narasimhan theory.
+/-- A breakpoint of `μ` on `I` is a point `x ∈ I` with `I.left < x` such that no value
+`μ.A (I.left, y)` with `I.left < y ≤ I.right` is strictly larger than `μ.A (I.left, x)`, and
+every such point with the same value lies below `x`.
 
-Breakpoints play the role of the *maximal destabilising subobjects* of the classical
-Harder–Narasimhan theory of vector bundles: the first step of the classical filtration is
-the subobject that maximises the slope and is greatest among the maximisers, exactly as a
-breakpoint maximises `μ.A (I.left, ·)` and is the greatest maximiser, and such elements are
-accordingly called *maximal destabilising elements* in the literature.  The neutral name
-*breakpoint* is preferred here because for a semistable payoff function the top element `⊤`
-is itself a breakpoint of the total interval (`isSemistable_iff_isBreakpoint_top`), and
-calling it "destabilising" would then be a misnomer. -/
+The value at a breakpoint is maximal, and is a maximum when `S` is linearly ordered.
+For slope payoffs, breakpoints play the role of maximal destabilising subobjects. The right
+endpoint is also allowed, as occurs for semistable intervals. -/
 structure IsBreakpoint (x : ℒ) : Prop where
   /-- A breakpoint lies in the interval. -/
   mem : x ∈ I
   /-- A breakpoint is distinct from the left endpoint. -/
   ne_left : I.left ≠ x
-  /-- No interior initial segment has a strictly larger first-player value. -/
+  /-- No initial segment has a strictly larger `μ.A`-value. -/
   not_lt : ∀ y : ℒ, (hyI : y ∈ I) → (hy : I.left ≠ y) →
     ¬ μ.A ⟨I.left, x, lt_of_le_of_ne mem.1 ne_left⟩ < μ.A ⟨I.left, y, lt_of_le_of_ne hyI.1 hy⟩
-  /-- Among the maximisers, `x` is the greatest. -/
+  /-- Every point with the same `μ.A`-value lies below `x`. -/
   le_of_eq : ∀ y : ℒ, (hyI : y ∈ I) → (hy : I.left ≠ y) →
     μ.A ⟨I.left, y, lt_of_le_of_ne hyI.1 hy⟩ = μ.A ⟨I.left, x, lt_of_le_of_ne mem.1 ne_left⟩ →
       y ≤ x
 
-/-- The set of breakpoints of `μ` on `I`.  See `PayoffFunction.IsBreakpoint` for the
-relation with the maximal destabilising subobjects of the classical theory. -/
+/-- The set of breakpoints of `μ` on `I`. -/
 def breakpoints : Set ℒ := {x | μ.IsBreakpoint I x}
 
 variable {μ I}
@@ -115,15 +100,14 @@ section BoundedOrder
 
 variable [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ] [CompleteLattice S]
 
-/-- A payoff function is *semistable* if no proper initial segment `(⊥, x)` has a strictly
-larger first-player value than the total interval: the whole object is already an optimal
-first move. -/
+/-- A payoff function is semistable if no initial segment `(⊥, x)` has a strictly larger
+`μ.A`-value than the total interval. -/
 class IsSemistable (μ : PayoffFunction ℒ S) : Prop where
-  /-- No proper initial segment beats the total interval. -/
+  /-- No initial segment has a strictly larger `μ.A`-value than the total interval. -/
   not_lt : ∀ x : ℒ, (hx : ⊥ < x) → ¬ μ.A ⊤ < μ.A ⟨⊥, x, hx⟩
 
-/-- A payoff function is *stable* if it is semistable and no proper initial segment `(⊥, x)`
-with `x < ⊤` ties with the total interval in first-player value. -/
+/-- A payoff function is stable if it is semistable and no proper initial segment has the
+same `μ.A`-value as the total interval. -/
 class IsStable (μ : PayoffFunction ℒ S) : Prop extends μ.IsSemistable where
   /-- No proper initial segment ties with the total interval. -/
   ne : ∀ x : ℒ, (hx : ⊥ < x) → x < ⊤ → μ.A ⟨⊥, x, hx⟩ ≠ μ.A ⊤
@@ -147,9 +131,7 @@ section Restrict
 
 variable [PartialOrder ℒ] [CompleteLattice S] {μ : PayoffFunction ℒ S} {I : StrictIntvl ℒ}
 
-/-- `I.right` is a breakpoint of `I` iff the restriction `μ.restrict I` is semistable.
-This is the key translation between the ambient-interval viewpoint and the viewpoint of the
-interval as a self-contained bounded order. -/
+/-- The right endpoint is a breakpoint iff the restriction to the interval is semistable. -/
 theorem isBreakpoint_right_iff :
     μ.IsBreakpoint I I.right ↔ (μ.restrict I).IsSemistable := by
   constructor

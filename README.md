@@ -7,11 +7,10 @@
 
 [![Graph](https://img.shields.io/badge/Dependency_graph-100000?style=for-the-badge&logo=GitHub&logoColor=white&labelColor=black&color=black)](https://yijunyuan.github.io/lean-graph/?url=https://raw.githubusercontent.com/YijunYuan/HarderNarasimhan/refs/heads/master/HarderNarasimhan.json#dark)
 
-A Lean 4 formalization of the **Harder–Narasimhan Games** of Huayi Chen & Marion Jeannin
-(referenced throughout the source as `[ChenJeannin]`): a two-player game played on the
-strict intervals of a bounded lattice, whose optimal strategies recover
-Harder–Narasimhan filtrations, Jordan–Hölder filtrations, and — for modules over a
-Noetherian ring — the classical coprimary filtrations.
+A Lean 4 formalization of the **Harder–Narasimhan Games** of Huayi Chen & Marion Jeannin: a two-player game played on the
+strict intervals of a bounded lattice. The library develops Harder–Narasimhan filtrations,
+Jordan–Hölder filtrations, and coprimary filtrations of nonzero finitely generated modules
+over a Noetherian commutative ring.
 
 ## Mathematical overview
 
@@ -25,20 +24,22 @@ structure PayoffFunction (ℒ : Type*) [LT ℒ] (S : Type*) where
 assigning to each strict interval `(a, b)` (with `a < b`) of an order `ℒ` a payoff in a
 complete lattice `S`.  Everything else is accessed through dot notation on `μ`:
 
-- `μ.max I` / `μ.min I` — extremal payoffs over interior points of `I`;
-- `μ.A I` / `μ.B I` — the first-player (minimax) and second-player (maximin) game values;
+- `μ.max I` — the supremum over `I.left < u ≤ I.right`, with the left endpoint fixed;
+- `μ.min I` — the infimum over `I.left ≤ u < I.right`, with the right endpoint fixed;
+- `μ.A I` / `μ.B I` — the game values when player A or player B moves first, respectively;
 - `μ.restrict I` — the induced payoff function on the points `↥I` of a subinterval;
 - `μ.dual` — the order-dual payoff function, exchanging the two players;
 - `μ.IsConvex`, `μ.IsSlopeLike`, `μ.IsSemistable`, … — typeclass hypotheses on `μ`;
 - `μ.breakpoints I` — the canonical cut points from which filtrations are built;
 - `μ.hnFiltration` — the canonical Harder–Narasimhan filtration of `μ`.
 
-Under suitable chain conditions the game values collapse (`μ.A ⊤ = μ.min ⊤`,
-`μ.B ⊤ = μ.max ⊤`), the game has a Nash equilibrium exactly when `μ` is semistable, and
-iterating the greatest-breakpoint construction produces the (unique, over a linear
-codomain) Harder–Narasimhan filtration.  Specializing `ℒ` to the submodule lattice and `μ`
-to the finset of associated primes of a subquotient identifies Harder–Narasimhan
-filtrations with coprimary filtrations.
+Under suitable chain and slope-like conditions, the game values satisfy
+`μ.A ⊤ = μ.min ⊤` and `μ.B ⊤ = μ.max ⊤`. For linearly ordered slope-like payoffs with
+the required chain conditions on restrictions, Nash equilibrium is equivalent to
+semistability. For convex admissible payoffs satisfying the ascending chain condition and
+`ADCC`, iterating greatest breakpoints gives a Harder–Narasimhan filtration, unique when
+the payoff order is linear. Applying this construction to associated primes of subquotients
+gives coprimary filtrations, relative to a fixed linear extension of the prime spectrum.
 
 ## Library structure
 
@@ -76,7 +77,8 @@ brings in the whole library.  It is organized as one infrastructure file and fou
 ### `Filtration/` — Harder–Narasimhan filtrations
 
 - [Defs.lean](HarderNarasimhan/Filtration/Defs.lean) — the `HarderNarasimhanFiltration`
-  structure (explicit `length`, semistable steps, strictly decreasing `μ.A`-slopes) and the
+  structure (explicit `length`, semistable steps, and successive `μ.A`-values satisfying
+  `¬ aᵢ ≤ aᵢ₊₁`, or strict decrease for a linear codomain) and the
   `Admissible` side condition.
 - [Exists.lean](HarderNarasimhan/Filtration/Exists.lean) — the canonical construction
   `μ.hnFiltration` by iterated greatest breakpoints.
@@ -88,23 +90,24 @@ brings in the whole library.  It is organized as one infrastructure file and fou
 - [Defs.lean](HarderNarasimhan/JordanHolder/Defs.lean) — the `JordanHolderFiltration`
   structure (descending chains with total step payoff) and the chain condition
   `EventuallyTopDCC`.
-- [Exists.lean](HarderNarasimhan/JordanHolder/Exists.lean) — existence by a greedy minimal
-  refinement (a `Nonempty` instance; such filtrations are not unique).
+- [Exists.lean](HarderNarasimhan/JordanHolder/Exists.lean) — existence by successively choosing
+  maximal points with the required payoff (a `Nonempty` instance; uniqueness is not asserted).
 - [Stability.lean](HarderNarasimhan/JordanHolder/Stability.lean) — the step condition is
   equivalent to piecewise stability of the restricted payoffs.
-- [Length.lean](HarderNarasimhan/JordanHolder/Length.lean) — over a modular lattice all
-  Jordan–Hölder filtrations have the same length.
+- [Length.lean](HarderNarasimhan/JordanHolder/Length.lean) — for semistable slope-like affine
+  payoffs in a complete linear order, Jordan–Hölder filtrations on a modular lattice have
+  the same length under the existence hypotheses.
 
 ### `Coprimary/` — coprimary filtrations of modules
 
 - [AssociatedPrimes.lean](HarderNarasimhan/Coprimary/AssociatedPrimes.lean) — pure
   commutative algebra: associated primes of the quotient by a localization kernel
-  (Bourbaki, *Algèbre commutative*, Ch. IV, §1, no. 2, Prop. 6).
+  (Bourbaki, *Algèbre commutative*).
 - [Defs.lean](HarderNarasimhan/Coprimary/Defs.lean) — the coprimary payoff function
   `Coprimary.payoff R M` on the submodule lattice, `IsCoprimary`, and the
   `CoprimaryFiltration` structure.
 - [Semistability.lean](HarderNarasimhan/Coprimary/Semistability.lean) — explicit
-  computation of the first-player value; semistability is having a unique associated prime.
+  computation of the value when A moves first; semistability is having a unique associated prime.
 - [Filtration.lean](HarderNarasimhan/Coprimary/Filtration.lean) — existence and uniqueness
   of the coprimary filtration, via the general Harder–Narasimhan machinery.
 
@@ -127,8 +130,6 @@ above) is regenerated by a local development script that is not tracked in this 
 5. `Coprimary/` shows the abstract theory at work on an honest example from commutative
    algebra.
 
-Each file carries a module docstring (`/-! # … -/`) with its main definitions and results
-and closes with a `## References` section pointing to [ChenJeannin].
 
 ## Main results at a glance
 
@@ -140,25 +141,25 @@ into the listed single-conclusion lemmas.
 |---|---|
 | Fundamental inequality chain for convex payoff functions | `A_le_max_inf`, `IsConvexOn.max_inf_le_max`, `IsConvexOn.A_le_A_sup` |
 | Stability of the extremal operations under convexity | `IsConvexOn.max`, `IsConvexOn.max_max`, `IsConvexOn.A_max` |
-| Comparison of the first-player value along a chain | `A_anti_left`, `IsConvexOn.inf_le_A`, `IsConvexOn.A_eq_of_ge`, `IsConvexOn.A_le_A_of_lt`, `IsConvexOn.A_eq_or_lt` |
+| Comparison of `μ.A`-values along a chain | `A_anti_left`, `IsConvexOn.inf_le_A`, `IsConvexOn.A_eq_of_ge`, `IsConvexOn.A_le_A_of_lt`, `IsConvexOn.A_eq_or_lt` |
 | Complementary segment value after a strict improvement | `IsConvex.A_right_eq_of_A_left_gt` |
-| Comparison of the first-player value along a join | `IsConvexOn.inf_A_le_A_sup`, `IsConvexOn.A_le_A_sup_or` |
-| Interval enlargement when the first-player value is `⊤` | `IsConvexOn.A_le_of_A_eq_top` |
+| Comparison of `μ.A`-values along a join | `IsConvexOn.inf_A_le_A_sup`, `IsConvexOn.A_le_A_sup_or` |
+| Interval enlargement when the `μ.A`-value is `⊤` | `IsConvexOn.A_le_of_A_eq_top` |
 | Sufficient condition for the descending chain condition | `adcc_of_exists_A_eq_top` |
 | Existence of breakpoints | `breakpoints_nonempty` |
 | Uniqueness of the breakpoint over a complete linear order | `IsBreakpoint.eq` |
 | Semistability below and obstruction above a breakpoint | `IsBreakpoint.isSemistable_restrict`, `IsBreakpoint.not_A_le` |
 | Totality, greatest element, and decomposition for breakpoints | `breakpoints_total`, `exists_isGreatest_breakpoints`, `IsBreakpoint.A_eq_A_of_lt` |
 | Existence and uniqueness of the Harder–Narasimhan filtration | `hnFiltration`, `Unique (μ.HarderNarasimhanFiltration)`, `exists_relSeries_semistableRel`, `existsUnique_relSeries_semistableRel` |
-| Chain equalities of the first-player value along the canonical filtration | `hnFiltration_A_bot_eq_A` |
+| Equalities of `μ.A`-values along the canonical filtration | `hnFiltration_A_bot_eq_A` |
 | Convexity of the coprimary payoff function | the `IsConvexOn ⊤` instance for `Coprimary.payoff R M` |
-| First-player value of the coprimary payoff function | `Coprimary.A_payoff` |
+| Value of the coprimary payoff function when A moves first | `Coprimary.A_payoff` |
 | Descending chain condition for the coprimary payoff function | the `ADCC` instance for `Coprimary.payoff R M` |
 | Semistable means coprimary | `Coprimary.isSemistable_iff_A_const`, `Coprimary.isSemistable_iff_existsUnique_associatedPrime` |
 | Existence and uniqueness of the coprimary filtration | `Coprimary.coprimaryFiltration`, `Unique (CoprimaryFiltration R M)` |
 | The associated primes of `M` via the coprimary filtration | `CoprimaryFiltration.associatedPrimes_eq_iUnion` |
-| Player A's value collapses to the global minimum | `A_top_eq_min_top`, `A_top_le_B_top` |
-| Player B's value collapses to the global maximum | `B_top_eq_max_top`, `A_top_le_B_top_of_strongDCC` |
+| Player A's value equals the global infimum | `A_top_eq_min_top`, `A_top_le_B_top` |
+| Player B's value equals the global supremum | `B_top_eq_max_top`, `A_top_le_B_top_of_strongDCC` |
 | Strong descending chain condition from a well-ordered rank | `strongDCC_of_wellOrderedRank` |
 | The slope-like axiom as the seesaw trichotomy | `isSlopeLike_iff_seesaw`, `IsSlopeLike.seesaw` |
 | The slope of a degree by a rank is slope-like | `isSlopeLike_slope` |
@@ -170,7 +171,7 @@ into the listed single-conclusion lemmas.
 | Nash equilibrium iff the global extremal values coincide | `min_top_eq_max_top_iff_hasNashEquilibrium`, `nashEquilibrium_tfae` |
 | Existence of Jordan–Hölder filtrations | `Nonempty (μ.JordanHolderFiltration)`, `exists_relSeries_jordanHolderRel` |
 
-Further results include the uniqueness of the Jordan–Hölder length over a modular lattice
+Further results include the uniqueness of the Jordan–Hölder length under the hypotheses above
 (`JordanHolderFiltration.length_eq`), the piecewise-stability characterization
 (`piecewise_isStable_iff`), and the commutative algebra input
 `HarderNarasimhan.associatedPrimes_quot_ker_mkLinearMap`.
@@ -188,3 +189,5 @@ lake build
 ## License
 
 Licensed under the Apache License, Version 2.0.  See [LICENSE](LICENSE).
+
+[ChenJeannin]: https://arxiv.org/abs/2306.08283

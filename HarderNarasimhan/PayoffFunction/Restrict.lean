@@ -10,16 +10,13 @@ public import HarderNarasimhan.PayoffFunction.Defs
 /-!
 # Restriction of payoff functions
 
-This file defines `μ.restrict I`, the restriction of a payoff function `μ` on `ℒ` to the
-points `↥I` of a strict interval `I`, and proves that the four extremal operations commute
-with restriction:
+A payoff function on `ℒ` restricts to the closed interval of points `↥I` of a strict interval
+`I`. The four operations `max`, `min`, `A` and `B` commute with restriction, so their values
+on a subinterval agree whether computed in `ℒ` or in `↥I`.
 
-* `max_restrict` : `(μ.restrict I).max = μ.max.restrict I`, and the analogous
-  `min_restrict`, `A_restrict`, `B_restrict`.
+## Main definitions
 
-These are key “locality” principles: computations of `μ.max`, `μ.min`, `μ.A` and `μ.B` can
-be performed on subintervals.  Pointwise versions (`max_restrict_apply`, …) are provided for
-rewriting a single value.
+* `HarderNarasimhan.PayoffFunction.restrict`: restriction to the points of an interval.
 -/
 
 @[expose] public section
@@ -30,9 +27,8 @@ namespace PayoffFunction
 
 variable {ℒ S : Type*} [PartialOrder ℒ]
 
-/-- `μ.restrict I` is the restriction of the payoff function `μ` to the points of `I`: a
-strict interval `J` of `↥I` is sent to `μ ↑J`.  This is the core adapter used throughout the
-development to reuse global constructions on subintervals. -/
+/-- The restriction of `μ` to the points of `I`. A strict interval `J` in `↥I` has payoff
+`μ ↑J`, where `↑J` is the corresponding interval in `ℒ`. -/
 def restrict (μ : PayoffFunction ℒ S) (I : StrictIntvl ℒ) : PayoffFunction ↥I S :=
   ⟨fun J ↦ μ ↑J⟩
 

@@ -12,35 +12,22 @@ public import Mathlib.Tactic.Tauto
 /-!
 # Slope-like payoff functions
 
-This file defines the *slope-like* axiom for a payoff function `μ`: for any chain
-`x < y < z` the value on the long interval `(x, z)` is constrained between the values on the
-two short intervals, as if `μ` were a slope `degree/rank` (see
-`HarderNarasimhan.PayoffFunction.Slope` for that construction).
+A payoff function is slope-like if it satisfies the seesaw property: for `x < y < z`, the
+three values `μ (x, y)`, `μ (x, z)` and `μ (y, z)` are strictly increasing, strictly decreasing,
+or all equal. Slopes obtained by dividing an additive degree by an additive nonnegative rank
+satisfy this property when the degree is positive on intervals of rank zero; see
+`HarderNarasimhan/PayoffFunction/Slope.lean`.
 
-The axiom itself (`IsSlopeLike`) is a redundancy-rich conjunction of four disjunctions that
-works in an arbitrary complete lattice.  Its useful reformulation is the *seesaw*
-trichotomy (`IsSlopeLike.seesaw`): the three values
+## Main declarations
 
-* `left  = μ (x, y)`,
-* `total = μ (x, z)`,
-* `right = μ (y, z)`
+* `HarderNarasimhan.PayoffFunction.IsSlopeLike`: the slope-like condition, expressed as four
+  alternatives between inequalities.
+* `HarderNarasimhan.PayoffFunction.isSlopeLike_iff_seesaw`: equivalence with the seesaw
+  trichotomy, for payoffs in a complete lattice.
 
-are either strictly increasing, strictly decreasing, or all equal.
-
-## The `seesaw_*` lemmas
-
-For each of the pairwise comparisons the trichotomy yields an equivalence with the
-**left-versus-total** comparison, which we adopt as the canonical right-hand side:
-
-* `seesaw_total_lt_right_iff` : `total < right ↔ left < total`
-* `seesaw_left_lt_right_iff`  : `left < right ↔ left < total`
-* `seesaw_right_lt_total_iff` : `right < total ↔ total < left`
-* `seesaw_right_lt_left_iff`  : `right < left ↔ total < left`
-* `seesaw_total_eq_right_iff` : `total = right ↔ left = total`
-* `seesaw_left_eq_right_iff`  : `left = right ↔ left = total`
-
-Any of the nine possible one-step implications is a `.1`/`.2` of one of these (or a
-`.trans` of two).
+The comparison lemmas, such as
+`HarderNarasimhan.PayoffFunction.IsSlopeLike.seesaw_total_lt_right_iff`, express comparisons
+between the three values in terms of the comparison between `μ (x, y)` and `μ (x, z)`.
 
 ## References
 
@@ -55,10 +42,12 @@ namespace PayoffFunction
 
 variable {ℒ S : Type*} [PartialOrder ℒ] [CompleteLattice S]
 
-/-- The *slope-like* axiom: for any chain `x < y < z`, the four disjunctions constrain the
-value on `(x, z)` to sit between the values on `(x, y)` and `(y, z)` in the “seesaw” manner.
-The formulation is deliberately redundancy-rich so that it is usable in a mere complete
-lattice; over a linear order it is equivalent to the trichotomy `IsSlopeLike.seesaw`. -/
+/-- A payoff function is slope-like if, for `x < y < z`, the payoffs on `(x, y)`, `(x, z)`
+and `(y, z)` satisfy the seesaw condition.
+
+The four alternatives below are equivalent to these three values being strictly increasing,
+strictly decreasing, or all equal; see
+`HarderNarasimhan.PayoffFunction.isSlopeLike_iff_seesaw`. -/
 class IsSlopeLike (μ : PayoffFunction ℒ S) : Prop where
   /-- The four-fold seesaw condition. -/
   slopelike : ∀ (x y z : ℒ), (h : x < y ∧ y < z) →
@@ -111,7 +100,8 @@ section Seesaw
 variable (hsl : μ.IsSlopeLike) {x y z : ℒ} (h₁ : x < y) (h₂ : y < z)
 include hsl
 
-/-- Seesaw: `total < right ↔ left < total`. -/
+/-- The total payoff is less than the right payoff iff the left payoff is less than the
+total payoff. -/
 lemma IsSlopeLike.seesaw_total_lt_right_iff :
     μ ⟨x, z, h₁.trans h₂⟩ < μ ⟨y, z, h₂⟩ ↔ μ ⟨x, y, h₁⟩ < μ ⟨x, z, h₁.trans h₂⟩ := by
   rcases hsl.seesaw h₁ h₂ with ⟨ha, hb⟩ | ⟨ha, hb⟩ | ⟨ha, hb⟩
@@ -119,7 +109,7 @@ lemma IsSlopeLike.seesaw_total_lt_right_iff :
   · exact iff_of_false (asymm hb) (asymm ha)
   · exact iff_of_false hb.not_lt ha.not_lt
 
-/-- Seesaw: `left < right ↔ left < total`. -/
+/-- The left payoff is less than the right payoff iff it is less than the total payoff. -/
 lemma IsSlopeLike.seesaw_left_lt_right_iff :
     μ ⟨x, y, h₁⟩ < μ ⟨y, z, h₂⟩ ↔ μ ⟨x, y, h₁⟩ < μ ⟨x, z, h₁.trans h₂⟩ := by
   rcases hsl.seesaw h₁ h₂ with ⟨ha, hb⟩ | ⟨ha, hb⟩ | ⟨ha, hb⟩
@@ -127,7 +117,8 @@ lemma IsSlopeLike.seesaw_left_lt_right_iff :
   · exact iff_of_false (asymm (hb.trans ha)) (asymm ha)
   · exact iff_of_false (ha.trans hb).not_lt ha.not_lt
 
-/-- Seesaw: `right < total ↔ total < left`. -/
+/-- The right payoff is less than the total payoff iff the total payoff is less than the
+left payoff. -/
 lemma IsSlopeLike.seesaw_right_lt_total_iff :
     μ ⟨y, z, h₂⟩ < μ ⟨x, z, h₁.trans h₂⟩ ↔ μ ⟨x, z, h₁.trans h₂⟩ < μ ⟨x, y, h₁⟩ := by
   rcases hsl.seesaw h₁ h₂ with ⟨ha, hb⟩ | ⟨ha, hb⟩ | ⟨ha, hb⟩
@@ -135,7 +126,8 @@ lemma IsSlopeLike.seesaw_right_lt_total_iff :
   · exact iff_of_true hb ha
   · exact iff_of_false hb.not_gt ha.not_gt
 
-/-- Seesaw: `right < left ↔ total < left`. -/
+/-- The right payoff is less than the left payoff iff the total payoff is less than the
+left payoff. -/
 lemma IsSlopeLike.seesaw_right_lt_left_iff :
     μ ⟨y, z, h₂⟩ < μ ⟨x, y, h₁⟩ ↔ μ ⟨x, z, h₁.trans h₂⟩ < μ ⟨x, y, h₁⟩ := by
   rcases hsl.seesaw h₁ h₂ with ⟨ha, hb⟩ | ⟨ha, hb⟩ | ⟨ha, hb⟩
@@ -143,7 +135,7 @@ lemma IsSlopeLike.seesaw_right_lt_left_iff :
   · exact iff_of_true (hb.trans ha) ha
   · exact iff_of_false (ha.trans hb).not_gt ha.not_gt
 
-/-- Seesaw: `total = right ↔ left = total`. -/
+/-- The total and right payoffs are equal iff the left and total payoffs are equal. -/
 lemma IsSlopeLike.seesaw_total_eq_right_iff :
     μ ⟨x, z, h₁.trans h₂⟩ = μ ⟨y, z, h₂⟩ ↔ μ ⟨x, y, h₁⟩ = μ ⟨x, z, h₁.trans h₂⟩ := by
   rcases hsl.seesaw h₁ h₂ with ⟨ha, hb⟩ | ⟨ha, hb⟩ | ⟨ha, hb⟩
@@ -151,7 +143,7 @@ lemma IsSlopeLike.seesaw_total_eq_right_iff :
   · exact iff_of_false hb.ne' ha.ne'
   · exact iff_of_true hb ha
 
-/-- Seesaw: `left = right ↔ left = total`. -/
+/-- The left and right payoffs are equal iff the left and total payoffs are equal. -/
 lemma IsSlopeLike.seesaw_left_eq_right_iff :
     μ ⟨x, y, h₁⟩ = μ ⟨y, z, h₂⟩ ↔ μ ⟨x, y, h₁⟩ = μ ⟨x, z, h₁.trans h₂⟩ := by
   rcases hsl.seesaw h₁ h₂ with ⟨ha, hb⟩ | ⟨ha, hb⟩ | ⟨ha, hb⟩

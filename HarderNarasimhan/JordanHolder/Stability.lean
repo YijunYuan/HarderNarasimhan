@@ -10,17 +10,18 @@ public import HarderNarasimhan.JordanHolder.Defs
 /-!
 # Stability of the steps of a Jordan–Hölder filtration
 
-This file relates the two ways of saying that the steps of a finite strictly decreasing
-chain `f` are *stable*: the stability condition of `PayoffFunction.JordanHolderFiltration`
-(refining a step through any strictly intermediate point strictly decreases the payoff) is
-equivalent to stability, in the sense of `PayoffFunction.IsStable`, of the restriction of
-`μ` to each step interval.
+For a slope-like payoff function satisfying the eventually-`⊤` descending chain condition,
+the payoff inequalities in a Jordan–Hölder filtration characterize stability of its steps.
+More precisely, a step with endpoints `a < b` is stable if and only if every `a < z < b`
+satisfies `μ ⟨a, z, _⟩ < μ ⟨a, b, _⟩`. We assume that the codomain is a complete linear order
+and `>` is well-founded on the lattice.
 
 ## Main results
 
-* `PayoffFunction.piecewise_isStable_iff` : the equivalence.
-* `PayoffFunction.piecewise_isStable_of_payoff_lt`,
-  `PayoffFunction.payoff_lt_of_piecewise_isStable` : the two directions.
+* `HarderNarasimhan.PayoffFunction.piecewise_isStable_iff`: the equivalence for a finite
+  strictly decreasing chain.
+* `HarderNarasimhan.PayoffFunction.piecewise_isStable_of_payoff_lt` and
+  `HarderNarasimhan.PayoffFunction.payoff_lt_of_piecewise_isStable`: the two implications.
 
 ## References
 
@@ -39,8 +40,8 @@ variable (μ : PayoffFunction ℒ S) [μ.IsSlopeLike] [μ.EventuallyTopDCC]
 variable (f : ℕ → ℒ) {n : ℕ}
 
 omit [Nontrivial ℒ] [BoundedOrder ℒ] in
-/-- If every strictly intermediate refinement of the steps of `f` strictly decreases the
-payoff, then the restriction of `μ` to each step interval is semistable. -/
+/-- If replacing the upper endpoint of each step by a strictly intermediate point strictly
+decreases the payoff, then every step is semistable. -/
 private lemma piecewise_isSemistable_of_payoff_lt
     (hsa : ∀ i j : ℕ, i < j → j ≤ n → f j < f i)
     (h : ∀ i : ℕ, (hi : i < n) → ∀ z : ℒ, (h' : f (i + 1) < z) → z < f i →
@@ -67,8 +68,8 @@ private lemma piecewise_isSemistable_of_payoff_lt
       (h i hi u.val hul hur)
 
 omit [Nontrivial ℒ] [BoundedOrder ℒ] in
-/-- If every strictly intermediate refinement of the steps of `f` strictly decreases the
-payoff, then the restriction of `μ` to each step interval is stable. -/
+/-- If replacing the upper endpoint of each step by a strictly intermediate point strictly
+decreases the payoff, then every step is stable. -/
 theorem piecewise_isStable_of_payoff_lt
     (hsa : ∀ i j : ℕ, i < j → j ≤ n → f j < f i)
     (h : ∀ i : ℕ, (hi : i < n) → ∀ z : ℒ, (h' : f (i + 1) < z) → z < f i →
@@ -94,8 +95,8 @@ theorem piecewise_isStable_of_payoff_lt
       h i hi x.val hx_left hx').ne
 
 omit [Nontrivial ℒ] [BoundedOrder ℒ] in
-/-- Conversely, if the restriction of `μ` to each step interval of `f` is stable, then every
-strictly intermediate refinement of the steps strictly decreases the payoff. -/
+/-- If every step is stable, replacing its upper endpoint by a strictly intermediate point
+strictly decreases the payoff. -/
 theorem payoff_lt_of_piecewise_isStable
     (hsa : ∀ i j : ℕ, i < j → j ≤ n → f j < f i)
     (hst : ∀ i : ℕ, (hi : i < n) →
@@ -115,7 +116,7 @@ theorem payoff_lt_of_piecewise_isStable
     min_top_eq_apply_iff.2 (min_top_eq_max_top_iff_hasNashEquilibrium.2 hNash_step)
   have hmax_step : (μ.restrict stepI).max ⊤ = (μ.restrict stepI) ⊤ :=
     max_top_eq_apply_iff.2 (min_top_eq_max_top_iff_hasNashEquilibrium.2 hNash_step)
-  -- Stability gives a strict inequality for the minimum payoff on the shorter interval.
+  -- Stability gives a strict inequality for the infimum of payoffs on the shorter interval.
   have hmin_lt : μ.min ⟨f (i + 1), z, hz⟩ <
       μ ⟨f (i + 1), f i, hsa i (i + 1) (lt_add_one i) hi⟩ := by
     have hstable := (not_lt.1 ((hst i hi).toIsSemistable.not_lt midI hmid_ne_bot)).lt_of_ne
@@ -129,7 +130,7 @@ theorem payoff_lt_of_piecewise_isStable
     hmax_step ▸ le_iSup₂_of_le u ⟨hu, le_top⟩ le_rfl
   refine (payoff_le_total midI hmid_ne_bot).lt_of_ne ?_
   intro heq
-  -- If the payoffs were equal, a smaller minimum would violate semistability.
+  -- If the payoffs were equal, a smaller infimum would violate semistability.
   change μ ⟨f (i + 1), z, hz⟩ =
     μ ⟨f (i + 1), f i, hsa i (i + 1) (lt_add_one i) hi⟩ at heq
   rw [← heq] at hmin_lt
@@ -144,10 +145,8 @@ theorem payoff_lt_of_piecewise_isStable
   exact hy_gt.not_ge (payoff_le_total ⟨y, hy_mem.1, (hy_mem.2.trans hz').le⟩ hy_left)
 
 omit [Nontrivial ℒ] [BoundedOrder ℒ] in
-/-- The stability condition of `PayoffFunction.JordanHolderFiltration` is equivalent to
-stability of the restriction of `μ` to each step interval: for a chain `f` strictly
-decreasing up to `n`, every strictly intermediate refinement of the steps strictly
-decreases the payoff iff each restricted payoff function is stable. -/
+/-- The steps of a finite strictly decreasing chain are stable if and only if replacing
+the upper endpoint of any step by a strictly intermediate point strictly decreases its payoff. -/
 theorem piecewise_isStable_iff (hsa : ∀ i j : ℕ, i < j → j ≤ n → f j < f i) :
     (∀ i : ℕ, (hi : i < n) →
         (μ.restrict ⟨f (i + 1), f i, hsa i (i + 1) (lt_add_one i) hi⟩).IsStable) ↔

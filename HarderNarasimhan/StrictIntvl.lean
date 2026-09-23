@@ -13,34 +13,29 @@ public import Mathlib.Order.Sublattice
 /-!
 # Strict intervals
 
-This file defines `StrictIntvl ℒ`, the type of *strict intervals* in an order `ℒ`: ordered
-pairs of endpoints `left < right`.  Strict intervals index every payoff function in this
-library; strictness is part of the data, so no use site ever needs to carry a nondegeneracy
-side condition.
-
-`StrictIntvl ℒ` is partially ordered by inclusion, and when `ℒ` is a nontrivial bounded
-order the total interval `(⊥, ⊤)` is its top element `⊤`.
-
-A strict interval `I` is also viewed as a self-contained bounded order through its coercion
-to sort: `↥I` is the subtype of points lying between the endpoints, with `⊥ = I.left` and
-`⊤ = I.right`.  Lattice structure, modularity and well-foundedness of `>` all descend from
-`ℒ` to `↥I`.
+A strict interval in an order `ℒ` is a pair of endpoints `a < b`. The points of the interval
+include both endpoints: `x ∈ I` means `I.left ≤ x ∧ x ≤ I.right`.
+Strict intervals are ordered by inclusion. If `ℒ` is a nontrivial bounded order, the interval
+with endpoints `⊥` and `⊤` is the greatest strict interval.
 
 ## Main definitions
 
-* `StrictIntvl ℒ`: the type of strict intervals `left < right` in `ℒ`, with membership
-  `x ∈ I ↔ I.left ≤ x ∧ x ≤ I.right` and the inclusion order.
-* The points type `↥I`, together with its inherited `BoundedOrder`, `Lattice`,
-  `IsModularLattice` and `WellFoundedGT` instances.
-* `StrictIntvl.ofSub`: reinterpret a strict interval of `↥I` as a strict interval of `ℒ`;
-  the preferred spelling is the coercion `↑J`.
+* `HarderNarasimhan.StrictIntvl`: intervals with strictly ordered endpoints.
+* `HarderNarasimhan.StrictIntvl.ofSub`: a strict interval of `↥I`, viewed as an interval of `ℒ`.
+
+## Implementation notes
+
+An interval `I` coerces to the subtype of its points. This subtype has bottom `I.left` and
+top `I.right`, and inherits lattice structure, modularity, and well-foundedness of `>`
+from `ℒ`. The coercion from `StrictIntvl ↥I` to `StrictIntvl ℒ` is given by
+`HarderNarasimhan.StrictIntvl.ofSub`.
 -/
 
 @[expose] public section
 
 namespace HarderNarasimhan
 
-/-- A *strict interval* in `ℒ`: an ordered pair of endpoints `left < right`. -/
+/-- A strict interval in `ℒ` is a pair of endpoints `left < right`. -/
 @[ext]
 structure StrictIntvl (ℒ : Type*) [LT ℒ] where
   /-- The left endpoint. -/
@@ -101,8 +96,7 @@ section OrderTop
 
 variable [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 
-/-- When `ℒ` is a nontrivial bounded order, the total interval `(⊥, ⊤)` is the greatest
-strict interval with respect to inclusion. -/
+/-- The interval with endpoints `⊥` and `⊤` is the greatest strict interval. -/
 instance : OrderTop (StrictIntvl ℒ) where
   top := ⟨⊥, ⊤, bot_lt_top⟩
   le_top _ := ⟨bot_le, le_top⟩
@@ -114,15 +108,12 @@ instance : OrderTop (StrictIntvl ℒ) where
 /-- Every element lies in the total interval `⊤`. -/
 @[simp] lemma mem_top (x : ℒ) : x ∈ (⊤ : StrictIntvl ℒ) := ⟨bot_le, le_top⟩
 
-/-- An interval with endpoints `⊥` and `⊤` is the total interval `⊤`, whatever the proof. -/
+/-- An interval with endpoints `⊥` and `⊤` is the total interval. -/
 @[simp] lemma mk_bot_top (h : (⊥ : ℒ) < ⊤) : (⟨⊥, ⊤, h⟩ : StrictIntvl ℒ) = ⊤ := rfl
 
 end OrderTop
 
-/-! ### The points of a strict interval
-
-The coercion to sort realises a strict interval `I` as the subtype `{x // x ∈ I}` of its
-points, a self-contained bounded order with `⊥ = I.left` and `⊤ = I.right`. -/
+/-! ### The points of a strict interval -/
 
 /-- The type of points of a strict interval: `↥I` is the subtype `{x // x ∈ I}`. -/
 instance [LT ℒ] [LE ℒ] : CoeSort (StrictIntvl ℒ) (Type _) :=
@@ -147,16 +138,13 @@ instance : BoundedOrder ↥I where
 
 @[simp] lemma val_top : (⊤ : ↥I).val = I.right := rfl
 
-/-- Well-foundedness of `>` is inherited by intervals: the strict order on `↥I` is the
-pullback of the strict order on `ℒ` along `Subtype.val`, so well-foundedness transports
-along `InvImage.wf`. -/
+/-- If `>` is well-founded on `ℒ`, then it is well-founded on the points of any interval. -/
 instance [hw : WellFoundedGT ℒ] : WellFoundedGT ↥I :=
   ⟨Subrelation.wf (fun h ↦ Subtype.coe_lt_coe.mpr h) (InvImage.wf Subtype.val hw.wf)⟩
 
-/-- Reinterpret a strict interval of `↥I` as a strict interval of the ambient order `ℒ`.
+/-- A strict interval of `↥I`, viewed as a strict interval of `ℒ`.
 
-This is the canonical adapter between the relative and the ambient viewpoints; the
-preferred spelling is the coercion arrow `↑J` provided by the `CoeOut` instance below. -/
+This defines the coercion from `StrictIntvl ↥I` to `StrictIntvl ℒ`. -/
 def ofSub (J : StrictIntvl ↥I) : StrictIntvl ℒ :=
   ⟨J.left, J.right, Subtype.coe_lt_coe.2 J.lt⟩
 
@@ -166,7 +154,7 @@ instance : CoeOut (StrictIntvl ↥I) (StrictIntvl ℒ) := ⟨ofSub⟩
 
 @[simp] lemma ofSub_right (J : StrictIntvl ↥I) : (ofSub J).right = J.right.val := rfl
 
-/-- The total interval of `↥I` maps back to `I` itself under `ofSub`. -/
+/-- The total interval of `↥I`, viewed in the ambient order, is `I`. -/
 @[simp] lemma ofSub_top : ofSub (⊤ : StrictIntvl ↥I) = I := rfl
 
 end Points
@@ -175,8 +163,8 @@ section Lattice
 
 variable [Lattice ℒ] {I : StrictIntvl ℒ}
 
-/-- If `ℒ` is a lattice, then `↥I` is a lattice with `⊔`/`⊓` computed in `ℒ`: the interval
-is closed under `⊔` and `⊓` by the endpoint bounds stored in the membership proofs. -/
+/-- The points of an interval in a lattice form a lattice, with joins and meets computed
+in the ambient lattice. -/
 instance : Lattice ↥I :=
   Subtype.lattice (fun _ _ hx hy ↦ ⟨le_trans hx.1 le_sup_left, sup_le hx.2 hy.2⟩)
     (fun _ _ hx hy ↦ ⟨le_inf hx.1 hy.1, le_trans inf_le_right hy.2⟩)

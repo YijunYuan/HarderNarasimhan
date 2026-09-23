@@ -14,42 +14,25 @@ public import Mathlib.Algebra.Module.Torsion.Basic
 /-!
 # Semistability of the coprimary payoff function
 
-This file establishes the game-theoretic properties of the coprimary payoff function
-`Coprimary.payoff R M` that feed the general Harder–Narasimhan machinery, and identifies its
-semistability with the classical coprimarity condition.
+Let `M` be a finitely generated module over a commutative Noetherian ring. This file
+computes the value of the coprimary payoff function when player A moves first. For `M ≠ 0`,
+this payoff function is semistable precisely when `M` is coprimary.
 
-The key computation is `Coprimary.A_payoff`: the first-player value of the game on an
-interval `(N₁, N₂)` of submodules is the singleton containing the *minimal* associated prime
-of `N₂ ⧸ N₁` (in the fixed linear extension of the prime spectrum).  The optimal first move
-is exhibited by the kernel of the localization of `N₂ ⧸ N₁` at that minimal prime, whose
-associated primes are computed by `associatedPrimes_quot_ker_mkLinearMap` from
-`HarderNarasimhan.Coprimary.AssociatedPrimes`.
-
-From this computation the standing hypotheses of the general theory follow: convexity
-(the `IsConvexOn ⊤` instance) and the descending chain condition (the `ADCC` instance, by
-finiteness of the associated primes of a fixed module over a Noetherian ring).  Moreover
-semistability of `Coprimary.payoff R M` is equivalent to `M` having a unique associated
-prime (`Coprimary.isSemistable_iff_existsUnique_associatedPrime`), i.e. to `M` being
-coprimary.
-
-Finally, the file provides the translation between the game restricted to an interval
-`(N₁, N₂)` of submodules of `M` and the game on the submodule lattice of the subquotient
-`N₂ ⧸ N₁` (`Coprimary.A_restrict_eq_quotient` and
-`Coprimary.isSemistable_restrict_iff_quotient`); this is how "the subquotients of a
-Harder–Narasimhan filtration are coprimary" is extracted in
-`HarderNarasimhan.Coprimary.Filtration`.
+All comparisons of prime ideals use the fixed linear extension of the prime spectrum.
+In particular, the least associated prime below refers to this linear order.
 
 ## Main results
 
-* `Coprimary.A_payoff` : the first-player value is the singleton on the minimal associated
-  prime of the subquotient.
-* `Coprimary.isSemistable_iff_A_const`, `Coprimary.isSemistable_iff_existsUnique_associatedPrime` :
-  semistability of the coprimary payoff function is equivalent to constancy of the
-  first-player value on initial segments, and to `M` having exactly one associated prime.
-* `Coprimary.isSemistable_restrict_iff_quotient` : semistability of the restriction to an
-  interval of submodules is semistability of the coprimary payoff function of the
-  subquotient.
-* The `IsConvexOn ⊤` and `ADCC` instances for `Coprimary.payoff R M`.
+* `HarderNarasimhan.Coprimary.A_payoff`: the value when A moves first on `N₁ < N₂` is the
+  singleton containing the least associated prime of `N₂ ⧸ N₁`.
+* `HarderNarasimhan.Coprimary.isSemistable_iff_existsUnique_associatedPrime`: for `M ≠ 0`,
+  semistability is equivalent to having exactly one associated prime.
+* `HarderNarasimhan.Coprimary.isSemistable_restrict_iff_quotient`: semistability of the restriction
+  to an interval is equivalent to semistability of the payoff function of its subquotient.
+
+The coprimary payoff function is convex and satisfies the descending chain condition
+`HarderNarasimhan.PayoffFunction.ADCC`. These instances allow the existence theorem for
+Harder–Narasimhan filtrations to be applied in `HarderNarasimhan/Coprimary/Filtration.lean`.
 
 ## References
 
@@ -72,17 +55,16 @@ lemma nontrivial_quotient_of_lt {N₁ N₂ : Submodule R M} (hN : N₁ < N₂) :
   rw [Submodule.Quotient.nontrivial_iff, ne_eq, Submodule.submoduleOf_eq_top]
   exact hN.not_ge
 
-/-- Monotonicity of `Coprimary.subquotientAssociatedPrimes` in the right endpoint: if
-`N₁ < u ≤ N₃`, every associated prime of `u ⧸ N₁` is an associated prime of `N₃ ⧸ N₁`. -/
+/-- If `N₁ < u ≤ N₃`, every associated prime of `u ⧸ N₁` is an associated prime of
+`N₃ ⧸ N₁`. -/
 lemma subquotientAssociatedPrimes_mono_right {N₁ u N₃ : Submodule R M}
     (h₁ : N₁ < u) (h₂ : u ≤ N₃) :
     subquotientAssociatedPrimes ⟨N₁, u, h₁⟩ ⊆
       subquotientAssociatedPrimes ⟨N₁, N₃, h₁.trans_le h₂⟩ :=
   fun _ hi ↦ associatedPrimes_subset_of_submoduleOf_le N₁ u N₃ h₂ hi
 
-/-- Lift a submodule of a subquotient back to a submodule of the ambient module: for
-`x ≤ N₂ ⧸ N₁`, `liftQuot N₁ N₂ x` is the preimage of `x` under the quotient map
-`N₂ → N₂ ⧸ N₁`, viewed inside `M` via the inclusion `N₂ ↪ M`. -/
+/-- The preimage of a submodule of `N₂ / (N₂ ∩ N₁)` under the quotient map, viewed as a
+submodule of `M`. -/
 private def liftQuot (N₁ N₂ : Submodule R M) (x : Submodule R (N₂ ⧸ N₁.submoduleOf N₂)) :
     Submodule R M :=
   Submodule.map N₂.subtype (Submodule.comap (N₁.submoduleOf N₂).mkQ x)
@@ -96,7 +78,7 @@ private lemma liftQuot_middle (N₁ N₂ : Submodule R M) (hN : N₁ ≤ N₂)
   change N₁ ≤ Submodule.map N₂.subtype (N₁.submoduleOf N₂)
   rw [Submodule.submoduleOf, Submodule.map_comap_subtype, inf_eq_right.2 hN]
 
-/-- If `x ≠ ⊥` as a submodule of the subquotient `N₂ ⧸ N₁`, then `liftQuot N₁ N₂ x ≠ N₁`. -/
+/-- The lift of a nonzero submodule of `N₂ / (N₂ ∩ N₁)` differs from `N₁`. -/
 private lemma liftQuot_ne_left (N₁ N₂ : Submodule R M)
     (x : Submodule R (N₂ ⧸ N₁.submoduleOf N₂)) (hx : x ≠ ⊥) : liftQuot N₁ N₂ x ≠ N₁ := by
   intro hc
@@ -111,8 +93,8 @@ private lemma liftQuot_ne_left (N₁ N₂ : Submodule R M)
   rw [← hc]
   exact ⟨a, ha, rfl⟩
 
-/-- Third isomorphism theorem for lifted submodules: the quotient of `N₂` by the lift of
-`X ≤ N₂ ⧸ N₁` is canonically the quotient `(N₂ ⧸ N₁) ⧸ X`. -/
+/-- The isomorphism between `(N₂ / (N₂ ∩ N₁)) / X` and the quotient of `N₂` by the
+preimage of `X`, given by the third isomorphism theorem. -/
 private noncomputable def quotLiftQuotEquiv (N₁ N₂ : Submodule R M)
     (X : Submodule R (↥N₂ ⧸ N₁.submoduleOf N₂)) :
     (↥N₂ ⧸ (liftQuot N₁ N₂ X).submoduleOf N₂) ≃ₗ[R] ((↥N₂ ⧸ N₁.submoduleOf N₂) ⧸ X) :=
@@ -121,8 +103,8 @@ private noncomputable def quotLiftQuotEquiv (N₁ N₂ : Submodule R M)
       (Submodule.quotientQuotientEquivQuotient (N₁.submoduleOf N₂) _
         (Submodule.le_comap_mkQ _ _)).symm)
 
-/-- Subquotients on an interval identify with the corresponding submodules of the quotient
-module: for `N₁ ≤ W ≤ N₂`, the module `W ⧸ N₁` is the image of `W` in `N₂ ⧸ N₁`. -/
+/-- For `N₁ ≤ W ≤ N₂`, the canonical isomorphism from `W ⧸ N₁` to the image of `W` in
+`N₂ ⧸ N₁`. -/
 private noncomputable def quotEquivMapComap {N₁ N₂ W : Submodule R M}
     (_ : N₁ ≤ W) (h₂ : W ≤ N₂) :
     (↥W ⧸ N₁.submoduleOf W) ≃ₗ[R]
@@ -149,9 +131,7 @@ private noncomputable def quotEquivMapComap {N₁ N₂ W : Submodule R M}
     (Submodule.quotEquivOfEq (N₁.submoduleOf W) (LinearMap.ker f) hker.symm).trans
       ((LinearMap.quotKerEquivRange f).trans (LinearEquiv.ofEq _ _ hrange))
 
-/-- The image in `N₂ ⧸ N₁` of a submodule `W` with `N₁ ≤ W ≤ N₂` and `W ≠ N₁` is nonzero.
-This lemma is public because it supplies the nonvanishing proof in the statement of
-`Coprimary.A_restrict_eq_quotient`. -/
+/-- The image of `W` in `N₂ ⧸ N₁` is nonzero when `N₁ < W ≤ N₂`. -/
 lemma map_comap_ne_bot {N₁ N₂ W : Submodule R M} (h₁ : N₁ ≤ W) (h₂ : W ≤ N₂)
     (h₃ : W ≠ N₁) :
     Submodule.map (N₁.submoduleOf N₂).mkQ (Submodule.comap N₂.subtype W) ≠ ⊥ := by
@@ -164,8 +144,7 @@ lemma map_comap_ne_bot {N₁ N₂ W : Submodule R M} (h₁ : N₁ ≤ W) (h₂ :
   change (⟨x, h₂ hx⟩ : N₂) ∈ N₁.submoduleOf N₂
   simpa [hbot, Submodule.Quotient.mk_eq_zero] using hx_image
 
-/-- `Coprimary.subquotientAssociatedPrimes` agrees with its quotient-lattice version under
-the submodule correspondence. -/
+/-- Associated primes agree under the submodule correspondence for a quotient. -/
 private lemma subquotientAssociatedPrimes_eq_quotient {N₁ N₂ W : Submodule R M}
     (h₁ : N₁ ≤ W) (h₂ : W ≤ N₂) (h₃ : W ≠ N₁) :
     subquotientAssociatedPrimes ⟨N₁, W, h₁.lt_of_ne' h₃⟩ =
@@ -192,8 +171,7 @@ section Payoff
 variable {R : Type*} [CommRing R] [IsNoetherianRing R]
 variable {M : Type*} [AddCommGroup M] [Module R M] [Module.Finite R M]
 
-/-- For a strict inclusion `N₁ < N₂`, the subquotient `N₂ ⧸ N₁` is nontrivial, hence has an
-associated prime: the finset of associated primes of any interval is nonempty. -/
+/-- The subquotient of a strict inclusion has an associated prime. -/
 lemma subquotientAssociatedPrimes_nonempty (I : StrictIntvl (Submodule R M)) :
     (subquotientAssociatedPrimes I).toFinset.Nonempty := by
   simp only [Set.toFinset_nonempty]
@@ -201,18 +179,15 @@ lemma subquotientAssociatedPrimes_nonempty (I : StrictIntvl (Submodule R M)) :
   obtain ⟨q, hq⟩ := associatedPrimes.nonempty R (↥I.right ⧸ I.left.submoduleOf I.right)
   exact ⟨⟨q, hq.out.1⟩, hq⟩
 
-/-- The minimal element of the associated primes of an interval is itself an associated
-prime of the subquotient. -/
+/-- The least associated prime of a subquotient belongs to its set of associated primes. -/
 lemma min'_mem_subquotientAssociatedPrimes (I : StrictIntvl (Submodule R M)) :
     (subquotientAssociatedPrimes I).toFinset.min' (subquotientAssociatedPrimes_nonempty I) ∈
       subquotientAssociatedPrimes I :=
   (Set.mem_toFinset (s := subquotientAssociatedPrimes I)).mp <|
     (subquotientAssociatedPrimes I).toFinset.min'_mem (subquotientAssociatedPrimes_nonempty I)
 
-/-- If the subquotient of `I` has a unique associated prime, every associated prime computes
-the minimal element of `Coprimary.subquotientAssociatedPrimes I`.  This bridges the
-`IsCoprimary` predicate on subquotients and the minimal associated primes compared by the
-Harder–Narasimhan axioms. -/
+/-- If a subquotient has exactly one associated prime, that prime is the least element of
+its set of associated primes in the linear extension. -/
 lemma toLinearExtension_eq_min' (I : StrictIntvl (Submodule R M))
     (hu : ∃! p, p ∈ associatedPrimes R (I.right ⧸ I.left.submoduleOf I.right))
     {p : PrimeSpectrum R}
@@ -221,9 +196,8 @@ lemma toLinearExtension_eq_min' (I : StrictIntvl (Submodule R M))
       (subquotientAssociatedPrimes I).toFinset.min' (subquotientAssociatedPrimes_nonempty I) :=
   PrimeSpectrum.ext (hu.unique hp (min'_mem_subquotientAssociatedPrimes I))
 
-/-- For the coprimary payoff function, the `max` operation is redundant: enlarging the right
-endpoint only enlarges the set of associated primes, so the whole interval already realizes
-the supremum. -/
+/-- The coprimary payoff function is unchanged by taking the supremum over subintervals
+with the same left endpoint. -/
 lemma max_payoff : (payoff R M).max = payoff R M := by
   refine PayoffFunction.ext fun I ↦
     le_antisymm (PayoffFunction.max_le fun u hu ↦ ?_) PayoffFunction.apply_le_max
@@ -231,10 +205,7 @@ lemma max_payoff : (payoff R M).max = payoff R M := by
   exact DedekindCut.principal_le_principal.mpr <| Finset.Colex.toColex_le_toColex_of_subset <|
     Set.toFinset_subset_toFinset.mpr <| subquotientAssociatedPrimes_mono_right hu.1 hu.2
 
-/-- The coprimary payoff function is convex: the payoff of `(x ⊓ y, x)` is at most the
-payoff of `(y, x ⊔ y)`, since the second isomorphism theorem embeds the first subquotient
-into the second and subset inclusion of associated primes refines the colexicographic order.
-The global `IsConvex` instance is derived automatically. -/
+/-- The coprimary payoff function is convex. -/
 instance [Nontrivial M] : (payoff R M).IsConvexOn ⊤ := by
   refine { le := fun x y _ _ hxy ↦ ?_ }
   simp only [payoff_apply]
@@ -244,13 +215,8 @@ instance [Nontrivial M] : (payoff R M).IsConvexOn ⊤ := by
   rw [mem_subquotientAssociatedPrimes, AssociatedPrimes.mem_iff] at hw ⊢
   exact (LinearEquiv.isAssociatedPrime_iff (LinearMap.quotientInfEquivSupQuotient x y)).1 hw
 
-/-- Lower bound property of the minimal associated prime: for an intermediate submodule
-`N''` of `I`, any associated prime of `I.right ⧸ N''` is at least the minimal element of
-`Coprimary.subquotientAssociatedPrimes I`.  Indeed, such a prime contains the annihilator
-of `I.right ⧸ N''`,
-hence the annihilator of `I.right ⧸ I.left`; a minimal prime over that annihilator below it
-is an associated prime of `I.right ⧸ I.left` (Noetherian, finite), and the chosen minimum is
-below it in the linear extension. -/
+/-- The least associated prime of `I.right ⧸ I.left` is a lower bound, in the linear
+extension, for the associated primes of `I.right ⧸ N''` when `I.left ≤ N'' ≤ I.right`. -/
 private lemma min'_le_toLinearExtension (I : StrictIntvl (Submodule R M))
     (N'' : Submodule R M) (ha1 : N'' ∈ I) :
     ∀ p : PrimeSpectrum R,
@@ -277,8 +243,9 @@ private lemma min'_le_toLinearExtension (I : StrictIntvl (Submodule R M))
       Module.associatedPrimes.minimalPrimes_annihilator_subset_associatedPrimes _ _ hr) <|
     toLinearExtension.monotone' (hrq : (⟨r, hr.1.1⟩ : PrimeSpectrum R) ≤ p)
 
-/-- Singleton lower bound for the first-player value: the singleton on the minimal
-associated prime of `I` is below the associated primes of any right-anchored subinterval. -/
+/-- For `I.left ≤ N'' < I.right`, the singleton containing the least associated prime of
+`I.right ⧸ I.left` is a lower bound in colexicographic order for the finite set of associated
+primes of `I.right ⧸ N''`. -/
 private lemma singleton_min'_le (I : StrictIntvl (Submodule R M))
     (N'' : Submodule R M) (ha1 : N'' ∈ I) (ha2 : N'' ≠ I.right) :
     toColex {(subquotientAssociatedPrimes I).toFinset.min'
@@ -294,8 +261,8 @@ private lemma singleton_min'_le (I : StrictIntvl (Submodule R M))
       Finset.Colex.toColex_le_toColex_of_subset <| Finset.singleton_subset_iff.mpr <|
         (subquotientAssociatedPrimes J).toFinset.min'_mem (subquotientAssociatedPrimes_nonempty J)
 
-/-- The kernel of the localization map of the subquotient of `I` at (the complement of) its
-minimal associated prime.  Its lift realizes the infimum defining the first-player value. -/
+/-- The kernel of the localization map of `I.right ⧸ I.left` at its least associated
+prime in the linear extension. -/
 private noncomputable abbrev locKer (I : StrictIntvl (Submodule R M)) :
     Submodule R (↥I.right ⧸ I.left.submoduleOf I.right) :=
   LinearMap.ker (LocalizedModule.mkLinearMap
@@ -303,10 +270,8 @@ private noncomputable abbrev locKer (I : StrictIntvl (Submodule R M)) :
       (subquotientAssociatedPrimes_nonempty I)).asIdeal.primeCompl)
     (↥I.right ⧸ I.left.submoduleOf I.right))
 
-/-- The associated primes of the witness subquotient form a singleton: quotienting by the
-lifted localization kernel leaves exactly the associated primes disjoint from the complement
-of the minimal prime (Bourbaki), i.e. those contained in it; by minimality of the chosen
-element in the linear extension, only the minimal prime remains. -/
+/-- Quotienting by the lifted localization kernel gives a coprimary module whose associated
+prime is the least associated prime of `I.right ⧸ I.left`. -/
 private lemma associatedPrimes_quot_liftQuot_locKer (I : StrictIntvl (Submodule R M)) :
     associatedPrimes R
         (↥I.right ⧸ (liftQuot I.left I.right (locKer I)).submoduleOf I.right) =
@@ -328,10 +293,9 @@ private lemma associatedPrimes_quot_liftQuot_locKer (I : StrictIntvl (Submodule 
     simp only [Submodule.carrier_eq_coe, Submonoid.coe_set_mk, Subsemigroup.coe_set_mk,
       Set.inter_compl_self]
 
-/-- The first-player value of the coprimary payoff function on any interval is the singleton
-containing the *minimal* associated prime of its subquotient (in the fixed linear extension
-of the prime spectrum).  The optimal first move is the lift of the localization kernel
-`Coprimary.locKer`, whose subquotient has exactly the minimal prime as associated prime. -/
+/-- The value of the coprimary payoff function on `I` when player A moves first is the singleton
+containing the least associated prime of `I.right ⧸ I.left` in the fixed linear extension
+of the prime spectrum, embedded in the Dedekind–MacNeille completion. -/
 lemma A_payoff (I : StrictIntvl (Submodule R M)) :
     (payoff R M).A I =
       .principal (toColex {(subquotientAssociatedPrimes I).toFinset.min'
@@ -359,10 +323,8 @@ lemma A_payoff (I : StrictIntvl (Submodule R M)) :
     rw [max_payoff, payoff_apply]
     exact DedekindCut.principal_le_principal.mpr <| singleton_min'_le I a ⟨ha.1, ha.2.le⟩ ha.2.ne
 
-/-- The coprimary payoff function satisfies the descending chain condition for the
-first-player value: a strictly improving chain of submodules would produce infinitely many
-distinct associated primes of a fixed finitely generated module, contradicting finiteness of
-`associatedPrimes` over a Noetherian ring. -/
+/-- The coprimary payoff function satisfies the descending chain condition
+`HarderNarasimhan.PayoffFunction.ADCC`. -/
 instance : (payoff R M).ADCC where
   dcc := by
     intro N x hx1 hx2
@@ -380,9 +342,9 @@ instance : (payoff R M).ADCC where
       exact associatedPrimes_subset_of_submoduleOf_le N (x i) (x 0) (hx2.antitone i.zero_le)
         (min'_mem_subquotientAssociatedPrimes ⟨N, x i, hx1 i⟩)
 
-/-- Semistability of the coprimary payoff function is equivalent to the first-player value
-being constant on the initial segments `(⊥, N)`, equal to the singleton on the minimal
-associated prime of `M`. -/
+/-- Semistability of the coprimary payoff function is equivalent to constancy of the value
+when A moves first on the intervals `(⊥, N)`. This value is the singleton containing the
+least associated prime of `M` in the linear extension. -/
 theorem isSemistable_iff_A_const [Nontrivial M] :
     (payoff R M).IsSemistable ↔ ∀ N : Submodule R M, (hN : ⊥ < N) →
       (payoff R M).A ⟨⊥, N, hN⟩ =
@@ -403,11 +365,8 @@ theorem isSemistable_iff_A_const [Nontrivial M] :
     rw [h N hN, A_payoff (⊤ : StrictIntvl (Submodule R M))]
     exact lt_irrefl _
 
-/-- **Semistable means coprimary**: the coprimary payoff function of `M` is semistable if
-and only if `M` has exactly one associated prime.  This is the core semantic equivalence of
-the theory; together with `Coprimary.isSemistable_restrict_iff_quotient` it identifies
-Harder–Narasimhan filtrations of `Coprimary.payoff R M` with coprimary filtrations of
-`M`. -/
+/-- The coprimary payoff function of a nonzero finitely generated module over a Noetherian
+ring is semistable if and only if the module has exactly one associated prime. -/
 theorem isSemistable_iff_existsUnique_associatedPrime [Nontrivial M] :
     (payoff R M).IsSemistable ↔ ∃! p, p ∈ associatedPrimes R M := by
   rw [isSemistable_iff_A_const]
@@ -434,7 +393,7 @@ theorem isSemistable_iff_existsUnique_associatedPrime [Nontrivial M] :
         rw [Ideal.mem_torsionOf_iff, ht, Submodule.mem_colon_singleton, Submodule.mem_bot]
       rw [← LinearEquiv.AssociatedPrimes.eq (Ideal.quotTorsionOfEquivSpanSingleton R M t), htors,
         associatedPrimes.eq_singleton_of_isPrimary hJp.isPrimary, hJp.radical]
-    -- Constancy of the first-player value identifies that prime with the global minimum.
+    -- Constancy of the value when A moves first identifies that prime with the global minimum.
     have hmin : (subquotientAssociatedPrimes ⟨⊥, R ∙ t, hN⟩).toFinset.min'
         (subquotientAssociatedPrimes_nonempty _) = ⟨J, hJp⟩ := by
       apply PrimeSpectrum.ext
@@ -458,10 +417,8 @@ theorem isSemistable_iff_existsUnique_associatedPrime [Nontrivial M] :
           (min'_mem_subquotientAssociatedPrimes (⟨⊥, N, hN⟩ : StrictIntvl (Submodule R M)))
     exact PrimeSpectrum.ext ((hp_unique _ hq).trans (hp_unique _ hp0).symm)
 
-/-- The first-player value on an interval `(N₁, W)` inside `(N₁, N₂)` agrees with the
-first-player value of the coprimary payoff function of the subquotient `N₂ ⧸ N₁` on the
-image of `W`.  This is the value-level translation between the restricted game and the game
-on the subquotient. -/
+/-- For `N₁ < W ≤ N₂`, the value when A moves first on `(N₁, W)` equals the corresponding
+value on `(⊥, W ⧸ N₁)` in the submodule lattice of `N₂ ⧸ N₁`. -/
 lemma A_restrict_eq_quotient {N₁ N₂ W : Submodule R M} (h₁ : N₁ ≤ W) (h₂ : W ≤ N₂)
     (h₃ : W ≠ N₁) :
     (payoff R M).A ⟨N₁, W, h₁.lt_of_ne' h₃⟩ =
@@ -472,11 +429,8 @@ lemma A_restrict_eq_quotient {N₁ N₂ W : Submodule R M} (h₁ : N₁ ≤ W) (
   simp only [DedekindCut.principal_inj, toColex_inj, Finset.singleton_inj]
   simp [subquotientAssociatedPrimes_eq_quotient h₁ h₂ h₃]
 
-/-- Semistability of the coprimary payoff function restricted to an interval `(N₁, N₂)` of
-submodules of `M` is semistability of the coprimary payoff function of the subquotient
-`N₂ ⧸ N₁`.  This is the key translation step for coprimary filtrations: combined with
-`Coprimary.isSemistable_iff_existsUnique_associatedPrime` it shows that the semistable
-pieces of a Harder–Narasimhan filtration are exactly the coprimary subquotients. -/
+/-- The coprimary payoff function restricted to `(N₁, N₂)` is semistable if and only if the
+coprimary payoff function of `N₂ ⧸ N₁` is semistable. -/
 lemma isSemistable_restrict_iff_quotient (N₁ N₂ : Submodule R M) (hN : N₁ < N₂) :
     ((payoff R M).restrict ⟨N₁, N₂, hN⟩).IsSemistable ↔
       letI : Nontrivial (↥N₂ ⧸ N₁.submoduleOf N₂) := nontrivial_quotient_of_lt hN

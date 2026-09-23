@@ -15,49 +15,35 @@ public import Mathlib.RingTheory.Spectrum.Prime.Basic
 /-!
 # The coprimary payoff function and coprimary filtrations
 
-This file specializes the Harder–Narasimhan Games to modules: for a finite module `M` over a
-Noetherian commutative ring `R`, it defines a payoff function on the lattice of submodules of
-`M` whose Harder–Narasimhan filtrations are precisely the classical *coprimary filtrations*.
+For a finitely generated module `M` over a commutative Noetherian ring `R`, the coprimary
+payoff function assigns to a strict inclusion `N₁ < N₂` the associated primes of
+`N₂ ⧸ N₁`.
 
-The payoff `Coprimary.payoff R M` of an interval `(N₁, N₂)` of submodules is the finset of
-associated primes of the subquotient `N₂ ⧸ N₁`, recorded as follows:
-
-* the primes are taken in a fixed linear extension `LinearExtension (PrimeSpectrum R)` of the
-  prime spectrum, so that finsets of them can be compared;
-* finsets are compared in mathlib's colexicographic order `Colex (Finset _)`, which refines
-  subset inclusion and restricts to the underlying order on singletons;
-* the resulting linear order is completed to the complete linear order
-  `DedekindCut (Colex (Finset (LinearExtension (PrimeSpectrum R))))`, as required by the
-  general theory.
-
-The set-valued companion `Coprimary.subquotientAssociatedPrimes I` records the associated
-primes of the subquotient of `I` before any bundling; it is finite (`Fintype` instance) by
-Noetherianity.
-
-A module is *coprimary* (`IsCoprimary`) when it has exactly one associated prime.  A
-*coprimary filtration* (`CoprimaryFiltration`) of `M` is a finite chain
-`⊥ = F 0 < F 1 < ⋯ < F F.length = ⊤` of submodules whose successive subquotients are
-coprimary with strictly decreasing associated primes.  As for
-`PayoffFunction.HarderNarasimhanFiltration`, the length of the chain is stored as a `length`
-field which carries no extra information: it is provably the least index at which the chain
-reaches `⊤` (`CoprimaryFiltration.length_le_of_eq_top`), so extensionality
-(`CoprimaryFiltration.ext`) only requires the underlying chains to agree.
+A module is *coprimary* if it has exactly one associated prime. A *coprimary filtration*
+is a finite filtration with coprimary successive quotients whose associated primes strictly
+decrease in a fixed linear extension of the prime spectrum. These are the Harder–Narasimhan
+filtrations of the coprimary payoff function; see `HarderNarasimhan/Coprimary/Filtration.lean`.
 
 ## Main definitions
 
-* `Coprimary.subquotientAssociatedPrimes` : the set of associated primes of the subquotient
-  of an interval of submodules, viewed in the linear extension of the prime spectrum.
-* `Coprimary.payoff` : the coprimary payoff function on the submodule lattice.
-* `IsCoprimary` : the module has exactly one associated prime.
-* `CoprimaryFiltration` : a filtration with coprimary subquotients and strictly decreasing
-  associated primes, applied to indices via the `FunLike` coercion.
+* `HarderNarasimhan.Coprimary.subquotientAssociatedPrimes`: the associated primes of a subquotient,
+  viewed in the linear extension of the prime spectrum.
+* `HarderNarasimhan.Coprimary.payoff`: the coprimary payoff function on the submodule lattice.
+* `HarderNarasimhan.IsCoprimary`: the property of having exactly one associated prime.
+* `HarderNarasimhan.CoprimaryFiltration`: a filtration with coprimary successive quotients and
+  strictly decreasing associated primes.
 
-## Main results
+## Implementation notes
 
-* `CoprimaryFiltration.length_le_of_eq_top`, `ne_top_of_lt`, `eq_top_of_length_le` : the
-  `length` field is the least index at which the chain reaches `⊤`.
-* `CoprimaryFiltration.ext` : two coprimary filtrations with the same underlying chain are
-  equal.
+The payoff takes values in
+`DedekindCut (Colex (Finset (LinearExtension (PrimeSpectrum R))))`.
+The linear extension orders the prime spectrum, and the colexicographic order on finite sets
+extends inclusion and agrees with this order on singletons. The Dedekind–MacNeille completion
+then gives the complete linear order required by the general theory.
+
+A filtration is represented by a sequence indexed by `ℕ`, constant at `⊤` from its length
+onwards. Its length is determined by the sequence, so
+`HarderNarasimhan.CoprimaryFiltration.ext` only requires equality of the underlying sequences.
 
 ## References
 
@@ -68,9 +54,9 @@ reaches `⊤` (`CoprimaryFiltration.length_le_of_eq_top`), so extensionality
 
 namespace HarderNarasimhan
 
-/-- `LinearExtension` is a plain type synonym, and typeclass resolution does not unfold it,
-so primality of `p.asIdeal` must be restated for points of the linearly extended prime
-spectrum. -/
+/-- The ideal underlying a point of the linearly extended prime spectrum is prime.
+
+This instance makes primality available without unfolding `LinearExtension`. -/
 instance {R : Type*} [CommRing R] (p : LinearExtension (PrimeSpectrum R)) :
     p.asIdeal.IsPrime := PrimeSpectrum.isPrime p
 
@@ -80,10 +66,8 @@ section SubquotientAssociatedPrimes
 
 variable {R : Type*} [CommRing R] {M : Type*} [AddCommGroup M] [Module R M]
 
-/-- The set of associated primes of the subquotient of an interval: for an interval
-`I : N₁ < N₂` in the submodule lattice of `M`, `subquotientAssociatedPrimes I` is the set
-of points of the linearly extended prime spectrum whose ideals are associated primes of
-`N₂ ⧸ N₁`.  The coprimary payoff function `Coprimary.payoff` is built from this set. -/
+/-- The associated primes of `I.right ⧸ I.left`, viewed in the linearly extended prime
+spectrum. -/
 def subquotientAssociatedPrimes (I : StrictIntvl (Submodule R M)) :
     Set (LinearExtension (PrimeSpectrum R)) :=
   {q | q.asIdeal ∈ associatedPrimes R (I.right ⧸ I.left.submoduleOf I.right)}
@@ -94,9 +78,8 @@ def subquotientAssociatedPrimes (I : StrictIntvl (Submodule R M)) :
       q.asIdeal ∈ associatedPrimes R (I.right ⧸ I.left.submoduleOf I.right) :=
   Iff.rfl
 
-/-- Over a Noetherian ring, a finite module has finitely many associated primes, and
-`subquotientAssociatedPrimes I` is the preimage of the associated primes of the subquotient
-of `I` under the injection `q ↦ q.asIdeal`; hence it is a `Fintype`. -/
+/-- A subquotient of a finitely generated module over a Noetherian ring has finitely many
+associated primes. -/
 noncomputable instance [IsNoetherianRing R] [Module.Finite R M]
     (I : StrictIntvl (Submodule R M)) : Fintype (subquotientAssociatedPrimes I) :=
   (Set.Finite.preimage (Set.injOn_of_injective fun _ _ h ↦ PrimeSpectrum.ext h)
@@ -109,13 +92,9 @@ section Payoff
 variable (R : Type*) [CommRing R] [IsNoetherianRing R]
 variable (M : Type*) [AddCommGroup M] [Module R M] [Module.Finite R M]
 
-/-- The **coprimary payoff function** on the lattice of submodules of a finite module `M`
-over a Noetherian commutative ring `R`: an interval `(N₁, N₂)` is sent to the finset of
-associated primes of `N₂ ⧸ N₁`, compared in the colexicographic order on finsets of the
-linearly extended prime spectrum and viewed in its Dedekind–MacNeille completion.
-
-The Harder–Narasimhan filtration of this payoff function is the coprimary filtration of `M`;
-see `HarderNarasimhan.Coprimary.Filtration`. -/
+/-- The coprimary payoff function sends `N₁ < N₂` to the associated primes of `N₂ ⧸ N₁`,
+ordered colexicographically in the linearly extended prime spectrum and embedded in the
+Dedekind–MacNeille completion. -/
 noncomputable def payoff :
     PayoffFunction (Submodule R M)
       (DedekindCut (Colex (Finset (LinearExtension (PrimeSpectrum R))))) :=
@@ -133,10 +112,7 @@ section IsCoprimary
 
 variable (R : Type*) [CommRing R] (M : Type*) [AddCommGroup M] [Module R M]
 
-/-- A module is *coprimary* if it has exactly one associated prime.  This is the classical
-condition on the successive subquotients of a coprimary filtration; it is equivalent to
-semistability of the coprimary payoff function
-(`Coprimary.isSemistable_iff_existsUnique_associatedPrime`). -/
+/-- A module is *coprimary* if it has exactly one associated prime. -/
 class IsCoprimary : Prop where
   /-- The module has exactly one associated prime. -/
   existsUnique_associatedPrime : ∃! p, p ∈ associatedPrimes R M
@@ -145,24 +121,18 @@ end IsCoprimary
 
 section CoprimaryFiltration
 
-/-- A **coprimary filtration** of a finite module `M` over a Noetherian commutative ring
-`R`: a finite chain `⊥ = F 0 < F 1 < ⋯ < F F.length = ⊤` of submodules, extended constantly
-by `⊤` above `length`, whose successive subquotients are coprimary and whose associated
-primes strictly decrease along the chain (in the fixed linear extension of the prime
-spectrum).  Since each subquotient is coprimary, its set of associated primes is a
-singleton, so the universally quantified field `associatedPrime_succ_lt` is equivalent to
-comparing "the" primes — but it avoids `Exists.choose` in the statement.
+/-- A coprimary filtration is a finite chain `⊥ = F 0 < ⋯ < F F.length = ⊤` of submodules
+whose successive quotients are coprimary and whose associated primes strictly decrease in
+the fixed linear extension of the prime spectrum.
 
-`length` is stored as data but carries no extra information: it is provably the *least*
-index at which the chain reaches `⊤` (`length_le_of_eq_top`), hence determined by `toFun`;
-accordingly `ext` only asks for `toFun` to agree. -/
+The chain is indexed by `ℕ` and is constant at `⊤` from `F.length` onwards. -/
 structure CoprimaryFiltration (R : Type*) [CommRing R] [IsNoetherianRing R]
     (M : Type*) [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] where
   /-- The underlying chain; apply via the coercion, `F n`. -/
   toFun : ℕ → Submodule R M
-  /-- The index at which the chain reaches `⊤`. -/
+  /-- The number of successive quotients. -/
   length : ℕ
-  /-- The chain is monotone (constantly `⊤` above `length`). -/
+  /-- The chain is monotone. -/
   monotone : Monotone toFun
   /-- The chain starts at `⊥`. -/
   head_eq_bot : toFun 0 = ⊥
@@ -214,17 +184,15 @@ variable {F G : CoprimaryFiltration R M} {m : ℕ}
 lemma ne_top_of_lt (h : m < F.length) : F m ≠ ⊤ := fun hc ↦
   (F.strictMonoOn h.le (Set.mem_Iic.2 le_rfl) h).ne (hc.trans F.length_eq_top.symm)
 
-/-- Minimality of the `length` field: it is the least index at which the chain reaches
-`⊤`.  In particular `length` is determined by the underlying chain. -/
+/-- The length is the least index at which the filtration reaches `⊤`. -/
 lemma length_le_of_eq_top (h : F m = ⊤) : F.length ≤ m :=
   not_lt.1 fun hc ↦ ne_top_of_lt hc h
 
-/-- Above `F.length` the chain is constantly `⊤`. -/
+/-- From `F.length` onwards, the chain is constantly `⊤`. -/
 lemma eq_top_of_length_le (h : F.length ≤ m) : F m = ⊤ :=
   top_le_iff.1 <| F.length_eq_top ▸ F.monotone h
 
-/-- Two coprimary filtrations with the same underlying chain are equal: the `length` field
-is determined by the chain (`length_le_of_eq_top`) and the remaining fields are proofs. -/
+/-- Two coprimary filtrations with the same underlying chain are equal. -/
 @[ext] theorem ext (h : ∀ n, F n = G n) : F = G := DFunLike.ext F G h
 
 end CoprimaryFiltration

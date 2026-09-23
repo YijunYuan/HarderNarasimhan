@@ -11,25 +11,25 @@ public import Mathlib.Data.List.TFAE
 public import Mathlib.Tactic.TFAE
 
 /-!
-# Nash equilibria of the Harder–Narasimhan Games
+# Nash equilibria of the Harder–Narasimhan games
 
-The Harder–Narasimhan Games associated to `μ` *has a Nash equilibrium* when its two values
-coincide: `μ.A ⊤ = μ.B ⊤` (`HasNashEquilibrium`).  This file relates that condition to the
-global extremal values `μ.min ⊤` and `μ.max ⊤` and, over a linear order, to semistability.
+The games associated to `μ` have a Nash equilibrium when the two game values agree:
+`μ.A ⊤ = μ.B ⊤`. For a slope-like payoff function satisfying both chain conditions, this is
+equivalent to `μ.min ⊤ = μ.max ⊤`, and either side then equals `μ ⊤`.
 
-## Main results
+Over a complete linear order of payoffs, semistability implies Nash equilibrium under the
+hypotheses computing player A's value. The converse holds for payoffs in a complete lattice
+when those hypotheses hold on every initial segment.
 
-* `B_top_le_A_top_iff`, `hasNashEquilibrium_iff_min_le`, `hasNashEquilibrium_iff_le_max` :
-  unfolded reformulations of the equilibrium condition.
-* `B_top_le_A_top_of_min_eq_max`, `min_top_eq_max_top_of_B_top_le_A_top` : the equivalence
-  between the inequality `μ.B ⊤ ≤ μ.A ⊤` and the coincidence of the global extremal values.
-* `max_top_eq_apply_iff`, `min_top_eq_apply_iff` : for a slope-like payoff the endpoint
-  equalities `μ.max ⊤ = μ ⊤`, `μ.min ⊤ = μ ⊤` and `μ.min ⊤ = μ.max ⊤` are equivalent.
-* `min_top_eq_max_top_iff_hasNashEquilibrium`, `nashEquilibrium_tfae` : under both chain
-  conditions the above are further equivalent to `HasNashEquilibrium`.
-* `IsSemistable.B_top_le_A_top`, `IsSemistable.hasNashEquilibrium`,
-  `isSemistable_of_hasNashEquilibrium` : the equivalence between semistability and Nash
-  equilibrium over a complete linear order.
+## Main declarations
+
+* `HarderNarasimhan.PayoffFunction.HasNashEquilibrium`: equality of the two game values.
+* `HarderNarasimhan.PayoffFunction.nashEquilibrium_tfae`: equivalent characterisations using
+  `μ.max ⊤`, `μ.min ⊤`, and `μ ⊤`.
+* `HarderNarasimhan.PayoffFunction.IsSemistable.hasNashEquilibrium`: Nash equilibrium from
+  semistability.
+* `HarderNarasimhan.PayoffFunction.isSemistable_of_hasNashEquilibrium`: semistability from
+  Nash equilibrium.
 
 ## References
 
@@ -45,15 +45,15 @@ namespace PayoffFunction
 variable {ℒ S : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ] [CompleteLattice S]
 variable {μ : PayoffFunction ℒ S}
 
-/-- The Harder–Narasimhan Games of `μ` *has a Nash equilibrium* when the first-player and
-second-player values coincide: `μ.A ⊤ = μ.B ⊤`, i.e. the minimax and maximin values agree
-and the game has a value. -/
+/-- The Harder–Narasimhan games have a Nash equilibrium if the values obtained when A and
+B move first are equal. This condition concerns equality of values; attainment is a
+separate property. -/
 class HasNashEquilibrium (μ : PayoffFunction ℒ S) : Prop where
   /-- The two game values coincide. -/
   eq : μ.A ⊤ = μ.B ⊤
 
 /-- The inequality `μ.B ⊤ ≤ μ.A ⊤`, unfolded as a family of comparisons between
-bottom-anchored minima and top-anchored maxima. -/
+infima on initial segments and suprema on final segments. -/
 theorem B_top_le_A_top_iff :
     μ.B ⊤ ≤ μ.A ⊤ ↔
       ∀ x : ℒ, (hx : x ≠ ⊤) → ∀ y : ℒ, (hy : ⊥ < y) →
@@ -67,8 +67,8 @@ theorem B_top_le_A_top_iff :
         A_le (I := ⊤) ⟨bot_le, lt_top_iff_ne_top.2 hx⟩
   · exact fun h ↦ B_le fun y hy ↦ le_A fun x hx ↦ h x hx.2.ne y hy.1
 
-/-- Under the hypotheses computing player A's value, the game has a Nash equilibrium iff no
-proper initial segment has a smaller minimum than the total interval. -/
+/-- Under the weak ascending chain condition and the weak slope-like condition at `⊤`,
+Nash equilibrium is equivalent to `μ.min (⊥, y) ≤ μ.min ⊤` for every `y > ⊥`. -/
 theorem hasNashEquilibrium_iff_min_le [μ.WeakACC] [μ.WeakSlopeLikeAtTop] :
     μ.HasNashEquilibrium ↔
       ∀ y : ℒ, (hy : y ≠ ⊥) → μ.min ⟨⊥, y, bot_lt_iff_ne_bot.2 hy⟩ ≤ μ.min ⊤ := by
@@ -85,8 +85,8 @@ theorem hasNashEquilibrium_iff_min_le [μ.WeakACC] [μ.WeakSlopeLikeAtTop] :
     exact eq_of_le_of_ge (le_iSup₂_of_le ⊤ ⟨bot_lt_top, le_rfl⟩ le_rfl)
       (iSup₂_le fun b hb ↦ h b hb.1.ne')
 
-/-- Under the hypotheses computing player B's value, the game has a Nash equilibrium iff no
-proper final segment has a larger maximum than the total interval. -/
+/-- Under the strong descending chain condition and the weak slope-like condition at `⊥`,
+Nash equilibrium is equivalent to `μ.max ⊤ ≤ μ.max (y, ⊤)` for every `y < ⊤`. -/
 theorem hasNashEquilibrium_iff_le_max [μ.StrongDCC] [μ.WeakSlopeLikeAtBot] :
     μ.HasNashEquilibrium ↔
       ∀ y : ℒ, (hy : y ≠ ⊤) → μ.max ⊤ ≤ μ.max ⟨y, ⊤, lt_top_iff_ne_top.2 hy⟩ := by
@@ -143,9 +143,7 @@ section SlopeLike
 
 variable [hμ : μ.IsSlopeLike]
 
-/-- For a slope-like payoff function, `μ.max ⊤ = μ ⊤` says exactly that the two global
-extremal values coincide.  Together with `min_top_eq_apply_iff` this makes the two endpoint
-equalities `μ.max ⊤ = μ ⊤` and `μ.min ⊤ = μ ⊤` interchangeable. -/
+/-- For a slope-like payoff function, `μ.max ⊤ = μ ⊤` iff `μ.min ⊤ = μ.max ⊤`. -/
 theorem max_top_eq_apply_iff : μ.max ⊤ = μ ⊤ ↔ μ.min ⊤ = μ.max ⊤ := by
   constructor
   · exact min_eq_max_of_max_eq fun x hx ↦
@@ -154,8 +152,7 @@ theorem max_top_eq_apply_iff : μ.max ⊤ = μ ⊤ ↔ μ.min ⊤ = μ.max ⊤ :
   · intro h
     exact le_antisymm (h.symm.trans_le min_le_apply) apply_le_max
 
-/-- For a slope-like payoff function, `μ.min ⊤ = μ ⊤` says exactly that the two global
-extremal values coincide. -/
+/-- For a slope-like payoff function, `μ.min ⊤ = μ ⊤` iff `μ.min ⊤ = μ.max ⊤`. -/
 theorem min_top_eq_apply_iff : μ.min ⊤ = μ ⊤ ↔ μ.min ⊤ = μ.max ⊤ := by
   constructor
   · exact fun h ↦ (max_eq_min_of_min_eq (fun x hx ↦
@@ -164,9 +161,8 @@ theorem min_top_eq_apply_iff : μ.min ⊤ = μ ⊤ ↔ μ.min ⊤ = μ.max ⊤ :
   · intro h
     exact le_antisymm min_le_apply (apply_le_max.trans_eq h.symm)
 
-/-- For a slope-like payoff function satisfying both chain conditions, the game has a Nash
-equilibrium iff the two global extremal values coincide.  This is the key bridge between the
-extremal operations and the game values. -/
+/-- For a slope-like payoff function satisfying both chain conditions, Nash equilibrium
+is equivalent to `μ.min ⊤ = μ.max ⊤`. -/
 theorem min_top_eq_max_top_iff_hasNashEquilibrium [h₁ : μ.WeakACC] [h₂ : μ.StrongDCC] :
     μ.min ⊤ = μ.max ⊤ ↔ μ.HasNashEquilibrium := by
   have hwsl : μ.WeakSlopeLikeAtTop :=
@@ -176,10 +172,9 @@ theorem min_top_eq_max_top_iff_hasNashEquilibrium [h₁ : μ.WeakACC] [h₂ : μ
   exact ⟨fun h ↦ ⟨eq_of_le_of_ge A_top_le_B_top <| B_top_le_A_top_of_min_eq_max h⟩,
     fun h ↦ min_top_eq_max_top_of_B_top_le_A_top h.eq.symm.le⟩
 
-/-- The four equivalent formulations of Nash equilibrium for a slope-like payoff function
-satisfying both chain conditions.  This `TFAE` is a summary statement; the individual
-equivalences `max_top_eq_apply_iff`, `min_top_eq_apply_iff` and
-`min_top_eq_max_top_iff_hasNashEquilibrium` are the working API. -/
+/-- For a slope-like payoff function satisfying both chain conditions, Nash equilibrium
+and the three equalities `μ.max ⊤ = μ ⊤`, `μ.min ⊤ = μ ⊤` and `μ.min ⊤ = μ.max ⊤` are
+equivalent. -/
 theorem nashEquilibrium_tfae [μ.WeakACC] [μ.StrongDCC] :
     List.TFAE [μ.max ⊤ = μ ⊤, μ.min ⊤ = μ ⊤, μ.min ⊤ = μ.max ⊤, μ.HasNashEquilibrium] := by
   tfae_have 1 ↔ 3 := max_top_eq_apply_iff

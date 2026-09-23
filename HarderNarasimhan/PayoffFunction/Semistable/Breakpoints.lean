@@ -12,28 +12,24 @@ public import Mathlib.Tactic.Linarith
 /-!
 # Existence and properties of breakpoints
 
-This file proves the main structural facts about the breakpoints of a convex payoff function
-on a well-founded lattice:
+A convex payoff function satisfying `ADCC` has a breakpoint on every strict interval when
+`>` is well-founded on the underlying lattice. Each breakpoint cuts out a semistable initial
+segment. With linearly ordered payoffs, a breakpoint is unique.
 
-* existence (`breakpoints_nonempty`), by a well-founded recursion that repeatedly improves
-  the candidate breakpoint;
-* uniqueness over a linearly ordered codomain (`IsBreakpoint.eq`);
-* semistability of the initial segment cut at a breakpoint
-  (`IsBreakpoint.isSemistable_restrict`) and the obstruction above a breakpoint
-  (`IsBreakpoint.not_A_le`);
-* totality of the breakpoint set and existence of a greatest breakpoint
-  (`breakpoints_total`, `exists_isGreatest_breakpoints`), and the decomposition formula
-  `IsBreakpoint.A_eq_A_of_lt`, under a comparability or attainment hypothesis.
+More generally, the breakpoint set is totally ordered if the payoffs are totally ordered
+or the infimum defining `μ.A` is attained on every initial segment. Under the existence
+hypotheses, it then has a greatest element.
 
 ## Main results
 
-* `breakpoints_nonempty` : existence of breakpoints.
-* `IsBreakpoint.eq` : uniqueness over a complete linear order.
-* `IsBreakpoint.isSemistable_restrict`, `IsBreakpoint.not_A_le` : semistability of the
-  initial segment cut at a breakpoint, and the obstruction above a breakpoint.
-* `breakpoints_total`, `exists_isGreatest_breakpoints`, `IsBreakpoint.A_eq_A_of_lt` :
-  totality of the breakpoint set, existence of a greatest breakpoint, and the decomposition
-  of the first-player value at a breakpoint.
+* `HarderNarasimhan.PayoffFunction.breakpoints_nonempty`: existence of breakpoints.
+* `HarderNarasimhan.PayoffFunction.IsBreakpoint.eq`: uniqueness for linearly ordered payoffs.
+* `HarderNarasimhan.PayoffFunction.IsBreakpoint.isSemistable_restrict`: semistability of the
+  initial segment cut out by a breakpoint.
+* `HarderNarasimhan.PayoffFunction.exists_isGreatest_breakpoints`: existence of a greatest
+  breakpoint.
+* `HarderNarasimhan.PayoffFunction.IsBreakpoint.A_eq_A_of_lt`: for a breakpoint `x` and
+  `y ∈ I` with `x < y`, the value on `(I.left, y)` equals the value on `(x, y)`.
 
 ## References
 
@@ -49,18 +45,16 @@ namespace PayoffFunction
 variable {ℒ S : Type*} [Lattice ℒ] [CompleteLattice S]
 variable {μ : PayoffFunction ℒ S} {I : StrictIntvl ℒ}
 
-/-- If the first-player value on `(x, z)` is `⊤`, then enlarging an interval `(a, x)` to
-`(a, z)` cannot decrease the first-player value.  This is the key step in deriving the
-descending chain condition in `adcc_of_exists_A_eq_top`. -/
+/-- For a payoff function convex on `I` and `a < x < z` in `I`, if `μ.A (x, z) = ⊤`, then
+`μ.A (a, x) ≤ μ.A (a, z)`. -/
 lemma IsConvexOn.A_le_of_A_eq_top (hμcvx : μ.IsConvexOn I) {x z : ℒ}
     (hxI : x ∈ I) (hzI : z ∈ I) (h : x < z) (h' : μ.A ⟨x, z, h⟩ = ⊤)
     {a : ℒ} (haI : a ∈ I) (hax : a < x) :
     μ.A ⟨a, x, hax⟩ ≤ μ.A ⟨a, z, lt_trans hax h⟩ := by
   simpa only [h', inf_top_eq] using hμcvx.inf_le_A haI hxI hzI hax h
 
-/-- A convenient sufficient condition for `ADCC`: if every strictly descending chain
-eventually produces a step with first-player value `⊤`, then the descending chain condition
-holds. -/
+/-- A convex payoff function satisfies `ADCC` if every infinite strictly decreasing
+sequence has an adjacent pair with `μ.A`-value `⊤`. -/
 lemma adcc_of_exists_A_eq_top [Nontrivial ℒ] [BoundedOrder ℒ] (hμcvx : μ.IsConvexOn ⊤)
     (h : ∀ f : ℕ → ℒ, (h : StrictAnti f) → ∃ N : ℕ, μ.A ⟨f <| N + 1, f N, h (lt_add_one N)⟩ = ⊤) :
     μ.ADCC := by
@@ -69,13 +63,16 @@ lemma adcc_of_exists_A_eq_top [Nontrivial ℒ] [BoundedOrder ℒ] (hμcvx : μ.I
   exact ⟨N, not_lt_of_ge <| hμcvx.A_le_of_A_eq_top (StrictIntvl.mem_top <| f <| N + 1)
     (StrictIntvl.mem_top <| f N) (h₂ (lt_add_one N)) hN (StrictIntvl.mem_top a) (h₁ <| N + 1)⟩
 
-/-! ### The breakpoint recursion
+/-!
+### The breakpoint recursion
 
-The existence proof iterates the following step, starting from the right endpoint of `I`:
-if some point strictly below the current candidate gives a strictly larger first-player
-value, replace the candidate by a minimal such point (using well-foundedness of `>`).
-The `ADCC` hypothesis forces this process to reach the left endpoint in finitely many
-steps, and the last candidate before termination is a breakpoint. -/
+Start from the right endpoint of `I`. If a point below the current candidate gives a
+strictly larger `μ.A`-value, choose a maximal such point. Well-foundedness of `>` provides
+this choice. If no such point exists, use the left endpoint as a termination marker.
+
+The `ADCC` hypothesis forces the sequence to reach the left endpoint. Convexity then shows
+that the last point before termination is a breakpoint.
+-/
 
 section Recursion
 
@@ -89,8 +86,8 @@ private def improvingSet (μ : PayoffFunction ℒ S) (I : StrictIntvl ℒ)
     μ.A ⟨I.left, x.val, lt_of_le_of_ne x.prop.1 hx⟩}
 
 open Classical in
-/-- The breakpoint recursion: start at the right endpoint and repeatedly move to a minimal
-strictly improving point, stopping at the left endpoint. -/
+/-- A sequence starting at the right endpoint and passing to a maximal strictly improving
+point at each step. It becomes constant at the left endpoint when no improvement is possible. -/
 private noncomputable def breakpointAux (μ : PayoffFunction ℒ S) (I : StrictIntvl ℒ)
     (k : ℕ) : ↥I :=
   match k with
@@ -142,7 +139,7 @@ private lemma breakpointAux_defprop2 (μ : PayoffFunction ℒ S) (I : StrictIntv
     hwf.wf.min_mem (improvingSet μ I (breakpointAux μ I i) hprev) hne
   simp only [breakpointAux, hprev, hne, ↓reduceDIte] at hz ⊢
   intro hdominates
-  -- A point above the chosen minimum with at least its value would also be a candidate.
+  -- A point above the chosen maximal element with at least its value is a candidate.
   apply hwf.wf.not_lt_min (improvingSet μ I (breakpointAux μ I i) hprev) ?_ hz.1
   have hz_left : I.left < z := hminI.1.trans_lt hz.1
   refine ⟨⟨hz_left.le, hz.2.trans (breakpointAux μ I i).prop.2⟩,
@@ -222,9 +219,8 @@ private lemma breakpointAux_defprop3 (μ : PayoffFunction ℒ S) (I : StrictIntv
     exact (hwf.wf.min_mem (improvingSet μ I (breakpointAux μ I (len - 1)) hlast.ne)
       hne).out.choose_spec.choose.1 hfinished.symm
 
-/-- The set of breakpoints is nonempty: under the descending chain condition and convexity
-on `I`, the breakpoint recursion terminates at a breakpoint.  This is the key existential
-input to the Harder–Narasimhan filtration. -/
+/-- If `>` is well-founded on `ℒ`, a payoff function satisfying `ADCC` and convexity on `I`
+has a breakpoint on `I`. -/
 lemma breakpoints_nonempty [hμDCC : μ.ADCC] (hμcvx : μ.IsConvexOn I) :
     (μ.breakpoints I).Nonempty := by
   classical
@@ -289,7 +285,7 @@ section LinearOrder
 
 variable {S : Type*} [CompleteLinearOrder S] {μ : PayoffFunction ℒ S} {I : StrictIntvl ℒ}
 
-/-- Over a complete linear order the breakpoint is unique. -/
+/-- Breakpoints of the same interval are equal when the payoffs are linearly ordered. -/
 lemma IsBreakpoint.eq {x y : ℒ} (hx : μ.IsBreakpoint I x) (hy : μ.IsBreakpoint I y) : x = y := by
   have e := eq_of_le_of_ge (le_of_not_gt <| hx.not_lt y hy.mem hy.ne_left)
     (le_of_not_gt <| hy.not_lt x hx.mem hx.ne_left)
@@ -310,8 +306,8 @@ lemma IsBreakpoint.isSemistable_restrict {x : ℒ} (hx : μ.IsBreakpoint I x) :
     (μ.restrict ⟨I.left, x, hx.left_lt⟩).IsSemistable :=
   isBreakpoint_right_iff.1 hx.isBreakpoint_left
 
-/-- Above a breakpoint the first-player value cannot be dominated: for `y > x` in `I` the
-value on `(x, y)` does not dominate the value on `(I.left, x)`. -/
+/-- For a payoff function convex on `I` and a breakpoint `x` of `I`, the value on `(x, y)`
+for `y ∈ I` with `x < y` cannot be greater than or equal to the value on `(I.left, x)`. -/
 lemma IsBreakpoint.not_A_le {x : ℒ} (hx : μ.IsBreakpoint I x) (hμcvx : μ.IsConvexOn I)
     {y : ℒ} (hyI : y ∈ I) (hy : x < y) :
     ¬ μ.A ⟨I.left, x, hx.left_lt⟩ ≤ μ.A ⟨x, y, hy⟩ := by
@@ -327,8 +323,8 @@ section Total
 
 variable {μ : PayoffFunction ℒ S} {I : StrictIntvl ℒ}
 
-/-- Under convexity and a comparability or attainment hypothesis, the breakpoints of `I`
-are totally ordered. -/
+/-- The breakpoints of a convex payoff function are totally ordered if the payoffs are
+totally ordered or `μ.A` is attained on every initial segment. -/
 lemma breakpoints_total (hμcvx : μ.IsConvexOn I)
     (h : (Std.Total (· ≤ · : S → S → Prop)) ∨
       ∀ z : ℒ, (hzI : z ∈ I) → (hz : I.left ≠ z) →
@@ -353,9 +349,9 @@ lemma breakpoints_total (hμcvx : μ.IsConvexOn I)
   · have heq := eq_of_le_of_not_lt hle (hx'.not_lt (x ⊔ x') hsI hsne)
     exact Or.inl (le_sup_left.trans (hx'.le_of_eq (x ⊔ x') hsI hsne heq.symm))
 
-/-- Under the descending chain condition, convexity, and a comparability or attainment
-hypothesis, the set of breakpoints has a greatest element.  This is the existence input for
-the canonical Harder–Narasimhan filtration. -/
+/-- If `>` is well-founded on `ℒ`, a convex payoff function satisfying `ADCC` has a greatest
+breakpoint on `I`, provided the payoffs are totally ordered or `μ.A` is attained on every
+initial segment. -/
 lemma exists_isGreatest_breakpoints [hwf : WellFoundedGT ℒ] [μ.ADCC] (hμcvx : μ.IsConvexOn I)
     (h : (Std.Total (· ≤ · : S → S → Prop)) ∨
       ∀ z : ℒ, (hzI : z ∈ I) → (hz : I.left ≠ z) →
@@ -366,8 +362,9 @@ lemma exists_isGreatest_breakpoints [hwf : WellFoundedGT ℒ] [μ.ADCC] (hμcvx 
   exact ((breakpoints_total hμcvx h).total ⟨x, hx⟩ ⟨M, hM.1⟩).elim id
     fun c2 ↦ le_of_eq <| eq_of_le_of_not_lt' c2 (hM.2 x hx)
 
-/-- Decomposition at a breakpoint: for `y` above a breakpoint `x`, the first-player value on
-`(I.left, y)` is computed on `(x, y)`. -/
+/-- For a payoff function convex on `I`, a breakpoint `x` of `I`, and `y ∈ I` with `x < y`,
+the value on `(I.left, y)` equals the value on `(x, y)`, provided the payoffs are totally
+ordered or `μ.A` is attained on every initial segment of `I`. -/
 lemma IsBreakpoint.A_eq_A_of_lt {x : ℒ} (hx : μ.IsBreakpoint I x) (hμcvx : μ.IsConvexOn I)
     (h : (Std.Total (· ≤ · : S → S → Prop)) ∨
       ∀ z : ℒ, (hzI : z ∈ I) → (hz : I.left ≠ z) →

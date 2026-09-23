@@ -11,34 +11,29 @@ public import HarderNarasimhan.Filtration.Unique
 /-!
 # Existence and uniqueness of coprimary filtrations
 
-This file identifies the coprimary filtrations of a finite module `M` over a Noetherian
-commutative ring `R` with the Harder–Narasimhan filtrations of the coprimary payoff function
-`Coprimary.payoff R M`, and derives existence and uniqueness.
+Every nonzero finitely generated module over a commutative Noetherian ring has a unique
+coprimary filtration, for the fixed linear extension of the prime spectrum. Its successive
+quotients have exactly the associated primes of the module.
 
-In one direction, the subquotients of any Harder–Narasimhan filtration of
-`Coprimary.payoff R M` are coprimary
-(`PayoffFunction.HarderNarasimhanFiltration.piecewise_isCoprimary`), so the canonical
-filtration `(Coprimary.payoff R M).hnFiltration` yields the canonical coprimary filtration
-`Coprimary.coprimaryFiltration R M`.  In the other direction, every coprimary filtration
-underlies a Harder–Narasimhan filtration (`CoprimaryFiltration.exists_hnFiltration`);
-since the payoff codomain is a complete linear order, the Harder–Narasimhan filtration is
-unique, and therefore so is the coprimary filtration.
+Existence and uniqueness follow by identifying coprimary filtrations with Harder–Narasimhan
+filtrations of the coprimary payoff function.
 
 ## Main definitions
 
-* `Coprimary.coprimaryFiltration` : the canonical coprimary filtration of `M`, also
-  available as `default` via the `Inhabited` instance.
+* `HarderNarasimhan.Coprimary.coprimaryFiltration`: the coprimary filtration of `M`.
 
 ## Main results
 
-* `PayoffFunction.HarderNarasimhanFiltration.piecewise_isCoprimary` : the subquotients of a
-  Harder–Narasimhan filtration of the coprimary payoff function are coprimary.
-* `CoprimaryFiltration.exists_hnFiltration` : every coprimary filtration underlies a
-  Harder–Narasimhan filtration of the coprimary payoff function.
-* `Unique (CoprimaryFiltration R M)` : existence and uniqueness of the coprimary
-  filtration.
-* `CoprimaryFiltration.associatedPrimes_eq_iUnion` : the associated primes of `M` are
-  exactly the associated primes of the subquotients of the coprimary filtration.
+* `HarderNarasimhan.PayoffFunction.HarderNarasimhanFiltration.piecewise_isCoprimary`: the
+  successive quotients of a Harder–Narasimhan filtration of the coprimary payoff function
+  are coprimary.
+* `HarderNarasimhan.CoprimaryFiltration.exists_hnFiltration`: every coprimary filtration
+  underlies a Harder–Narasimhan filtration of the coprimary payoff function.
+* `HarderNarasimhan.CoprimaryFiltration.associatedPrimes_eq_iUnion`: the associated primes
+  of `M` are the union of those of the successive quotients of its coprimary filtration.
+
+The `Unique` instance on `HarderNarasimhan.CoprimaryFiltration` expresses existence and
+uniqueness; its default element is `HarderNarasimhan.Coprimary.coprimaryFiltration`.
 
 ## References
 
@@ -51,10 +46,8 @@ namespace HarderNarasimhan
 
 variable {R : Type*} [CommRing R] [IsNoetherianRing R]
 
-/-- The subquotients of a Harder–Narasimhan filtration of the coprimary payoff function are
-coprimary: each step is semistable, semistability of the restriction translates to
-semistability on the subquotient (`Coprimary.isSemistable_restrict_iff_quotient`), and the
-latter is coprimarity (`Coprimary.isSemistable_iff_existsUnique_associatedPrime`). -/
+/-- The successive quotients of a Harder–Narasimhan filtration of the coprimary payoff
+function are coprimary. -/
 lemma PayoffFunction.HarderNarasimhanFiltration.piecewise_isCoprimary
     {M : Type*} [AddCommGroup M] [Module R M] [Module.Finite R M]
     (F : (Coprimary.payoff R M).HarderNarasimhanFiltration) :
@@ -71,13 +64,9 @@ namespace Coprimary
 variable {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]
 
 variable (R M) in
-/-- The **canonical coprimary filtration** of a finite module `M` over a Noetherian
-commutative ring `R`: the canonical Harder–Narasimhan filtration of the coprimary payoff
-function `Coprimary.payoff R M`, with the coprimarity of its subquotients supplied by
-`PayoffFunction.HarderNarasimhanFiltration.piecewise_isCoprimary` and the strict decrease of
-their associated primes extracted from the strict decrease of the first-player values via
-`Coprimary.A_payoff`.  By the `Unique` instance below it is the *only* coprimary filtration
-of `M`. -/
+/-- The coprimary filtration of a nonzero finitely generated module over a commutative
+Noetherian ring, obtained from the Harder–Narasimhan filtration of its coprimary payoff
+function. -/
 noncomputable def coprimaryFiltration : CoprimaryFiltration R M :=
   let F := (payoff R M).hnFiltration
   { toFun := ⇑F
@@ -99,7 +88,7 @@ noncomputable def coprimaryFiltration : CoprimaryFiltration R M :=
         Finset.Colex.singleton_lt_singleton, PayoffFunction.HarderNarasimhanFiltration.toFun_eq_coe]
         using lt_of_not_ge (F.not_A_le_succ n hn) }
 
-/-- Coprimary filtrations exist; the default is the canonical one. -/
+/-- The canonical coprimary filtration is the default coprimary filtration. -/
 noncomputable instance : Inhabited (CoprimaryFiltration R M) := ⟨coprimaryFiltration R M⟩
 
 instance : Nonempty (CoprimaryFiltration R M) := inferInstance
@@ -110,11 +99,8 @@ namespace CoprimaryFiltration
 
 variable {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]
 
-/-- Every coprimary filtration underlies a Harder–Narasimhan filtration of the coprimary
-payoff function: the chain is reused as is, piecewise semistability is coprimarity of the
-subquotients read through `Coprimary.isSemistable_restrict_iff_quotient`, and the strict
-decrease of the first-player values is the strict decrease of the minimal associated primes
-via `Coprimary.A_payoff`. -/
+/-- Every coprimary filtration has the same underlying chain as a Harder–Narasimhan
+filtration of the coprimary payoff function. -/
 lemma exists_hnFiltration (a : CoprimaryFiltration R M) :
     ∃ F : (Coprimary.payoff R M).HarderNarasimhanFiltration, ⇑a = ⇑F :=
   ⟨{ toFun := ⇑a
@@ -139,36 +125,23 @@ lemma exists_hnFiltration (a : CoprimaryFiltration R M) :
            a.strictMonoOn (Nat.le_of_succ_le hi.le) (Nat.le_of_succ_le hi)
              (lt_add_one i)⟩) }, rfl⟩
 
-/-- The chain underlying any coprimary filtration is the canonical Harder–Narasimhan
-filtration, by uniqueness of the latter over the complete linear payoff codomain. -/
+/-- Every coprimary filtration has the same underlying chain as the canonical
+Harder–Narasimhan filtration of the coprimary payoff function. -/
 private lemma coe_eq_hnFiltration (a : CoprimaryFiltration R M) :
     ⇑a = ⇑((Coprimary.payoff R M).hnFiltration) := by
   obtain ⟨F, hF⟩ := exists_hnFiltration a
   rw [hF, Subsingleton.elim F ((Coprimary.payoff R M).hnFiltration)]
 
-/-- Uniqueness of the coprimary filtration: any two coprimary filtrations of `M` share the
-underlying chain of the canonical Harder–Narasimhan filtration, hence are equal.  Together
-with the `Inhabited` instance this shows every finite module over a Noetherian commutative
-ring admits exactly one coprimary filtration. -/
+/-- A nonzero finitely generated module over a commutative Noetherian ring has a unique
+coprimary filtration for the fixed linear extension of the prime spectrum. -/
 @[no_expose]
 noncomputable instance : Unique (CoprimaryFiltration R M) where
   uniq a := by
     ext n
     rw [coe_eq_hnFiltration a, coe_eq_hnFiltration default]
 
-/-- The associated primes of `M` are exactly the associated primes of the subquotients of
-its coprimary filtration.  As each subquotient is coprimary, the right-hand side is the set
-of "the" associated primes of the subquotients, which are pairwise distinct by the strict
-decrease along the filtration; the coprimary filtration therefore computes
-`associatedPrimes R M`.
-
-The inclusion `⊆` is the classical dévissage of associated primes along a filtration
-(`associatedPrimes.subset_union_of_exact`), valid for any filtration.  The reverse inclusion
-identifies the filtration with the canonical Harder–Narasimhan filtration of the coprimary
-payoff function: the first-player values of the intervals `(⊥, F (i + 1))` and
-`(F i, F (i + 1))` agree (`PayoffFunction.hnFiltration_A_bot_eq_A`), and both compute
-minimal associated primes (`Coprimary.A_payoff`), which places the associated prime of each
-subquotient inside `associatedPrimes R M`. -/
+/-- The associated primes of a module are the union of the associated primes of the
+successive quotients of its coprimary filtration. -/
 theorem associatedPrimes_eq_iUnion (F : CoprimaryFiltration R M) :
     associatedPrimes R M =
       ⋃ i < F.length, associatedPrimes R (F (i + 1) ⧸ (F i).submoduleOf (F (i + 1))) := by

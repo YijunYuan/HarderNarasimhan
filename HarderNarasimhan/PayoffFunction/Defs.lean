@@ -11,29 +11,22 @@ public import Mathlib.Order.CompleteLattice.Defs
 /-!
 # Payoff functions
 
-This file defines `PayoffFunction ℒ S`, the bundled type of payoff functions of the
-Harder–Narasimhan Games: functions assigning to every strict interval of `ℒ` a payoff in `S`.
-Payoff functions are applied via a `FunLike` coercion, so `μ ⟨a, b, h⟩` is the payoff of the
-game played on the interval `(a, b)`.
+A payoff function assigns a value to each strict interval of an ordered type. In the
+Harder–Narasimhan games, player A chooses a left endpoint and seeks to minimise the payoff,
+while player B chooses a right endpoint and seeks to maximise it. The endpoints must satisfy
+`a < b`.
 
-For a complete lattice `S` we introduce the four extremal operations of the theory, each of
-which is again a payoff function:
+For a complete lattice of payoffs, `μ.max I` is the supremum over right endpoints with the
+left endpoint fixed, and `μ.min I` is the infimum over left endpoints with the right endpoint
+fixed. The game values `μ.A I` and `μ.B I` correspond to A and B moving first, respectively.
+When the underlying order is bounded and nontrivial, the global game values are `μ.A ⊤`
+and `μ.B ⊤`.
 
-* `μ.max I`, the supremum of `μ (I.left, u)` over interior points `u`, and its order-dual
-  companion `μ.min I`;
-* `μ.A I`, the value of the game on `I` when player A moves first (an infimum of `μ.max`
-  values over left endpoints), and its companion `μ.B I` for player B.
+## Main definitions
 
-The global values of the game are `μ.A ⊤` and `μ.B ⊤` (often denoted `μ_A^*` and `μ_B^*`).
-
-Finally, `μ.IsAttained I` records that the infimum defining `μ.A I` is attained.
-
-## Implementation notes
-
-All four operations are bounded suprema/infima in the dependent `⨆ (x) (hx : _), …` form, so
-that the intervals appearing in the body can use the membership proof; basic `le_max`/`max_le`
-style lemmas are provided so that downstream files never need to invoke the `iSup₂`/`iInf₂`
-lemma families directly.
+* `HarderNarasimhan.PayoffFunction`: payoff functions on strict intervals.
+* `HarderNarasimhan.PayoffFunction.A`, `HarderNarasimhan.PayoffFunction.B`: the two game values.
+* `HarderNarasimhan.PayoffFunction.IsAttained`: attainment of the infimum defining `μ.A I`.
 
 ## References
 
@@ -44,12 +37,12 @@ lemma families directly.
 
 namespace HarderNarasimhan
 
-/-- A *payoff function* on `ℒ` with values in `S`: a function assigning to every strict
-interval of `ℒ` a payoff.  Payoff functions are applied via the `FunLike` coercion, so
-`μ ⟨a, b, h⟩` is the payoff of the game played on the interval `(a, b)`. -/
+/-- A payoff function assigns a value in `S` to each strict interval of `ℒ`.
+
+The coercion to functions allows the notation `μ ⟨a, b, h⟩` for the payoff on an interval
+with endpoints `a < b`. -/
 structure PayoffFunction (ℒ : Type*) [LT ℒ] (S : Type*) where
-  /-- The underlying interval-indexed function.  Apply the payoff function via the coercion
-  instead of using this projection directly. -/
+  /-- The underlying function on strict intervals. -/
   toFun : StrictIntvl ℒ → S
 
 namespace PayoffFunction
@@ -68,9 +61,10 @@ instance : FunLike (PayoffFunction ℒ S) (StrictIntvl ℒ) S where
 
 @[ext] lemma ext {μ ν : PayoffFunction ℒ S} (h : ∀ I, μ I = ν I) : μ = ν := DFunLike.ext μ ν h
 
-/-- The order-dual payoff function: `μ.dual` plays the game on the order duals of `ℒ` and
-`S`, exchanging the two players.  See `A_top_dual` and `B_top_dual` in
-`HarderNarasimhan.PayoffFunction.GameValue` for the exchange of the game values. -/
+/-- The payoff function on the order duals of `ℒ` and `S`, obtained by reversing the
+endpoints. Order duality exchanges the two players; see
+`HarderNarasimhan.PayoffFunction.A_top_dual` and
+`HarderNarasimhan.PayoffFunction.B_top_dual`. -/
 def dual (μ : PayoffFunction ℒ S) : PayoffFunction ℒᵒᵈ Sᵒᵈ :=
   ⟨fun p ↦ OrderDual.toDual <| μ ⟨p.right, p.left, p.lt⟩⟩
 
@@ -84,51 +78,42 @@ variable [Preorder ℒ] [CompleteLattice S] (μ : PayoffFunction ℒ S)
 
 /-! ### The extremal operations -/
 
-/-- `μ.max I` is the supremum of `μ (I.left, u)` as `u` ranges over the points of `I` distinct
-from the left endpoint.  This is a “best possible” payoff obtained by moving the right
-endpoint while keeping the left endpoint fixed. -/
+/-- The supremum of the payoffs on `(I.left, u)` for `I.left < u ≤ I.right`. -/
 def max : PayoffFunction ℒ S :=
   ⟨fun I ↦ ⨆ (u : ℒ) (hu : u ∈ Set.Ioc I.left I.right), μ ⟨I.left, u, hu.1⟩⟩
 
 lemma max_apply (I : StrictIntvl ℒ) :
     μ.max I = ⨆ (u : ℒ) (hu : u ∈ Set.Ioc I.left I.right), μ ⟨I.left, u, hu.1⟩ := rfl
 
-/-- `μ.min I` is the infimum of `μ (u, I.right)` as `u` ranges over the points of `I` distinct
-from the right endpoint.  This is the order-dual companion of `μ.max`. -/
+/-- The infimum of the payoffs on `(u, I.right)` for `I.left ≤ u < I.right`. -/
 def min : PayoffFunction ℒ S :=
   ⟨fun I ↦ ⨅ (u : ℒ) (hu : u ∈ Set.Ico I.left I.right), μ ⟨u, I.right, hu.2⟩⟩
 
 lemma min_apply (I : StrictIntvl ℒ) :
     μ.min I = ⨅ (u : ℒ) (hu : u ∈ Set.Ico I.left I.right), μ ⟨u, I.right, hu.2⟩ := rfl
 
-/-- `μ.A I` is the value of the game on `I` when player A moves first: the infimum, over left
-endpoints `a` in the interval, of `μ.max` computed on the right-anchored subinterval
-`(a, I.right)`.  The global value of the game for player A is `μ.A ⊤`. -/
+/-- The value when player A moves first: the infimum of `μ.max (a, I.right)` over
+`I.left ≤ a < I.right`. -/
 def A : PayoffFunction ℒ S :=
   ⟨fun I ↦ ⨅ (a : ℒ) (ha : a ∈ Set.Ico I.left I.right), μ.max ⟨a, I.right, ha.2⟩⟩
 
 lemma A_apply (I : StrictIntvl ℒ) :
     μ.A I = ⨅ (a : ℒ) (ha : a ∈ Set.Ico I.left I.right), μ.max ⟨a, I.right, ha.2⟩ := rfl
 
-/-- `μ.B I` is the value of the game on `I` when player B moves first: the supremum, over
-right endpoints `b` in the interval, of `μ.min` computed on the left-anchored subinterval
-`(I.left, b)`.  This is the order-dual companion of `μ.A`; the global value of the game for
-player B is `μ.B ⊤`. -/
+/-- The value when player B moves first: the supremum of `μ.min (I.left, b)` over
+`I.left < b ≤ I.right`. -/
 def B : PayoffFunction ℒ S :=
   ⟨fun I ↦ ⨆ (b : ℒ) (hb : b ∈ Set.Ioc I.left I.right), μ.min ⟨I.left, b, hb.1⟩⟩
 
 lemma B_apply (I : StrictIntvl ℒ) :
     μ.B I = ⨆ (b : ℒ) (hb : b ∈ Set.Ioc I.left I.right), μ.min ⟨I.left, b, hb.1⟩ := rfl
 
-/-- `μ.IsAttained I` asserts that the infimum defining `μ.A I` is attained: there is a left
-endpoint `a` in the interval with `μ.max (a, I.right) = μ.A I`. -/
+/-- The infimum defining `μ.A I` is attained at some left endpoint
+`I.left ≤ a < I.right`. -/
 def IsAttained (I : StrictIntvl ℒ) : Prop :=
   ∃ (a : ℒ) (ha : a ∈ Set.Ico I.left I.right), μ.max ⟨a, I.right, ha.2⟩ = μ.A I
 
-/-! ### Basic bounds
-
-These lemmas interface the four operations with arbitrary bounds, so that downstream files
-never need to unfold them to their `iSup₂`/`iInf₂` normal forms. -/
+/-! ### Basic bounds -/
 
 variable {μ} {I : StrictIntvl ℒ} {s : S}
 
@@ -166,9 +151,7 @@ lemma min_le_apply : μ.min I ≤ μ I := min_le ⟨le_rfl, I.lt⟩
 /-- The payoff of an interval is bounded above by `μ.max`. -/
 lemma apply_le_max : μ I ≤ μ.max I := le_max ⟨I.lt, le_rfl⟩
 
-/-- `μ.A` is antitone in the left endpoint: enlarging the interval to the left can only
-decrease the first-player value.  This is a formal consequence of the definition of `μ.A` as
-an infimum and needs no convexity. -/
+/-- Extending an interval to the left cannot increase the value when player A moves first. -/
 lemma A_anti_left (μ : PayoffFunction ℒ S) {x y z : ℒ} (h₁ : x < y) (h₂ : y < z) :
     μ.A ⟨x, z, h₁.trans h₂⟩ ≤ μ.A ⟨y, z, h₂⟩ :=
   le_A fun _ hv ↦ A_le (I := ⟨x, z, h₁.trans h₂⟩) ⟨(h₁.trans_le hv.1).le, hv.2⟩

@@ -10,24 +10,22 @@ public import HarderNarasimhan.Filtration.Exists
 /-!
 # Uniqueness of Harder–Narasimhan filtrations
 
-Over a complete *linear* order `S`, the Harder–Narasimhan filtration of a payoff function is
-unique: any filtration satisfying the axioms of
-`PayoffFunction.HarderNarasimhanFiltration` coincides with the canonical construction
-`μ.hnFiltration`.  This is the uniqueness half of the existence-and-uniqueness theorem for
-Harder–Narasimhan filtrations and it is exposed as a `Unique` instance.
+For a convex payoff function with a complete linearly ordered codomain, the
+Harder–Narasimhan filtration is unique under the chain conditions used in
+`HarderNarasimhan/Filtration/Exists.lean`. Every such filtration equals the one obtained by
+successively taking greatest breakpoints.
 
-This file also repackages existence and uniqueness in terms of `RelSeries` for the relation
-`μ.semistableRel`: a Harder–Narasimhan filtration is the same thing as a finite `RelSeries`
-of semistable intervals from `⊥` to `⊤` whose successive `μ.A`-slopes strictly decrease.
+We also state existence and uniqueness in terms of finite `RelSeries` of semistable
+intervals from `⊥` to `⊤`. In this formulation, the successive `μ.A`-values satisfy
+`¬ aᵢ ≤ aᵢ₊₁`; for a linearly ordered codomain, they strictly decrease.
 
 ## Main results
 
-* `Unique (μ.HarderNarasimhanFiltration)` : over a complete linear order the
-  Harder–Narasimhan filtration is unique.
-* `PayoffFunction.exists_relSeries_semistableRel` : existence of a semistable `RelSeries`
-  from `⊥` to `⊤` with strictly decreasing slopes.
-* `PayoffFunction.existsUnique_relSeries_semistableRel` : its uniqueness over a complete
-  linear order.
+* A `Unique` instance for `μ.HarderNarasimhanFiltration`.
+* `HarderNarasimhan.PayoffFunction.exists_relSeries_semistableRel`: existence of a semistable
+  series satisfying the successive-value condition, for an admissible payoff function.
+* `HarderNarasimhan.PayoffFunction.existsUnique_relSeries_semistableRel`: uniqueness of
+  this series for a complete linearly ordered codomain.
 
 ## References
 
@@ -48,9 +46,8 @@ section Unique
 variable [CompleteLinearOrder S] {μ : PayoffFunction ℒ S} [μ.ADCC] [μ.IsConvex]
 
 open Classical in
-/-- Any Harder–Narasimhan filtration coincides with the canonical one.  This is the
-uniqueness half of the existence-and-uniqueness theorem; it is exposed through the `Unique`
-instance below. -/
+/-- Every Harder–Narasimhan filtration equals the filtration obtained by taking greatest
+breakpoints. -/
 private theorem eq_hnFiltration (F : μ.HarderNarasimhanFiltration) : F = μ.hnFiltration := by
   have hμcvx : μ.IsConvexOn ⊤ := inferInstance
   have strict_growth : ∀ i j : ℕ, i < j → j ≤ F.length → F i < F j :=
@@ -154,9 +151,8 @@ section Exists
 
 variable [CompleteLattice S]
 
-/-- Existence of a `RelSeries` of semistable intervals from `⊥` to `⊤` with strictly
-decreasing `μ.A`-slopes: the `RelSeries` repackaging of the canonical Harder–Narasimhan
-filtration `μ.hnFiltration`. -/
+/-- There is a finite series of semistable intervals from `⊥` to `⊤` whose successive
+`μ.A`-values satisfy `¬ aᵢ ≤ aᵢ₊₁`. -/
 theorem exists_relSeries_semistableRel (μ : PayoffFunction ℒ S)
     [μ.ADCC] [μ.IsConvex] [μ.Admissible] :
     ∃ s : RelSeries μ.semistableRel,
@@ -188,7 +184,7 @@ section Unique
 variable [CompleteLinearOrder S] {μ : PayoffFunction ℒ S} [μ.ADCC] [μ.IsConvex]
 
 omit [Nontrivial ℒ] [WellFoundedGT ℒ] [μ.ADCC] [μ.IsConvex] in
-/-- Any semistable `RelSeries` from `⊥` to `⊤` with strictly decreasing slopes underlies a
+/-- Any semistable `RelSeries` from `⊥` to `⊤` with strictly decreasing `μ.A`-values underlies a
 Harder–Narasimhan filtration, obtained by extending it constantly by `⊤`. -/
 private lemma exists_hnFiltration_of_relSeries (s : RelSeries μ.semistableRel)
     (h : s.head = ⊥ ∧ s.last = ⊤ ∧
@@ -232,9 +228,8 @@ private lemma exists_hnFiltration_of_relSeries (s : RelSeries μ.semistableRel)
         · simp only [hi.le, ↓reduceIte]
         · simp only [show i + 2 ≤ s.length from hi, ↓reduceIte] }, rfl, rfl⟩
 
-/-- Over a complete linear order, there is a *unique* `RelSeries` of semistable intervals
-from `⊥` to `⊤` with strictly decreasing `μ.A`-slopes: the `RelSeries` repackaging of the
-uniqueness of the Harder–Narasimhan filtration. -/
+/-- For a complete linearly ordered codomain, there is a unique finite series of semistable
+intervals from `⊥` to `⊤` with strictly decreasing `μ.A`-values. -/
 theorem existsUnique_relSeries_semistableRel (μ : PayoffFunction ℒ S)
     [μ.ADCC] [μ.IsConvex] :
     ∃! s : RelSeries μ.semistableRel,
