@@ -219,6 +219,41 @@ private lemma subseqIdx_inherit_step_predicate (f : ℕ → ℒ) (atf : ∃ k, f
 
 end SubseqIdx
 
+section NormalizeFiltration
+
+variable {ℒ S : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
+variable [CompleteLattice S] {μ : PayoffFunction ℒ S}
+
+/-- Remove the plateaus of an antitone chain whose strict steps satisfy the Jordan–Hölder
+conditions. A plateau before the given bottom index makes the resulting filtration shorter. -/
+private lemma exists_shorter_filtration_of_plateau (f : ℕ → ℒ) (k : ℕ)
+    (hf : Antitone f) (hfirst : f 0 = ⊤) (hlast : f k = ⊥)
+    (hpayoff : ∀ i, (hi : f (i + 1) < f i) → μ ⟨f (i + 1), f i, hi⟩ = μ ⊤)
+    (hstable : ∀ i, (hi : f (i + 1) < f i) → ∀ z,
+      (hz : f (i + 1) < z) → z < f i → μ ⟨f (i + 1), z, hz⟩ < μ ⟨f (i + 1), f i, hi⟩)
+    (hplateau : ∃ i, i + 1 ≤ k ∧ f i = f (i + 1)) :
+    ∃ F : μ.JordanHolderFiltration, F.length < k := by
+  classical
+  have atf : ∃ i, f i = ⊥ := ⟨k, hlast⟩
+  let F : μ.JordanHolderFiltration :=
+    { toFun := fun i ↦ f (subseqIdx f atf hf i)
+      length := subseqLen f atf hf
+      antitone := fun _ _ hij ↦
+        hf ((strictMono_nat_of_lt_succ (subseqIdx.lt_succ f atf hf)).monotone hij)
+      head_eq_top := hfirst
+      length_eq_bot := subseqLen_spec f atf hf
+      strictAntiOn := fun i _ j hj hij ↦ subseqIdx_strictAnti f atf hf i j hij hj
+      step_payoff_eq := fun i hi ↦ subseqIdx_inherit_step_predicate f atf hf
+        (fun I ↦ μ I = μ ⊤) hpayoff i hi
+      payoff_lt_of_between := fun i hi z hz hz' ↦ subseqIdx_inherit_step_predicate f atf hf
+        (fun I ↦ ∀ z, (hz : I.left < z) → z < I.right → μ ⟨I.left, z, hz⟩ < μ I)
+        hstable i hi z hz hz' }
+  refine ⟨F, lt_of_le_of_ne ?_ (subseqLen_ne_of_plateau f atf hf k hlast hplateau)⟩
+  apply F.length_le_of_eq_bot
+  exact le_bot_iff.mp (hlast ▸ hf (subseqIdx.ge_self f atf hf k))
+
+end NormalizeFiltration
+
 /-! ### Length uniqueness -/
 
 section RestrictLast
@@ -252,6 +287,246 @@ private lemma isSemistable_restrict_last [μ.IsSlopeLike] [μ.IsSemistable]
 
 end RestrictLast
 
+section RestrictLastFiltration
+
+variable {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
+variable {S : Type*} [CompleteLattice S] {μ : PayoffFunction ℒ S}
+
+/-- Removing the last step gives a filtration on the remaining top interval, with length
+one less than the original, provided that interval has the original total payoff. -/
+private lemma exists_filtration_restrict_last (F : μ.JordanHolderFiltration)
+    (h : F (F.length - 1) < ⊤)
+    (hpayoff : μ ⟨F (F.length - 1), ⊤, h⟩ = μ ⊤) :
+    ∃ G : (μ.restrict ⟨F (F.length - 1), ⊤, h⟩).JordanHolderFiltration,
+      G.length = F.length - 1 := by
+  let interval : StrictIntvl ℒ := ⟨F (F.length - 1), ⊤, h⟩
+  let truncated : ℕ → ↥interval := fun i ↦
+    if hi : i ≤ F.length - 1 then ⟨F i, F.antitone hi, le_top⟩ else ⊥
+  refine ⟨{
+    toFun := truncated
+    length := F.length - 1
+    antitone := by
+      intro i j hij
+      by_cases hj : j ≤ F.length - 1
+      · simp only [truncated, hij.trans hj, hj, ↓reduceDIte]
+        exact F.antitone hij
+      · simp only [truncated, hj, ↓reduceDIte, bot_le]
+    head_eq_top := by
+      simpa only [truncated, zero_le, ↓reduceDIte, JordanHolderFiltration.apply_zero]
+        using by rfl
+    length_eq_bot := by
+      simp only [truncated, le_refl, ↓reduceDIte]
+      rfl
+    strictAntiOn := by
+      intro i _ j hj hij
+      rw [Set.mem_Iic] at hj
+      simp only [truncated, hj, (hij.trans_le hj).le, ↓reduceDIte]
+      exact Subtype.coe_lt_coe.1 (F.apply_lt_apply hij (hj.trans (Nat.sub_le F.length 1)))
+    step_payoff_eq := by
+      intro i hi
+      have hsucc : i + 1 ≤ F.length - 1 := hi
+      simp only [restrict_apply, truncated, hi.le, hsucc, ↓reduceDIte]
+      exact (F.step_payoff (Nat.lt_of_lt_pred hi)).trans hpayoff.symm
+    payoff_lt_of_between := by
+      intro i hi z hz hz'
+      have hsucc : i + 1 ≤ F.length - 1 := hi
+      simp only [truncated, hsucc, hi.le, ↓reduceDIte] at hz hz'
+      simp only [restrict_apply, truncated, hsucc, hi.le, ↓reduceDIte]
+      exact F.payoff_lt (Nat.lt_of_lt_pred hi) hz hz' }, rfl⟩
+
+end RestrictLastFiltration
+
+section JoinedSteps
+
+variable {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
+variable {S : Type*} [CompleteLinearOrder S] {μ : PayoffFunction ℒ S}
+variable [hsl : μ.IsSlopeLike] [hst : μ.IsSemistable] [μ.EventuallyTopDCC]
+
+/-- The first-player value below any nonbottom filtration term is the total payoff. -/
+private lemma A_bot_eq_top_payoff (F : μ.JordanHolderFiltration) (i : ℕ)
+    (hi : i < F.length) : μ.A ⟨⊥, F i, F.bot_lt_of_lt hi⟩ = μ ⊤ := by
+  have hpayoff := F.payoff_bot_eq_top_payoff i hi
+  have hmax : μ.max ⊤ = μ ⊤ :=
+    max_top_eq_apply_iff.2
+      (min_top_eq_max_top_iff_hasNashEquilibrium.2 hst.hasNashEquilibrium)
+  rw [← hsl.min_eq_A, ← hpayoff]
+  refine le_antisymm min_le_apply (le_min fun u hu ↦ ?_)
+  by_cases hu_bot : u = ⊥
+  · simp only [hu_bot, le_refl]
+  · by_contra! hsmaller
+    have hgreater := (hsl.seesaw_right_lt_total_iff
+      (bot_lt_iff_ne_bot.2 hu_bot) hu.2).1 hsmaller
+    rw [hpayoff] at hgreater
+    exact hgreater.not_ge ((le_max (I := ⊤)
+      ⟨bot_lt_iff_ne_bot.2 hu_bot, le_top⟩).trans_eq hmax)
+
+/-- Joining a nonbottom term of one filtration with a term of another preserves the
+payoff of the initial segment. Convexity supplies the lower bound; semistability the upper. -/
+private lemma payoff_sup_eq_top_payoff [μ.IsConvex] (F G : μ.JordanHolderFiltration)
+    (i : ℕ) (hi : i < F.length) (j : ℕ) :
+    μ ⟨⊥, F i ⊔ G j, lt_of_lt_of_le (F.bot_lt_of_lt hi) le_sup_left⟩ = μ ⊤ := by
+  have hmax : μ.max ⊤ = μ ⊤ :=
+    max_top_eq_apply_iff.2
+      (min_top_eq_max_top_iff_hasNashEquilibrium.2 hst.hasNashEquilibrium)
+  apply le_antisymm
+  · exact (le_max (I := ⊤) ⟨(F.bot_lt_of_lt hi).trans_le le_sup_left, le_top⟩).trans_eq hmax
+  · refine le_trans ?_ (min_le_apply (μ := μ))
+    rw [hsl.min_eq_A]
+    by_cases hbot : G j = ⊥
+    · simpa only [hbot, sup_bot_eq] using (A_bot_eq_top_payoff F i hi).ge
+    · have hj : j < G.length := JordanHolderFiltration.ne_bot_iff_lt_length.1 hbot
+      calc
+        μ ⊤ = μ.A ⟨⊥, F i, F.bot_lt_of_lt hi⟩ ⊓ μ.A ⟨⊥, G j, G.bot_lt_of_lt hj⟩ := by
+          rw [A_bot_eq_top_payoff F i hi, A_bot_eq_top_payoff G j hj, inf_idem]
+        _ ≤ μ.A ⟨⊥, F i ⊔ G j, lt_sup_of_lt_left (F.bot_lt_of_lt hi)⟩ :=
+          (inferInstance : μ.IsConvexOn ⊤).inf_A_le_A_sup
+            (StrictIntvl.mem_top _) (StrictIntvl.mem_top _) (StrictIntvl.mem_top _)
+            (F.bot_lt_of_lt hi) (G.bot_lt_of_lt hj)
+
+end JoinedSteps
+
+section JoinedStability
+
+variable {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [hmod : IsModularLattice ℒ]
+variable {S : Type*} [CompleteLinearOrder S] {μ : PayoffFunction ℒ S}
+variable [hsl : μ.IsSlopeLike] [haff : μ.IsAffine]
+
+/-- A strict joined step with the total payoff remains stable. Modularity transports an
+intermediate point to a strict refinement of the original step, and affinity identifies
+its payoff. -/
+private lemma joined_step_stable (G : μ.JordanHolderFiltration) {x : ℒ} {j : ℕ}
+    (hj : j < G.length) (hstep : x ⊔ G (j + 1) < x ⊔ G j)
+    (hpayoff : μ ⟨x ⊔ G (j + 1), x ⊔ G j, hstep⟩ = μ ⊤)
+    {w : ℒ} (hw₁ : x ⊔ G (j + 1) < w) (hw₂ : w < x ⊔ G j) :
+    μ ⟨x ⊔ G (j + 1), w, hw₁⟩ < μ ⟨x ⊔ G (j + 1), x ⊔ G j, hstep⟩ := by
+  have hxw : x ≤ w := le_sup_left.trans hw₁.le
+  have hnot_le : ¬ G j ≤ w := fun hle ↦ hw₂.not_ge (sup_le hxw hle)
+  have hmeet_ne : G (j + 1) ≠ G j ⊓ w := by
+    intro heq
+    have hmodular := hmod.sup_inf_le_assoc_of_le (G j) hxw
+    rw [← heq, inf_eq_right.2 hw₂.le] at hmodular
+    exact hw₁.not_ge hmodular
+  have hmeet_lt : G (j + 1) < G j ⊓ w :=
+    lt_of_le_of_ne (le_inf (G.antitone (Nat.le_succ j)) (le_sup_right.trans hw₁.le)) hmeet_ne
+  have hjoin : x ⊔ G j = G j ⊔ w :=
+    le_antisymm (sup_le (hxw.trans le_sup_right) le_sup_left) (sup_le le_sup_right hw₂.le)
+  have hpayoff_meet : μ ⟨w, x ⊔ G j, hw₂⟩ = μ ⟨G j ⊓ w, G j, inf_lt_left.2 hnot_le⟩ := by
+    rw [haff.eq (G j) w hnot_le]
+    simp only [hjoin]
+  apply (hsl.seesaw_total_lt_right_iff hw₁ hw₂).1
+  calc
+    μ ⟨x ⊔ G (j + 1), x ⊔ G j, hstep⟩ = μ ⊤ := hpayoff
+    _ = μ ⟨G (j + 1), G j, G.apply_lt_apply (Nat.lt_succ_self j) hj⟩ :=
+      (G.step_payoff hj).symm
+    _ < μ ⟨G j ⊓ w, G j, inf_lt_left.2 hnot_le⟩ :=
+      (hsl.seesaw_total_lt_right_iff hmeet_lt (inf_lt_left.2 hnot_le)).2
+        (G.payoff_lt hj hmeet_lt (inf_lt_left.2 hnot_le))
+    _ = μ ⟨w, x ⊔ G j, hw₂⟩ := hpayoff_meet.symm
+
+end JoinedStability
+
+section JoinPlateau
+
+variable {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
+variable {S : Type*} [CompleteLinearOrder S] {μ : PayoffFunction ℒ S}
+variable [hsl : μ.IsSlopeLike] [haff : μ.IsAffine]
+
+/-- Joining with the last nonbottom term of `F` creates a plateau in `G`: the last
+term of `G` above that point agrees with the join of its successor. -/
+private lemma exists_join_plateau (F G : μ.JordanHolderFiltration) :
+    ∃ i : ℕ, i + 1 ≤ G.length ∧
+      F (F.length - 1) ⊔ G i = F (F.length - 1) ⊔ G (i + 1) := by
+  classical
+  let x := F (F.length - 1)
+  let i := Nat.findGreatest (fun j ↦ x ≤ G j) (G.length - 1)
+  have hlast : F.length - 1 < F.length := Nat.sub_one_lt F.length_pos.ne'
+  have hi : i + 1 ≤ G.length := by
+    have := Nat.findGreatest_le (P := fun j ↦ x ≤ G j) (G.length - 1)
+    have := G.length_pos
+    omega
+  have hx_le : x ≤ G i :=
+    @Nat.findGreatest_spec 0 (fun j ↦ x ≤ G j) inferInstance (G.length - 1)
+      (Nat.zero_le _) (by simp only [JordanHolderFiltration.apply_zero, le_top])
+  have hx_not_le : ¬ x ≤ G (i + 1) := by
+    by_cases hnext : i + 1 ≤ G.length - 1
+    · exact Nat.findGreatest_is_greatest (lt_add_one _) hnext
+    · have hnext_eq : i + 1 = G.length := by omega
+      simpa only [hnext_eq, JordanHolderFiltration.apply_length, le_bot_iff] using
+        F.ne_bot_of_lt hlast
+  have hjoin : x ⊔ G (i + 1) = G i := by
+    refine eq_of_le_of_not_lt (sup_le hx_le <| G.antitone (Nat.le_add_right i 1))
+      fun hjoin_lt ↦ ?_
+    have hnext_lt : G (i + 1) < x ⊔ G (i + 1) := right_lt_sup.mpr hx_not_le
+    have hpayoff_lt := G.payoff_lt hi hnext_lt hjoin_lt
+    rw [G.step_payoff hi] at hpayoff_lt
+    refine hpayoff_lt.not_ge ?_
+    rw [← haff.eq x (G (i + 1)) hx_not_le]
+    have hlast_payoff : μ ⟨⊥, x, F.bot_lt_of_lt hlast⟩ = μ ⊤ := by
+      simpa only [Nat.sub_one_add_one F.length_pos.ne',
+        JordanHolderFiltration.apply_length] using F.step_payoff hlast
+    by_cases hmeet : x ⊓ G (i + 1) = ⊥
+    · exact le_of_eq (by simpa only [hmeet] using hlast_payoff.symm)
+    · have hmeet_pos : ⊥ < x ⊓ G (i + 1) := bot_lt_iff_ne_bot.mpr hmeet
+      have hmeet_lt : x ⊓ G (i + 1) < x := inf_lt_left.mpr hx_not_le
+      have hstable : μ ⟨⊥, x ⊓ G (i + 1), hmeet_pos⟩ < μ ⟨⊥, x, F.bot_lt_of_lt hlast⟩ := by
+        simpa only [Nat.sub_one_add_one F.length_pos.ne',
+          JordanHolderFiltration.apply_length] using F.payoff_lt hlast
+            (by simpa only [Nat.sub_one_add_one F.length_pos.ne',
+              JordanHolderFiltration.apply_length] using hmeet_pos) hmeet_lt
+      rw [← hlast_payoff]
+      exact ((hsl.seesaw_total_lt_right_iff hmeet_pos hmeet_lt).2 hstable).le
+  refine ⟨i, hi, ?_⟩
+  calc
+    x ⊔ G i = G i := sup_eq_right.mpr hx_le
+    _ = x ⊔ G (i + 1) := hjoin.symm
+
+end JoinPlateau
+
+section JoinFiltration
+
+variable {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
+variable [IsModularLattice ℒ]
+variable {S : Type*} [CompleteLinearOrder S] {μ : PayoffFunction ℒ S}
+variable [hsl : μ.IsSlopeLike] [μ.IsSemistable] [μ.EventuallyTopDCC] [μ.IsAffine]
+
+/-- Join `G` with the last nonbottom term of `F` and remove plateaus. The strict joined
+steps retain their payoff and stability, and the plateau forces a drop in length. -/
+private lemma exists_shorter_join_filtration (F G : μ.JordanHolderFiltration)
+    (h : F (F.length - 1) < ⊤)
+    (hpayoff : μ ⟨F (F.length - 1), ⊤, h⟩ = μ ⊤) :
+    ∃ H : (μ.restrict ⟨F (F.length - 1), ⊤, h⟩).JordanHolderFiltration,
+      H.length < G.length := by
+  let x := F (F.length - 1)
+  let I : StrictIntvl ℒ := ⟨x, ⊤, h⟩
+  let joined : ℕ → ↥I := fun j ↦ ⟨x ⊔ G j, le_sup_left, le_top⟩
+  have hlast : F.length - 1 < F.length := Nat.sub_one_lt F.length_pos.ne'
+  have hx : ⊥ < x := F.bot_lt_of_lt hlast
+  have step_payoff : ∀ j, (hj : joined (j + 1) < joined j) →
+      μ ⟨x ⊔ G (j + 1), x ⊔ G j, hj⟩ = μ ⊤ := by
+    intro j hj
+    calc
+      μ ⟨x ⊔ G (j + 1), x ⊔ G j, hj⟩ =
+          μ ⟨⊥, x ⊔ G j, hx.trans_le le_sup_left⟩ := by
+        apply ((hsl.seesaw_total_eq_right_iff (hx.trans_le le_sup_left) hj).2 ?_).symm
+        rw [payoff_sup_eq_top_payoff F G _ hlast (j + 1),
+          payoff_sup_eq_top_payoff F G _ hlast j]
+      _ = μ ⊤ := payoff_sup_eq_top_payoff F G _ hlast j
+  refine exists_shorter_filtration_of_plateau (μ := μ.restrict I) joined G.length
+    (fun _ _ hij ↦ sup_le_sup_left (G.antitone hij) x) ?_ ?_
+    (fun j hj ↦ (step_payoff j hj).trans hpayoff.symm) ?_ ?_
+  · exact Subtype.ext (by simp [joined, I])
+  · exact Subtype.ext (by simp [joined, I])
+  · intro j hj w hw₁ hw₂
+    have hj_length : j < G.length := by
+      apply JordanHolderFiltration.ne_bot_iff_lt_length.1
+      intro hbot
+      exact hj.not_ge (show x ⊔ G j ≤ x ⊔ G (j + 1) by rw [hbot, sup_bot_eq]; exact le_sup_left)
+    exact joined_step_stable G hj_length hj (step_payoff j hj) hw₁ hw₂
+  · obtain ⟨j, hj, heq⟩ := exists_join_plateau F G
+    exact ⟨j, hj, Subtype.ext heq⟩
+
+end JoinFiltration
+
 open Classical in
 /-- The induction engine for length uniqueness: if some Jordan–Hölder filtration has length
 `≤ n`, then every Jordan–Hölder filtration has length `≤ n`.  The lattice is quantified
@@ -269,255 +544,29 @@ private lemma length_le_of_exists_length_le (n : ℕ) :
   | zero =>
     intro ℒ _ _ _ _ _ S _ μ _ _ _ _ _ ⟨F, hF⟩ _
     exact absurd (nonpos_iff_eq_zero.mp hF) F.length_pos.ne'
-  | succ n hn =>
-    intro ℒ _ _ _ _ hmod S _ μ hftp hsl hst _ haff ⟨JHy, hJHy⟩ JHx
-    let lenx := JHx.length
-    let leny := JHy.length
-    let x0 := JHx (lenx - 1)
-    if htriv : lenx = 1 then exact htriv ▸ Nat.le_add_left 1 n
-    else
-    have hlenx_ne_zero : lenx ≠ 0 := JHx.length_pos.ne'
-    have hlenx : 0 < lenx - 1 := by omega
-    let Ires : StrictIntvl ℒ := ⟨x0, ⊤, JHx.apply_lt_top hlenx (Nat.sub_le lenx 1)⟩
-    have hx0_bot : ⊥ < x0 := JHx.bot_lt_of_lt (Nat.sub_one_lt hlenx_ne_zero)
-    have nt : x0 < ⊤ := JHx.apply_lt_top hlenx (Nat.sub_le lenx 1)
-    have hlast_step := JHx.step_payoff (Nat.sub_one_lt hlenx_ne_zero)
-    have hstepx0 : μ ⟨x0, ⊤, nt⟩ = μ ⊤ := by
-      simp only [Nat.sub_one_add_one JHx.length_pos.ne',
-        JordanHolderFiltration.apply_length] at hlast_step
-      exact ((hsl.seesaw_total_eq_right_iff hx0_bot nt).2 hlast_step).symm
-    have hftp_res : (μ.restrict Ires).FiniteTotalPayoff :=
-      ⟨by simpa only [restrict_apply, StrictIntvl.ofSub_top] using
-        hstepx0.symm ▸ hftp.ne_top⟩
-    -- Join the comparison filtration with the last nonbottom term, then remove plateaus.
-    let JH_raw : ℕ → ↥Ires := fun m ↦ ⟨x0 ⊔ JHy m, le_sup_left, le_top⟩
-    have JH_raw_antitone : Antitone JH_raw :=
-      fun _ _ hab ↦ sup_le_sup_left (JHy.antitone hab) _
-    have JH_raw_first_top : JH_raw 0 = ⊤ := by
-      simpa only [JH_raw, JordanHolderFiltration.apply_zero, le_top, sup_of_le_right]
-        using by rfl
-    have hJHy_last : JHy leny = ⊥ := JHy.apply_length
-    have JH_raw_fin_len : JH_raw leny = ⊥ := by
-      simpa only [JH_raw, leny, hJHy_last, JordanHolderFiltration.apply_length, bot_le,
-        sup_of_le_left] using by rfl
-    have atRaw : ∃ k, JH_raw k = ⊥ := ⟨leny, JH_raw_fin_len⟩
-    let JHfinal := fun m ↦ JH_raw (subseqIdx JH_raw atRaw JH_raw_antitone m)
-    have JHfinal_first_top : JHfinal 0 = ⊤ := by
-      simpa [JHfinal, subseqIdx] using JH_raw_first_top
-    have hmax_top : μ.max ⊤ = μ ⊤ :=
-      max_top_eq_apply_iff.2
-        (min_top_eq_max_top_iff_hasNashEquilibrium.2 hst.hasNashEquilibrium)
-    have hA_eq_tot : ∀ (F : μ.JordanHolderFiltration) (k : ℕ), (hk : k < F.length) →
-        μ ⊤ = μ.A ⟨⊥, F k, F.bot_lt_of_lt hk⟩ := by
-      intro F k hk
-      rw [← hsl.min_eq_A]
-      have hess := F.payoff_bot_eq_top_payoff k hk
-      rw [← hess]
-      refine eq_of_le_of_ge ?_ ?_
-      · refine le_iInf₂ fun u hu1 ↦ ?_
-        if hubot : u = ⊥ then simp only [hubot, le_refl]
-        else
-          by_contra! hc
-          replace hc := (hsl.seesaw_right_lt_total_iff
-            (bot_lt_iff_ne_bot.2 hubot) hu1.2).1 hc
-          rw [hess] at hc
-          have hμu : μ ⟨⊥, u, bot_lt_iff_ne_bot.mpr hubot⟩ ≤ μ ⊤ := by
-            rw [← hmax_top]
-            exact le_iSup₂_of_le u ⟨bot_lt_iff_ne_bot.2 hubot, le_top⟩ le_rfl
-          exact not_le_of_gt hc hμu
-      · exact min_le_apply
-    have index_lt_length : ∀ j : ℕ, JH_raw (j + 1) < JH_raw j → j < leny := by
-      intro j hfj
-      by_contra hcontra
-      have hjbot : JHy j = ⊥ :=
-        le_bot_iff.mp (hJHy_last ▸ JHy.antitone (not_lt.1 hcontra))
-      have hraw : JH_raw j = ⊥ := by
-        have hval : x0 ⊔ JHy j = x0 := by rw [hjbot]; exact sup_bot_eq x0
-        exact Subtype.ext hval
-      exact not_lt_bot (hraw ▸ hfj)
-    -- Convexity preserves the common payoff after taking joins.
-    have raw_step_payoff : ∀ j : ℕ, (hfj : JH_raw (j + 1) < JH_raw j) →
-        (μ.restrict Ires) ⟨JH_raw (j + 1), JH_raw j, hfj⟩ = (μ.restrict Ires) ⊤ := by
-      intro j hfj
-      have hjy := index_lt_length j hfj
-      simp only [restrict_apply, StrictIntvl.ofSub, JH_raw]
-      have payoff_of_sup : ∀ j : ℕ, j ≤ leny →
-          μ ⟨⊥, x0 ⊔ JHy j, lt_of_lt_of_le hx0_bot le_sup_left⟩ = μ ⊤ := by
-        refine fun j hj ↦ eq_of_le_of_ge ?_ ?_
-        · rw [← hmax_top]
-          exact le_iSup₂_of_le (x0 ⊔ JHy j)
-            ⟨lt_of_lt_of_le hx0_bot le_sup_left, le_top⟩ le_rfl
-        · refine le_trans ?_ (min_le_apply (μ := μ)
-            (I := ⟨⊥, x0 ⊔ JHy j, lt_of_lt_of_le hx0_bot le_sup_left⟩))
-          rw [hsl.min_eq_A ⟨⊥, x0 ⊔ JHy j, lt_of_lt_of_le hx0_bot le_sup_left⟩]
-          by_cases hjbot : ⊥ = JHy j
-          · simpa only [← hjbot, sup_bot_eq] using
-              (hA_eq_tot JHx (lenx - 1) (Nat.sub_one_lt hlenx_ne_zero)).le
-          · have hjlt : j < JHy.length :=
-              JordanHolderFiltration.ne_bot_iff_lt_length.1 (Ne.symm hjbot)
-            calc
-              μ ⊤ = μ.A ⟨⊥, x0, hx0_bot⟩ ⊓ μ.A ⟨⊥, JHy j, Ne.bot_lt' hjbot⟩ := by
-                rw [← hA_eq_tot JHx (lenx - 1) (Nat.sub_one_lt hlenx_ne_zero),
-                  ← hA_eq_tot JHy j hjlt, inf_idem]
-              _ ≤ μ.A ⟨⊥, x0 ⊔ JHy j, lt_sup_of_lt_left hx0_bot⟩ :=
-                (inferInstance : μ.IsConvexOn ⊤).inf_A_le_A_sup (StrictIntvl.mem_top _)
-                  (StrictIntvl.mem_top _) (StrictIntvl.mem_top _) hx0_bot (Ne.bot_lt' hjbot)
-      calc
-        μ ⟨x0 ⊔ JHy (j + 1), x0 ⊔ JHy j, hfj⟩ =
-            μ ⟨⊥, x0 ⊔ JHy j, lt_of_lt_of_le hx0_bot le_sup_left⟩ := by
-          apply ((hsl.seesaw_total_eq_right_iff
-            (lt_of_lt_of_le hx0_bot le_sup_left) hfj).2 ?_).symm
-          rw [payoff_of_sup (j + 1) hjy, payoff_of_sup j hjy.le]
-        _ = μ ⊤ := payoff_of_sup j hjy.le
-        _ = μ ⟨x0, ⊤, nt⟩ := hstepx0.symm
-    -- Modularity and affinity transport stability to each strict joined step.
-    have raw_step_stable : ∀ j : ℕ, (hfj : JH_raw (j + 1) < JH_raw j) →
-        ∀ w : ↥Ires, (hw : JH_raw (j + 1) < w) → w < JH_raw j →
-          (μ.restrict Ires) ⟨JH_raw (j + 1), w, hw⟩ <
-            (μ.restrict Ires) ⟨JH_raw (j + 1), JH_raw j, hfj⟩ := by
-      intro j hfj w hw1 hw2
-      have hjy := index_lt_length j hfj
-      refine (hsl.seesaw_total_lt_right_iff
-        (x := ↑(JH_raw (j + 1))) (y := ↑w) (z := ↑(JH_raw j)) hw1 hw2).1 ?_
-      have hkey := raw_step_payoff j hfj
-      simp only [restrict_apply, StrictIntvl.ofSub] at hkey
-      have hmeet_ne : JHy (j + 1) ≠ JHy j ⊓ ↑w := by
-        by_contra hc
-        have hmodu := hmod.sup_inf_le_assoc_of_le (x := x0) (JHy j) (z := w.val)
-          (le_of_lt <| lt_of_le_of_lt le_sup_left hw1)
-        rw [← hc, inf_eq_right.2 (le_of_lt hw2 : (↑w : ℒ) ≤ x0 ⊔ JHy j)] at hmodu
-        exact (not_le_of_gt hw1) hmodu
-      have hnle : ¬ (JHy j ≤ ↑w) := by
-        by_contra hc
-        refine (not_le_of_gt hw2) <| sup_le_iff.2 ⟨?_, hc⟩
-        exact le_of_lt <| lt_of_le_of_lt le_sup_left hw1
-      have hx0w : x0 ≤ (↑w : ℒ) := le_of_lt (lt_of_le_of_lt le_sup_left hw1)
-      have hval : (↑(JH_raw j) : ℒ) = JHy j ⊔ ↑w :=
-        le_antisymm (sup_le (hx0w.trans le_sup_right) le_sup_left)
-          (sup_le le_sup_right hw2.le)
-      have payoff_of_meet : μ ⟨↑w, ↑(JH_raw j), hw2⟩ =
-          μ ⟨JHy j ⊓ ↑w, JHy j, inf_lt_left.2 hnle⟩ := by
-        rw [haff.eq (JHy j) ↑w hnle]
-        simp only [hval]
-      rw [hkey]
-      simp only [StrictIntvl.left_top, StrictIntvl.right_top]
-      rw [payoff_of_meet, ((by rfl) : μ ⟨↑(⊥ : ↥Ires), ↑(⊤ : ↥Ires), nt⟩ = μ ⟨x0, ⊤, nt⟩),
-        hstepx0, ← JHy.step_payoff hjy]
-      have hlt : JHy (j + 1) < JHy j ⊓ ↑w :=
-        lt_of_le_of_ne (le_inf (JHy.antitone (Nat.le_add_right j 1))
-          (le_of_lt (lt_of_le_of_lt le_sup_right hw1))) hmeet_ne
-      refine (hsl.seesaw_total_lt_right_iff hlt (inf_lt_left.2 hnle)).2 ?_
-      exact JHy.payoff_lt hjy hlt (inf_lt_left.mpr hnle)
-    let JH_FINAL : (μ.restrict Ires).JordanHolderFiltration :=
-      { toFun := JHfinal
-        length := subseqLen JH_raw atRaw JH_raw_antitone
-        antitone := fun _ _ hij ↦ JH_raw_antitone <|
-          (strictMono_nat_of_lt_succ (subseqIdx.lt_succ JH_raw atRaw JH_raw_antitone)).monotone
-            hij
-        head_eq_top := JHfinal_first_top
-        length_eq_bot := subseqLen_spec JH_raw atRaw JH_raw_antitone
-        strictAntiOn := fun i _ j hj hij ↦
-          subseqIdx_strictAnti JH_raw atRaw JH_raw_antitone i j hij hj
-        step_payoff_eq := fun i hi ↦
-          subseqIdx_inherit_step_predicate JH_raw atRaw JH_raw_antitone
-            (fun z ↦ (μ.restrict Ires) z = (μ.restrict Ires) ⊤) raw_step_payoff i hi
-        payoff_lt_of_between := fun i hi z h' h'' ↦
-          subseqIdx_inherit_step_predicate JH_raw atRaw JH_raw_antitone
-            (fun w ↦ ∀ z : ↥Ires, (hw : w.left < z) → z < w.right →
-              (μ.restrict Ires) ⟨w.left, z, hw⟩ < (μ.restrict Ires) w)
-            (fun j hfj w hw1 hw2 ↦ raw_step_stable j hfj w hw1 hw2) i hi z h' h'' }
-    -- A plateau occurs after the last term of the comparison filtration above x0.
-    have normalised_length_lt : JH_FINAL.length < leny := by
-      have hbot : JHfinal leny = ⊥ :=
-        eq_bot_iff.2 <| JH_raw_fin_len ▸
-          JH_raw_antitone (subseqIdx.ge_self JH_raw atRaw JH_raw_antitone leny)
-      refine lt_of_le_of_ne (JH_FINAL.length_le_of_eq_bot hbot) ?_
-      let i0 := Nat.findGreatest (fun m ↦ x0 ≤ JHy m) (leny - 1)
-      refine subseqLen_ne_of_plateau JH_raw atRaw JH_raw_antitone leny JH_raw_fin_len
-        ⟨i0, ⟨Nat.add_le_of_le_sub (Nat.one_le_iff_ne_zero.mpr JHy.length_pos.ne') <|
-          Nat.findGreatest_le (leny - 1), ?_⟩⟩
-      · have hx0_le := @Nat.findGreatest_spec 0 (fun m ↦ x0 ≤ JHy m)
-          inferInstance (leny - 1) (Nat.zero_le _)
-          (by simp only [JordanHolderFiltration.apply_zero, le_top])
-        have hnext_eq_length : ¬ i0 + 1 ≤ leny - 1 → i0 + 1 = leny := by
-          intro hw
-          refine le_antisymm ?_ <| le_of_not_gt fun hlt ↦ hw <|
-            (Nat.le_sub_one_iff_lt JHy.length_pos).2 hlt
-          exact Nat.add_le_of_le_sub (Nat.one_le_iff_ne_zero.mpr JHy.length_pos.ne') <|
-            Nat.findGreatest_le (leny - 1)
-        have hnot_le_next : ¬ x0 ≤ JHy (i0 + 1) := by
-          by_cases hw : i0 + 1 ≤ leny - 1
-          · exact Nat.findGreatest_is_greatest (lt_add_one _) hw
-          · simp only [hnext_eq_length hw, leny, JordanHolderFiltration.apply_length, le_bot_iff]
-            exact JHx.ne_bot_of_lt (Nat.sub_one_lt JHx.length_pos.ne')
-        have hplateau : (↑(JH_raw (i0 + 1)) : ℒ) = JHy i0 := by
-          refine eq_of_le_of_not_lt
-            (sup_le hx0_le <| JHy.antitone (Nat.le_add_right i0 1)) fun hc ↦ ?_
-          have hi0_le : i0 ≤ leny - 1 := Nat.findGreatest_le (leny - 1)
-          have hsmall : JHy (i0 + 1) < ↑(JH_raw (i0 + 1)) := by
-            refine lt_of_le_of_ne le_sup_right ?_
-            exact fun heq ↦ hnot_le_next (right_eq_sup.1 heq)
-          have hstrict_payoff := JHy.payoff_lt ((Nat.le_sub_one_iff_lt JHy.length_pos).1 hi0_le)
-            hsmall hc
-          rw [JHy.step_payoff (lt_of_le_of_lt hi0_le (Nat.sub_one_lt JHy.length_pos.ne'))]
-            at hstrict_payoff
-          refine (lt_iff_not_ge.1 hstrict_payoff) ?_
-          rw [← JHx.step_payoff (Nat.sub_one_lt JHx.length_pos.ne')]
-          rw [(haff.eq x0 (JHy (i0 + 1)) hnot_le_next).symm]
-          if hmeet_eq_last : JHx (JHx.length) = JHx (JHx.length - 1) ⊓ JHy (i0 + 1) then
-            apply le_of_eq
-            simp [lenx, x0, Nat.sub_one_add_one JHx.length_pos.ne', hmeet_eq_last]
-          else
-            have hmeet_pos : JHx (JHx.length) < JHx (JHx.length - 1) ⊓ JHy (i0 + 1) := by
-              simp only [JordanHolderFiltration.apply_length] at hmeet_eq_last
-              simpa [JordanHolderFiltration.apply_length] using Ne.bot_lt' hmeet_eq_last
-            simp only [Nat.sub_one_add_one JHx.length_pos.ne']
-            apply le_of_lt
-            apply (hsl.seesaw_total_lt_right_iff hmeet_pos (inf_lt_left.mpr hnot_le_next)).2
-            simpa only [Nat.sub_one_add_one JHx.length_pos.ne'] using
-              JHx.payoff_lt (Nat.sub_one_lt JHx.length_pos.ne')
-                ((Nat.sub_one_add_one JHx.length_pos.ne') ▸ hmeet_pos)
-                (inf_lt_left.mpr hnot_le_next)
-        exact Subtype.coe_inj.1 <| hplateau ▸ (sup_eq_right.2 hx0_le)
-    -- Restrict the original filtration and apply induction to the two shorter chains.
-    let JHfun : ℕ → ↥Ires := fun m ↦
-      if hm : m ≤ lenx - 1 then ⟨JHx m, JHx.antitone hm, le_top⟩ else ⊥
-    have JHfun_antitone : Antitone JHfun := by
-      intro n1 n2 hn12
-      by_cases h3 : n2 ≤ lenx - 1
-      · simp only [JHfun, le_trans hn12 h3, h3, ↓reduceDIte]
-        exact JHx.antitone hn12
-      · simp only [JHfun, h3, ↓reduceDIte, bot_le]
-    let JHres : (μ.restrict Ires).JordanHolderFiltration :=
-      { toFun := JHfun
-        length := lenx - 1
-        antitone := JHfun_antitone
-        head_eq_top := by
-          simpa only [JHfun, zero_le, ↓reduceDIte, JordanHolderFiltration.apply_zero]
-            using by rfl
-        length_eq_bot := by
-          simp only [JHfun, le_refl, ↓reduceDIte]
-          rfl
-        strictAntiOn := by
-          intro i _ j hj hij
-          rw [Set.mem_Iic] at hj
-          simp only [JHfun, hj, (hij.trans_le hj).le, ↓reduceDIte]
-          exact Subtype.coe_lt_coe.1 (JHx.apply_lt_apply hij (hj.trans (Nat.sub_le lenx 1)))
-        step_payoff_eq := by
-          intro k1 hk1
-          simp only [restrict_apply, JHfun]
-          have hk1' : k1 + 1 ≤ lenx - 1 := hk1
-          simp only [hk1.le, ↓reduceDIte, hk1']
-          exact (JHx.step_payoff (Nat.lt_of_lt_pred hk1)).trans hstepx0.symm
-        payoff_lt_of_between := by
-          intro i hi z hz hz'
-          have hi' : i + 1 ≤ lenx - 1 := hi
-          simp only [JHfun, hi', hi.le, ↓reduceDIte] at hz hz'
-          simp only [restrict_apply, JHfun, hi', hi.le, ↓reduceDIte]
-          exact JHx.payoff_lt (Nat.lt_of_lt_pred hi) hz hz' }
-    have hres_ss : (μ.restrict Ires).IsSemistable := isSemistable_restrict_last JHx nt
-    exact Nat.le_add_of_sub_le (hn (μ := μ.restrict Ires)
-      ⟨JH_FINAL, Nat.le_of_lt_succ (Nat.lt_of_lt_of_le normalised_length_lt hJHy)⟩ JHres)
+  | succ n ih =>
+    intro ℒ _ _ _ _ _ S _ μ hfinite hsl _ _ _ ⟨F, hF⟩ G
+    by_cases hlength : G.length = 1
+    · omega
+    have hlast_pos : 0 < G.length - 1 := by
+      have := G.length_pos
+      omega
+    let I : StrictIntvl ℒ :=
+      ⟨G (G.length - 1), ⊤, G.apply_lt_top hlast_pos (Nat.sub_le G.length 1)⟩
+    have hlast : G.length - 1 < G.length := Nat.sub_one_lt G.length_pos.ne'
+    have hpayoff : μ I = μ ⊤ :=
+      ((hsl.seesaw_total_eq_right_iff (G.bot_lt_of_lt hlast) I.lt).2
+        (G.payoff_bot_eq_top_payoff _ hlast)).symm
+    have hfinite_res : (μ.restrict I).FiniteTotalPayoff :=
+      ⟨by simpa only [restrict_apply, StrictIntvl.ofSub_top, hpayoff] using hfinite.ne_top⟩
+    have hsemistable_res : (μ.restrict I).IsSemistable := isSemistable_restrict_last G I.lt
+    -- Joining shortens F, while removing the last step of G decreases its length by one.
+    obtain ⟨shorter, hshorter⟩ := exists_shorter_join_filtration G F I.lt hpayoff
+    obtain ⟨restricted, hrestricted⟩ := exists_filtration_restrict_last G I.lt hpayoff
+    apply Nat.le_add_of_sub_le
+    rw [← hrestricted]
+    exact ih (μ := μ.restrict I)
+      ⟨shorter, Nat.le_of_lt_succ (hshorter.trans_le hF)⟩ restricted
 
 section LengthEq
 
