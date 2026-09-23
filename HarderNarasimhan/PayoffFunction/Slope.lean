@@ -78,56 +78,64 @@ theorem isSlopeLike_slope [Nontrivial V] (r : StrictIntvl ℒ → ℝ≥0) (d : 
     (hpos : ∀ (x y : ℒ), (h : x < y) → r ⟨x, y, h⟩ = 0 → 0 < d ⟨x, y, h⟩) :
     (slope r d).IsSlopeLike := by
   refine isSlopeLike_iff_seesaw.2 fun x y z h₁ h₂ ↦ ?_
-  have hd := hd x y z h₁ h₂
-  have hr := hr x y z h₁ h₂
+  have hdegree := hd x y z h₁ h₂
+  have hrank := hr x y z h₁ h₂
   have etop : ∀ w : StrictIntvl ℒ, r w = 0 → slope r d w = ⊤ :=
     fun w hw ↦ dif_neg (by simp [hw])
-  rcases eq_zero_or_pos (r ⟨x, z, h₁.trans h₂⟩) with h' | h'
+  rcases eq_zero_or_pos (r ⟨x, z, h₁.trans h₂⟩) with htotal | htotal
   · -- all ranks vanish: all three slopes are `⊤`, the constant pattern
-    obtain ⟨hxy, hyz⟩ := add_eq_zero.1 <| hr ▸ h'
+    obtain ⟨hxy, hyz⟩ := add_eq_zero.1 <| hrank ▸ htotal
     exact Or.inr <| Or.inr
-      ⟨(etop _ hxy).trans (etop _ h').symm, (etop _ h').trans (etop _ hyz).symm⟩
-  · obtain ⟨μxz, hxz₁, hxz₂⟩ := slope_pos (d := d) h'
+      ⟨(etop _ hxy).trans (etop _ htotal).symm, (etop _ htotal).trans (etop _ hyz).symm⟩
+  · obtain ⟨μxz, hxz₁, hxz₂⟩ := slope_pos (d := d) htotal
     have hlt : slope r d ⟨x, z, h₁.trans h₂⟩ < ⊤ := hxz₁ ▸ DedekindCut.principal_lt_top μxz
     rcases eq_zero_or_pos (r ⟨x, y, h₁⟩) with hxy | hxy
     · rcases eq_zero_or_pos (r ⟨y, z, h₂⟩) with hyz | hyz
       · -- both short ranks zero would force `r (x, z) = 0`
-        exact absurd (by rw [hr, hxy, hyz, add_zero]) h'.ne'
+        exact absurd (by rw [hrank, hxy, hyz, add_zero]) htotal.ne'
       · -- `r (x, y) = 0 < r (y, z)`: the strictly decreasing pattern
         refine Or.inr <| Or.inl ⟨hlt.trans_eq (etop _ hxy).symm, ?_⟩
-        have h4 : r ⟨x, z, h₁.trans h₂⟩ = r ⟨y, z, h₂⟩ := by rw [hr, hxy, zero_add]
-        simp only [slope, coe_mk, h', hyz, ↓reduceDIte, DedekindCut.principal_lt_principal]
-        exact h4 ▸ ((smul_lt_smul_iff_of_pos_left (inv_pos.2 h')).2 <|
-          hd ▸ lt_add_of_pos_left (d ⟨y, z, h₂⟩) <| hpos x y h₁ hxy)
+        have hsame_rank : r ⟨x, z, h₁.trans h₂⟩ = r ⟨y, z, h₂⟩ := by rw [hrank, hxy, zero_add]
+        simp only [slope, coe_mk, htotal, hyz, ↓reduceDIte, DedekindCut.principal_lt_principal]
+        exact hsame_rank ▸ ((smul_lt_smul_iff_of_pos_left (inv_pos.2 htotal)).2 <|
+          hdegree ▸ lt_add_of_pos_left (d ⟨y, z, h₂⟩) <| hpos x y h₁ hxy)
     · rcases eq_zero_or_pos (r ⟨y, z, h₂⟩) with hyz | hyz
       · -- `r (y, z) = 0 < r (x, y)`: the strictly increasing pattern
         refine Or.inl ⟨?_, hlt.trans_eq (etop _ hyz).symm⟩
-        have h4 : r ⟨x, z, h₁.trans h₂⟩ = r ⟨x, y, h₁⟩ := by rw [hr, hyz, add_zero]
-        simp only [slope, coe_mk, h', hxy, ↓reduceDIte, DedekindCut.principal_lt_principal]
-        exact h4 ▸ ((smul_lt_smul_iff_of_pos_left (inv_pos.2 h')).2 <|
-          hd ▸ lt_add_of_pos_right (d ⟨x, y, h₁⟩) <| hpos y z h₂ hyz)
+        have hsame_rank : r ⟨x, z, h₁.trans h₂⟩ = r ⟨x, y, h₁⟩ := by rw [hrank, hyz, add_zero]
+        simp only [slope, coe_mk, htotal, hxy, ↓reduceDIte, DedekindCut.principal_lt_principal]
+        exact hsame_rank ▸ ((smul_lt_smul_iff_of_pos_left (inv_pos.2 htotal)).2 <|
+          hdegree ▸ lt_add_of_pos_right (d ⟨x, y, h₁⟩) <| hpos y z h₂ hyz)
       · -- both short ranks positive: compare the underlying vectors directly
         obtain ⟨μxy, hxy₁, hxy₂⟩ := slope_pos (d := d) hxy
         obtain ⟨μyz, hyz₁, hyz₂⟩ := slope_pos (d := d) hyz
-        have key : r ⟨x, y, h₁⟩ • μxz + r ⟨y, z, h₂⟩ • μxz =
+        have hweighted : r ⟨x, y, h₁⟩ • μxz + r ⟨y, z, h₂⟩ • μxz =
             r ⟨x, y, h₁⟩ • μxy + r ⟨y, z, h₂⟩ • μyz := by
-          rw [hxy₂, hyz₂, ← add_smul, ← hr, hxz₂, hd]
+          rw [hxy₂, hyz₂, ← add_smul, ← hrank, hxz₂, hdegree]
         simp only [hxy₁, hxz₁, hyz₁, DedekindCut.principal_lt_principal,
           DedekindCut.principal_inj]
-        by_cases hs : μxy < μxz
-        · exact Or.inl ⟨hs, (smul_lt_smul_iff_of_pos_left hyz).1 <|
-            (add_lt_add_iff_left <| r ⟨x, y, h₁⟩ • μxy).1 <| lt_sub_iff_add_lt.1 <|
-            (eq_sub_of_add_eq key) ▸ (smul_lt_smul_iff_of_pos_left hxy).2 hs⟩
-        · by_cases hs' : μxy = μxz
-          · refine Or.inr <| Or.inr ⟨hs', ?_⟩
-            rw [hs'] at key
-            have h_eq := (add_right_inj _).mp key
-            exact le_antisymm ((smul_le_smul_iff_of_pos_left hyz).1 h_eq.le)
-              ((smul_le_smul_iff_of_pos_left hyz).1 h_eq.ge)
-          · have hs' : μxz < μxy := (not_lt.1 hs).lt_of_ne' hs'
-            exact Or.inr <| Or.inl ⟨hs', (smul_lt_smul_iff_of_pos_left hyz).1 <|
-              (add_lt_add_iff_left <| r ⟨x, y, h₁⟩ • μxy).1 <| sub_lt_iff_lt_add.1 <|
-              (eq_sub_of_add_eq key) ▸ (smul_lt_smul_iff_of_pos_left hxy).2 hs'⟩
+        rcases lt_trichotomy μxy μxz with hlt | heq | hgt
+        · refine Or.inl ⟨hlt, ?_⟩
+          apply (smul_lt_smul_iff_of_pos_left hyz).1
+          apply (add_lt_add_iff_left (r ⟨x, y, h₁⟩ • μxy)).1
+          calc
+            r ⟨x, y, h₁⟩ • μxy + r ⟨y, z, h₂⟩ • μxz <
+                r ⟨x, y, h₁⟩ • μxz + r ⟨y, z, h₂⟩ • μxz :=
+              add_lt_add_of_lt_of_le ((smul_lt_smul_iff_of_pos_left hxy).2 hlt) le_rfl
+            _ = r ⟨x, y, h₁⟩ • μxy + r ⟨y, z, h₂⟩ • μyz := hweighted
+        · refine Or.inr (Or.inr ⟨heq, ?_⟩)
+          rw [heq] at hweighted
+          have hright := (add_right_inj _).mp hweighted
+          exact le_antisymm ((smul_le_smul_iff_of_pos_left hyz).1 hright.le)
+            ((smul_le_smul_iff_of_pos_left hyz).1 hright.ge)
+        · refine Or.inr (Or.inl ⟨hgt, ?_⟩)
+          apply (smul_lt_smul_iff_of_pos_left hyz).1
+          apply (add_lt_add_iff_left (r ⟨x, y, h₁⟩ • μxy)).1
+          calc
+            r ⟨x, y, h₁⟩ • μxy + r ⟨y, z, h₂⟩ • μyz =
+                r ⟨x, y, h₁⟩ • μxz + r ⟨y, z, h₂⟩ • μxz := hweighted.symm
+            _ < r ⟨x, y, h₁⟩ • μxy + r ⟨y, z, h₂⟩ • μxz :=
+              add_lt_add_of_lt_of_le ((smul_lt_smul_iff_of_pos_left hxy).2 hgt) le_rfl
 
 end PayoffFunction
 

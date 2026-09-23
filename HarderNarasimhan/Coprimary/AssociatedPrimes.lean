@@ -95,11 +95,11 @@ embeds into the localized module. -/
 lemma inter_eq_empty_of_mem_associatedPrimes_quot_ker {p : Ideal R}
     (hp : p ∈ associatedPrimes R (M ⧸ LinearMap.ker (LocalizedModule.mkLinearMap S M))) :
     p.carrier ∩ S = ∅ := by
-  have hfQ : Function.Injective ((LinearMap.ker (LocalizedModule.mkLinearMap S M)).liftQ
-      (LocalizedModule.mkLinearMap S M) le_rfl) :=
-    LinearMap.ker_eq_bot.mp (Submodule.ker_liftQ_eq_bot' _ _ rfl)
-  exact inter_eq_empty_of_mem_associatedPrimes_localizedModule S
-    (associatedPrimes.subset_of_injective hfQ hp)
+  apply inter_eq_empty_of_mem_associatedPrimes_localizedModule (M := M) S
+  apply associatedPrimes.subset_of_injective (f :=
+    (LinearMap.ker (LocalizedModule.mkLinearMap S M)).liftQ
+      (LocalizedModule.mkLinearMap S M) le_rfl) ?_ hp
+  exact LinearMap.ker_eq_bot.mp (Submodule.ker_liftQ_eq_bot' _ _ rfl)
 
 open Module in
 /-- An associated prime of `M ⧸ ker (M → S⁻¹M)` that is disjoint from `S` is an associated
@@ -113,8 +113,9 @@ lemma mem_associatedPrimes_of_mem_associatedPrimes_quot_ker [IsNoetherianRing R]
     (hp : p ∈ associatedPrimes R (M ⧸ LinearMap.ker (LocalizedModule.mkLinearMap S M)))
     (hpDisj : p.carrier ∩ S = ∅) :
     p ∈ associatedPrimes R M := by
-  have : p.IsPrime := hp.1
+  let : p.IsPrime := hp.1
   let K : Submodule R M := LinearMap.ker (LocalizedModule.mkLinearMap S M)
+  -- Every element of the kernel is killed by a unit after localization at `p`.
   have hKloc : K.localized (p := p.primeCompl) = ⊥ := by
     change Submodule.localized' (Localization p.primeCompl) p.primeCompl
       (LocalizedModule.mkLinearMap p.primeCompl M) K = ⊥
@@ -129,20 +130,16 @@ lemma mem_associatedPrimes_of_mem_associatedPrimes_quot_ker [IsNoetherianRing R]
       LocalizedModule p.primeCompl M :=
     (localizedQuotientEquiv (p := p.primeCompl) (M' := K)).symm.trans
       (Submodule.quotEquivOfEqBot _ hKloc)
-  have hAtPrimeQuot : IsLocalRing.maximalIdeal (Localization.AtPrime p) ∈
-      associatedPrimes (Localization.AtPrime p) (LocalizedModule.AtPrime p (M ⧸ K)) := by
-    simpa [LocalizedModule.AtPrime, K] using
-      (Module.associatedPrimes.mem_associatedPrimes_atPrime_of_mem_associatedPrimes
-        (R := R) (M := (M ⧸ K)) (p := p) hp)
+  -- Transfer the associated prime through the localized quotient isomorphism.
   have hAtPrimeM : IsLocalRing.maximalIdeal (Localization.AtPrime p) ∈
       associatedPrimes (Localization.AtPrime p) (LocalizedModule.AtPrime p M) := by
-    simpa [LocalizedModule.AtPrime, K] using
-      ((LinearEquiv.AssociatedPrimes.eq (R := Localization.AtPrime p) e) ▸ hAtPrimeQuot)
-  have hComap :=
-    associatedPrimes.comap_mem_associatedPrimes_of_mem_associatedPrimes_of_isLocalizedModule_of_fg
+    rw [← LinearEquiv.AssociatedPrimes.eq (R := Localization.AtPrime p) e]
+    exact Module.associatedPrimes.mem_associatedPrimes_atPrime_of_mem_associatedPrimes hp
+  -- Contract back to `R`; finite generation is supplied by Noetherianity.
+  simpa [Localization.AtPrime.under_maximalIdeal] using
+    (associatedPrimes.comap_mem_associatedPrimes_of_mem_associatedPrimes_of_isLocalizedModule_of_fg
       p.primeCompl (LocalizedModule.mkLinearMap p.primeCompl M) _ hAtPrimeM
-      ((isNoetherianRing_iff_ideal_fg R).mp ‹IsNoetherianRing R› _)
-  simpa [Localization.AtPrime.under_maximalIdeal] using hComap
+      ((isNoetherianRing_iff_ideal_fg R).mp ‹IsNoetherianRing R› _))
 
 /-- The quotient half of Bourbaki, *Algèbre commutative*, Ch. IV, §1, no. 2, Prop. 6: the
 associated primes of `M ⧸ ker (M → S⁻¹M)` are exactly the associated primes of `M` that are
@@ -150,13 +147,15 @@ disjoint from `S`. -/
 theorem associatedPrimes_quot_ker_mkLinearMap [IsNoetherianRing R] :
     associatedPrimes R (M ⧸ LinearMap.ker (LocalizedModule.mkLinearMap S M)) =
       { p ∈ associatedPrimes R M | p.carrier ∩ S = ∅ } := by
-  refine le_antisymm
-    (fun p hp ↦ ⟨mem_associatedPrimes_of_mem_associatedPrimes_quot_ker S hp
-      (inter_eq_empty_of_mem_associatedPrimes_quot_ker S hp),
-      inter_eq_empty_of_mem_associatedPrimes_quot_ker S hp⟩)
-    fun p hp ↦ Or.resolve_left
-      (associatedPrimes.subset_union_of_exact (Submodule.injective_subtype _)
-        (LinearMap.exact_subtype_mkQ (LinearMap.ker (LocalizedModule.mkLinearMap S M))) hp.1)
-      fun hpKer ↦ (inter_nonempty_of_mem_associatedPrimes_ker S hpKer).ne_empty hp.2
+  apply Set.Subset.antisymm
+  · intro p hp
+    have hdisj := inter_eq_empty_of_mem_associatedPrimes_quot_ker S hp
+    exact ⟨mem_associatedPrimes_of_mem_associatedPrimes_quot_ker S hp hdisj, hdisj⟩
+  · rintro p ⟨hp, hdisj⟩
+    rcases associatedPrimes.subset_union_of_exact (Submodule.injective_subtype _)
+      (LinearMap.exact_subtype_mkQ (LinearMap.ker (LocalizedModule.mkLinearMap S M))) hp with
+      hpKer | hpQuot
+    · exact ((inter_nonempty_of_mem_associatedPrimes_ker S hpKer).ne_empty hdisj).elim
+    · exact hpQuot
 
 end HarderNarasimhan

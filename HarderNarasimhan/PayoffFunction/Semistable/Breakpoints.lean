@@ -56,8 +56,7 @@ lemma IsConvexOn.A_le_of_A_eq_top (hμcvx : μ.IsConvexOn I) {x z : ℒ}
     (hxI : x ∈ I) (hzI : z ∈ I) (h : x < z) (h' : μ.A ⟨x, z, h⟩ = ⊤)
     {a : ℒ} (haI : a ∈ I) (hax : a < x) :
     μ.A ⟨a, x, hax⟩ ≤ μ.A ⟨a, z, lt_trans hax h⟩ := by
-  have h'' := hμcvx.inf_le_A haI hxI hzI hax h
-  rwa [h', inf_top_eq] at h''
+  simpa only [h', inf_top_eq] using hμcvx.inf_le_A haI hxI hzI hax h
 
 /-- A convenient sufficient condition for `ADCC`: if every strictly descending chain
 eventually produces a step with first-player value `⊤`, then the descending chain condition
@@ -135,49 +134,33 @@ private lemma breakpointAux_defprop2 (μ : PayoffFunction ℒ S) (I : StrictIntv
         μ.A ⟨I.left, (breakpointAux μ I (i+1)).val,
           lt_of_le_of_ne (breakpointAux μ I (i+1)).prop.1 hi⟩ := by
   intro z hz
-  have hne :
-      (improvingSet μ I (breakpointAux μ I i) <| breakpointAux_helper μ I i hi).Nonempty := by
-    by_contra hcontra
-    simp only [breakpointAux, breakpointAux_helper μ I i hi, hcontra, ↓reduceDIte, ne_eq,
-      not_true_eq_false] at hi
-  simp only [breakpointAux, breakpointAux_helper μ I i hi, hne]
-  by_contra hcontra
-  have h' : z ∈ (improvingSet μ I (breakpointAux μ I i) <| breakpointAux_helper μ I i hi) := by
-    use ⟨le_of_lt <| lt_of_le_of_lt (breakpointAux μ I (i + 1)).prop.1 hz.1,
-      le_trans hz.2 (breakpointAux μ I i).prop.2⟩
-    have h'' : z < (breakpointAux μ I i).val := by
-      apply lt_of_le_of_ne hz.2
-      intro hcontra'
-      simp only [hcontra', ↓reduceDIte, ge_iff_le] at hcontra
-      exact (hwf.wf.min_mem (improvingSet μ I (breakpointAux μ I i) <|
-        breakpointAux_helper μ I i hi) hne).out.choose_spec.choose_spec.not_ge hcontra
-    use ⟨ne_of_lt <| lt_of_le_of_lt (breakpointAux μ I (i+1)).prop.1 hz.1, h''⟩, lt_of_le_of_lt'
-      hcontra.ge (hwf.wf.min_mem (improvingSet μ I (breakpointAux μ I i) <|
-        breakpointAux_helper μ I i hi) hne).out.choose_spec.choose_spec
-  simp only [breakpointAux, breakpointAux_helper μ I i hi, hne] at hz
-  exact hwf.wf.not_lt_min (improvingSet μ I (breakpointAux μ I i) <|
-    breakpointAux_helper μ I i hi) h' hz.1
+  have hprev := breakpointAux_helper μ I i hi
+  have hne : (improvingSet μ I (breakpointAux μ I i) hprev).Nonempty := by
+    by_contra hempty
+    simp only [breakpointAux, hprev, hempty, ↓reduceDIte, ne_eq, not_true_eq_false] at hi
+  obtain ⟨hminI, hmin_bounds, hmin_improves⟩ :=
+    hwf.wf.min_mem (improvingSet μ I (breakpointAux μ I i) hprev) hne
+  simp only [breakpointAux, hprev, hne, ↓reduceDIte] at hz ⊢
+  intro hdominates
+  -- A point above the chosen minimum with at least its value would also be a candidate.
+  apply hwf.wf.not_lt_min (improvingSet μ I (breakpointAux μ I i) hprev) ?_ hz.1
+  have hz_left : I.left < z := hminI.1.trans_lt hz.1
+  refine ⟨⟨hz_left.le, hz.2.trans (breakpointAux μ I i).prop.2⟩,
+    ⟨hz_left.ne, ?_⟩, hmin_improves.trans_le hdominates⟩
+  apply lt_of_le_of_ne hz.2
+  intro heq
+  subst z
+  exact hmin_improves.not_ge hdominates
 
 private lemma breakpointAux_strict_decreasing (μ : PayoffFunction ℒ S) (I : StrictIntvl ℒ) :
     ∀ i : ℕ, I.left ≠ (breakpointAux μ I i).val →
       (breakpointAux μ I i).val > (breakpointAux μ I (i+1)).val := by
   intro i hi
-  by_cases h : I.left = (breakpointAux μ I (i+1)).val
-  · simp only [breakpointAux, hi, ↓reduceDIte] at h
-    by_cases hne : (improvingSet μ I (breakpointAux μ I i) hi).Nonempty
-    · simp only [hne, ↓reduceDIte] at h
-      exact False.elim ((hwf.wf.min_mem (improvingSet μ I (breakpointAux μ I i) hi) hne
-        ).out.choose_spec.choose.1 h)
-    · simp only [breakpointAux, hi, hne]
-      exact lt_of_le_of_ne (breakpointAux μ I i).prop.1 hi
-  · simp only [breakpointAux, hi, ↓reduceDIte]
-    have hne :
-        (improvingSet μ I (breakpointAux μ I i) <| breakpointAux_helper μ I i h).Nonempty := by
-      by_contra hcontra
-      simp only [breakpointAux, breakpointAux_helper μ I i h, hcontra,
-        ↓reduceDIte, not_true_eq_false] at h
-    simpa only [hne, ↓reduceDIte] using (hwf.wf.min_mem
-      (improvingSet μ I (breakpointAux μ I i) hi) hne).out.choose_spec.choose.2
+  by_cases hne : (improvingSet μ I (breakpointAux μ I i) hi).Nonempty
+  · simpa only [breakpointAux, hi, hne, ↓reduceDIte] using
+      (hwf.wf.min_mem (improvingSet μ I (breakpointAux μ I i) hi) hne).out.choose_spec.choose.2
+  · simpa only [breakpointAux, hi, hne, ↓reduceDIte] using
+      lt_of_le_of_ne (breakpointAux μ I i).prop.1 hi
 
 private lemma breakpointAux_fin_len (μ : PayoffFunction ℒ S) (I : StrictIntvl ℒ)
     (hμDCC : μ.ADCC) :
@@ -208,8 +191,8 @@ private lemma breakpointAux_defprop3₀ (μ : PayoffFunction ℒ S) (I : StrictI
     (i : ℕ) (hi : i < (breakpointAux_len μ I hμDCC)) :
     I.left < (breakpointAux μ I i).val := by
   classical
-  exact ((Nat.find_min (breakpointAux_fin_len μ I hμDCC)) hi).decidable_imp_symm
-    fun hcontra ↦ (eq_of_le_of_not_lt (breakpointAux μ I i).prop.1 hcontra).symm
+  exact lt_of_le_of_ne (breakpointAux μ I i).prop.1
+    (fun heq ↦ Nat.find_min (breakpointAux_fin_len μ I hμDCC) hi heq.symm)
 
 private lemma breakpointAux_defprop3 (μ : PayoffFunction ℒ S) (I : StrictIntvl ℒ)
     (hμDCC : μ.ADCC)
@@ -220,26 +203,24 @@ private lemma breakpointAux_defprop3 (μ : PayoffFunction ℒ S) (I : StrictIntv
         breakpointAux_len_nonzero μ I hμDCC⟩ := by
   classical
   let len := breakpointAux_len μ I hμDCC
-  by_contra hcontra
-  by_cases hcases : y < (breakpointAux μ I (len - 1)).val
-  · have h₂ : (breakpointAux μ I len).val = I.left :=
+  have hlast : I.left < (breakpointAux μ I (len - 1)).val :=
+    breakpointAux_defprop3₀ μ I hμDCC (len - 1)
+      (Nat.sub_one_lt (breakpointAux_len_nonzero μ I hμDCC))
+  intro himproves
+  rcases hy.2.eq_or_lt with heq | hy_lt
+  · simp only [heq, lt_self_iff_false] at himproves
+  · -- A strict improvement would force another nonterminal step of the recursion.
+    have hne : (improvingSet μ I (breakpointAux μ I (len - 1)) hlast.ne).Nonempty :=
+      ⟨y, ⟨hy.1.le, hy.2.trans (breakpointAux μ I (len - 1)).prop.2⟩,
+        ⟨hy.1.ne, hy_lt⟩, himproves⟩
+    have hfinished : (breakpointAux μ I len).val = I.left :=
       Nat.find_spec (breakpointAux_fin_len μ I hμDCC)
-    have h₃ : ¬ (improvingSet μ I (breakpointAux μ I <| len - 1)
-        (ne_of_lt <| breakpointAux_defprop3₀ μ I hμDCC (len - 1)
-          (Nat.sub_one_lt <| breakpointAux_len_nonzero μ I hμDCC))).Nonempty := by
-      by_contra hcontra'
-      have triv : len - 1 + 1 = len := Nat.sub_one_add_one <| breakpointAux_len_nonzero μ I hμDCC
-      rw [← triv] at h₂
-      simp only [breakpointAux, ne_of_lt <| breakpointAux_defprop3₀ μ I hμDCC (len - 1)
-        (Nat.sub_one_lt <| breakpointAux_len_nonzero μ I hμDCC), hcontra', ↓reduceDIte] at h₂
-      exact (hwf.wf.min_mem (improvingSet μ I (breakpointAux μ I (len-1)) (ne_of_lt <|
-        breakpointAux_defprop3₀ μ I hμDCC (len - 1) (Nat.sub_one_lt <|
-        breakpointAux_len_nonzero μ I hμDCC))) hcontra').out.choose_spec.choose.1
-        h₂.symm
-    exact h₃ ⟨y, ⟨hy.1.le, le_trans hy.2 (breakpointAux μ I (len - 1)).prop.2⟩,
-      ⟨hy.1.ne, hcases⟩, hcontra⟩
-  · simp only [eq_of_le_of_not_lt hy.2 hcases] at hcontra
-    exact lt_irrefl _ hcontra
+    have hlen : len - 1 + 1 = len :=
+      Nat.sub_one_add_one (breakpointAux_len_nonzero μ I hμDCC)
+    rw [← hlen] at hfinished
+    simp only [breakpointAux, hlast.ne, hne, ↓reduceDIte] at hfinished
+    exact (hwf.wf.min_mem (improvingSet μ I (breakpointAux μ I (len - 1)) hlast.ne)
+      hne).out.choose_spec.choose.1 hfinished.symm
 
 /-- The set of breakpoints is nonempty: under the descending chain condition and convexity
 on `I`, the breakpoint recursion terminates at a breakpoint.  This is the key existential
@@ -249,74 +230,58 @@ lemma breakpoints_nonempty [hμDCC : μ.ADCC] (hμcvx : μ.IsConvexOn I) :
   classical
   let len := breakpointAux_len μ I hμDCC
   let func := breakpointAux μ I
-  by_cases h : len = 1
-  · refine ⟨I.right, I.right_mem, I.lt.ne, ?_, fun _ hyI _ _ ↦ hyI.2⟩
-    intro y hyI hy
-    have h' : (breakpointAux μ I (breakpointAux_len μ I hμDCC - 1)).val = I.right :=
-      congrArg (fun a ↦ (func (a - 1)).val) h
-    simpa only [h', Prod.mk.eta, Subtype.coe_eta, gt_iff_lt] using
-      breakpointAux_defprop3 μ I hμDCC y ⟨lt_of_le_of_ne hyI.left hy, h' ▸ hyI.2⟩
-  · have h₂ : ∀ i : ℕ, i ≤ len - 1 → I.left ≠ (func i).val := by
-      intro i hi
-      by_contra!
-      exact (Nat.find_min (breakpointAux_fin_len μ I hμDCC) <| Nat.lt_of_le_sub_one
-        (Nat.zero_lt_of_ne_zero <| breakpointAux_len_nonzero μ I hμDCC) hi) this.symm
-    have h₃ : ∀ i : ℕ, (hi : 1 ≤ i ∧ i ≤ len - 1) → (∀ y : ℒ, (hyI : y ∈ I) →
-        (hy : I.left ≠ y) → (y < func (i-1) ∧ μ.A ⟨I.left, y, lt_of_le_of_ne hyI.1 hy⟩ ≥
-        μ.A ⟨I.left, (func i).val, lt_of_le_of_ne (func i).prop.1 <| h₂ i hi.2⟩) →
-        y ≤ (func i).val) := by
-      intro i hi y hyI hy hy'
-      by_contra!
-      have h₃' : (func i).val < y ⊔ (func i).val ∧ y ⊔ (func i).val ≤ (func (i-1)).val := by
-        refine ⟨right_lt_sup.2 this, sup_le_iff.2 ⟨hy'.1.le, ?_⟩⟩
-        have h₃'' := breakpointAux_strict_decreasing μ I (i-1) (h₂ (i-1) <| le_trans (le_of_lt <|
-          Nat.sub_one_lt <| Nat.one_le_iff_ne_zero.1 hi.1) hi.2)
-        rw [Nat.sub_one_add_one <| Nat.one_le_iff_ne_zero.1 hi.1] at h₃''
-        exact h₃''.le
-      have h₃''' : ∀ (hi' : I.left ≠ (func i).val) (z : ℒ) (hz : (func i).val < z ∧
-          z ≤ (func (i - 1)).val), ¬ μ.A ⟨I.left, z, lt_of_le_of_lt (func i).prop.1 hz.1⟩ ≥
-          μ.A ⟨I.left, (func (i - 1 + 1)).val, lt_of_le_of_ne ((func (i - 1 + 1)).prop).1
-            ((Nat.sub_one_add_one <| Nat.one_le_iff_ne_zero.1 hi.1) ▸ h₂ i hi.2)⟩ :=
-        fun hi' z hz ↦ breakpointAux_defprop2 μ I (i - 1) ((Nat.sub_one_add_one <|
-          Nat.one_le_iff_ne_zero.1 hi.1) ▸ h₂ i hi.2) z ((Nat.sub_one_add_one <|
-          Nat.one_le_iff_ne_zero.1 hi.1) ▸ hz)
-      simp only [ne_eq, not_false_eq_true, Nat.sub_add_cancel, ge_iff_le, forall_const, hi,
-        h₂] at h₃'''
-      exact (h₃''' (y ⊔ func i) h₃') <| inf_eq_right.2 hy'.2 ▸
-        hμcvx.inf_A_le_A_sup hyI (func i).prop I.left_mem
-          (lt_of_le_of_ne hyI.1 hy) (lt_of_le_of_ne (func i).prop.1 <| h₂ i hi.2)
-    have h₄ : ∀ y : ℒ, (hyI : y ∈ I) → (hy : I.left ≠ y) → μ.A ⟨I.left, y,
-        lt_of_le_of_ne hyI.1 hy⟩ ≥ μ.A ⟨I.left, (func (len - 1)).val, lt_of_le_of_ne (func
-        (len - 1)).prop.1 <| h₂ (len - 1) le_rfl⟩ → (∀ i : ℕ, i ≤ len - 1 → y ≤ (func i).val) := by
-      intro y hyI hy hy' i hi
-      induction i with
-      | zero => exact hyI.2
-      | succ i hi' =>
-        have hfinal : ∀ j : ℕ, (hj : j ≤ len - 1) → μ.A ⟨I.left, (func (len - 1)).val,
-            lt_of_le_of_ne ((func (len - 1)).prop).1 (h₂ (len - 1) le_rfl)⟩ ≥
-            μ.A ⟨I.left, func j,
-            breakpointAux_defprop3₀ μ I hμDCC j <| lt_of_le_of_lt hj <| Nat.sub_one_lt <|
-            ne_of_gt <| Nat.zero_lt_of_ne_zero <| breakpointAux_len_nonzero μ I hμDCC⟩ := by
-          apply Nat.decreasingInduction
-          · exact fun k hk hk' ↦ le_of_lt <| lt_of_lt_of_le (breakpointAux_defprop1 μ I k <|
-              ne_of_lt <| breakpointAux_defprop3₀ μ I hμDCC (k+1) <| Nat.add_lt_of_lt_sub hk) hk'
-          · exact le_rfl
-        have hh : y < func i := by
-          refine lt_of_le_of_ne (hi' (Nat.le_of_succ_le hi)) ?_
-          intro heq
-          have hhh := lt_of_le_of_lt' hy' <| lt_of_le_of_lt' (hfinal (i+1) hi) <|
-            breakpointAux_defprop1 μ I i (ne_of_lt <| breakpointAux_defprop3₀ μ I hμDCC (i+1) <|
-            lt_of_le_of_lt hi <| Nat.sub_one_lt <| ne_of_gt <| Nat.zero_lt_of_ne_zero <|
-            breakpointAux_len_nonzero μ I hμDCC)
-          simp only [heq] at hhh
-          exact irrefl _ hhh
-        exact h₃ (i+1) ⟨Nat.le_add_left 1 i, hi⟩ y hyI hy ⟨hh, ge_trans hy' (hfinal (i+1) hi)⟩
-    refine ⟨(func (len - 1)).val, (func (len - 1)).prop, h₂ (len - 1) le_rfl, ?_,
-      fun y hyI hy hy' ↦ h₄ y hyI hy (ge_of_eq hy') (len - 1) le_rfl⟩
-    intro y hyI hy
-    by_contra!
-    exact breakpointAux_defprop3 μ I hμDCC y ⟨lt_of_le_of_ne hyI.1 hy,
-      h₄ y hyI hy this.le (len - 1) le_rfl⟩ this
+  have active : ∀ i : ℕ, i ≤ len - 1 → I.left < (func i).val := by
+    intro i hi
+    exact breakpointAux_defprop3₀ μ I hμDCC i
+      (hi.trans_lt (Nat.sub_one_lt (breakpointAux_len_nonzero μ I hμDCC)))
+  -- Convexity upgrades maximality inside a step to domination of all competing points.
+  have step_dominates : ∀ i : ℕ, (hi : i + 1 ≤ len - 1) →
+      ∀ y : ℒ, (hyI : y ∈ I) → (hy : I.left ≠ y) → y < func i →
+      μ.A ⟨I.left, func (i + 1), active (i + 1) hi⟩ ≤
+        μ.A ⟨I.left, y, lt_of_le_of_ne hyI.1 hy⟩ → y ≤ func (i + 1) := by
+    intro i hi y hyI hy hy_prev hvalue
+    by_contra hnot_le
+    have hsup : (func (i + 1)).val < y ⊔ (func (i + 1)).val ∧
+        y ⊔ (func (i + 1)).val ≤ (func i).val :=
+      ⟨right_lt_sup.2 hnot_le, sup_le hy_prev.le
+        (breakpointAux_strict_decreasing μ I i (active i (Nat.le_of_succ_le hi)).ne).le⟩
+    apply breakpointAux_defprop2 μ I i (active (i + 1) hi).ne
+      (y ⊔ (func (i + 1)).val) hsup
+    simpa only [inf_eq_right.2 hvalue] using
+      hμcvx.inf_A_le_A_sup hyI (func (i + 1)).prop I.left_mem
+        (lt_of_le_of_ne hyI.1 hy) (active (i + 1) hi)
+  -- Values increase along the recursion, so the last active value dominates all earlier ones.
+  have value_le_final : ∀ i : ℕ, (hi : i ≤ len - 1) →
+      μ.A ⟨I.left, func i, active i hi⟩ ≤
+        μ.A ⟨I.left, func (len - 1), active (len - 1) le_rfl⟩ := by
+    apply Nat.decreasingInduction
+    · intro i hi ih
+      exact (breakpointAux_defprop1 μ I i (active (i + 1) hi).ne).le.trans ih
+    · exact le_rfl
+  have final_dominates : ∀ y : ℒ, (hyI : y ∈ I) → (hy : I.left ≠ y) →
+      μ.A ⟨I.left, func (len - 1), active (len - 1) le_rfl⟩ ≤
+        μ.A ⟨I.left, y, lt_of_le_of_ne hyI.1 hy⟩ →
+      ∀ i : ℕ, i ≤ len - 1 → y ≤ (func i).val := by
+    intro y hyI hy hvalue i hi
+    induction i with
+    | zero => exact hyI.2
+    | succ i ih =>
+      apply step_dominates i hi y hyI hy ?_ ((value_le_final (i + 1) hi).trans hvalue)
+      refine lt_of_le_of_ne (ih (Nat.le_of_succ_le hi)) ?_
+      intro heq
+      have hstrict : μ.A ⟨I.left, func i, active i (Nat.le_of_succ_le hi)⟩ <
+          μ.A ⟨I.left, y, lt_of_le_of_ne hyI.1 hy⟩ := calc
+        _ < μ.A ⟨I.left, func (i + 1), active (i + 1) hi⟩ :=
+          breakpointAux_defprop1 μ I i (active (i + 1) hi).ne
+        _ ≤ μ.A ⟨I.left, func (len - 1), active (len - 1) le_rfl⟩ := value_le_final (i + 1) hi
+        _ ≤ _ := hvalue
+      simp only [heq, lt_self_iff_false] at hstrict
+  refine ⟨(func (len - 1)).val, (func (len - 1)).prop, (active (len - 1) le_rfl).ne, ?_, ?_⟩
+  · intro y hyI hy hbetter
+    exact breakpointAux_defprop3 μ I hμDCC y
+      ⟨lt_of_le_of_ne hyI.1 hy, final_dominates y hyI hy hbetter.le (len - 1) le_rfl⟩ hbetter
+  · intro y hyI hy heq
+    exact final_dominates y hyI hy heq.ge (len - 1) le_rfl
 
 end Recursion
 
@@ -349,11 +314,14 @@ lemma IsBreakpoint.isSemistable_restrict {x : ℒ} (hx : μ.IsBreakpoint I x) :
 value on `(x, y)` does not dominate the value on `(I.left, x)`. -/
 lemma IsBreakpoint.not_A_le {x : ℒ} (hx : μ.IsBreakpoint I x) (hμcvx : μ.IsConvexOn I)
     {y : ℒ} (hyI : y ∈ I) (hy : x < y) :
-    ¬ μ.A ⟨I.left, x, hx.left_lt⟩ ≤ μ.A ⟨x, y, hy⟩ := fun hy' ↦
-  (not_le_of_gt hy) (hx.le_of_eq y hyI (ne_of_lt <| lt_of_le_of_lt hx.mem.1 hy) <|
-    eq_of_le_of_not_lt' ((inf_eq_left.2 hy') ▸
-      hμcvx.inf_le_A I.left_mem hx.mem hyI hx.left_lt hy) <|
-    hx.not_lt y hyI <| ne_of_lt <| lt_of_le_of_lt hx.mem.1 hy)
+    ¬ μ.A ⟨I.left, x, hx.left_lt⟩ ≤ μ.A ⟨x, y, hy⟩ := by
+  intro hslope
+  have hy_left : I.left < y := hx.left_lt.trans hy
+  apply hy.not_ge
+  apply hx.le_of_eq y hyI hy_left.ne
+  refine eq_of_le_of_not_lt' ?_ (hx.not_lt y hyI hy_left.ne)
+  simpa only [inf_eq_left.2 hslope] using
+    hμcvx.inf_le_A I.left_mem hx.mem hyI hx.left_lt hy
 
 section Total
 
@@ -379,14 +347,11 @@ lemma breakpoints_total (hμcvx : μ.IsConvexOn I)
     rcases h with htotal | hattained
     · exact Or.inl <| htotal.total _ _
     · exact Or.inr <| hattained (x ⊔ x') hsI hsne
-  have h₂ : μ.A ⟨I.left, x, hxlt⟩ = μ.A ⟨I.left, x ⊔ x', lt_sup_of_lt_left hxlt⟩ ∨
-      μ.A ⟨I.left, x', hx'lt⟩ = μ.A ⟨I.left, x ⊔ x', lt_sup_of_lt_left hxlt⟩ := by
-    rcases hμcvx.A_le_A_sup_or hx.mem hx'.mem I.left_mem hxlt hx'lt h₁ with c1 | c2
-    · exact Or.inl <| eq_of_le_of_not_lt c1 <| hx.not_lt (x ⊔ x') hsI hsne
-    · exact Or.inr <| eq_of_le_of_not_lt c2 <| hx'.not_lt (x ⊔ x') hsI hsne
-  rcases h₂ with c1 | c2
-  · exact Or.inr (sup_le_iff.1 <| hx.le_of_eq (x ⊔ x') hsI hsne c1.symm).2
-  · exact Or.inl (sup_le_iff.1 <| hx'.le_of_eq (x ⊔ x') hsI hsne c2.symm).1
+  rcases hμcvx.A_le_A_sup_or hx.mem hx'.mem I.left_mem hxlt hx'lt h₁ with hle | hle
+  · have heq := eq_of_le_of_not_lt hle (hx.not_lt (x ⊔ x') hsI hsne)
+    exact Or.inr (le_sup_right.trans (hx.le_of_eq (x ⊔ x') hsI hsne heq.symm))
+  · have heq := eq_of_le_of_not_lt hle (hx'.not_lt (x ⊔ x') hsI hsne)
+    exact Or.inl (le_sup_left.trans (hx'.le_of_eq (x ⊔ x') hsI hsne heq.symm))
 
 /-- Under the descending chain condition, convexity, and a comparability or attainment
 hypothesis, the set of breakpoints has a greatest element.  This is the existence input for

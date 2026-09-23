@@ -61,7 +61,7 @@ lemma PayoffFunction.HarderNarasimhanFiltration.piecewise_isCoprimary
     ∀ i < F.length, IsCoprimary R (F (i + 1) ⧸ (F i).submoduleOf (F (i + 1))) := by
   intro i hi
   have hstep := F.strictMonoOn hi.le hi (lt_add_one i)
-  have := Coprimary.nontrivial_quotient_of_lt hstep
+  let := Coprimary.nontrivial_quotient_of_lt hstep
   exact ⟨Coprimary.isSemistable_iff_existsUnique_associatedPrime.mp <|
     (Coprimary.isSemistable_restrict_iff_quotient _ _ hstep).mp
       (F.piecewise_isSemistable i hi)⟩
@@ -89,20 +89,15 @@ noncomputable def coprimaryFiltration : CoprimaryFiltration R M :=
     piecewise_isCoprimary := F.piecewise_isCoprimary
     associatedPrime_succ_lt := by
       intro n hn p q hp hq
-      have h1 : (payoff R M).A ⟨F (n + 1), F (n + 2),
-          F.strictMonoOn hn.le hn (lt_add_one (n + 1))⟩ <
-        (payoff R M).A ⟨F n, F (n + 1),
-          F.strictMonoOn (Nat.le_of_succ_le hn.le) (Nat.le_of_succ_le hn) (lt_add_one n)⟩ :=
-        lt_of_not_ge (F.not_A_le_succ n hn)
-      rw [A_payoff, A_payoff, DedekindCut.principal_lt_principal,
-        Finset.Colex.singleton_lt_singleton] at h1
       rw [toLinearExtension_eq_min' ⟨F (n + 1), F (n + 2),
           F.strictMonoOn hn.le hn (lt_add_one (n + 1))⟩
           (F.piecewise_isCoprimary (n + 1) hn).existsUnique_associatedPrime hp,
         toLinearExtension_eq_min' ⟨F n, F (n + 1),
           F.strictMonoOn (Nat.le_of_succ_le hn.le) (Nat.le_of_succ_le hn) (lt_add_one n)⟩
           (F.piecewise_isCoprimary n (Nat.lt_of_succ_lt hn)).existsUnique_associatedPrime hq]
-      exact h1 }
+      simpa only [A_payoff, DedekindCut.principal_lt_principal,
+        Finset.Colex.singleton_lt_singleton, PayoffFunction.HarderNarasimhanFiltration.toFun_eq_coe]
+        using lt_of_not_ge (F.not_A_le_succ n hn) }
 
 /-- Coprimary filtrations exist; the default is the canonical one. -/
 noncomputable instance : Inhabited (CoprimaryFiltration R M) := ⟨coprimaryFiltration R M⟩
@@ -130,7 +125,7 @@ lemma exists_hnFiltration (a : CoprimaryFiltration R M) :
      strictMonoOn := a.strictMonoOn
      piecewise_isSemistable := fun i hi ↦ by
        have hstep := a.strictMonoOn hi.le hi (lt_add_one i)
-       have := Coprimary.nontrivial_quotient_of_lt hstep
+       let := Coprimary.nontrivial_quotient_of_lt hstep
        exact (Coprimary.isSemistable_restrict_iff_quotient _ _ hstep).mpr <|
          Coprimary.isSemistable_iff_existsUnique_associatedPrime.mpr
            (a.piecewise_isCoprimary i hi).existsUnique_associatedPrime
@@ -178,38 +173,34 @@ theorem associatedPrimes_eq_iUnion (F : CoprimaryFiltration R M) :
     associatedPrimes R M =
       ⋃ i < F.length, associatedPrimes R (F (i + 1) ⧸ (F i).submoduleOf (F (i + 1))) := by
   apply subset_antisymm
-  · have key : ∀ k, k ≤ F.length →
+  · -- Dévissage along the chain places every associated prime in one of its factors.
+    have key : ∀ k, k ≤ F.length →
         associatedPrimes R ↥(F k) ⊆
           ⋃ i < F.length, associatedPrimes R (F (i + 1) ⧸ (F i).submoduleOf (F (i + 1))) := by
       intro k
       induction k with
       | zero =>
         intro _
-        have h0 : F 0 = (⊥ : Submodule R M) := F.head_eq_bot
-        have hsub : Subsingleton ↥(F 0) := by rw [h0]; infer_instance
-        rw [associatedPrimes.eq_empty_of_subsingleton]
+        rw [show F 0 = ⊥ from F.head_eq_bot, associatedPrimes.eq_empty_of_subsingleton]
         exact Set.empty_subset _
       | succ k ih =>
-        intro hk
-        have hk' : k ≤ F.length := (Nat.le_succ k).trans hk
-        have hsub := associatedPrimes.subset_union_of_exact
+        intro hk q hq
+        rcases associatedPrimes.subset_union_of_exact
           (Submodule.injective_subtype ((F k).submoduleOf (F (k + 1))))
-          (LinearMap.exact_subtype_mkQ ((F k).submoduleOf (F (k + 1))))
-        have hle : F k ≤ F (k + 1) := F.monotone (Nat.le_succ k)
-        have hAss : associatedPrimes R ↥((F k).submoduleOf (F (k + 1))) =
-            associatedPrimes R ↥(F k) :=
-          LinearEquiv.AssociatedPrimes.eq (Submodule.comapSubtypeEquivOfLe hle)
-        intro q hq
-        rcases hsub hq with h | h
-        · exact ih hk' (hAss ▸ h)
+          (LinearMap.exact_subtype_mkQ ((F k).submoduleOf (F (k + 1)))) hq with h | h
+        · apply ih ((Nat.le_succ k).trans hk)
+          have hAss : associatedPrimes R ↥((F k).submoduleOf (F (k + 1))) =
+              associatedPrimes R ↥(F k) :=
+            LinearEquiv.AssociatedPrimes.eq
+              (Submodule.comapSubtypeEquivOfLe (F.monotone (Nat.le_succ k)))
+          exact hAss ▸ h
         · exact Set.mem_iUnion₂.mpr ⟨k, Nat.lt_of_succ_le hk, h⟩
     intro q hq
-    have hq' : q ∈ associatedPrimes R ↥(F F.length) := by
-      have hEq : F F.length = (⊤ : Submodule R M) := F.length_eq_top
-      rw [hEq, LinearEquiv.AssociatedPrimes.eq (Submodule.topEquiv (M := M))]
-      exact hq
-    exact key F.length le_rfl hq'
-  · obtain rfl := Subsingleton.elim F (Coprimary.coprimaryFiltration R M)
+    apply key F.length le_rfl
+    rwa [show F F.length = ⊤ from F.length_eq_top,
+      LinearEquiv.AssociatedPrimes.eq (Submodule.topEquiv (M := M))]
+  · -- For the canonical chain, each factor prime is also the prime of an initial segment.
+    obtain rfl := Subsingleton.elim F (Coprimary.coprimaryFiltration R M)
     set F := Coprimary.coprimaryFiltration R M
     refine Set.iUnion₂_subset fun i hi q hq ↦ ?_
     have hstep : F i < F (i + 1) := F.strictMonoOn hi.le hi (lt_add_one i)
@@ -219,23 +210,15 @@ theorem associatedPrimes_eq_iUnion (F : CoprimaryFiltration R M) :
       PayoffFunction.hnFiltration_A_bot_eq_A (μ := Coprimary.payoff R M) (n := i) hstep
     rw [Coprimary.A_payoff, Coprimary.A_payoff] at hchain
     simp only [DedekindCut.principal_inj, toColex_inj, Finset.singleton_inj] at hchain
-    have hbotSub : (⊥ : Submodule R M).submoduleOf ⊤ = ⊥ := Submodule.ker_subtype ⊤
-    have hmem := Coprimary.subquotientAssociatedPrimes_mono_right hbot le_top
+    change (toLinearExtension (⟨q, hq.out.1⟩ : PrimeSpectrum R)).asIdeal ∈ associatedPrimes R M
+    rw [Coprimary.toLinearExtension_eq_min' ⟨F i, F (i + 1), hstep⟩
+      (F.piecewise_isCoprimary i hi).existsUnique_associatedPrime hq, ← hchain]
+    -- Include that initial segment into `M`, using `⊤ / ⊥ ≃ M`.
+    rw [← LinearEquiv.AssociatedPrimes.eq
+      ((Submodule.quotEquivOfEqBot _ (Submodule.ker_subtype (⊤ : Submodule R M))).trans
+        Submodule.topEquiv)]
+    exact Coprimary.subquotientAssociatedPrimes_mono_right hbot le_top
       (Coprimary.min'_mem_subquotientAssociatedPrimes ⟨⊥, F (i + 1), hbot⟩)
-    have hmem' : ((Coprimary.subquotientAssociatedPrimes ⟨⊥, F (i + 1), hbot⟩).toFinset.min'
-        (Coprimary.subquotientAssociatedPrimes_nonempty _)).asIdeal ∈
-          associatedPrimes R (↥(⊤ : Submodule R M) ⧸ (⊥ : Submodule R M).submoduleOf ⊤) :=
-      hmem
-    rw [LinearEquiv.AssociatedPrimes.eq
-      ((Submodule.quotEquivOfEqBot _ hbotSub).trans Submodule.topEquiv)] at hmem'
-    have hq' := Coprimary.toLinearExtension_eq_min' ⟨F i, F (i + 1), hstep⟩
-      (F.piecewise_isCoprimary i hi).existsUnique_associatedPrime
-      (p := ⟨q, hq.out.1⟩) hq
-    have hgoal : (toLinearExtension (⟨q, hq.out.1⟩ : PrimeSpectrum R)).asIdeal ∈
-        associatedPrimes R M := by
-      rw [hq', ← hchain]
-      exact hmem'
-    exact hgoal
 
 end CoprimaryFiltration
 

@@ -92,111 +92,28 @@ and the defining choice of the next term. -/
 private lemma JHFil_step_payoff_eq_tot :
     ∀ k : ℕ, (hk : JHFil μ k > ⊥) →
       μ ⟨JHFil μ (k + 1), JHFil μ k, JHFil_anti_mono μ k hk⟩ = μ ⊤ := by
-  intro k
-  induction k with
-  | zero =>
-    intro hk'
-    simp only [JHFil]
-    by_cases this : {p : ℒ | ∃ h : ⊥ < p, p < ⊤ ∧ μ ⟨⊥, p, h⟩ = μ ⊤}.Nonempty
-    · simp only [this, ↓reduceDIte]
-      let minTop := hacc.wf.has_min _ this
-      have this' := minTop.choose_spec.1.2.2
-      exact (((hsl.seesaw minTop.choose_spec.1.choose
-        minTop.choose_spec.1.out.choose_spec.1).resolve_left (by aesop)).resolve_left
-        (by aesop)).2.symm
-    · simp only [this, ↓reduceDIte]
-      rfl
-  | succ k hk =>
-    intro hk'
-    have jh_kp1_ntop : {p : ℒ | ∃ h : ⊥ < p, p < JHFil μ k ∧ μ ⟨⊥, p, h⟩ =
-        μ ⊤}.Nonempty := by
-      by_contra!
-      simp only [JHFil, this, Set.not_nonempty_empty, ↓reduceDIte, gt_iff_lt,
-        lt_self_iff_false] at hk'
-    let min1 := hacc.wf.has_min _ jh_kp1_ntop
-    have jh_kp1_ntop' : JHFil μ k > ⊥ := by
-      refine lt_trans hk' ?_
-      simp only [JHFil, jh_kp1_ntop]
-      exact min1.choose_spec.1.out.choose_spec.1
-    have bot_jh_kp1_eq_ans := min1.choose_spec.1.2.2
-    by_cases jh_kp2_ntop : {p : ℒ | ∃ h : ⊥ < p, p < JHFil μ (k + 1) ∧ μ ⟨⊥, p, h⟩
-        = μ ⊤}.Nonempty
-    · let min2 := hacc.wf.has_min _ jh_kp2_ntop
-      have smart : μ ⟨⊥, min2.choose, min2.choose_spec.1.out.1⟩ =
-          μ ⟨⊥, JHFil μ (k + 1), hk'⟩ := by
-        rw [min2.choose_spec.1.out.choose_spec.2, ← bot_jh_kp1_eq_ans]
-        simp only [JHFil, jh_kp1_ntop]
-        simp only [exists_and_left, Set.mem_ofPred_eq, and_imp, forall_exists_index,
-          ↓reduceDIte]
-      have hfinal : μ ⟨⊥, JHFil μ (k + 1), hk'⟩ =
-          μ ⟨min2.choose, JHFil μ (k + 1),
-            min2.choose_spec.1.out.choose_spec.1⟩ := by
-        refine (((hsl.seesaw min2.choose_spec.1.out.choose
-          min2.choose_spec.1.out.choose_spec.1).resolve_left ?_).resolve_left ?_).2
-        · apply not_and_iff_not_or_not.2
-          refine Or.inl ?_
-          simp only [smart]
-          simp only [JHFil, jh_kp1_ntop]
-          simp only [↓reduceDIte,
-            exists_and_left, Set.mem_ofPred_eq, and_imp, forall_exists_index,
-            lt_self_iff_false, not_false_eq_true]
-        · apply not_and_iff_not_or_not.2
-          refine Or.inl ?_
-          simp only [smart]
-          simp only [JHFil, jh_kp1_ntop]
-          simp only [↓reduceDIte, exists_and_left, Set.mem_ofPred_eq, and_imp,
-            forall_exists_index, lt_self_iff_false, not_false_eq_true]
-      conv_lhs =>
-        arg 2; arg 1
-        unfold JHFil
-        simp only [jh_kp2_ntop]
-        simp only [↓reduceDIte, exists_and_left, Set.mem_ofPred_eq, gt_iff_lt, and_imp,
-          forall_exists_index]
-      simp only [exists_and_left, Set.mem_ofPred_eq, and_imp,
-        forall_exists_index] at hfinal
-      rw [← hfinal]
-      simp only [JHFil, jh_kp1_ntop]
-      simp only [↓reduceDIte, exists_and_left, Set.mem_ofPred_eq, and_imp,
-        forall_exists_index]
-      simp only [exists_and_left, Set.mem_ofPred_eq, and_imp,
-        forall_exists_index] at bot_jh_kp1_eq_ans
-      exact bot_jh_kp1_eq_ans
-    · conv_lhs =>
-        arg 2; arg 1
-        unfold JHFil
-        simp only [jh_kp2_ntop]
-        simp only [↓reduceDIte]
-      have this' : μ ⟨⊥, JHFil μ k, jh_kp1_ntop'⟩ = μ ⊤ := by
-        by_cases hh : k = 0
-        · simp only [hh, JHFil]
-          rfl
-        · have : JHFil μ k = JHFil μ ((k - 1) + 1) := by
-            simp only [Nat.sub_one_add_one hh]
-          simp only [this]
-          have : {p | ∃ (h : ⊥ < p), p < JHFil μ (k - 1) ∧ μ ⟨⊥, p, h⟩ =
-              μ ⊤}.Nonempty := by
-            by_contra hthis
-            rw [this] at jh_kp1_ntop'
-            simp only [JHFil, hthis] at jh_kp1_ntop'
-            simp only [↓reduceDIte, gt_iff_lt, lt_self_iff_false] at jh_kp1_ntop'
-          simp only [JHFil, this]
-          simp only [↓reduceDIte, exists_and_left, Set.mem_ofPred_eq, and_imp,
-            forall_exists_index]
-          simpa only [exists_and_left, Set.mem_ofPred_eq, gt_iff_lt, and_imp,
-            forall_exists_index] using (hacc.wf.has_min _ this).choose_spec.1.out.choose_spec.2
-      simp only [← this']
-      have : JHFil μ (k + 1) < JHFil μ k := by
-        simpa only [JHFil, jh_kp1_ntop, ↓reduceDIte] using
-          min1.choose_spec.1.out.choose_spec.1
-      have this'' : μ ⟨⊥, JHFil μ (k + 1), hk'⟩ =
-          μ ⟨JHFil μ (k + 1), JHFil μ k, this⟩ := by
-        rw [hk jh_kp1_ntop', ← bot_jh_kp1_eq_ans]
-        simp only [JHFil, jh_kp1_ntop]
-        simp only [↓reduceDIte, exists_and_left, Set.mem_ofPred_eq, and_imp,
-          forall_exists_index]
-      exact (((hsl.seesaw hk' this).resolve_left
-        (fun this_1 ↦ (this_1.left.trans this_1.right).ne this'')).resolve_left
-        (fun this_1 ↦ (this_1.2.trans this_1.1).ne this''.symm)).1
+  -- Every nonbottom term was chosen with total payoff (including the initial term).
+  have payoff_from_bot : ∀ n : ℕ, (hn : ⊥ < JHFil μ n) →
+      μ ⟨⊥, JHFil μ n, hn⟩ = μ ⊤ := by
+    intro n hn
+    cases n with
+    | zero => rfl
+    | succ n =>
+      by_cases hchoices : {p : ℒ | ∃ h : ⊥ < p,
+          p < JHFil μ n ∧ μ ⟨⊥, p, h⟩ = μ ⊤}.Nonempty
+      · simpa only [JHFil, hchoices, ↓reduceDIte] using
+          (hacc.wf.has_min _ hchoices).choose_spec.1.2.2
+      · simp only [JHFil, hchoices, ↓reduceDIte, lt_self_iff_false] at hn
+  intro k hk
+  by_cases hbot : JHFil μ (k + 1) = ⊥
+  · simpa only [hbot] using payoff_from_bot k hk
+  · have hnext : ⊥ < JHFil μ (k + 1) := bot_lt_iff_ne_bot.2 hbot
+    calc
+      μ ⟨JHFil μ (k + 1), JHFil μ k, JHFil_anti_mono μ k hk⟩ =
+          μ ⟨⊥, JHFil μ k, hk⟩ := by
+        apply ((hsl.seesaw_total_eq_right_iff hnext (JHFil_anti_mono μ k hk)).2 ?_).symm
+        rw [payoff_from_bot (k + 1) hnext, payoff_from_bot k hk]
+      _ = μ ⊤ := payoff_from_bot k hk
 
 variable [hftp : μ.FiniteTotalPayoff] [hdc : μ.EventuallyTopDCC]
 
@@ -237,69 +154,35 @@ private lemma JHFil_refine_lt_step_payoff :
       μ ⟨JHFil μ (k + 1), z, h'⟩ <
         μ ⟨JHFil μ (k + 1), JHFil μ k, JHFil_anti_mono μ k hk⟩ := by
   intro k hk z h' h''
-  have this_new : μ.max ⊤ = μ ⊤ :=
+  have hzbot : ⊥ < z := lt_of_le_of_lt bot_le h'
+  have hmax : μ.max ⊤ = μ ⊤ :=
     max_top_eq_apply_iff.2
       (min_top_eq_max_top_iff_hasNashEquilibrium.2 hst.hasNashEquilibrium)
-  have this_q : μ ⟨⊥, z, lt_of_le_of_lt bot_le h'⟩ ≤ μ ⊤ :=
-    this_new ▸ le_iSup₂_of_le z ⟨lt_of_le_of_lt bot_le h', le_top⟩ le_rfl
-  by_cases hfp1bot : JHFil μ (k + 1) = ⊥
-  · simp only [hfp1bot]
-    have : ¬ {p | ∃ (h : ⊥ < p), p < JHFil μ k ∧ μ ⟨⊥, p, h⟩ =
-        μ ⊤}.Nonempty := by
-      by_contra!
-      simp only [JHFil, this] at hfp1bot
-      have := (hacc.wf.has_min _ this).choose_spec.1.out.choose
-      simp only [↓reduceDIte, exists_and_left, Set.mem_ofPred_eq, and_imp,
-        forall_exists_index] at hfp1bot
-      simp only [exists_and_left, Set.mem_ofPred_eq, and_imp, forall_exists_index] at this
-      exact this.ne hfp1bot.symm
-    replace this := Set.eq_empty_iff_forall_notMem.1 (Set.not_nonempty_iff_eq_empty.1 this) z
-    simp only [exists_and_left, Set.mem_ofPred_eq, not_and, not_exists] at this
-    replace := this_q.lt_of_ne <| this h'' (lt_of_le_of_lt bot_le h')
-    by_cases hk' : k = 0
-    · simpa only [hk', JHFil]
-    · conv_rhs =>
-        arg 2; arg 2; arg 2
-        rw [← Nat.sub_one_add_one hk']
-      have hne : {p | ∃ (h : ⊥ < p), p < JHFil μ (k - 1) ∧ μ ⟨⊥, p, h⟩ =
-          μ ⊤}.Nonempty := by
-        by_contra!
-        have this' : JHFil μ k = JHFil μ ((k - 1) + 1) :=
-          congrArg (JHFil μ) (Nat.sub_one_add_one hk').symm
-        simp only [this', JHFil, this] at hk
-        simp only [Set.not_nonempty_empty, ↓reduceDIte, gt_iff_lt, lt_self_iff_false] at hk
-      rw [← (hacc.wf.has_min _ hne).choose_spec.1.out.2.2] at this
-      simp only [JHFil, hne]
-      simp only [↓reduceDIte, exists_and_left, Set.mem_ofPred_eq, gt_iff_lt, and_imp,
-        forall_exists_index]
-      simpa only [exists_and_left, Set.mem_ofPred_eq,
-        gt_iff_lt, and_imp, forall_exists_index] using this
-  · have h''' : μ ⟨⊥, z, lt_of_le_of_lt bot_le h'⟩ < μ ⊤ := by
-      refine this_q.lt_of_ne ?_
-      by_contra!
-      by_cases hne : {p | ∃ (h : ⊥ < p), p < JHFil μ k ∧
-          μ ⟨⊥, p, h⟩ = μ ⊤}.Nonempty
-      · have := (hacc.wf.has_min _ hne).choose_spec.2 z (by use lt_of_le_of_lt bot_le h')
-        simp only [JHFil, hne] at h'
-        simp only [gt_iff_lt, exists_and_left, Set.mem_ofPred_eq, and_imp, forall_exists_index,
-          ↓reduceDIte] at *
-        exact this h'
-      · exact hne ⟨z, lt_of_le_of_lt bot_le h', h'', this⟩
-    have h'''' : μ ⊤ = μ ⟨⊥, JHFil μ (k + 1),
-        bot_lt_iff_ne_bot.2 hfp1bot⟩ := by
-      by_cases hne : {p | ∃ (h : ⊥ < p), p < JHFil μ k ∧ μ ⟨⊥, p, h⟩ =
-          μ ⊤}.Nonempty
-      · simp only [JHFil, hne]
-        have := (hacc.wf.has_min _ hne).choose_spec.1.out.choose_spec.2
-        simp only [gt_iff_lt, exists_and_left, Set.mem_ofPred_eq, and_imp, forall_exists_index,
-          ↓reduceDIte] at *
-        exact this.symm
-      · simp only [JHFil, hne] at hfp1bot
-        simp only [↓reduceDIte, not_true_eq_false] at hfp1bot
-    exact (JHFil_step_payoff_eq_tot μ k hk).symm ▸ (((hsl.seesaw
-      (bot_lt_iff_ne_bot.2 hfp1bot) h').resolve_left
-      (not_and_iff_not_or_not.2 <| Or.inl <| not_lt_of_gt <| h'''' ▸ h''')).resolve_right
-      (not_and_iff_not_or_not.2 <| Or.inl <| ne_of_gt <| h'''' ▸ h''')).2.trans h'''
+  have hzle : μ ⟨⊥, z, hzbot⟩ ≤ μ ⊤ :=
+    hmax ▸ le_iSup₂_of_le z ⟨hzbot, le_top⟩ le_rfl
+  -- Equality would make z an admissible choice above the selected term.
+  have hzlt : μ ⟨⊥, z, hzbot⟩ < μ ⊤ := by
+    refine hzle.lt_of_ne fun heq ↦ ?_
+    have hchoices : {p : ℒ | ∃ h : ⊥ < p,
+        p < JHFil μ k ∧ μ ⟨⊥, p, h⟩ = μ ⊤}.Nonempty :=
+      ⟨z, hzbot, h'', heq⟩
+    have hminimal := (hacc.wf.has_min _ hchoices).choose_spec.2 z ⟨hzbot, h'', heq⟩
+    exact hminimal (by simpa only [JHFil, hchoices, ↓reduceDIte] using h')
+  rw [JHFil_step_payoff_eq_tot μ k hk]
+  by_cases hbot : JHFil μ (k + 1) = ⊥
+  · simpa only [hbot] using hzlt
+  · have hnext : ⊥ < JHFil μ (k + 1) := bot_lt_iff_ne_bot.2 hbot
+    have hnext_payoff : μ ⟨⊥, JHFil μ (k + 1), hnext⟩ = μ ⊤ := by
+      by_cases hchoices : {p : ℒ | ∃ h : ⊥ < p,
+          p < JHFil μ k ∧ μ ⟨⊥, p, h⟩ = μ ⊤}.Nonempty
+      · simpa only [JHFil, hchoices, ↓reduceDIte] using
+          (hacc.wf.has_min _ hchoices).choose_spec.1.2.2
+      · simp only [JHFil, hchoices, ↓reduceDIte, not_true_eq_false] at hbot
+    calc
+      μ ⟨JHFil μ (k + 1), z, h'⟩ < μ ⟨⊥, z, hzbot⟩ := by
+        apply (hsl.seesaw_right_lt_total_iff hnext h').2
+        rwa [hnext_payoff]
+      _ < μ ⊤ := hzlt
 
 /-- Existence of a Jordan–Hölder filtration: the greedy construction `JHFil` packages into
 a `JordanHolderFiltration`.  In contrast to the Harder–Narasimhan filtration, a

@@ -53,95 +53,90 @@ uniqueness half of the existence-and-uniqueness theorem; it is exposed through t
 instance below. -/
 private theorem eq_hnFiltration (F : μ.HarderNarasimhanFiltration) : F = μ.hnFiltration := by
   have hμcvx : μ.IsConvexOn ⊤ := inferInstance
-  have hfsi : ∀ i j : ℕ, i < j → j ≤ F.length → F i < F j :=
+  have strict_growth : ∀ i j : ℕ, i < j → j ≤ F.length → F i < F j :=
     fun i j hij hj ↦ F.strictMonoOn (hij.le.trans hj) hj hij
-  have hbp : ∀ j : ℕ, (hj : j < F.length) →
-      μ.IsBreakpoint ⟨F j, F (j + 1), hfsi j (j + 1) (lt_add_one j) hj⟩ (F (j + 1)) :=
-    fun j hj ↦ (isBreakpoint_right_iff
-      (I := ⟨F j, F (j + 1), hfsi j (j + 1) (lt_add_one j) hj⟩)).2 <|
-      F.piecewise_isSemistable j hj
-  have hmua : ∀ i j : ℕ, (hij : i < j) → (hj : j < F.length) →
-      μ.A ⟨F i, F (i + 1), hfsi i (i + 1) (lt_add_one i) (by omega)⟩ >
-      μ.A ⟨F j, F (j + 1), hfsi j (j + 1) (lt_add_one j) hj⟩ := by
+  have step_breakpoint : ∀ j : ℕ, (hj : j < F.length) →
+      μ.IsBreakpoint ⟨F j, F (j + 1), strict_growth j (j + 1) (lt_add_one j) hj⟩
+        (F (j + 1)) :=
+    fun j hj ↦ isBreakpoint_right_iff.2 (F.piecewise_isSemistable j hj)
+  have slopes_strictAnti : ∀ i j : ℕ, (hij : i < j) → (hj : j < F.length) →
+      μ.A ⟨F i, F (i + 1), strict_growth i (i + 1) (lt_add_one i) (by omega)⟩ >
+      μ.A ⟨F j, F (j + 1), strict_growth j (j + 1) (lt_add_one j) hj⟩ := by
     intro i
-    have key : ∀ j : ℕ, (hij : i + 1 ≤ j) → (hj : j < F.length) →
-        μ.A ⟨F i, F (i + 1), hfsi i (i + 1) (lt_add_one i) (by omega)⟩ >
-        μ.A ⟨F j, F (j + 1), hfsi j (j + 1) (lt_add_one j) hj⟩ := by
-      apply Nat.le_induction
-      · exact fun hj ↦ lt_of_not_ge (F.not_A_le_succ i hj)
-      · refine fun j hij hind hj ↦ gt_trans (hind (Nat.lt_of_succ_lt hj)) ?_
-        exact lt_of_not_ge <| F.not_A_le_succ j hj
-    exact fun j hij hj ↦ key j hij hj
+    apply Nat.le_induction
+    · exact fun hj ↦ lt_of_not_ge (F.not_A_le_succ i hj)
+    · intro j hij ih hj
+      exact (lt_of_not_ge (F.not_A_le_succ j hj)).trans (ih (Nat.lt_of_succ_lt hj))
   refine HarderNarasimhanFiltration.ext fun k ↦ ?_
   induction k with
   | zero => exact F.head_eq_bot.trans μ.hnFiltration.head_eq_bot.symm
   | succ n hn =>
-    by_cases h₁ : n + 1 ≤ F.length
-    · have h₂ : ∃ N : ℕ, N ≥ n + 1 ∧ μ.hnFiltration (n + 1) ≤ F N :=
-        ⟨F.length, h₁, le_top.trans (F.eq_top_of_length_le le_rfl).ge⟩
-      let i : ℕ := Nat.find h₂
-      have h₃ : μ.hnFiltration n < μ.hnFiltration (n + 1) :=
+    by_cases hnext : n + 1 ≤ F.length
+    · -- Find the first step of F containing the next canonical breakpoint.
+      have hcover : ∃ N : ℕ, N ≥ n + 1 ∧ μ.hnFiltration (n + 1) ≤ F N :=
+        ⟨F.length, hnext, le_top.trans (F.eq_top_of_length_le le_rfl).ge⟩
+      let i : ℕ := Nat.find hcover
+      obtain ⟨hn_le_i, hcanonical_le⟩ : n + 1 ≤ i ∧ μ.hnFiltration (n + 1) ≤ F i :=
+        Nat.find_spec hcover
+      have hi_pos : 0 < i := Nat.zero_lt_of_lt hn_le_i
+      have hi_length : i ≤ F.length :=
+        Nat.find_min' hcover ⟨hnext, le_top.trans (F.eq_top_of_length_le le_rfl).ge⟩
+      have hprev_length : i - 1 < F.length := Nat.sub_one_lt_of_le hi_pos hi_length
+      have hcanonical_growth : μ.hnFiltration n < μ.hnFiltration (n + 1) :=
         μ.hnFiltration.lt_succ_of_ne_top
-          (hn ▸ F.ne_top_of_lt (lt_of_lt_of_le (lt_add_one n) h₁))
-      have h₁₅ : i ≥ n + 1 := (Nat.find_spec h₂).1
-      have h₉ : i > 0 := Nat.zero_lt_of_lt h₁₅
-      have hile : i ≤ F.length := by
-        by_contra! hc
-        rcases not_and_or.1 (Nat.find_min h₂ hc) with c₁ | c₂
-        · exact c₁ h₁
-        · exact c₂ (le_top.trans (F.eq_top_of_length_le le_rfl).ge)
-      have h₈ : i - 1 < F.length := Nat.sub_one_lt_of_le h₉ hile
-      have h₄ : ¬ μ.hnFiltration (n + 1) ≤ F (i - 1) := by
-        rcases not_and_or.1 (Nat.find_min h₂ (Nat.sub_one_lt h₉.ne')) with h₅ | h₅
+          (hn ▸ F.ne_top_of_lt (lt_of_lt_of_le (lt_add_one n) hnext))
+      have hnot_le_prev : ¬ μ.hnFiltration (n + 1) ≤ F (i - 1) := by
+        rcases not_and_or.1 (Nat.find_min hcover (Nat.sub_one_lt hi_pos.ne')) with hindex | hvalue
         · rw [show i - 1 = n by omega, hn]
-          exact not_le_of_gt h₃
-        · exact h₅
-      have h₁₃ : μ.hnFiltration n ≤ F (i - 1) := by
+          exact not_le_of_gt hcanonical_growth
+        · exact hvalue
+      have hbase_le_prev : μ.hnFiltration n ≤ F (i - 1) := by
         rw [← hn]
-        rcases (Nat.le_sub_one_of_lt h₁₅).eq_or_lt with h₁₄ | h₁₄
-        · rw [h₁₄]
-        · exact (hfsi n (i - 1) h₁₄ (by omega)).le
-      have h₆ : μ.A ⟨μ.hnFiltration n, μ.hnFiltration (n + 1), h₃⟩ ≤
-          μ.A ⟨F (i - 1), μ.hnFiltration (n + 1) ⊔ F (i - 1), right_lt_sup.2 h₄⟩ :=
-        hμcvx.A_le_A_sup (StrictIntvl.mem_top (μ.hnFiltration (n + 1)))
-          (StrictIntvl.mem_top (F (i - 1))) h₄ (le_inf h₃.le h₁₃)
-      have h₇ : F (i - 1) < F i := hfsi (i - 1) i (Nat.sub_one_lt h₉.ne') hile
-      have h₁₀ : μ.A ⟨μ.hnFiltration n, μ.hnFiltration (n + 1), h₃⟩ ≤
-          μ.A ⟨F (i - 1), F i, h₇⟩ := by
-        have h₁₁ := hbp (i - 1) h₈
-        simp only [Nat.sub_one_add_one h₉.ne'] at h₁₁
-        exact le_trans h₆ <| le_of_not_gt (h₁₁.not_lt (μ.hnFiltration (n + 1) ⊔ F (i - 1))
-          ⟨le_sup_right, sup_le_iff.2 ⟨(Nat.find_spec h₂).2, h₇.le⟩⟩
-          <| ne_of_lt <| right_lt_sup.2 h₄)
-      have hspec := mem_breakpoints.1
-        (hnFiltration_succ_isGreatest_breakpoints (h₃.trans_le le_top).ne).1
-      have h₁₂ : i = n + 1 := by
-        refine eq_of_le_of_not_lt' h₁₅ ?_
+        exact F.monotone (Nat.le_sub_one_of_lt hn_le_i)
+      have hstep_lt : F (i - 1) < F i :=
+        strict_growth (i - 1) i (Nat.sub_one_lt hi_pos.ne') hi_length
+      -- Convexity and semistability compare the canonical slope with this step's slope.
+      have hslope_le : μ.A ⟨μ.hnFiltration n, μ.hnFiltration (n + 1), hcanonical_growth⟩ ≤
+          μ.A ⟨F (i - 1), F i, hstep_lt⟩ := by
+        have hprev_breakpoint := step_breakpoint (i - 1) hprev_length
+        simp only [Nat.sub_one_add_one hi_pos.ne'] at hprev_breakpoint
+        calc
+          _ ≤ μ.A ⟨F (i - 1), μ.hnFiltration (n + 1) ⊔ F (i - 1),
+              right_lt_sup.2 hnot_le_prev⟩ :=
+            hμcvx.A_le_A_sup (StrictIntvl.mem_top (μ.hnFiltration (n + 1)))
+              (StrictIntvl.mem_top (F (i - 1))) hnot_le_prev
+              (le_inf hcanonical_growth.le hbase_le_prev)
+          _ ≤ _ := le_of_not_gt (hprev_breakpoint.not_lt
+            (μ.hnFiltration (n + 1) ⊔ F (i - 1))
+            ⟨le_sup_right, sup_le hcanonical_le hstep_lt.le⟩
+            (ne_of_lt (right_lt_sup.2 hnot_le_prev)))
+      have hcanonical_breakpoint := mem_breakpoints.1
+        (hnFiltration_succ_isGreatest_breakpoints (hcanonical_growth.trans_le le_top).ne).1
+      have hi_eq : i = n + 1 := by
+        refine eq_of_le_of_not_lt' hn_le_i ?_
         by_contra! hlt
-        have hlt' : μ.hnFiltration n < F (n + 1) :=
-          hn.ge.trans_lt (hfsi n (n + 1) (lt_add_one n) h₁)
-        have h₁₃' := hmua n (i - 1) (Nat.lt_sub_of_add_lt hlt) h₈
-        simp only [hn, Nat.sub_one_add_one h₉.ne', gt_iff_lt] at h₁₃'
-        exact hspec.not_lt (F (n + 1)) ⟨hlt'.le, le_top⟩ hlt'.ne
-          (h₁₀.trans_lt h₁₃')
-      have h₁₄ := le_of_le_of_eq (Nat.find_spec h₂).2 (congrArg (⇑F) h₁₂)
-      have h₁₉ : μ.hnFiltration n < F (n + 1) := h₃.trans_le h₁₄
-      have h₁₆ : F n < μ.hnFiltration (n + 1) := hn.le.trans_lt h₃
-      have h₁₇ := le_of_not_gt <| (hbp n h₁).not_lt (μ.hnFiltration (n + 1))
-        ⟨h₁₆.le, h₁₄⟩ <| h₁₆.ne
-      simp only [hn] at h₁₇
-      exact eq_of_le_of_ge (hspec.le_of_eq (F (n + 1)) ⟨h₁₉.le, le_top⟩ h₁₉.ne
-        (eq_of_le_of_not_lt h₁₇ <| hspec.not_lt (F (n + 1)) ⟨h₁₉.le, le_top⟩
-          h₁₉.ne).symm) h₁₄
-    · apply Nat.gt_of_not_le at h₁
-      rw [F.eq_top_of_length_le (Nat.le_of_succ_le h₁), eq_comm]
-      rw [F.eq_top_of_length_le (Nat.le_of_lt_succ h₁)] at hn
-      have h₀ : ¬ n < μ.hnFiltration.length :=
-        (HarderNarasimhanFiltration.ne_top_iff_lt_length (F := μ.hnFiltration)).not.1
-          (not_ne_iff.2 hn.symm)
-      exact not_ne_iff.1 <|
-        (HarderNarasimhanFiltration.ne_top_iff_lt_length (F := μ.hnFiltration)).not.2
-          (by omega)
+        have hnext_lt : μ.hnFiltration n < F (n + 1) :=
+          hn.ge.trans_lt (strict_growth n (n + 1) (lt_add_one n) hnext)
+        have hslope_lt := slopes_strictAnti n (i - 1) (Nat.lt_sub_of_add_lt hlt) hprev_length
+        simp only [hn, Nat.sub_one_add_one hi_pos.ne', gt_iff_lt] at hslope_lt
+        exact hcanonical_breakpoint.not_lt (F (n + 1)) ⟨hnext_lt.le, le_top⟩ hnext_lt.ne
+          (hslope_le.trans_lt hslope_lt)
+      rw [hi_eq] at hcanonical_le
+      have hnext_lt : μ.hnFiltration n < F (n + 1) := hcanonical_growth.trans_le hcanonical_le
+      -- Both endpoints maximise the same value; the canonical breakpoint is greatest.
+      refine le_antisymm (hcanonical_breakpoint.le_of_eq (F (n + 1))
+        ⟨hnext_lt.le, le_top⟩ hnext_lt.ne ?_) hcanonical_le
+      symm
+      refine eq_of_le_of_not_lt ?_
+        (hcanonical_breakpoint.not_lt (F (n + 1)) ⟨hnext_lt.le, le_top⟩ hnext_lt.ne)
+      simpa only [hn] using le_of_not_gt ((step_breakpoint n hnext).not_lt
+        (μ.hnFiltration (n + 1)) ⟨(hn.le.trans_lt hcanonical_growth).le, hcanonical_le⟩
+        (hn.le.trans_lt hcanonical_growth).ne)
+    · have hn_top : μ.hnFiltration n = ⊤ :=
+        hn.symm.trans (F.eq_top_of_length_le (by omega))
+      rw [F.eq_top_of_length_le (by omega)]
+      exact (μ.hnFiltration.eq_top_of_length_le
+        ((μ.hnFiltration.length_le_of_eq_top hn_top).trans (Nat.le_succ n))).symm
 
 /-- Over a complete linear order the Harder–Narasimhan filtration is unique; the canonical
 representative is `μ.hnFiltration`. -/
@@ -225,20 +220,10 @@ private lemma exists_hnFiltration_of_relSeries (s : RelSeries μ.semistableRel)
         simpa only [(hij.trans_le hj).le, hj, ↓reduceIte] using Fmono i j hij hj
       piecewise_isSemistable := by
         intro i hi
-        have e₁ : (if i ≤ s.length then s.toFun ↑i else ⊤) = s.toFun (Fin.castSucc ⟨i, hi⟩) := by
-          simp only [hi.le, ↓reduceIte, Fin.castSucc_mk,
-            Fin.natCast_eq_mk (Nat.lt_add_right 1 hi)]
-        have e₂ : (if i + 1 ≤ s.length then s.toFun ↑(i + 1) else ⊤) =
-            s.toFun (Fin.succ ⟨i, hi⟩) := by
-          simp only [show i + 1 ≤ s.length from hi, ↓reduceIte, Fin.succ_mk,
+        convert (s.step ⟨i, hi⟩).choose_spec <;>
+          simp only [hi.le, show i + 1 ≤ s.length from hi, ↓reduceIte,
+            Fin.castSucc_mk, Fin.succ_mk, Fin.natCast_eq_mk (Nat.lt_add_right 1 hi),
             Fin.natCast_eq_mk (Nat.add_lt_add_right hi 1)]
-        have hIJ : (⟨s.toFun (Fin.castSucc ⟨i, hi⟩), s.toFun (Fin.succ ⟨i, hi⟩),
-            (s.step ⟨i, hi⟩).choose⟩ : StrictIntvl ℒ) =
-              ⟨if i ≤ s.length then s.toFun ↑i else ⊤,
-                if i + 1 ≤ s.length then s.toFun ↑(i + 1) else ⊤,
-                by rw [e₁, e₂]; exact (s.step ⟨i, hi⟩).choose⟩ :=
-          StrictIntvl.ext e₁.symm e₂.symm
-        exact hIJ ▸ (s.step ⟨i, hi⟩).choose_spec
       not_A_le_succ := by
         intro i hi
         convert h.2.2 i hi
@@ -268,30 +253,16 @@ theorem existsUnique_relSeries_semistableRel (μ : PayoffFunction ℒ S)
     ext x
     · rw [← len1.2, ← len2.2, h12]
     · simp only [Function.comp_apply]
-      have hx2 := congrFun (congrArg (DFunLike.coe (F := μ.HarderNarasimhanFiltration)) h12)
-        (x : ℕ)
-      rw [len1.1, len2.1] at hx2
-      convert hx2
-      · simp only [Fin.cast_val_eq_self]
-        if hx : (x : ℕ) ≤ F1.length then
-          simp only [hx, ↓reduceIte]
-        else
-          simp only [hx, ↓reduceIte]
-          simp only [not_le] at hx
-          have := Fin.is_le x
-          exfalso
-          linarith
-      · if hx : (x : ℕ) ≤ F2.length then
-          simp only [hx, ↓reduceIte]
-          congr
-          refine Fin.eq_of_val_eq <| (Fin.val_cast_of_lt ?_).symm
-          exact Nat.lt_add_one_of_le hx
-        else
-          simp only [hx, ↓reduceIte]
-          simp only [not_le] at hx
-          have : (x : ℕ) ≤ F2.length := len_eq ▸ Fin.is_le x
-          exfalso
-          linarith
+      have hpointwise := congrFun
+        (congrArg (DFunLike.coe (F := μ.HarderNarasimhanFiltration)) h12) (x : ℕ)
+      rw [len1.1, len2.1] at hpointwise
+      have hx1 : (x : ℕ) ≤ F1.length := Fin.is_le x
+      have hx2 : (x : ℕ) ≤ F2.length := len_eq ▸ hx1
+      convert hpointwise
+      · simp only [Fin.cast_val_eq_self, hx1, ↓reduceIte]
+      · simp only [hx2, ↓reduceIte]
+        congr
+        exact Fin.eq_of_val_eq (Fin.val_cast_of_lt (Nat.lt_add_one_of_le hx2)).symm
 
 end Unique
 

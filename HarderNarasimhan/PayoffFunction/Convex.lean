@@ -134,14 +134,17 @@ lemma IsConvexOn.max_inf_le_max (hμcvx : μ.IsConvexOn I) {x w t : ℒ}
     μ.max ⟨x ⊓ w, x, inf_lt_left.2 hxw⟩ ≤
       μ.max ⟨w, t, lt_of_le_of_lt' hxwt <| right_lt_sup.2 hxw⟩ := by
   refine max_le fun b hb ↦ ?_
-  have hh : x ⊓ w = b ⊓ w :=
+  have hinf : x ⊓ w = b ⊓ w :=
     le_antisymm (le_inf hb.1.le inf_le_right) (inf_le_inf_right w hb.2)
-  have hbnlew : ¬ b ≤ w := inf_lt_left.mp (hh ▸ hb.1)
-  simp only [hh]
-  exact le_trans (hμcvx.le b w ⟨le_of_lt (lt_of_le_of_lt (le_inf hxI.1 hwI.1) hb.1),
-    le_trans hb.2 hxI.2⟩ hwI hbnlew) <|
-    le_max (I := ⟨w, t, lt_of_le_of_lt' hxwt <| right_lt_sup.2 hxw⟩)
-      ⟨right_lt_sup.2 hbnlew, le_trans (sup_le_sup_right hb.2 w) hxwt⟩
+  have hbw : ¬ b ≤ w := inf_lt_left.mp (hinf ▸ hb.1)
+  have hbI : b ∈ I := ⟨(le_inf hxI.1 hwI.1).trans hb.1.le, hb.2.trans hxI.2⟩
+  calc
+    μ ⟨x ⊓ w, b, hb.1⟩ = μ ⟨b ⊓ w, b, inf_lt_left.2 hbw⟩ :=
+      congrArg μ (StrictIntvl.ext hinf rfl)
+    _ ≤ μ ⟨w, b ⊔ w, right_lt_sup.2 hbw⟩ := hμcvx.le b w hbI hwI hbw
+    _ ≤ μ.max ⟨w, t, lt_of_le_of_lt' hxwt <| right_lt_sup.2 hxw⟩ :=
+      le_max (I := ⟨w, t, lt_of_le_of_lt' hxwt <| right_lt_sup.2 hxw⟩)
+        ⟨right_lt_sup.2 hbw, (sup_le_sup_right hb.2 w).trans hxwt⟩
 
 /-- Under convexity on `I`, the first-player value on `(u, x)` with `u ≤ x ⊓ w` is bounded by
 the first-player value on `(w, x ⊔ w)`. -/
@@ -150,11 +153,14 @@ lemma IsConvexOn.A_le_A_sup (hμcvx : μ.IsConvexOn I) {x w u : ℒ}
     μ.A ⟨u, x, lt_of_le_of_lt huxw <| inf_lt_left.2 hxw⟩ ≤
       μ.A ⟨w, x ⊔ w, right_lt_sup.2 hxw⟩ := by
   refine le_A fun y hy ↦ ?_
-  have h₁ : ¬ x ≤ y := fun h ↦ lt_irrefl (x ⊔ w) <| lt_of_le_of_lt (sup_le_sup_right h w) <|
-    (sup_eq_left.2 hy.1).symm ▸ hy.2
-  exact le_trans (A_le_max_inf μ h₁ <| le_trans huxw <| inf_le_inf_left x hy.1) <|
-    hμcvx.max_inf_le_max hxI ⟨le_trans hwI.1 hy.1, le_trans hy.2.le <| sup_le hxI.2 hwI.2⟩
-      h₁ (sup_le le_sup_left hy.2.le)
+  have hxy : ¬ x ≤ y := fun hxy ↦ hy.2.not_ge (sup_le hxy hy.1)
+  have hyI : y ∈ I := ⟨hwI.1.trans hy.1, hy.2.le.trans (sup_le hxI.2 hwI.2)⟩
+  calc
+    μ.A ⟨u, x, lt_of_le_of_lt huxw <| inf_lt_left.2 hxw⟩ ≤
+        μ.max ⟨x ⊓ y, x, inf_lt_left.2 hxy⟩ :=
+      A_le_max_inf μ hxy (huxw.trans (inf_le_inf_left x hy.1))
+    _ ≤ μ.max ⟨y, x ⊔ w, hy.2⟩ :=
+      hμcvx.max_inf_le_max hxI hyI hxy (sup_le le_sup_left hy.2.le)
 
 /-! ### Stability of the extremal operations under convexity
 
@@ -195,10 +201,16 @@ lemma IsConvexOn.inf_le_A (hμcvx : μ.IsConvexOn I) {x y z : ℒ}
     μ.A ⟨x, y, h₁⟩ ⊓ μ.A ⟨y, z, h₂⟩ ≤ μ.A ⟨x, z, h₁.trans h₂⟩ := by
   refine le_A fun a ha ↦ ?_
   by_cases hya : y ≤ a
-  · exact le_trans inf_le_right <| A_le (I := ⟨y, z, h₂⟩) ⟨hya, ha.2⟩
-  · exact le_trans inf_le_left <| le_trans (A_le_max_inf μ hya (le_inf h₁.le ha.1)) <|
-      hμcvx.max_inf_le_max hyI ⟨le_trans hxI.1 ha.1, le_trans ha.2.le hzI.2⟩ hya
-        (sup_le h₂.le ha.2.le)
+  · calc
+      μ.A ⟨x, y, h₁⟩ ⊓ μ.A ⟨y, z, h₂⟩ ≤ μ.A ⟨y, z, h₂⟩ := inf_le_right
+      _ ≤ μ.max ⟨a, z, ha.2⟩ := A_le (I := ⟨y, z, h₂⟩) ⟨hya, ha.2⟩
+  · calc
+      μ.A ⟨x, y, h₁⟩ ⊓ μ.A ⟨y, z, h₂⟩ ≤ μ.A ⟨x, y, h₁⟩ := inf_le_left
+      _ ≤ μ.max ⟨y ⊓ a, y, inf_lt_left.2 hya⟩ :=
+        A_le_max_inf μ hya (le_inf h₁.le ha.1)
+      _ ≤ μ.max ⟨a, z, ha.2⟩ :=
+        hμcvx.max_inf_le_max hyI ⟨hxI.1.trans ha.1, ha.2.le.trans hzI.2⟩ hya
+          (sup_le h₂.le ha.2.le)
 
 /-- If the first-player value on `(x, y)` dominates the one on `(y, z)`, then cutting at `y`
 does not change the value: `μ.A (y, z) = μ.A (x, z)`. -/

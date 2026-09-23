@@ -60,9 +60,12 @@ theorem B_top_le_A_top_iff :
         μ.min ⟨⊥, y, hy⟩ ≤ μ.max ⟨x, ⊤, lt_top_iff_ne_top.2 hx⟩ := by
   constructor
   · intro h x hx y hy
-    exact le_trans (le_iSup₂_of_le y ⟨hy, le_top⟩ le_rfl) <|
-      h.trans (iInf₂_le x ⟨bot_le, lt_top_iff_ne_top.2 hx⟩)
-  · exact fun h ↦ iSup₂_le fun y hy ↦ le_iInf₂ fun x hx ↦ h x hx.2.ne y hy.1
+    calc
+      μ.min ⟨⊥, y, hy⟩ ≤ μ.B ⊤ := le_B (I := ⊤) ⟨hy, le_top⟩
+      _ ≤ μ.A ⊤ := h
+      _ ≤ μ.max ⟨x, ⊤, lt_top_iff_ne_top.2 hx⟩ :=
+        A_le (I := ⊤) ⟨bot_le, lt_top_iff_ne_top.2 hx⟩
+  · exact fun h ↦ B_le fun y hy ↦ le_A fun x hx ↦ h x hx.2.ne y hy.1
 
 /-- Under the hypotheses computing player A's value, the game has a Nash equilibrium iff no
 proper initial segment has a smaller minimum than the total interval. -/
@@ -71,10 +74,11 @@ theorem hasNashEquilibrium_iff_min_le [μ.WeakACC] [μ.WeakSlopeLikeAtTop] :
       ∀ y : ℒ, (hy : y ≠ ⊥) → μ.min ⟨⊥, y, bot_lt_iff_ne_bot.2 hy⟩ ≤ μ.min ⊤ := by
   constructor
   · intro h y hy
-    have h := h.eq
-    rw [A_top_eq_min_top] at h
-    rw [h]
-    exact le_iSup₂_of_le y ⟨bot_lt_iff_ne_bot.2 hy, le_top⟩ le_rfl
+    calc
+      μ.min ⟨⊥, y, bot_lt_iff_ne_bot.2 hy⟩ ≤ μ.B ⊤ :=
+        le_B (I := ⊤) ⟨bot_lt_iff_ne_bot.2 hy, le_top⟩
+      _ = μ.A ⊤ := h.eq.symm
+      _ = μ.min ⊤ := A_top_eq_min_top
   · intro h
     refine ⟨?_⟩
     rw [A_top_eq_min_top]
@@ -88,10 +92,11 @@ theorem hasNashEquilibrium_iff_le_max [μ.StrongDCC] [μ.WeakSlopeLikeAtBot] :
       ∀ y : ℒ, (hy : y ≠ ⊤) → μ.max ⊤ ≤ μ.max ⟨y, ⊤, lt_top_iff_ne_top.2 hy⟩ := by
   constructor
   · intro h y hy
-    have h := h.eq
-    rw [B_top_eq_max_top (μ := μ)] at h
-    rw [← h]
-    exact iInf₂_le y ⟨bot_le, lt_top_iff_ne_top.2 hy⟩
+    calc
+      μ.max ⊤ = μ.B ⊤ := B_top_eq_max_top.symm
+      _ = μ.A ⊤ := h.eq.symm
+      _ ≤ μ.max ⟨y, ⊤, lt_top_iff_ne_top.2 hy⟩ :=
+        A_le (I := ⊤) ⟨bot_le, lt_top_iff_ne_top.2 hy⟩
   · intro h
     refine ⟨?_⟩
     rw [B_top_eq_max_top (μ := μ)]
@@ -100,12 +105,10 @@ theorem hasNashEquilibrium_iff_le_max [μ.StrongDCC] [μ.WeakSlopeLikeAtBot] :
 
 /-- If the global extremal values coincide, then `μ.B ⊤ ≤ μ.A ⊤`. -/
 theorem B_top_le_A_top_of_min_eq_max (h : μ.min ⊤ = μ.max ⊤) : μ.B ⊤ ≤ μ.A ⊤ := by
-  have h₁ : μ.B ⊤ ≤ μ.max ⊤ :=
-    iSup₂_le fun b hb ↦ le_trans (min_le_apply (I := ⟨⊥, b, hb.1⟩)) <|
-      le_iSup₂_of_le b hb le_rfl
-  have h₂ : μ.min ⊤ ≤ μ.A ⊤ :=
-    le_iInf₂ fun b hb ↦ le_trans (iInf₂_le b hb) (apply_le_max (I := ⟨b, ⊤, hb.2⟩))
-  exact h₁.trans (h ▸ h₂)
+  calc
+    μ.B ⊤ ≤ μ.max ⊤ := B_le fun b hb ↦ min_le_apply.trans (le_max hb)
+    _ = μ.min ⊤ := h.symm
+    _ ≤ μ.A ⊤ := le_A fun b hb ↦ (min_le hb).trans apply_le_max
 
 /-- Conversely, under the hypotheses computing both game values, `μ.B ⊤ ≤ μ.A ⊤` forces the
 global extremal values to coincide. -/
@@ -149,8 +152,7 @@ theorem max_top_eq_apply_iff : μ.max ⊤ = μ ⊤ ↔ μ.min ⊤ = μ.max ⊤ :
       ((hμ.slopelike ⊥ x ⊤
         ⟨bot_lt_iff_ne_bot.2 hx.1, lt_top_iff_ne_top.2 hx.2⟩).2.2.1).imp_left not_le_of_gt
   · intro h
-    have hb : μ.min ⊤ ≤ μ ⊤ ∧ μ ⊤ ≤ μ.max ⊤ := ⟨min_le_apply, apply_le_max⟩
-    exact (h ▸ hb).elim eq_of_le_of_ge
+    exact le_antisymm (h.symm.trans_le min_le_apply) apply_le_max
 
 /-- For a slope-like payoff function, `μ.min ⊤ = μ ⊤` says exactly that the two global
 extremal values coincide. -/
@@ -160,8 +162,7 @@ theorem min_top_eq_apply_iff : μ.min ⊤ = μ ⊤ ↔ μ.min ⊤ = μ.max ⊤ :
       ((hμ.slopelike ⊥ x ⊤
         ⟨bot_lt_iff_ne_bot.2 hx.1, lt_top_iff_ne_top.2 hx.2⟩).1).imp_right not_le_of_gt) h).symm
   · intro h
-    have hb : μ.min ⊤ ≤ μ ⊤ ∧ μ ⊤ ≤ μ.max ⊤ := ⟨min_le_apply, apply_le_max⟩
-    exact (h.symm ▸ hb).elim eq_of_le_of_ge
+    exact le_antisymm min_le_apply (apply_le_max.trans_eq h.symm)
 
 /-- For a slope-like payoff function satisfying both chain conditions, the game has a Nash
 equilibrium iff the two global extremal values coincide.  This is the key bridge between the
@@ -196,10 +197,11 @@ variable {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 theorem IsSemistable.B_top_le_A_top {S : Type*} [CompleteLinearOrder S]
     {μ : PayoffFunction ℒ S} (hμ : μ.IsSemistable) : μ.B ⊤ ≤ μ.A ⊤ := by
   rw [isSemistable_iff_isBreakpoint_top] at hμ
-  have hstep : ∀ (x : ℒ) (hx : ⊥ < x), μ.A ⟨⊥, x, hx⟩ ≤ μ.A ⊤ := fun x hx ↦
-    le_of_not_gt <| hμ.not_lt x (StrictIntvl.mem_top x) hx.ne
-  refine iSup₂_le fun x hx ↦ le_trans ?_ (hstep x hx.1)
-  exact le_iInf₂ fun y hy ↦ iInf₂_le_of_le y hy (apply_le_max (I := ⟨y, x, hy.2⟩))
+  refine B_le fun x hx ↦ ?_
+  calc
+    μ.min ⟨⊥, x, hx.1⟩ ≤ μ.A ⟨⊥, x, hx.1⟩ :=
+      le_A fun y hy ↦ (min_le hy).trans apply_le_max
+    _ ≤ μ.A ⊤ := le_of_not_gt (hμ.not_lt x (StrictIntvl.mem_top x) hx.1.ne)
 
 /-- Over a complete linear order, a semistable payoff function has a Nash equilibrium under
 the hypotheses computing player A's value. -/
@@ -216,21 +218,15 @@ theorem isSemistable_of_hasNashEquilibrium {S : Type*} [CompleteLattice S]
     (h₂ : ∀ x : ℒ, (hx : x ≠ ⊥) →
       (μ.restrict ⟨⊥, x, bot_lt_iff_ne_bot.2 hx⟩).WeakSlopeLikeAtTop)
     (h : μ.HasNashEquilibrium) : μ.IsSemistable := by
-  have h := h.eq
-  have key : ∀ (x : ℒ) (hx : ⊥ < x), μ.A ⟨⊥, x, hx⟩ = μ.min ⟨⊥, x, hx⟩ := by
-    intro x hx
-    have := A_top_eq_min_top (μ := μ.restrict ⟨⊥, x, hx⟩)
-      (h₁ := h₁ x hx.ne') (h₂ := h₂ x hx.ne')
-    rwa [A_restrict_apply, min_restrict_apply, StrictIntvl.ofSub_top] at this
-  have hB : (⨆ (x : ℒ) (hx : ⊥ < x), μ.A ⟨⊥, x, hx⟩) = μ.B ⊤ :=
-    le_antisymm (iSup₂_le fun x hx ↦ le_iSup₂_of_le x ⟨hx, le_top⟩ (key x hx).le)
-      (iSup₂_le fun x hx ↦ le_iSup₂_of_le x hx.1 (key x hx.1).ge)
-  have hle : ∀ x : ℒ, (hx : x ≠ ⊥) → μ.A ⟨⊥, x, bot_lt_iff_ne_bot.2 hx⟩ ≤ μ.A ⊤ := by
-    rw [← h] at hB
-    intro x hx
-    rw [← hB]
-    exact le_iSup₂_of_le x (bot_lt_iff_ne_bot.2 hx) le_rfl
-  exact ⟨fun x hx ↦ (hle x hx.ne').not_gt⟩
+  refine ⟨fun x hx ↦ not_lt_of_ge ?_⟩
+  -- Compute the value on the initial segment, then compare it with the global game value.
+  calc
+    μ.A ⟨⊥, x, hx⟩ = μ.min ⟨⊥, x, hx⟩ := by
+      simpa only [A_restrict_apply, min_restrict_apply, StrictIntvl.ofSub_top] using
+        A_top_eq_min_top (μ := μ.restrict ⟨⊥, x, hx⟩)
+          (h₁ := h₁ x hx.ne') (h₂ := h₂ x hx.ne')
+    _ ≤ μ.B ⊤ := le_B (I := ⊤) ⟨hx, le_top⟩
+    _ = μ.A ⊤ := h.eq.symm
 
 end Semistable
 

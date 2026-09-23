@@ -140,24 +140,23 @@ private lemma iInf_top_eq_min_top (μ : PayoffFunction ℒ S) :
 weak slope-like alternative at `⊤`, the first-player value `μ.A ⊤` equals `μ.min ⊤`. -/
 theorem A_top_eq_min_top [h₁ : μ.WeakACC] [h₂ : μ.WeakSlopeLikeAtTop] :
     μ.A ⊤ = μ.min ⊤ := by
-  rw [← iInf_top_eq_min_top]
-  have key : ∀ yA : ℒ, (hyA : yA < ⊤) → ∃ xA : ℒ, xA < ⊤ ∧ (∀ xB : ℒ, (hAB : xA < xB) →
-      μ ⟨xA, xB, hAB⟩ ≤ μ ⟨yA, ⊤, hyA⟩) := by
-    by_contra!
-    let Y := badSeq μ this
-    have hsmf : StrictMono (fun n ↦ (Y n : ℒ)) := strictMono_nat_of_lt_succ fun n ↦
-      ((Y n).prop.out.choose_spec (Y n) (Y n).prop.out.choose).choose_spec.choose
-    have hfinal : ∀ n : ℕ, ¬ μ ⟨Y n, Y (n+1), hsmf (Nat.lt_add_one n)⟩ ≤
-        μ ⟨Y n, ⊤, lt_of_lt_of_le (hsmf (Nat.lt_add_one n)) le_top⟩ := fun n ↦
-      ((Y n).prop.out.choose_spec (Y n) (Y n).prop.out.choose).choose_spec.choose_spec
-    obtain ⟨N, hN⟩ := h₁.exists_le (fun n ↦ Y n) hsmf
-    exact hfinal N hN
-  refine le_antisymm ?_ ?_
-  · refine le_iInf₂ fun yA hyA ↦ ?_
-    obtain ⟨xA, hxA, h'⟩ := key yA hyA
-    exact iInf₂_le_of_le xA ⟨bot_le, hxA⟩ (iSup₂_le fun xB hxB ↦ h' xB hxB.1)
-  · exact le_iInf₂ fun x hx ↦ iInf₂_le_of_le x hx.2
-      (le_iSup₂_of_le ⊤ ⟨hx.2, le_rfl⟩ le_rfl)
+  apply le_antisymm
+  · -- If no move gives the required bound, the bad moves form a chain violating WeakACC.
+    have exists_move : ∀ yA : ℒ, (hyA : yA < ⊤) →
+        ∃ xA : ℒ, xA < ⊤ ∧ ∀ xB : ℒ, (hAB : xA < xB) →
+          μ ⟨xA, xB, hAB⟩ ≤ μ ⟨yA, ⊤, hyA⟩ := by
+      by_contra! hbad
+      let Y := badSeq μ hbad
+      have hmono : StrictMono (fun n ↦ (Y n : ℒ)) := strictMono_nat_of_lt_succ fun n ↦
+        ((Y n).prop.out.choose_spec (Y n) (Y n).prop.out.choose).choose_spec.choose
+      obtain ⟨N, hN⟩ := h₁.exists_le (fun n ↦ Y n) hmono
+      exact ((Y N).prop.out.choose_spec (Y N) (Y N).prop.out.choose).choose_spec.choose_spec hN
+    refine le_min fun yA hyA ↦ ?_
+    obtain ⟨xA, hxA, hbound⟩ := exists_move yA hyA.2
+    calc
+      μ.A ⊤ ≤ μ.max ⟨xA, ⊤, hxA⟩ := A_le (I := ⊤) ⟨bot_le, hxA⟩
+      _ ≤ μ ⟨yA, ⊤, hyA.2⟩ := max_le fun xB hxB ↦ hbound xB hxB.1
+  · exact le_A fun x hx ↦ (min_le hx).trans apply_le_max
 
 /-- The first-mover advantage `μ.A ⊤ ≤ μ.B ⊤`, under the hypotheses computing player A's
 value. -/
@@ -200,17 +199,16 @@ private lemma iSup_bot_eq_max_top (μ : PayoffFunction ℒ S) :
 /-- Player B's value is the global maximum: under the strong descending chain condition and
 the weak slope-like alternative at `⊥`, the second-player value `μ.B ⊤` equals `μ.max ⊤`. -/
 theorem B_top_eq_max_top [μ.StrongDCC] [μ.WeakSlopeLikeAtBot] : μ.B ⊤ = μ.max ⊤ := by
-  have := A_top_eq_min_top (μ := μ.dual)
-  rw [← iInf_top_eq_min_top] at this
-  rw [← iSup_bot_eq_max_top, ← A_top_dual, this]
-  rfl
+  calc
+    μ.B ⊤ = OrderDual.ofDual (μ.dual.A ⊤) := A_top_dual.symm
+    _ = OrderDual.ofDual (μ.dual.min ⊤) := congrArg OrderDual.ofDual A_top_eq_min_top
+    _ = μ.max ⊤ := by rw [← iInf_top_eq_min_top, ← iSup_bot_eq_max_top]; rfl
 
 /-- The first-mover advantage `μ.A ⊤ ≤ μ.B ⊤`, under the hypotheses computing player B's
 value. -/
 theorem A_top_le_B_top_of_strongDCC [μ.StrongDCC] [μ.WeakSlopeLikeAtBot] : μ.A ⊤ ≤ μ.B ⊤ := by
-  have h := A_top_le_B_top (μ := μ.dual)
   rw [← A_top_dual, ← B_top_dual]
-  exact h
+  exact A_top_le_B_top (μ := μ.dual)
 
 omit [Nontrivial ℒ] in
 /-- A monotone real-valued rank function with well-ordered range yields the strong
@@ -238,9 +236,8 @@ interval is the minimum payoff.  This is the interval version of `A_top_eq_min_t
 by restricting `μ` to the interval. -/
 lemma IsSlopeLike.min_eq_A [WellFoundedGT ℒ] (hsl : μ.IsSlopeLike) (I : StrictIntvl ℒ) :
     μ.min I = μ.A I := by
-  have h := A_top_eq_min_top (μ := μ.restrict I)
-  rw [A_restrict_apply, min_restrict_apply, StrictIntvl.ofSub_top] at h
-  exact h.symm
+  simpa only [A_restrict_apply, min_restrict_apply, StrictIntvl.ofSub_top] using
+    (A_top_eq_min_top (μ := μ.restrict I)).symm
 
 end SlopeLike
 

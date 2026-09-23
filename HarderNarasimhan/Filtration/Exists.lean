@@ -100,17 +100,20 @@ private lemma HNFil_ne_top_iff (n : ℕ) : HNFil μ n ≠ ⊤ ↔ n < HNlen μ :
     (fun k _ hk' ↦ by simp only [HNFil, hk', ↓reduceDIte]) n this)
 
 private lemma HNFil_strictMonoOn : StrictMonoOn (HNFil μ) (Set.Iic (HNlen μ)) := by
-  have key : ∀ i j : ℕ, i < j → j ≤ HNlen μ → HNFil μ i < HNFil μ j := fun i ↦
-    Nat.le_induction
-      (fun hi ↦ HNFil_lt_succ μ i ((HNFil_ne_top_iff μ i).2 hi))
-      fun k _ hk' hk'' ↦
-        lt_trans (hk' (le_trans (Nat.le_succ k) hk''))
-          (HNFil_lt_succ μ k ((HNFil_ne_top_iff μ k).2 hk''))
-  exact fun i _ j hj hij ↦ key i j hij hj
+  intro i _ j hj hij
+  revert hj
+  induction j, hij using Nat.le_induction with
+  | base =>
+    intro hj
+    exact HNFil_lt_succ μ i ((HNFil_ne_top_iff μ i).2 hj)
+  | succ j hij ih =>
+    intro hj
+    exact (ih (Nat.le_of_succ_le hj)).trans
+      (HNFil_lt_succ μ j ((HNFil_ne_top_iff μ j).2 hj))
 
 private lemma HNFil_length_eq_top : HNFil μ (HNlen μ) = ⊤ := by
-  by_contra hc
-  exact absurd le_rfl (not_le.2 ((HNFil_ne_top_iff μ (HNlen μ)).1 hc))
+  classical
+  exact Nat.find_spec (HNFil_exists_eq_top μ)
 
 private lemma HNFil_monotone : Monotone (HNFil μ) := by
   have htop : ∀ n : ℕ, HNlen μ ≤ n → HNFil μ n = ⊤ :=
@@ -193,15 +196,17 @@ theorem hnFiltration_A_bot_eq_A {n : ℕ} {y : ℒ} (hy : μ.hnFiltration n < y)
   induction n with
   | zero => rfl
   | succ n ih =>
-    have hmono : μ.hnFiltration n < y :=
+    have hprev_lt : μ.hnFiltration n < y :=
       lt_of_le_of_lt ((μ.hnFiltration).monotone (Nat.le_succ n)) hy
-    have hne : μ.hnFiltration n ≠ ⊤ := fun hc ↦ absurd (hc ▸ hmono) not_top_lt
-    have hIB := mem_breakpoints.1 (hnFiltration_succ_isGreatest_breakpoints (μ := μ) hne).1
-    have hstep := hIB.A_eq_A_of_lt ((inferInstance : μ.IsConvexOn ⊤).mono le_top)
-      (hadm.total_or_attained.imp id fun h z hzI hz ↦
-        h ⟨μ.hnFiltration n, z, lt_of_le_of_ne hzI.left hz⟩)
-      ⟨hmono.le, le_top⟩ hy
-    exact (ih hmono).trans hstep
+    have hne : μ.hnFiltration n ≠ ⊤ := (hprev_lt.trans_le le_top).ne
+    have hbreakpoint := mem_breakpoints.1
+      (hnFiltration_succ_isGreatest_breakpoints (μ := μ) hne).1
+    calc
+      _ = μ.A ⟨μ.hnFiltration n, y, hprev_lt⟩ := ih hprev_lt
+      _ = _ := hbreakpoint.A_eq_A_of_lt ((inferInstance : μ.IsConvexOn ⊤).mono le_top)
+        (hadm.total_or_attained.imp id fun h z hzI hz ↦
+          h ⟨μ.hnFiltration n, z, lt_of_le_of_ne hzI.left hz⟩)
+        ⟨hprev_lt.le, le_top⟩ hy
 
 end PayoffFunction
 

@@ -84,22 +84,11 @@ theorem piecewise_isStable_of_payoff_lt
       ⟨f (i + 1), f i, hsa i (i + 1) (lt_add_one i) hi⟩
     have hx_left : f (i + 1) < x.val :=
       x.prop.1.lt_of_ne fun hc ↦ hx.ne' <| Subtype.coe_inj.1 hc.symm
-    have hA_step : (μ.restrict stepI).A ⊤ = (μ.restrict stepI).min ⊤ :=
-      A_top_eq_min_top
-    have hA_x : (μ.restrict ⟨f (i + 1), x.val, hx_left⟩).A ⊤ =
-        (μ.restrict ⟨f (i + 1), x.val, hx_left⟩).min ⊤ :=
-      A_top_eq_min_top
-    simp only [A_restrict_apply, min_restrict_apply] at *
-    rw [hA_step]
-    replace hA_x : μ.A (StrictIntvl.ofSub ⟨⊥, x, hx⟩) =
-      μ.min (StrictIntvl.ofSub ⟨⊥, x, hx⟩) := hA_x
-    rw [hA_x]
-    have hss := piecewise_isSemistable_of_payoff_lt μ f hsa h i hi
-    have hNash_step := hss.hasNashEquilibrium
     have hmin_step : (μ.restrict stepI).min ⊤ = (μ.restrict stepI) ⊤ :=
-      min_top_eq_apply_iff.2
-        (min_top_eq_max_top_iff_hasNashEquilibrium.2 hNash_step)
+      min_top_eq_apply_iff.2 <| min_top_eq_max_top_iff_hasNashEquilibrium.2
+        (piecewise_isSemistable_of_payoff_lt μ f hsa h i hi).hasNashEquilibrium
     simp only [min_restrict_apply, restrict_apply] at hmin_step
+    simp only [A_restrict_apply, ← (inferInstance : μ.IsSlopeLike).min_eq_A]
     rw [hmin_step]
     exact ((min_le_apply (μ := μ) (I := ⟨f (i + 1), ↑x, hx_left⟩)).trans_lt <|
       h i hi x.val hx_left hx').ne
@@ -121,57 +110,38 @@ theorem payoff_lt_of_piecewise_isStable
     bot_lt_iff_ne_bot.2 fun hc ↦ hz.ne' (congrArg Subtype.val hc)
   have hmid_ne_top : midI < ⊤ :=
     lt_top_iff_ne_top.2 fun hc ↦ hz'.ne (congrArg Subtype.val hc)
-  have hss := (hst i hi).toIsSemistable.not_lt midI hmid_ne_bot
-  simp only [not_lt] at hss
-  have hst' : (μ.restrict stepI).A ⟨⊥, midI, hmid_ne_bot⟩ < (μ.restrict stepI).A ⊤ :=
-    hss.lt_of_ne ((hst i hi).ne midI hmid_ne_bot hmid_ne_top)
-  have hA_step : (μ.restrict stepI).A ⊤ = (μ.restrict stepI).min ⊤ :=
-    A_top_eq_min_top
-  rw [hA_step] at hst'
-  have hA_mid : (μ.restrict ⟨f (i + 1), z, hz⟩).A ⊤ =
-      (μ.restrict ⟨f (i + 1), z, hz⟩).min ⊤ :=
-    A_top_eq_min_top
-  have hb : (μ.restrict ⟨f (i + 1), f i, hz.trans hz'⟩).A ⟨⊥, midI, hmid_ne_bot⟩ =
-      (μ.restrict ⟨f (i + 1), z, hz⟩).A ⊤ := by
-    simp only [A_restrict_apply, min_restrict_apply] at *
-    rfl
-  rw [hb, hA_mid] at hst'
   have hNash_step := (hst i hi).toIsSemistable.hasNashEquilibrium
   have hmin_step : (μ.restrict stepI).min ⊤ = (μ.restrict stepI) ⊤ :=
-    min_top_eq_apply_iff.2
-      (min_top_eq_max_top_iff_hasNashEquilibrium.2 hNash_step)
-  rw [hmin_step] at hst'
+    min_top_eq_apply_iff.2 (min_top_eq_max_top_iff_hasNashEquilibrium.2 hNash_step)
   have hmax_step : (μ.restrict stepI).max ⊤ = (μ.restrict stepI) ⊤ :=
-    max_top_eq_apply_iff.2
-      (min_top_eq_max_top_iff_hasNashEquilibrium.2 hNash_step)
-  simp only [min_restrict_apply, restrict_apply] at hst'
-  have hsSup_step : ∀ (u : ↥stepI) (hu : (⊥ : ↥stepI) < u),
+    max_top_eq_apply_iff.2 (min_top_eq_max_top_iff_hasNashEquilibrium.2 hNash_step)
+  -- Stability gives a strict inequality for the minimum payoff on the shorter interval.
+  have hmin_lt : μ.min ⟨f (i + 1), z, hz⟩ <
+      μ ⟨f (i + 1), f i, hsa i (i + 1) (lt_add_one i) hi⟩ := by
+    have hstable := (not_lt.1 ((hst i hi).toIsSemistable.not_lt midI hmid_ne_bot)).lt_of_ne
+      ((hst i hi).ne midI hmid_ne_bot hmid_ne_top)
+    rw [A_top_eq_min_top, hmin_step] at hstable
+    simp only [A_restrict_apply, restrict_apply,
+      ← (inferInstance : μ.IsSlopeLike).min_eq_A] at hstable
+    exact hstable
+  have payoff_le_total : ∀ (u : ↥stepI) (hu : (⊥ : ↥stepI) < u),
       (μ.restrict stepI) ⟨⊥, u, hu⟩ ≤ (μ.restrict stepI) ⊤ := fun u hu ↦
     hmax_step ▸ le_iSup₂_of_le u ⟨hu, le_top⟩ le_rfl
-  have hsSup_step_bak := hsSup_step
-  have hsSup_mid := hsSup_step midI hmid_ne_bot
-  have hsSup_mid' : μ ⟨f (i + 1), z, hz⟩ ≤ μ ⟨f (i + 1), f i,
-      hsa i (i + 1) (lt_add_one i) hi⟩ := hsSup_mid
-  refine hsSup_mid'.lt_of_ne ?_
-  by_contra hc
-  replace hst' : μ.min ⟨f (i + 1), z, hz⟩ <
-      μ ⟨f (i + 1), f i, hz.trans hz'⟩ := hst'
-  rw [← hc] at hst'
-  obtain ⟨y, hy⟩ := iInf_lt_iff.1 hst'
-  obtain ⟨hy1, hs⟩ := iInf_lt_iff.1 hy
-  have := ((inferInstance : μ.IsSlopeLike).seesaw_right_lt_total_iff
-    (x := f (i + 1)) (y := y) (z := z)
-    (lt_of_le_of_ne hy1.1 fun hc ↦ by simp only [hc, lt_self_iff_false] at hs)
-    hy1.2).1 hs
-  simp only [hc] at this
-  have res := hsSup_step_bak ⟨y, hy1.1, (hy1.2.trans hz').le⟩ (by
-    refine lt_of_le_of_ne hy1.1 ?_
-    by_contra hc
-    apply Subtype.coe_inj.2 at hc
-    simp only at hc
-    simp only [← hc, StrictIntvl.val_bot, stepI, lt_self_iff_false] at hs)
-  simp only [stepI, restrict_apply] at res
-  exact (not_le_of_gt this) res
+  refine (payoff_le_total midI hmid_ne_bot).lt_of_ne ?_
+  intro heq
+  -- If the payoffs were equal, a smaller minimum would violate semistability.
+  change μ ⟨f (i + 1), z, hz⟩ =
+    μ ⟨f (i + 1), f i, hsa i (i + 1) (lt_add_one i) hi⟩ at heq
+  rw [← heq] at hmin_lt
+  obtain ⟨y, hy⟩ := iInf_lt_iff.1 hmin_lt
+  obtain ⟨hy_mem, hy_payoff⟩ := iInf_lt_iff.1 hy
+  have hy_left : f (i + 1) < y := by
+    refine lt_of_le_of_ne hy_mem.1 fun heq ↦ ?_
+    simp only [heq, lt_self_iff_false] at hy_payoff
+  have hy_gt := ((inferInstance : μ.IsSlopeLike).seesaw_right_lt_total_iff
+    hy_left hy_mem.2).1 hy_payoff
+  rw [heq] at hy_gt
+  exact hy_gt.not_ge (payoff_le_total ⟨y, hy_mem.1, (hy_mem.2.trans hz').le⟩ hy_left)
 
 omit [Nontrivial ℒ] [BoundedOrder ℒ] in
 /-- The stability condition of `PayoffFunction.JordanHolderFiltration` is equivalent to
