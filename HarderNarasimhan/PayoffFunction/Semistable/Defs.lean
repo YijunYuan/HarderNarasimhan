@@ -144,8 +144,7 @@ theorem isBreakpoint_right_iff :
     have hy' : (⊥ : ↥I) < ⟨y, hyI⟩ :=
       lt_of_le_of_ne bot_le fun hc ↦ hy (congrArg Subtype.val hc)
     refine h.not_lt ⟨y, hyI⟩ hy' ?_
-    simp only [A_restrict_apply, StrictIntvl.ofSub_top]
-    exact hcon
+    simpa only [A_restrict_apply, StrictIntvl.ofSub_top]
 
 end Restrict
 

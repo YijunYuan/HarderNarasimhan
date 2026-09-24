@@ -334,16 +334,15 @@ lemma breakpoints_total (hμcvx : μ.IsConvexOn I)
   rintro ⟨x, hx⟩ ⟨x', hx'⟩
   replace hx := mem_breakpoints.1 hx
   replace hx' := mem_breakpoints.1 hx'
-  have hxlt : I.left < x := hx.left_lt
   have hx'lt : I.left < x' := hx'.left_lt
   have hsI : (x ⊔ x') ∈ I := ⟨le_sup_of_le_left hx.mem.1, sup_le hx.mem.2 hx'.mem.2⟩
-  have hsne : I.left ≠ x ⊔ x' := ne_of_lt <| lt_sup_of_lt_left hxlt
-  have h₁ : Relation.SymmGen (· ≤ ·) (μ.A ⟨I.left, x, hxlt⟩) (μ.A ⟨I.left, x', hx'lt⟩) ∨
+  have hsne : I.left ≠ x ⊔ x' := ne_of_lt <| lt_sup_of_lt_left hx.left_lt
+  have h₁ : Relation.SymmGen (· ≤ ·) (μ.A ⟨I.left, x, hx.left_lt⟩) (μ.A ⟨I.left, x', hx'lt⟩) ∨
       μ.IsAttained ⟨I.left, x ⊔ x', lt_sup_of_lt_right hx'lt⟩ := by
     rcases h with htotal | hattained
     · exact Or.inl <| htotal.total _ _
     · exact Or.inr <| hattained (x ⊔ x') hsI hsne
-  rcases hμcvx.A_le_A_sup_or hx.mem hx'.mem I.left_mem hxlt hx'lt h₁ with hle | hle
+  rcases hμcvx.A_le_A_sup_or hx.mem hx'.mem I.left_mem hx.left_lt hx'lt h₁ with hle | hle
   · have heq := eq_of_le_of_not_lt hle (hx.not_lt (x ⊔ x') hsI hsne)
     exact Or.inr (le_sup_right.trans (hx.le_of_eq (x ⊔ x') hsI hsne heq.symm))
   · have heq := eq_of_le_of_not_lt hle (hx'.not_lt (x ⊔ x') hsI hsne)

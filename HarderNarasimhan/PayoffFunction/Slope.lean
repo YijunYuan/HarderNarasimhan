@@ -105,8 +105,7 @@ theorem isSlopeLike_slope [Nontrivial V] (r : StrictIntvl ℒ → ℝ≥0) (d : 
         have hweighted : r ⟨x, y, h₁⟩ • μxz + r ⟨y, z, h₂⟩ • μxz =
             r ⟨x, y, h₁⟩ • μxy + r ⟨y, z, h₂⟩ • μyz := by
           rw [hxy₂, hyz₂, ← add_smul, ← hrank, hxz₂, hdegree]
-        simp only [hxy₁, hxz₁, hyz₁, DedekindCut.principal_lt_principal,
-          DedekindCut.principal_inj]
+        simp only [hxy₁, hxz₁, hyz₁, DedekindCut.principal_lt_principal, DedekindCut.principal_inj]
         rcases lt_trichotomy μxy μxz with hlt | heq | hgt
         · refine Or.inl ⟨hlt, ?_⟩
           apply (smul_lt_smul_iff_of_pos_left hyz).1
