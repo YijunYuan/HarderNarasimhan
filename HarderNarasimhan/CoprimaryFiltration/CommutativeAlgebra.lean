@@ -17,7 +17,7 @@ subset of `R`, and let `K` be the kernel of the localization map `M → S⁻¹M`
 The associated primes of `M ⧸ K` are exactly the associated primes of `M` disjoint from `S`.
 
 This result is used to compute the value when player A moves first in
-`HarderNarasimhan/Coprimary/Semistability.lean`.
+`HarderNarasimhan/CoprimaryFiltration/Impl.lean`.
 
 ## Main results
 
@@ -37,7 +37,8 @@ namespace HarderNarasimhan
 
 variable {R : Type*} [CommRing R] {M : Type*} [AddCommGroup M] [Module R M]
 
-/-- For submodules `N`, `A`, and `B` with `A ≤ B`, every associated prime of
+/-- Commutative algebra input for Proposition 3.12. For submodules `N`, `A`, and `B` with `A ≤ B`,
+every associated prime of
 `A / (A ∩ N)` is an associated prime of `B / (B ∩ N)`. -/
 lemma associatedPrimes_subset_of_submoduleOf_le (N A B : Submodule R M) (h : A ≤ B) :
     associatedPrimes R (↥A ⧸ N.submoduleOf A) ⊆ associatedPrimes R (↥B ⧸ N.submoduleOf B) := by
@@ -49,7 +50,8 @@ lemma associatedPrimes_subset_of_submoduleOf_le (N A B : Submodule R M) (h : A �
 
 variable (S : Submonoid R)
 
-/-- Every associated prime of the kernel of the localization map `M → S⁻¹M` meets `S`. -/
+/-- Commutative algebra input for Proposition 3.12. Every associated prime of the kernel of the
+localization map `M → S⁻¹M` meets `S`. -/
 lemma inter_nonempty_of_mem_associatedPrimes_ker {p : Ideal R}
     (hp : p ∈ associatedPrimes R (LinearMap.ker (LocalizedModule.mkLinearMap S M))) :
     (p.carrier ∩ S).Nonempty := by
@@ -59,7 +61,8 @@ lemma inter_nonempty_of_mem_associatedPrimes_ker {p : Ideal R}
   rw [hx, Ideal.mem_radical_iff]
   exact ⟨1, by simpa [Submodule.mem_colon_singleton, Subtype.ext_iff] using hrx⟩
 
-/-- The associated primes of `S⁻¹M`, viewed as an `R`-module, are disjoint from `S`. -/
+/-- Commutative algebra input for Proposition 3.12. The associated primes of `S⁻¹M`, viewed as an
+`R`-module, are disjoint from `S`. -/
 lemma inter_eq_empty_of_mem_associatedPrimes_localizedModule {p : Ideal R}
     (hp : p ∈ associatedPrimes R (LocalizedModule S M)) : p.carrier ∩ S = ∅ := by
   obtain ⟨hpPrime, x, hx⟩ := hp
@@ -71,7 +74,8 @@ lemma inter_eq_empty_of_mem_associatedPrimes_localizedModule {p : Ideal R}
       (by simpa [Submonoid.smul_def, Submodule.mem_colon_singleton] using hn)
   exact hpPrime.ne_top (hx.trans (by rw [hx0, Submodule.colon_singleton_zero, Ideal.radical_top]))
 
-/-- The associated primes of `M ⧸ ker (M → S⁻¹M)` are disjoint from `S`. -/
+/-- Commutative algebra input for Proposition 3.12. The associated primes of `M ⧸ ker (M → S⁻¹M)`
+are disjoint from `S`. -/
 lemma inter_eq_empty_of_mem_associatedPrimes_quot_ker {p : Ideal R}
     (hp : p ∈ associatedPrimes R (M ⧸ LinearMap.ker (LocalizedModule.mkLinearMap S M))) :
     p.carrier ∩ S = ∅ := by
@@ -82,7 +86,8 @@ lemma inter_eq_empty_of_mem_associatedPrimes_quot_ker {p : Ideal R}
   exact LinearMap.ker_eq_bot.mp (Submodule.ker_liftQ_eq_bot' _ _ rfl)
 
 open Module in
-/-- Over a Noetherian ring, an associated prime of `M ⧸ ker (M → S⁻¹M)` disjoint from `S`
+/-- Commutative algebra input for Proposition 3.12. Over a Noetherian ring, an associated prime of
+`M ⧸ ker (M → S⁻¹M)` disjoint from `S`
 is an associated prime of `M`. -/
 lemma mem_associatedPrimes_of_mem_associatedPrimes_quot_ker [IsNoetherianRing R] {p : Ideal R}
     (hp : p ∈ associatedPrimes R (M ⧸ LinearMap.ker (LocalizedModule.mkLinearMap S M)))
@@ -116,7 +121,8 @@ lemma mem_associatedPrimes_of_mem_associatedPrimes_quot_ker [IsNoetherianRing R]
       p.primeCompl (LocalizedModule.mkLinearMap p.primeCompl M) _ hAtPrimeM
       ((isNoetherianRing_iff_ideal_fg R).mp ‹IsNoetherianRing R› _))
 
-/-- Over a Noetherian ring, the associated primes of `M ⧸ ker (M → S⁻¹M)` are exactly
+/-- Commutative algebra input for Proposition 3.12. Over a Noetherian ring, the associated primes
+of `M ⧸ ker (M → S⁻¹M)` are exactly
 the associated primes of `M` disjoint from `S`. -/
 theorem associatedPrimes_quot_ker_mkLinearMap [IsNoetherianRing R] :
     associatedPrimes R (M ⧸ LinearMap.ker (LocalizedModule.mkLinearMap S M)) =

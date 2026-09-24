@@ -5,12 +5,17 @@
 [![mathlib](https://img.shields.io/badge/mathlib-db584cd6d46c92f209a44c0f1c829460d327499d-5C2D91)](https://github.com/leanprover-community/mathlib4/tree/db584cd6d46c92f209a44c0f1c829460d327499d)
 [![License](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
 
-[![Graph](https://img.shields.io/badge/Dependency_graph-100000?style=for-the-badge&logo=GitHub&logoColor=white&labelColor=black&color=black)](https://yijunyuan.github.io/lean-graph/?url=https://raw.githubusercontent.com/YijunYuan/HarderNarasimhan/refs/heads/master/HarderNarasimhan.json#dark)
+[![Graph](https://img.shields.io/badge/Dependency_graph-100000?style=for-the-badge&logo=GitHub&logoColor=white&labelColor=black&color=black)](https://yijunyuan.github.io/lean-graph/?url=https://raw.githubusercontent.com/YijunYuan/HarderNarasimhan/refs/heads/literal/HarderNarasimhan.json#dark)
 
 A Lean 4 formalization of the **Harder–Narasimhan Games** of Huayi Chen & Marion Jeannin: a two-player game played on the
 strict intervals of a bounded lattice. The library develops Harder–Narasimhan filtrations,
 Jordan–Hölder filtrations, and coprimary filtrations of nonzero finitely generated modules
 over a Noetherian commutative ring.
+
+This branch follows the original paper as faithfully as possible, separating definitions,
+statements, and proofs so that the formalization can be read alongside the text. For a
+version organized for easier use as a library, see the
+[`master` branch](https://github.com/YijunYuan/HarderNarasimhan/tree/master).
 
 ## Mathematical overview
 
@@ -22,7 +27,7 @@ structure PayoffFunction (ℒ : Type*) [LT ℒ] (S : Type*) where
 ```
 
 assigning to each strict interval `(a, b)` (with `a < b`) of an order `ℒ` a payoff in a
-complete lattice `S`.  Everything else is accessed through dot notation on `μ`:
+complete lattice `S`. The main definitions use dot notation on `μ`:
 
 - `μ.max I` — the supremum over `I.left < u ≤ I.right`, with the left endpoint fixed;
 - `μ.min I` — the infimum over `I.left ≤ u < I.right`, with the right endpoint fixed;
@@ -31,150 +36,83 @@ complete lattice `S`.  Everything else is accessed through dot notation on `μ`:
 - `μ.dual` — the order-dual payoff function, exchanging the two players;
 - `μ.IsConvex`, `μ.IsSlopeLike`, `μ.IsSemistable`, … — typeclass hypotheses on `μ`;
 - `μ.breakpoints I` — the canonical cut points from which filtrations are built;
-- `μ.hnFiltration` — the canonical Harder–Narasimhan filtration of `μ`.
+- `μ.HarderNarasimhanFiltration` — the type of Harder–Narasimhan filtrations of `μ`.
 
 Under suitable chain and slope-like conditions, the game values satisfy
-`μ.A ⊤ = μ.min ⊤` and `μ.B ⊤ = μ.max ⊤`. For linearly ordered slope-like payoffs with
-the required chain conditions on restrictions, Nash equilibrium is equivalent to
-semistability. For convex admissible payoffs satisfying the ascending chain condition and
+`μ.A ⊤ = μ.min ⊤` and `μ.B ⊤ = μ.max ⊤`. For linearly ordered slope-like payoffs satisfying `WeakACC` and `StrongDCC`,
+Nash equilibrium is equivalent to semistability. For convex admissible payoffs satisfying the ascending chain condition and
 `ADCC`, iterating greatest breakpoints gives a Harder–Narasimhan filtration, unique when
 the payoff order is linear. Applying this construction to associated primes of subquotients
 gives coprimary filtrations, relative to a fixed linear extension of the prime spectrum.
 
-## Library structure
+## Reading alongside the paper
 
-Importing `HarderNarasimhan` (the umbrella module [HarderNarasimhan.lean](HarderNarasimhan.lean))
-brings in the whole library.  It is organized as one infrastructure file and four blocks:
+The chapter layout and numbering follow Chen–Jeannin,
+[*Harder–Narasimhan Games*, arXiv:2306.08283v1](https://arxiv.org/abs/2306.08283v1).
 
-### Infrastructure
+Each chapter has three files:
 
-- [HarderNarasimhan/StrictIntvl.lean](HarderNarasimhan/StrictIntvl.lean) — the type
-  `StrictIntvl ℒ` of strict intervals `left < right`, its inclusion order and top element,
-  and the points type `↥I` with its inherited `BoundedOrder`/`Lattice`/`IsModularLattice`/
-  `WellFoundedGT` instances.
+- `Defs.lean` — definitions, hypothesis classes, and the essential coercion/structure API.
+- `Impl.lean` — constructions, auxiliary lemmas, and proofs, collected in the
+  `HarderNarasimhan.Impl` namespace.
+- `Results.lean` — concise numbered statements in paper order, proved from `Impl`.
 
-### `PayoffFunction/` — the game and its values
+Import `HarderNarasimhan` for the whole library, or a chapter's `Results` for its public entry point.
+Numbered entry points such as `HarderNarasimhan.theorem_3_10` live in the
+`HarderNarasimhan` namespace. Definitions live in their corresponding namespaces in `Defs`,
+while implementation declarations are kept under `HarderNarasimhan.Impl`.
+Definitions and results have docstrings identifying the corresponding paper item. Technical
+lemmas are labelled as auxiliary results for that item; unnumbered notions are identified by
+section and their related numbered statement.
 
-- [Defs.lean](HarderNarasimhan/PayoffFunction/Defs.lean) — the `PayoffFunction` structure,
-  the operations `max`/`min`/`A`/`B` and their basic API, `IsAttained`, and the order dual.
-- [Restrict.lean](HarderNarasimhan/PayoffFunction/Restrict.lean) — restriction to a
-  subinterval and its commutation with `max`/`min`/`A`/`B`.
-- [Convex.lean](HarderNarasimhan/PayoffFunction/Convex.lean) — the convexity classes
-  `IsConvex`/`IsConvexOn`/`IsAffine` and the fundamental inequalities for `μ.A`.
-- [Semistable/Defs.lean](HarderNarasimhan/PayoffFunction/Semistable/Defs.lean) —
-  `IsSemistable`/`IsStable`, the chain condition `ADCC`, and breakpoints.
-- [Semistable/Breakpoints.lean](HarderNarasimhan/PayoffFunction/Semistable/Breakpoints.lean) —
-  existence, uniqueness, totality, and the decomposition formula for breakpoints.
-- [SlopeLike.lean](HarderNarasimhan/PayoffFunction/SlopeLike.lean) — the slope-like axiom
-  and its seesaw trichotomy (`seesaw_*` iff family).
-- [Slope.lean](HarderNarasimhan/PayoffFunction/Slope.lean) — the prototypical slope-like
-  payoff `slope r d` (degree over rank, valued in a Dedekind–MacNeille completion).
-- [GameValue.lean](HarderNarasimhan/PayoffFunction/GameValue.lean) — chain conditions
-  (`WeakACC`, `StrongDCC`), computation of the global game values, first-mover advantage.
-- [NashEquilibrium.lean](HarderNarasimhan/PayoffFunction/NashEquilibrium.lean) —
-  `HasNashEquilibrium` and its equivalence with semistability.
+| Paper section | Definitions | Statements | Proofs |
+|---|---|---|---|
+| §2.2 Convexity | [Defs](HarderNarasimhan/Convexity/Defs.lean) | [Results](HarderNarasimhan/Convexity/Results.lean) | [Impl](HarderNarasimhan/Convexity/Impl.lean) |
+| §3.1 Semistability | [Defs](HarderNarasimhan/Semistability/Defs.lean) | [Results](HarderNarasimhan/Semistability/Results.lean) | [Impl](HarderNarasimhan/Semistability/Impl.lean) |
+| §3.3 Harder–Narasimhan filtration | [Defs](HarderNarasimhan/Filtration/Defs.lean) | [Results](HarderNarasimhan/Filtration/Results.lean) | [Impl](HarderNarasimhan/Filtration/Impl.lean) |
+| §3.4 Coprimary filtration | [Defs](HarderNarasimhan/CoprimaryFiltration/Defs.lean) | [Results](HarderNarasimhan/CoprimaryFiltration/Results.lean) | [Impl](HarderNarasimhan/CoprimaryFiltration/Impl.lean) |
+| §§4.1–4.2 First-mover advantage and duality | [Defs](HarderNarasimhan/FirstMoverAdvantage/Defs.lean) | [Results](HarderNarasimhan/FirstMoverAdvantage/Results.lean) | [Impl](HarderNarasimhan/FirstMoverAdvantage/Impl.lean) |
+| §4.3 Slope-like payoffs | [Defs](HarderNarasimhan/SlopeLike/Defs.lean) | [Results](HarderNarasimhan/SlopeLike/Results.lean) | [Impl](HarderNarasimhan/SlopeLike/Impl.lean) |
+| §4.4 Nash equilibrium | [Defs](HarderNarasimhan/NashEquilibrium/Defs.lean) | [Results](HarderNarasimhan/NashEquilibrium/Results.lean) | [Impl](HarderNarasimhan/NashEquilibrium/Impl.lean) |
+| §4.5 Jordan–Hölder filtration | [Defs](HarderNarasimhan/JordanHolderFiltration/Defs.lean) | [Results](HarderNarasimhan/JordanHolderFiltration/Results.lean) | [Impl](HarderNarasimhan/JordanHolderFiltration/Impl.lean) |
 
-### `Filtration/` — Harder–Narasimhan filtrations
+Shared infrastructure remains in [StrictIntvl](HarderNarasimhan/StrictIntvl.lean),
+[PayoffFunction/Defs](HarderNarasimhan/PayoffFunction/Defs.lean), and
+[PayoffFunction/Restrict](HarderNarasimhan/PayoffFunction/Restrict.lean): strictly ordered pairs,
+the game values, and restrictions (Definitions 2.1–2.2 and Notation 4.9).
+The commutative algebra input for Proposition 3.12 is in
+[CoprimaryFiltration/CommutativeAlgebra](HarderNarasimhan/CoprimaryFiltration/CommutativeAlgebra.lean).
 
-- [Defs.lean](HarderNarasimhan/Filtration/Defs.lean) — the `HarderNarasimhanFiltration`
-  structure (explicit `length`, semistable steps, and successive `μ.A`-values satisfying
-  `¬ aᵢ ≤ aᵢ₊₁`, or strict decrease for a linear codomain) and the
-  `Admissible` side condition.
-- [Exists.lean](HarderNarasimhan/Filtration/Exists.lean) — the canonical construction
-  `μ.hnFiltration` by iterated greatest breakpoints.
-- [Unique.lean](HarderNarasimhan/Filtration/Unique.lean) — uniqueness over a complete
-  linear order, and the `RelSeries` repackaging.
+## Numbered results
 
-### `JordanHolder/` — Jordan–Hölder filtrations
-
-- [Defs.lean](HarderNarasimhan/JordanHolder/Defs.lean) — the `JordanHolderFiltration`
-  structure (descending chains with total step payoff) and the chain condition
-  `EventuallyTopDCC`.
-- [Exists.lean](HarderNarasimhan/JordanHolder/Exists.lean) — existence by successively choosing
-  maximal points with the required payoff (a `Nonempty` instance; uniqueness is not asserted).
-- [Stability.lean](HarderNarasimhan/JordanHolder/Stability.lean) — the step condition is
-  equivalent to piecewise stability of the restricted payoffs.
-- [Length.lean](HarderNarasimhan/JordanHolder/Length.lean) — for semistable slope-like affine
-  payoffs in a complete linear order, Jordan–Hölder filtrations on a modular lattice have
-  the same length under the existence hypotheses.
-
-### `Coprimary/` — coprimary filtrations of modules
-
-- [AssociatedPrimes.lean](HarderNarasimhan/Coprimary/AssociatedPrimes.lean) — pure
-  commutative algebra: associated primes of the quotient by a localization kernel
-  (Bourbaki, *Algèbre commutative*).
-- [Defs.lean](HarderNarasimhan/Coprimary/Defs.lean) — the coprimary payoff function
-  `Coprimary.payoff R M` on the submodule lattice, `IsCoprimary`, and the
-  `CoprimaryFiltration` structure.
-- [Semistability.lean](HarderNarasimhan/Coprimary/Semistability.lean) — explicit
-  computation of the value when A moves first; semistability is having a unique associated prime.
-- [Filtration.lean](HarderNarasimhan/Coprimary/Filtration.lean) — existence and uniqueness
-  of the coprimary filtration, via the general Harder–Narasimhan machinery.
-
-The dependency graph [HarderNarasimhan.json](HarderNarasimhan.json) (linked in the badge
-above) is regenerated by a local development script that is not tracked in this repository.
-
-## How to read this repository
-
-1. Start with [StrictIntvl.lean](HarderNarasimhan/StrictIntvl.lean) and
-   [PayoffFunction/Defs.lean](HarderNarasimhan/PayoffFunction/Defs.lean) for the two core
-   types and the game values.
-2. Read [Convex.lean](HarderNarasimhan/PayoffFunction/Convex.lean) and the two
-   `Semistable/` files for the breakpoint machinery — the heart of the theory.
-3. [Filtration/Exists.lean](HarderNarasimhan/Filtration/Exists.lean) and
-   [Filtration/Unique.lean](HarderNarasimhan/Filtration/Unique.lean) assemble the main
-   theorem on Harder–Narasimhan filtrations.
-4. The game-theoretic side ([GameValue.lean](HarderNarasimhan/PayoffFunction/GameValue.lean),
-   [NashEquilibrium.lean](HarderNarasimhan/PayoffFunction/NashEquilibrium.lean)) and the
-   `JordanHolder/` block can be read independently after step 2.
-5. `Coprimary/` shows the abstract theory at work on an honest example from commutative
-   algebra.
-
-
-## Main results at a glance
-
-Declarations live in the namespace `HarderNarasimhan.PayoffFunction` unless qualified
-otherwise.  Results that are naturally packaged as conjunctions or `TFAE` blocks are split
-into the listed single-conclusion lemmas.
-
-| Result | Lean declaration(s) |
+| Paper item | Entry point in `HarderNarasimhan` |
 |---|---|
-| Fundamental inequality chain for convex payoff functions | `A_le_max_inf`, `IsConvexOn.max_inf_le_max`, `IsConvexOn.A_le_A_sup` |
-| Stability of the extremal operations under convexity | `IsConvexOn.max`, `IsConvexOn.max_max`, `IsConvexOn.A_max` |
-| Comparison of `μ.A`-values along a chain | `A_anti_left`, `IsConvexOn.inf_le_A`, `IsConvexOn.A_eq_of_ge`, `IsConvexOn.A_le_A_of_lt`, `IsConvexOn.A_eq_or_lt` |
-| Complementary segment value after a strict improvement | `IsConvex.A_right_eq_of_A_left_gt` |
-| Comparison of `μ.A`-values along a join | `IsConvexOn.inf_A_le_A_sup`, `IsConvexOn.A_le_A_sup_or` |
-| Interval enlargement when the `μ.A`-value is `⊤` | `IsConvexOn.A_le_of_A_eq_top` |
-| Sufficient condition for the descending chain condition | `adcc_of_exists_A_eq_top` |
-| Existence of breakpoints | `breakpoints_nonempty` |
-| Uniqueness of the breakpoint over a complete linear order | `IsBreakpoint.eq` |
-| Semistability below and obstruction above a breakpoint | `IsBreakpoint.isSemistable_restrict`, `IsBreakpoint.not_A_le` |
-| Totality, greatest element, and decomposition for breakpoints | `breakpoints_total`, `exists_isGreatest_breakpoints`, `IsBreakpoint.A_eq_A_of_lt` |
-| Existence and uniqueness of the Harder–Narasimhan filtration | `hnFiltration`, `Unique (μ.HarderNarasimhanFiltration)`, `exists_relSeries_semistableRel`, `existsUnique_relSeries_semistableRel` |
-| Equalities of `μ.A`-values along the canonical filtration | `hnFiltration_A_bot_eq_A` |
-| Convexity of the coprimary payoff function | the `IsConvexOn ⊤` instance for `Coprimary.payoff R M` |
-| Value of the coprimary payoff function when A moves first | `Coprimary.A_payoff` |
-| Descending chain condition for the coprimary payoff function | the `ADCC` instance for `Coprimary.payoff R M` |
-| Semistable means coprimary | `Coprimary.isSemistable_iff_A_const`, `Coprimary.isSemistable_iff_existsUnique_associatedPrime` |
-| Existence and uniqueness of the coprimary filtration | `Coprimary.coprimaryFiltration`, `Unique (CoprimaryFiltration R M)` |
-| The associated primes of `M` via the coprimary filtration | `CoprimaryFiltration.associatedPrimes_eq_iUnion` |
-| Player A's value equals the global infimum | `A_top_eq_min_top`, `A_top_le_B_top` |
-| Player B's value equals the global supremum | `B_top_eq_max_top`, `A_top_le_B_top_of_strongDCC` |
-| Strong descending chain condition from a well-ordered rank | `strongDCC_of_wellOrderedRank` |
-| The slope-like axiom as the seesaw trichotomy | `isSlopeLike_iff_seesaw`, `IsSlopeLike.seesaw` |
-| The slope of a degree by a rank is slope-like | `isSlopeLike_slope` |
-| Unfolded reformulations of the equilibrium condition | `min_le_apply`, `apply_le_max`, `B_top_le_A_top_iff`, `hasNashEquilibrium_iff_min_le`, `hasNashEquilibrium_iff_le_max` |
-| Equilibrium inequality vs. coincidence of the extremal values | `B_top_le_A_top_of_min_eq_max`, `min_top_eq_max_top_of_B_top_le_A_top` |
-| Equivalence of the endpoint equalities for slope-like payoffs | `max_top_eq_apply_iff`, `min_top_eq_apply_iff` |
-| Semistability implies Nash equilibrium | `IsSemistable.B_top_le_A_top`, `IsSemistable.hasNashEquilibrium` |
-| Nash equilibrium implies semistability | `isSemistable_of_hasNashEquilibrium` |
-| Nash equilibrium iff the global extremal values coincide | `min_top_eq_max_top_iff_hasNashEquilibrium`, `nashEquilibrium_tfae` |
-| Existence of Jordan–Hölder filtrations | `Nonempty (μ.JordanHolderFiltration)`, `exists_relSeries_jordanHolderRel` |
+| Lemma 2.4 | `lemma_2_4` |
+| Remarks 2.5, 2.7 | `remark_2_5`, `remark_2_7` |
+| Propositions 2.6, 2.8 | `proposition_2_6`, `proposition_2_8` |
+| Proposition 3.2; Corollary 3.3 | `proposition_3_2`, `corollary_3_3` |
+| Proposition 3.4; Remark 3.5 | `proposition_3_4`, `remark_3_5` |
+| Propositions 3.7–3.8 | `proposition_3_7`, `proposition_3_8` |
+| Definition 3.9; Theorem 3.10 | `definition_3_9`, `theorem_3_10` |
+| Propositions 3.11–3.13 | `proposition_3_11`, `proposition_3_12`, `proposition_3_13` |
+| Remark 3.14; Theorem 3.15; Remark 3.16 | `remark_3_14`, `theorem_3_15`, `remark_3_16` |
+| Propositions 4.1, 4.3; Remark 4.4 | `proposition_4_1`, `proposition_4_3`, `remark_4_4` |
+| Propositions 4.6, 4.8 | `proposition_4_6`, `proposition_4_8` |
+| Remark 4.10; Propositions 4.11–4.16 | See [NashEquilibrium/Results](HarderNarasimhan/NashEquilibrium/Results.lean) |
+| Propositions 4.18, 4.20; Theorem 4.21 | `proposition_4_18`, `proposition_4_20`, `theorem_4_21` |
+| Theorem 4.25; Remark 4.26 | `theorem_4_25`, `remark_4_26` |
 
-Further results include the uniqueness of the Jordan–Hölder length under the hypotheses above
-(`JordanHolderFiltration.length_eq`), the piecewise-stability characterization
-(`piecewise_isStable_iff`), and the commutative algebra input
-`HarderNarasimhan.associatedPrimes_quot_ker_mkLinearMap`.
+Theorem 3.10 identifies every Harder–Narasimhan filtration with the canonical one;
+combined with Definition 3.9 this gives the existence and uniqueness of Theorem 1.1.
+Theorem 3.15 is Theorem 1.2 from the introduction, and Theorem 4.21 is Theorem 1.3.
+
+Some hypotheses need to be read explicitly alongside v1. The formal Proposition 4.3 uses
+the actual order dual of Proposition 4.1: the first disjunct in `WeakSlopeLikeAtBot` is
+`μ(⊥, y) ≤ μ(x, y)`, where v1 prints `μ(⊥, x) ≤ μ(x, y)`.
+The length result of Remark 4.26 assumes a modular lattice.
+The five-way equivalence in Theorem 4.21 uses the global weak ascending and
+strong descending chain conditions from the paper; the more general restriction-based
+criterion of Proposition 4.20 remains available separately.
 
 ## Building
 

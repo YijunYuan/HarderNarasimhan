@@ -5,35 +5,411 @@ Authors: Yijun Yuan
 -/
 module
 
-public import HarderNarasimhan.JordanHolder.Defs
-public import HarderNarasimhan.PayoffFunction.Convex
+public import HarderNarasimhan.JordanHolderFiltration.Defs
+public import HarderNarasimhan.NashEquilibrium.Results
+public import HarderNarasimhan.SlopeLike.Results
+public import HarderNarasimhan.Convexity.Results
+public import Mathlib.Order.RelSeries
 public import Mathlib.SetTheory.Cardinal.NatCard
 
 /-!
-# Uniqueness of the length of Jordan–Hölder filtrations
+# Section 4.5: implementation of Jordan–Hölder filtrations
 
-For a semistable slope-like affine payoff function on a modular lattice with values in a
-complete linear order, any two Jordan–Hölder filtrations have the same length, under the chain
-conditions and finite total payoff hypothesis used in `HarderNarasimhan/JordanHolder/Exists.lean`.
-
-The proof compares two filtrations after restricting to the interval from the last
-nonbottom term of one filtration to `⊤`. Joining the other filtration with this term
-preserves the payoff conditions on its strict steps and introduces a repeated value.
-Removing repeated values gives a shorter filtration, to which induction applies.
-
-## Main results
-
-* `HarderNarasimhan.PayoffFunction.JordanHolderFiltration.length_eq`: any two
-  Jordan–Hölder filtrations have the same length.
-
-## References
-
-* [Huayi Chen & Marion Jeannin, *Harder–Narasimhan Games*][ChenJeannin]
+Theorem 4.25 is proved by successively choosing maximal proper terms with the total
+payoff. The intermediate lemmas identify stable steps. For Remark 4.26, removing
+plateaus and comparing joined filtrations proves equality of lengths on a modular lattice.
 -/
 
 @[expose] public section
 
-namespace HarderNarasimhan
+open _root_.HarderNarasimhan.PayoffFunction
+open _root_.HarderNarasimhan.PayoffFunction.JordanHolderFiltration
+
+namespace HarderNarasimhan.Impl
+
+namespace PayoffFunction
+
+variable {ℒ S : Type*}
+
+section RestrictBotFiniteTotalPayoff
+
+variable [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
+variable [CompleteLinearOrder S] {μ : PayoffFunction ℒ S}
+
+/-- Auxiliary lemma for Theorem 4.25 and Remark 4.26.
+For a semistable slope-like payoff function with a complete linearly ordered codomain,
+finite total payoff is inherited by restrictions to intervals with left endpoint `⊥`,
+under the ascending and eventually-`⊤` descending chain conditions. -/
+instance [hftp : μ.FiniteTotalPayoff] [μ.IsSlopeLike] [hst : μ.IsSemistable]
+    [μ.EventuallyTopDCC] {x : ℒ} {hx : ⊥ < x} :
+    (μ.restrict ⟨⊥, x, hx⟩).FiniteTotalPayoff where
+  ne_top := by
+    simp only [restrict_apply, StrictIntvl.ofSub_top]
+    intro h
+    have hmax : μ.max ⊤ = μ ⊤ :=
+      max_top_eq_apply_iff.2
+        (min_top_eq_max_top_iff_hasNashEquilibrium.2 (IsSemistable.hasNashEquilibrium hst))
+    have hq : μ ⟨⊥, x, hx⟩ ≤ μ ⊤ := hmax ▸ le_max (I := ⊤) ⟨hx, le_top⟩
+    exact hftp.ne_top (top_le_iff.1 (h ▸ hq))
+
+end RestrictBotFiniteTotalPayoff
+
+namespace JordanHolderFiltration
+
+section SlopeLike
+
+variable [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ] [CompleteLattice S]
+variable {μ : PayoffFunction ℒ S} [hsl : μ.IsSlopeLike]
+
+/-- Auxiliary lemma for Theorem 4.25 and Remark 4.26.
+For a slope-like payoff function, the interval from `⊥` to any nonbottom filtration term
+has the total payoff. -/
+lemma payoff_bot_eq_top_payoff (F : μ.JordanHolderFiltration) (i : ℕ) (hi : i < F.length) :
+    μ ⟨⊥, F i, F.bot_lt_of_lt hi⟩ = μ ⊤ := by
+  induction i with
+  | zero => simp only [apply_zero, StrictIntvl.mk_bot_top]
+  | succ i ih =>
+    refine (IsSlopeLike.seesaw_total_eq_right_iff hsl (F.bot_lt_of_lt hi)
+      (F.apply_lt_top (Nat.zero_lt_succ i) hi.le)).1 ?_
+    simp only [StrictIntvl.mk_bot_top]
+    rw [← F.step_payoff (Nat.lt_of_succ_lt hi)]
+    if htop : F i = ⊤ then
+      simp only [htop]
+    else
+    refine (IsSlopeLike.seesaw_left_eq_right_iff hsl
+      (F.apply_lt_apply (lt_add_one i) hi.le) (Ne.lt_top htop)).1 ?_
+    specialize ih (Nat.lt_of_succ_lt hi)
+    rw [← ((IsSlopeLike.seesaw_total_eq_right_iff hsl (F.bot_lt_of_lt (Nat.lt_of_succ_lt hi))
+        (Ne.lt_top htop)).2 ih), F.step_payoff (Nat.lt_of_succ_lt hi)]
+    rfl
+
+end SlopeLike
+
+end JordanHolderFiltration
+
+end PayoffFunction
+
+end HarderNarasimhan.Impl
+
+namespace HarderNarasimhan.Impl
+
+namespace PayoffFunction
+
+variable {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [hacc : WellFoundedGT ℒ]
+variable {S : Type*} [CompleteLinearOrder S] (μ : PayoffFunction ℒ S)
+
+omit [CompleteLinearOrder S] in
+open Classical in
+/-- Auxiliary construction for Theorem 4.25.
+A chain starting at `⊤`, whose next term is a maximal point `p` strictly between `⊥` and
+the current term such that the interval from `⊥` to `p` has total payoff, or `⊥` if none exists.
+
+The choice uses well-foundedness of `>`: a minimal element for this relation is maximal in
+the lattice order. -/
+private noncomputable def JHFil (k : ℕ) : ℒ :=
+  match k with
+  | 0 => ⊤
+  | n + 1 =>
+    let 𝒮 := {p : ℒ | ∃ h : ⊥ < p, p < JHFil n ∧ μ ⟨⊥, p, h⟩ = μ ⊤}
+    if h𝒮 : 𝒮.Nonempty then
+      (hacc.wf.has_min 𝒮 h𝒮).choose
+    else
+      ⊥
+
+omit [CompleteLinearOrder S] in
+/-- Auxiliary construction for Theorem 4.25.
+Each term above `⊥` is strictly greater than its successor. -/
+private lemma JHFil_anti_mono :
+    ∀ k : ℕ, JHFil μ k > ⊥ → JHFil μ k > JHFil μ (k + 1) := by
+  intro k hk
+  simp only [JHFil]
+  by_cases h : {p : ℒ | ∃ h : ⊥ < p, p < JHFil μ k ∧ μ ⟨⊥, p, h⟩ = μ ⊤}.Nonempty
+  · simp only [h]
+    exact (hacc.wf.has_min _ h).choose_spec.1.2.1
+  · simpa only [h]
+
+omit [CompleteLinearOrder S] in
+/-- Auxiliary construction for Theorem 4.25.
+The chain `JHFil` is antitone: it decreases strictly until it reaches `⊥` and is
+constantly `⊥` afterwards. -/
+private lemma JHFil_antitone : Antitone (JHFil μ) :=
+  antitone_nat_of_succ_le fun n ↦ by
+    by_cases h : JHFil μ n = ⊥
+    · refine le_of_eq_of_le ?_ bot_le
+      have hempty : ¬ {p : ℒ | ∃ hp : ⊥ < p, p < JHFil μ n ∧ μ ⟨⊥, p, hp⟩ = μ ⊤}.Nonempty := by
+        rintro ⟨p, -, hlt, -⟩
+        exact not_lt_bot (h ▸ hlt)
+      simpa only [JHFil] using dif_neg hempty
+    · exact (JHFil_anti_mono μ n <| bot_lt_iff_ne_bot.2 h).le
+
+variable [hsl : μ.IsSlopeLike]
+
+open Classical in
+/-- Auxiliary construction for Theorem 4.25.
+Each step of the chain before it reaches `⊥` has the total payoff. -/
+private lemma JHFil_step_payoff_eq_tot :
+    ∀ k : ℕ, (hk : JHFil μ k > ⊥) →
+      μ ⟨JHFil μ (k + 1), JHFil μ k, JHFil_anti_mono μ k hk⟩ = μ ⊤ := by
+  -- Every nonbottom term was chosen with total payoff (including the initial term).
+  have payoff_from_bot : ∀ n : ℕ, (hn : ⊥ < JHFil μ n) →
+      μ ⟨⊥, JHFil μ n, hn⟩ = μ ⊤ := by
+    intro n hn
+    cases n with
+    | zero => rfl
+    | succ n =>
+      by_cases hchoices : {p : ℒ | ∃ h : ⊥ < p,
+          p < JHFil μ n ∧ μ ⟨⊥, p, h⟩ = μ ⊤}.Nonempty
+      · simpa only [JHFil, hchoices, ↓reduceDIte] using
+          (hacc.wf.has_min _ hchoices).choose_spec.1.2.2
+      · simp only [JHFil, hchoices, ↓reduceDIte, lt_self_iff_false] at hn
+  intro k hk
+  by_cases hbot : JHFil μ (k + 1) = ⊥
+  · simpa only [hbot] using payoff_from_bot k hk
+  · have hnext : ⊥ < JHFil μ (k + 1) := bot_lt_iff_ne_bot.2 hbot
+    calc
+      μ ⟨JHFil μ (k + 1), JHFil μ k, JHFil_anti_mono μ k hk⟩ =
+          μ ⟨⊥, JHFil μ k, hk⟩ := by
+        apply ((IsSlopeLike.seesaw_total_eq_right_iff hsl hnext (JHFil_anti_mono μ k hk)).2 ?_).symm
+        rw [payoff_from_bot (k + 1) hnext, payoff_from_bot k hk]
+      _ = μ ⊤ := payoff_from_bot k hk
+
+variable [hftp : μ.FiniteTotalPayoff] [hdc : μ.EventuallyTopDCC]
+
+/-- Auxiliary construction for Theorem 4.25.
+The chain reaches `⊥` in finitely many steps. -/
+private lemma JHFil_fin_len : ∃ N : ℕ, JHFil μ N = ⊥ := by
+  by_contra! hc
+  rcases hdc.exists_eq_top (fun n ↦ JHFil μ n) (strictAnti_nat_of_succ_lt <|
+    fun n ↦ JHFil_anti_mono μ n (bot_lt_iff_ne_bot.2 <| hc n)) with ⟨N, hN⟩
+  exact hftp.ne_top.symm <| hN ▸
+    JHFil_step_payoff_eq_tot μ N (bot_lt_iff_ne_bot.2 <| hc N)
+
+open Classical in
+/-- Auxiliary construction for Theorem 4.25.
+The least index at which `JHFil` reaches `⊥`. -/
+private noncomputable def JHlen : ℕ := Nat.find (JHFil_fin_len μ)
+
+open Classical in
+/-- Auxiliary lemma for Theorem 4.25. Terms before the stopping index are above bottom. -/
+private lemma JHFil_bot_lt {n : ℕ} (hn : n < JHlen μ) : ⊥ < JHFil μ n :=
+  bot_lt_iff_ne_bot.2 (Nat.find_min (JHFil_fin_len μ) hn)
+
+open Classical in
+/-- Auxiliary lemma for Theorem 4.25. The stopping index has value bottom. -/
+private lemma JHFil_length_eq_bot : JHFil μ (JHlen μ) = ⊥ := Nat.find_spec (JHFil_fin_len μ)
+
+/-- Auxiliary lemma for Theorem 4.25.
+The chain is strictly decreasing through its stopping index. -/
+private lemma JHFil_strictAntiOn : StrictAntiOn (JHFil μ) (Set.Iic (JHlen μ)) :=
+  fun x _ _y hy hxy ↦ lt_of_le_of_lt (JHFil_antitone μ hxy)
+    (JHFil_anti_mono μ x (JHFil_bot_lt μ (lt_of_lt_of_le hxy hy)))
+
+variable [hst : μ.IsSemistable]
+
+omit hftp in
+open Classical in
+/-- Auxiliary construction for Theorem 4.25.
+Replacing the upper endpoint of a step by a strictly intermediate point strictly
+decreases its payoff. -/
+private lemma JHFil_refine_lt_step_payoff :
+    ∀ k : ℕ, (hk : JHFil μ k > ⊥) → ∀ z : ℒ, (h' : JHFil μ (k + 1) < z) →
+      (h'' : z < JHFil μ k) →
+      μ ⟨JHFil μ (k + 1), z, h'⟩ <
+        μ ⟨JHFil μ (k + 1), JHFil μ k, JHFil_anti_mono μ k hk⟩ := by
+  intro k hk z h' h''
+  have hzbot : ⊥ < z := lt_of_le_of_lt bot_le h'
+  have hmax : μ.max ⊤ = μ ⊤ :=
+    max_top_eq_apply_iff.2
+      (min_top_eq_max_top_iff_hasNashEquilibrium.2 (IsSemistable.hasNashEquilibrium hst))
+  have hzle : μ ⟨⊥, z, hzbot⟩ ≤ μ ⊤ :=
+    hmax ▸ le_iSup₂_of_le z ⟨hzbot, le_top⟩ le_rfl
+  -- Equality would make z an admissible choice above the selected term.
+  have hzlt : μ ⟨⊥, z, hzbot⟩ < μ ⊤ := by
+    refine hzle.lt_of_ne fun heq ↦ ?_
+    have hchoices : {p : ℒ | ∃ h : ⊥ < p,
+        p < JHFil μ k ∧ μ ⟨⊥, p, h⟩ = μ ⊤}.Nonempty :=
+      ⟨z, hzbot, h'', heq⟩
+    have hminimal := (hacc.wf.has_min _ hchoices).choose_spec.2 z ⟨hzbot, h'', heq⟩
+    exact hminimal (by simpa only [JHFil, hchoices, ↓reduceDIte] using h')
+  rw [JHFil_step_payoff_eq_tot μ k hk]
+  by_cases hbot : JHFil μ (k + 1) = ⊥
+  · simpa only [hbot] using hzlt
+  · have hnext : ⊥ < JHFil μ (k + 1) := bot_lt_iff_ne_bot.2 hbot
+    have hnext_payoff : μ ⟨⊥, JHFil μ (k + 1), hnext⟩ = μ ⊤ := by
+      by_cases hchoices : {p : ℒ | ∃ h : ⊥ < p,
+          p < JHFil μ k ∧ μ ⟨⊥, p, h⟩ = μ ⊤}.Nonempty
+      · simpa only [JHFil, hchoices, ↓reduceDIte] using
+          (hacc.wf.has_min _ hchoices).choose_spec.1.2.2
+      · simp only [JHFil, hchoices, ↓reduceDIte, not_true_eq_false] at hbot
+    calc
+      μ ⟨JHFil μ (k + 1), z, h'⟩ < μ ⟨⊥, z, hzbot⟩ := by
+        apply (IsSlopeLike.seesaw_right_lt_total_iff hsl hnext h').2
+        rwa [hnext_payoff]
+      _ < μ ⊤ := hzlt
+
+/-- Theorem 4.25: existence of a Jordan–Hölder filtration.
+A semistable slope-like payoff function has a Jordan–Hölder filtration under the
+finite total payoff and eventually-`⊤` descending chain hypotheses. -/
+instance : Nonempty (μ.JordanHolderFiltration) :=
+  ⟨{ toFun := JHFil μ
+     length := JHlen μ
+     antitone := JHFil_antitone μ
+     head_eq_top := rfl
+     length_eq_bot := JHFil_length_eq_bot μ
+     strictAntiOn := JHFil_strictAntiOn μ
+     step_payoff_eq := fun k hk ↦ JHFil_step_payoff_eq_tot μ k (JHFil_bot_lt μ hk)
+     payoff_lt_of_between := fun i hi z h' h'' ↦
+       JHFil_refine_lt_step_payoff μ i (JHFil_bot_lt μ hi) z h' h'' }⟩
+
+/-- Theorem 4.25, expressed as a finite relation series.
+There is a finite series for `μ.jordanHolderRel` from `⊤` to `⊥`. -/
+theorem exists_relSeries_jordanHolderRel :
+    ∃ s : RelSeries (μ.jordanHolderRel), s.head = ⊤ ∧ s.last = ⊥ := by
+  obtain ⟨F⟩ := (inferInstance : Nonempty (μ.JordanHolderFiltration))
+  exact ⟨{ length := F.length
+           toFun := fun n ↦ F (n : ℕ)
+           step := fun n ↦ ⟨F.apply_lt_apply (Nat.lt_add_one (n : ℕ)) (Fin.is_le n.succ),
+             F.step_payoff n.isLt, fun z h' h'' ↦ F.payoff_lt n.isLt h' h''⟩ },
+    F.apply_zero, F.apply_length⟩
+
+end PayoffFunction
+
+end HarderNarasimhan.Impl
+
+namespace HarderNarasimhan.Impl
+
+namespace PayoffFunction
+
+variable {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
+variable {S : Type*} [CompleteLinearOrder S]
+variable (μ : PayoffFunction ℒ S) [μ.IsSlopeLike] [μ.EventuallyTopDCC]
+variable (f : ℕ → ℒ) {n : ℕ}
+
+omit [Nontrivial ℒ] [BoundedOrder ℒ] in
+/-- Auxiliary stability criterion for Theorem 4.25 and Remark 4.26.
+If replacing the upper endpoint of each step by a strictly intermediate point strictly
+decreases the payoff, then every step is semistable. -/
+private lemma piecewise_isSemistable_of_payoff_lt
+    (hsa : ∀ i j : ℕ, i < j → j ≤ n → f j < f i)
+    (h : ∀ i : ℕ, (hi : i < n) → ∀ z : ℒ, (h' : f (i + 1) < z) → z < f i →
+      μ ⟨f (i + 1), z, h'⟩ < μ ⟨f (i + 1), f i, hsa i (i + 1) (lt_add_one i) hi⟩) :
+    ∀ i : ℕ, (hi : i < n) →
+      (μ.restrict ⟨f (i + 1), f i, hsa i (i + 1) (lt_add_one i) hi⟩).IsSemistable := by
+  intro i hi
+  apply isSemistable_of_hasNashEquilibrium (fun _ _ ↦ inferInstance) (fun _ _ ↦ inferInstance)
+  apply min_top_eq_max_top_iff_hasNashEquilibrium.1
+  apply min_top_eq_apply_iff.1
+  apply eq_of_le_of_ge ?_ ?_
+  · exact iInf₂_le ⊥ ⟨le_rfl, bot_lt_top⟩
+  · refine le_iInf₂ fun u hu1 ↦ ?_
+    simp only [restrict_apply]
+    if hu : u = ⊥ then
+      subst hu
+      exact le_rfl
+    else
+    have hul : f (i + 1) < u.val :=
+      u.prop.1.lt_of_ne fun hc ↦ hu <| Subtype.coe_inj.1 hc.symm
+    have hur : u.val < f i :=
+      u.prop.2.lt_of_ne fun hc ↦ hu1.2.ne <| Subtype.coe_inj.1 hc
+    exact le_of_lt <| (IsSlopeLike.seesaw_total_lt_right_iff
+      (inferInstance : μ.IsSlopeLike) hul hur).2
+      (h i hi u.val hul hur)
+
+omit [Nontrivial ℒ] [BoundedOrder ℒ] in
+/-- Auxiliary stability criterion for Theorem 4.25 and Remark 4.26.
+If replacing the upper endpoint of each step by a strictly intermediate point strictly
+decreases the payoff, then every step is stable. -/
+theorem piecewise_isStable_of_payoff_lt
+    (hsa : ∀ i j : ℕ, i < j → j ≤ n → f j < f i)
+    (h : ∀ i : ℕ, (hi : i < n) → ∀ z : ℒ, (h' : f (i + 1) < z) → z < f i →
+      μ ⟨f (i + 1), z, h'⟩ < μ ⟨f (i + 1), f i, hsa i (i + 1) (lt_add_one i) hi⟩) :
+    ∀ i : ℕ, (hi : i < n) →
+      (μ.restrict ⟨f (i + 1), f i, hsa i (i + 1) (lt_add_one i) hi⟩).IsStable := by
+  intro i hi
+  refine {
+    toIsSemistable := piecewise_isSemistable_of_payoff_lt μ f hsa h i hi,
+    ne := ?_ }
+  · intro x hx hx'
+    let stepI : StrictIntvl ℒ :=
+      ⟨f (i + 1), f i, hsa i (i + 1) (lt_add_one i) hi⟩
+    have hx_left : f (i + 1) < x.val :=
+      x.prop.1.lt_of_ne fun hc ↦ hx.ne' <| Subtype.coe_inj.1 hc.symm
+    have hmin_step : (μ.restrict stepI).min ⊤ = (μ.restrict stepI) ⊤ :=
+      min_top_eq_apply_iff.2 <| min_top_eq_max_top_iff_hasNashEquilibrium.2
+        (IsSemistable.hasNashEquilibrium (piecewise_isSemistable_of_payoff_lt μ f hsa h i hi))
+    simp only [min_restrict_apply, restrict_apply] at hmin_step
+    simp only [A_restrict_apply, ← IsSlopeLike.min_eq_A (inferInstance : μ.IsSlopeLike)]
+    rw [hmin_step]
+    exact ((min_le_apply (μ := μ) (I := ⟨f (i + 1), ↑x, hx_left⟩)).trans_lt <|
+      h i hi x.val hx_left hx').ne
+
+omit [Nontrivial ℒ] [BoundedOrder ℒ] in
+/-- Auxiliary stability criterion for Theorem 4.25 and Remark 4.26.
+If every step is stable, replacing its upper endpoint by a strictly intermediate point
+strictly decreases the payoff. -/
+theorem payoff_lt_of_piecewise_isStable
+    (hsa : ∀ i j : ℕ, i < j → j ≤ n → f j < f i)
+    (hst : ∀ i : ℕ, (hi : i < n) →
+      (μ.restrict ⟨f (i + 1), f i, hsa i (i + 1) (lt_add_one i) hi⟩).IsStable) :
+    ∀ i : ℕ, (hi : i < n) → ∀ z : ℒ, (h' : f (i + 1) < z) → z < f i →
+      μ ⟨f (i + 1), z, h'⟩ < μ ⟨f (i + 1), f i, hsa i (i + 1) (lt_add_one i) hi⟩ := by
+  intro i hi z hz hz'
+  let stepI : StrictIntvl ℒ :=
+    ⟨f (i + 1), f i, hsa i (i + 1) (lt_add_one i) hi⟩
+  let midI : ↥stepI := ⟨z, hz.le, hz'.le⟩
+  have hmid_ne_bot : ⊥ < midI :=
+    bot_lt_iff_ne_bot.2 fun hc ↦ hz.ne' (congrArg Subtype.val hc)
+  have hmid_ne_top : midI < ⊤ :=
+    lt_top_iff_ne_top.2 fun hc ↦ hz'.ne (congrArg Subtype.val hc)
+  have hNash_step := IsSemistable.hasNashEquilibrium (hst i hi).toIsSemistable
+  have hmin_step : (μ.restrict stepI).min ⊤ = (μ.restrict stepI) ⊤ :=
+    min_top_eq_apply_iff.2 (min_top_eq_max_top_iff_hasNashEquilibrium.2 hNash_step)
+  have hmax_step : (μ.restrict stepI).max ⊤ = (μ.restrict stepI) ⊤ :=
+    max_top_eq_apply_iff.2 (min_top_eq_max_top_iff_hasNashEquilibrium.2 hNash_step)
+  -- Stability gives a strict inequality for the infimum of payoffs on the shorter interval.
+  have hmin_lt : μ.min ⟨f (i + 1), z, hz⟩ <
+      μ ⟨f (i + 1), f i, hsa i (i + 1) (lt_add_one i) hi⟩ := by
+    have hstable := (not_lt.1 ((hst i hi).toIsSemistable.not_lt midI hmid_ne_bot)).lt_of_ne
+      ((hst i hi).ne midI hmid_ne_bot hmid_ne_top)
+    rw [A_top_eq_min_top, hmin_step] at hstable
+    simp only [A_restrict_apply, restrict_apply,
+      ← IsSlopeLike.min_eq_A (inferInstance : μ.IsSlopeLike)] at hstable
+    exact hstable
+  have payoff_le_total : ∀ (u : ↥stepI) (hu : (⊥ : ↥stepI) < u),
+      (μ.restrict stepI) ⟨⊥, u, hu⟩ ≤ (μ.restrict stepI) ⊤ := fun u hu ↦
+    hmax_step ▸ le_iSup₂_of_le u ⟨hu, le_top⟩ le_rfl
+  refine (payoff_le_total midI hmid_ne_bot).lt_of_ne ?_
+  intro heq
+  -- If the payoffs were equal, a smaller infimum would violate semistability.
+  change μ ⟨f (i + 1), z, hz⟩ =
+    μ ⟨f (i + 1), f i, hsa i (i + 1) (lt_add_one i) hi⟩ at heq
+  rw [← heq] at hmin_lt
+  obtain ⟨y, hy⟩ := iInf_lt_iff.1 hmin_lt
+  obtain ⟨hy_mem, hy_payoff⟩ := iInf_lt_iff.1 hy
+  have hy_left : f (i + 1) < y := by
+    refine lt_of_le_of_ne hy_mem.1 fun heq ↦ ?_
+    simp only [heq, lt_self_iff_false] at hy_payoff
+  have hy_gt := (IsSlopeLike.seesaw_right_lt_total_iff (inferInstance : μ.IsSlopeLike)
+    hy_left hy_mem.2).1 hy_payoff
+  rw [heq] at hy_gt
+  exact hy_gt.not_ge (payoff_le_total ⟨y, hy_mem.1, (hy_mem.2.trans hz').le⟩ hy_left)
+
+omit [Nontrivial ℒ] [BoundedOrder ℒ] in
+/-- Auxiliary stability criterion for Theorem 4.25 and Remark 4.26.
+The steps of a finite strictly decreasing chain are stable if and only if replacing
+the upper endpoint of any step by a strictly intermediate point strictly decreases its payoff. -/
+theorem piecewise_isStable_iff (hsa : ∀ i j : ℕ, i < j → j ≤ n → f j < f i) :
+    (∀ i : ℕ, (hi : i < n) →
+        (μ.restrict ⟨f (i + 1), f i, hsa i (i + 1) (lt_add_one i) hi⟩).IsStable) ↔
+      ∀ i : ℕ, (hi : i < n) → ∀ z : ℒ, (h' : f (i + 1) < z) → z < f i →
+        μ ⟨f (i + 1), z, h'⟩ < μ ⟨f (i + 1), f i, hsa i (i + 1) (lt_add_one i) hi⟩ :=
+  ⟨payoff_lt_of_piecewise_isStable μ f hsa, piecewise_isStable_of_payoff_lt μ f hsa⟩
+
+end PayoffFunction
+
+end HarderNarasimhan.Impl
+
+namespace HarderNarasimhan.Impl
 
 namespace PayoffFunction
 
@@ -48,7 +424,8 @@ section SubseqIdx
 
 variable {ℒ : Type*} [PartialOrder ℒ] [OrderBot ℒ]
 
-/-- For an antitone `f` that eventually hits `⊥`, from any index `n` with `f n ≠ ⊥` there
+/-- Auxiliary implementation of Remark 4.26.
+For an antitone `f` that eventually hits `⊥`, from any index `n` with `f n ≠ ⊥` there
 is a later index where `f` drops strictly. -/
 private lemma exists_next_lt (f : ℕ → ℒ) (atf : ∃ k, f k = ⊥) (hf : Antitone f) (n : ℕ)
     (hcond : f n ≠ ⊥) : ∃ k : ℕ, n < k ∧ f k < f n := by
@@ -58,7 +435,8 @@ private lemma exists_next_lt (f : ℕ → ℒ) (atf : ∃ k, f k = ⊥) (hf : An
   simpa [hm] using bot_lt_iff_ne_bot.2 hcond
 
 open Classical in
-/-- The indices of the first occurrences of successive distinct values of `f`.
+/-- Auxiliary implementation of Remark 4.26.
+The indices of the first occurrences of successive distinct values of `f`.
 After the selected value reaches `⊥`, the indices increase by one at each step. -/
 private noncomputable def subseqIdx (f : ℕ → ℒ) (atf : ∃ k, f k = ⊥) (hf : Antitone f) :
     ℕ → ℕ
@@ -67,19 +445,22 @@ private noncomputable def subseqIdx (f : ℕ → ℒ) (atf : ∃ k, f k = ⊥) (
       if hcond : f (subseqIdx f atf hf t) = ⊥ then subseqIdx f atf hf t + 1
       else Nat.find (exists_next_lt f atf hf (subseqIdx f atf hf t) hcond)
 
-/-- A selected value above `⊥` is followed by a strictly smaller value. -/
+/-- Auxiliary implementation of Remark 4.26.
+A selected value above `⊥` is followed by a strictly smaller value. -/
 private lemma subseqIdx.next_exists (f : ℕ → ℒ) (atf : ∃ k, f k = ⊥) (hf : Antitone f)
     (t : ℕ) (hcond : f (subseqIdx f atf hf t) ≠ ⊥) :
     ∃ k : ℕ, subseqIdx f atf hf t < k ∧ f k < f (subseqIdx f atf hf t) :=
   exists_next_lt f atf hf (subseqIdx f atf hf t) hcond
 
 open Classical in
+/-- Auxiliary lemma for Remark 4.26. The next selected index is the least subsequent strict drop. -/
 private lemma subseqIdx.succ_eq_find (f : ℕ → ℒ) (atf : ∃ k, f k = ⊥) (hf : Antitone f)
     (t : ℕ) (hcond : f (subseqIdx f atf hf t) ≠ ⊥) :
     subseqIdx f atf hf (t + 1) = Nat.find (subseqIdx.next_exists f atf hf t hcond) := by
   simp [subseqIdx, hcond]
 
 open Classical in
+/-- Auxiliary lemma for Remark 4.26. The selected indices strictly increase. -/
 private lemma subseqIdx.lt_succ (f : ℕ → ℒ) (atf : ∃ k, f k = ⊥) (hf : Antitone f) (t : ℕ) :
     subseqIdx f atf hf t < subseqIdx f atf hf (t + 1) := by
   by_cases hcond : f (subseqIdx f atf hf t) = ⊥
@@ -87,12 +468,14 @@ private lemma subseqIdx.lt_succ (f : ℕ → ℒ) (atf : ∃ k, f k = ⊥) (hf :
   · rw [subseqIdx.succ_eq_find f atf hf t hcond]
     exact (Nat.find_spec (subseqIdx.next_exists f atf hf t hcond)).1
 
+/-- Auxiliary lemma for Remark 4.26. The selected index is at least the original index. -/
 private lemma subseqIdx.ge_self (f : ℕ → ℒ) (atf : ∃ k, f k = ⊥) (hf : Antitone f) :
     ∀ n : ℕ, n ≤ subseqIdx f atf hf n :=
   (strictMono_nat_of_lt_succ (subseqIdx.lt_succ f atf hf)).id_le
 
 open Classical in
-/-- Between two consecutive selected indices, the chain is constant. -/
+/-- Auxiliary implementation of Remark 4.26.
+Between two consecutive selected indices, the chain is constant. -/
 private lemma subseqIdx.const_between (f : ℕ → ℒ) (atf : ∃ k, f k = ⊥) (hf : Antitone f)
     (i m : ℕ) (hleft : subseqIdx f atf hf i ≤ m) (hright : m < subseqIdx f atf hf (i + 1)) :
     f m = f (subseqIdx f atf hf i) := by
@@ -107,31 +490,36 @@ private lemma subseqIdx.const_between (f : ℕ → ℒ) (atf : ∃ k, f k = ⊥)
     rw [← subseqIdx.succ_eq_find f atf hf i hbot] at hfirst
     exact hright.not_ge hfirst
 
-/-- The selected values eventually reach `⊥`. -/
+/-- Auxiliary implementation of Remark 4.26.
+The selected values eventually reach `⊥`. -/
 private lemma subseqIdx_hits_bot (f : ℕ → ℒ) (atf : ∃ k, f k = ⊥) (hf : Antitone f) :
     ∃ N : ℕ, f (subseqIdx f atf hf N) = ⊥ :=
   ⟨atf.choose, le_bot_iff.mp <|
     le_of_le_of_eq (hf (subseqIdx.ge_self f atf hf atf.choose)) atf.choose_spec⟩
 
 open Classical in
-/-- The number of strict drops of the chain: the least index at which the selected values
+/-- Auxiliary implementation of Remark 4.26.
+The number of strict drops of the chain: the least index at which the selected values
 reach `⊥`. -/
 private noncomputable def subseqLen (f : ℕ → ℒ) (atf : ∃ k, f k = ⊥) (hf : Antitone f) :
     ℕ :=
   Nat.find (subseqIdx_hits_bot f atf hf)
 
 open Classical in
+/-- Auxiliary lemma for Remark 4.26. The selected chain reaches bottom at its length. -/
 private lemma subseqLen_spec (f : ℕ → ℒ) (atf : ∃ k, f k = ⊥) (hf : Antitone f) :
     f (subseqIdx f atf hf (subseqLen f atf hf)) = ⊥ :=
   Nat.find_spec (subseqIdx_hits_bot f atf hf)
 
 open Classical in
+/-- Auxiliary lemma for Remark 4.26. Earlier selected values differ from bottom. -/
 private lemma subseqIdx_ne_bot_of_lt (f : ℕ → ℒ) (atf : ∃ k, f k = ⊥) (hf : Antitone f)
     {i : ℕ} (hi : i < subseqLen f atf hf) : f (subseqIdx f atf hf i) ≠ ⊥ :=
   Nat.find_min (subseqIdx_hits_bot f atf hf) hi
 
 open Classical in
-/-- The selected values are strictly decreasing up to `subseqLen`. -/
+/-- Auxiliary implementation of Remark 4.26.
+The selected values are strictly decreasing up to `subseqLen`. -/
 private lemma subseqIdx_strictAnti (f : ℕ → ℒ) (atf : ∃ k, f k = ⊥) (hf : Antitone f) :
     ∀ i j : ℕ, i < j → j ≤ subseqLen f atf hf →
       f (subseqIdx f atf hf j) < f (subseqIdx f atf hf i) := by
@@ -144,7 +532,8 @@ private lemma subseqIdx_strictAnti (f : ℕ → ℒ) (atf : ∃ k, f k = ⊥) (h
   exact (Nat.find_spec (subseqIdx.next_exists f atf hf i hbot)).2
 
 open Classical in
-/-- If `f k = ⊥` and two consecutive values up to index `k` coincide, then the number of
+/-- Auxiliary implementation of Remark 4.26.
+If `f k = ⊥` and two consecutive values up to index `k` coincide, then the number of
 strict drops differs from `k`. -/
 private lemma subseqLen_ne_of_plateau (f : ℕ → ℒ) (atf : ∃ k, f k = ⊥) (hf : Antitone f)
     (k : ℕ) (hk : f k = ⊥) (htech : ∃ N : ℕ, N + 1 ≤ k ∧ f N = f (N + 1)) :
@@ -186,7 +575,8 @@ private lemma subseqLen_ne_of_plateau (f : ℕ → ℒ) (atf : ∃ k, f k = ⊥)
   exact ne_of_lt <| Nat.succ_lt_succ_iff.mp <| lt_of_le_of_lt ineq1 ineq2
 
 open Classical in
-/-- A predicate holding on the strict steps of `f` also holds on the steps of the chain
+/-- Auxiliary implementation of Remark 4.26.
+A predicate holding on the strict steps of `f` also holds on the steps of the chain
 obtained by removing repeated values. -/
 private lemma subseqIdx_inherit_step_predicate (f : ℕ → ℒ) (atf : ∃ k, f k = ⊥)
     (hf : Antitone f) (P : StrictIntvl ℒ → Prop)
@@ -214,7 +604,8 @@ section NormalizeFiltration
 variable {ℒ S : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 variable [CompleteLattice S] {μ : PayoffFunction ℒ S}
 
-/-- Remove the plateaus of an antitone chain whose strict steps satisfy the Jordan–Hölder
+/-- Auxiliary implementation of Remark 4.26.
+Remove the plateaus of an antitone chain whose strict steps satisfy the Jordan–Hölder
 conditions. A plateau before the given bottom index makes the resulting filtration shorter. -/
 private lemma exists_shorter_filtration_of_plateau (f : ℕ → ℒ) (k : ℕ)
     (hf : Antitone f) (hfirst : f 0 = ⊤) (hlast : f k = ⊥)
@@ -255,7 +646,8 @@ section RestrictLast
 variable {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
 variable {S : Type*} [CompleteLinearOrder S] {μ : PayoffFunction ℒ S}
 
-/-- Restricting to the interval from the last nonbottom filtration term to `⊤` preserves
+/-- Auxiliary implementation of Remark 4.26.
+Restricting to the interval from the last nonbottom filtration term to `⊤` preserves
 semistability. -/
 private lemma isSemistable_restrict_last [μ.IsSlopeLike] [μ.IsSemistable]
     [μ.EventuallyTopDCC] (F : μ.JordanHolderFiltration) (h : F (F.length - 1) < ⊤) :
@@ -272,9 +664,10 @@ private lemma isSemistable_restrict_last [μ.IsSlopeLike] [μ.IsSemistable]
         (IsSemistable.hasNashEquilibrium inferInstance))
     calc
       μ ⟨F (F.length - 1), ⊤, h⟩ = μ ⊤ := by
-        exact (((inferInstance : μ.IsSlopeLike).seesaw_total_eq_right_iff
+        exact ((IsSlopeLike.seesaw_total_eq_right_iff (inferInstance : μ.IsSlopeLike)
           (F.bot_lt_of_lt (Nat.sub_one_lt F.length_pos.ne')) h).2
-          (F.payoff_bot_eq_top_payoff (F.length - 1) (Nat.sub_one_lt F.length_pos.ne'))).symm
+          (JordanHolderFiltration.payoff_bot_eq_top_payoff F (F.length - 1)
+            (Nat.sub_one_lt F.length_pos.ne'))).symm
       _ = μ.min ⊤ := hmin.symm
       _ ≤ μ ⟨u, ⊤, hu1.2⟩ := iInf₂_le u ⟨bot_le, hu1.2⟩
 
@@ -285,7 +678,8 @@ section RestrictLastFiltration
 variable {ℒ : Type*} [Nontrivial ℒ] [PartialOrder ℒ] [BoundedOrder ℒ]
 variable {S : Type*} [CompleteLattice S] {μ : PayoffFunction ℒ S}
 
-/-- Removing the last step gives a filtration on the remaining top interval, with length
+/-- Auxiliary implementation of Remark 4.26.
+Removing the last step gives a filtration on the remaining top interval, with length
 one less than the original, provided that interval has the original total payoff. -/
 private lemma exists_filtration_restrict_last (F : μ.JordanHolderFiltration)
     (h : F (F.length - 1) < ⊤)
@@ -334,16 +728,17 @@ variable {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFo
 variable {S : Type*} [CompleteLinearOrder S] {μ : PayoffFunction ℒ S}
 variable [hsl : μ.IsSlopeLike] [hst : μ.IsSemistable] [μ.EventuallyTopDCC]
 
-/-- The `μ.A`-value below any nonbottom filtration term is the total payoff. -/
+/-- Auxiliary implementation of Remark 4.26.
+The `μ.A`-value below any nonbottom filtration term is the total payoff. -/
 private lemma A_bot_eq_top_payoff (F : μ.JordanHolderFiltration) (i : ℕ)
     (hi : i < F.length) : μ.A ⟨⊥, F i, F.bot_lt_of_lt hi⟩ = μ ⊤ := by
-  have hpayoff := F.payoff_bot_eq_top_payoff i hi
-  rw [← hsl.min_eq_A, ← hpayoff]
+  have hpayoff := JordanHolderFiltration.payoff_bot_eq_top_payoff F i hi
+  rw [← IsSlopeLike.min_eq_A hsl, ← hpayoff]
   refine le_antisymm min_le_apply (le_min fun u hu ↦ ?_)
   by_cases hu_bot : u = ⊥
   · simp only [hu_bot, le_refl]
   · by_contra! hsmaller
-    have hgreater := (hsl.seesaw_right_lt_total_iff
+    have hgreater := (IsSlopeLike.seesaw_right_lt_total_iff hsl
       (bot_lt_iff_ne_bot.2 hu_bot) hu.2).1 hsmaller
     rw [hpayoff] at hgreater
     -- A smaller tail payoff would force an initial payoff above the semistable maximum.
@@ -352,9 +747,10 @@ private lemma A_bot_eq_top_payoff (F : μ.JordanHolderFiltration) (i : ℕ)
       μ ⟨⊥, u, bot_lt_iff_ne_bot.2 hu_bot⟩ ≤ μ.max ⊤ :=
         le_max (I := ⊤) ⟨bot_lt_iff_ne_bot.2 hu_bot, le_top⟩
       _ = μ ⊤ := max_top_eq_apply_iff.2
-        (min_top_eq_max_top_iff_hasNashEquilibrium.2 hst.hasNashEquilibrium)
+        (min_top_eq_max_top_iff_hasNashEquilibrium.2 (IsSemistable.hasNashEquilibrium hst))
 
-/-- The interval from `⊥` to the join of a nonbottom filtration term with any term of
+/-- Auxiliary implementation of Remark 4.26.
+The interval from `⊥` to the join of a nonbottom filtration term with any term of
 another filtration has the total payoff. -/
 private lemma payoff_sup_eq_top_payoff [μ.IsConvex] (F G : μ.JordanHolderFiltration)
     (i : ℕ) (hi : i < F.length) (j : ℕ) :
@@ -364,9 +760,9 @@ private lemma payoff_sup_eq_top_payoff [μ.IsConvex] (F G : μ.JordanHolderFiltr
       μ ⟨⊥, F i ⊔ G j, (F.bot_lt_of_lt hi).trans_le le_sup_left⟩ ≤ μ.max ⊤ :=
         le_max (I := ⊤) ⟨(F.bot_lt_of_lt hi).trans_le le_sup_left, le_top⟩
       _ = μ ⊤ := max_top_eq_apply_iff.2
-        (min_top_eq_max_top_iff_hasNashEquilibrium.2 hst.hasNashEquilibrium)
+        (min_top_eq_max_top_iff_hasNashEquilibrium.2 (IsSemistable.hasNashEquilibrium hst))
   · refine le_trans ?_ (min_le_apply (μ := μ))
-    rw [hsl.min_eq_A]
+    rw [IsSlopeLike.min_eq_A hsl]
     by_cases hbot : G j = ⊥
     · simpa only [hbot, sup_bot_eq] using (A_bot_eq_top_payoff F i hi).ge
     · have hj : j < G.length := JordanHolderFiltration.ne_bot_iff_lt_length.1 hbot
@@ -374,7 +770,7 @@ private lemma payoff_sup_eq_top_payoff [μ.IsConvex] (F G : μ.JordanHolderFiltr
         μ ⊤ = μ.A ⟨⊥, F i, F.bot_lt_of_lt hi⟩ ⊓ μ.A ⟨⊥, G j, G.bot_lt_of_lt hj⟩ := by
           rw [A_bot_eq_top_payoff F i hi, A_bot_eq_top_payoff G j hj, inf_idem]
         _ ≤ μ.A ⟨⊥, F i ⊔ G j, lt_sup_of_lt_left (F.bot_lt_of_lt hi)⟩ :=
-          (inferInstance : μ.IsConvexOn ⊤).inf_A_le_A_sup
+          IsConvexOn.inf_A_le_A_sup (inferInstance : μ.IsConvexOn ⊤)
             (StrictIntvl.mem_top _) (StrictIntvl.mem_top _) (StrictIntvl.mem_top _)
             (F.bot_lt_of_lt hi) (G.bot_lt_of_lt hj)
 
@@ -386,7 +782,8 @@ variable {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [hmod :
 variable {S : Type*} [CompleteLinearOrder S] {μ : PayoffFunction ℒ S}
 variable [hsl : μ.IsSlopeLike] [haff : μ.IsAffine]
 
-/-- Joining both endpoints of a step with a fixed element preserves the strict payoff
+/-- Auxiliary implementation of Remark 4.26.
+Joining both endpoints of a step with a fixed element preserves the strict payoff
 inequality, provided the joined step is strict and has the total payoff. -/
 private lemma joined_step_stable (G : μ.JordanHolderFiltration) {x : ℒ} {j : ℕ}
     (hj : j < G.length) (hstep : x ⊔ G (j + 1) < x ⊔ G j)
@@ -404,13 +801,13 @@ private lemma joined_step_stable (G : μ.JordanHolderFiltration) {x : ℒ} {j : 
     rw [← heq, inf_eq_right.2 hw₂.le] at hmodular
     exact hw₁.not_ge hmodular
   -- Seesaw compares the upper pieces; affinity transports the meet payoff back to the join.
-  apply (hsl.seesaw_total_lt_right_iff hw₁ hw₂).1
+  apply (IsSlopeLike.seesaw_total_lt_right_iff hsl hw₁ hw₂).1
   calc
     μ ⟨x ⊔ G (j + 1), x ⊔ G j, hstep⟩ = μ ⊤ := hpayoff
     _ = μ ⟨G (j + 1), G j, G.apply_lt_apply (Nat.lt_succ_self j) hj⟩ :=
       (G.step_payoff hj).symm
     _ < μ ⟨G j ⊓ w, G j, inf_lt_left.2 hnot_le⟩ :=
-      (hsl.seesaw_total_lt_right_iff hmeet_lt (inf_lt_left.2 hnot_le)).2
+      (IsSlopeLike.seesaw_total_lt_right_iff hsl hmeet_lt (inf_lt_left.2 hnot_le)).2
         (G.payoff_lt hj hmeet_lt (inf_lt_left.2 hnot_le))
     _ = μ ⟨w, x ⊔ G j, hw₂⟩ := by
       have hjoin : G j ⊔ w = x ⊔ G j :=
@@ -426,7 +823,8 @@ variable {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
 variable {S : Type*} [CompleteLinearOrder S] {μ : PayoffFunction ℒ S}
 variable [hsl : μ.IsSlopeLike] [haff : μ.IsAffine]
 
-/-- Joining every term of `G` with the last nonbottom term of `F` gives two equal consecutive
+/-- Auxiliary implementation of Remark 4.26.
+Joining every term of `G` with the last nonbottom term of `F` gives two equal consecutive
 terms before `G` reaches `⊥`. -/
 private lemma exists_join_plateau (F G : μ.JordanHolderFiltration) :
     ∃ i : ℕ, i + 1 ≤ G.length ∧
@@ -462,10 +860,10 @@ private lemma exists_join_plateau (F G : μ.JordanHolderFiltration) :
       G.step_payoff hi
     _ ≤ μ ⟨x ⊓ G (i + 1), x, inf_lt_left.mpr hx_not_le⟩ := by
       by_cases hmeet : x ⊓ G (i + 1) = ⊥
-      · simpa only [hmeet] using (F.payoff_bot_eq_top_payoff _ hlast).ge
+      · simpa only [hmeet] using (JordanHolderFiltration.payoff_bot_eq_top_payoff F _ hlast).ge
       · have hmeet_pos : ⊥ < x ⊓ G (i + 1) := bot_lt_iff_ne_bot.mpr hmeet
-        rw [← F.payoff_bot_eq_top_payoff _ hlast]
-        apply le_of_lt ((hsl.seesaw_total_lt_right_iff hmeet_pos
+        rw [← JordanHolderFiltration.payoff_bot_eq_top_payoff F _ hlast]
+        apply le_of_lt ((IsSlopeLike.seesaw_total_lt_right_iff hsl hmeet_pos
           (inf_lt_left.mpr hx_not_le)).2 ?_)
         simpa only [Nat.sub_one_add_one F.length_pos.ne',
           JordanHolderFiltration.apply_length] using F.payoff_lt hlast
@@ -482,7 +880,8 @@ variable [IsModularLattice ℒ]
 variable {S : Type*} [CompleteLinearOrder S] {μ : PayoffFunction ℒ S}
 variable [hsl : μ.IsSlopeLike] [μ.IsSemistable] [μ.EventuallyTopDCC] [μ.IsAffine]
 
-/-- Joining `G` with the last nonbottom term of `F` and removing repeated values gives a
+/-- Auxiliary implementation of Remark 4.26.
+Joining `G` with the last nonbottom term of `F` and removing repeated values gives a
 shorter filtration of the restricted payoff function. -/
 private lemma exists_shorter_join_filtration (F G : μ.JordanHolderFiltration)
     (h : F (F.length - 1) < ⊤)
@@ -500,7 +899,8 @@ private lemma exists_shorter_join_filtration (F G : μ.JordanHolderFiltration)
     calc
       μ ⟨x ⊔ G (j + 1), x ⊔ G j, hj⟩ =
           μ ⟨⊥, x ⊔ G j, hx_pos.trans_le le_sup_left⟩ := by
-        apply ((hsl.seesaw_total_eq_right_iff (hx_pos.trans_le le_sup_left) hj).2 ?_).symm
+        apply ((IsSlopeLike.seesaw_total_eq_right_iff hsl
+          (hx_pos.trans_le le_sup_left) hj).2 ?_).symm
         rw [payoff_sup_eq_top_payoff F G _ hlast (j + 1),
           payoff_sup_eq_top_payoff F G _ hlast j]
       _ = μ ⊤ := payoff_sup_eq_top_payoff F G _ hlast j
@@ -525,7 +925,8 @@ private lemma exists_shorter_join_filtration (F G : μ.JordanHolderFiltration)
 end JoinFiltration
 
 open Classical in
-/-- If one Jordan–Hölder filtration has length at most `n`, then every Jordan–Hölder
+/-- Auxiliary implementation of Remark 4.26.
+If one Jordan–Hölder filtration has length at most `n`, then every Jordan–Hölder
 filtration has length at most `n`. -/
 private lemma length_le_of_exists_length_le (n : ℕ) :
     ∀ {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ]
@@ -550,8 +951,8 @@ private lemma length_le_of_exists_length_le (n : ℕ) :
     have hlast : G.length - 1 < G.length := Nat.sub_one_lt G.length_pos.ne'
     have hpayoff : μ I = μ ⊤ := by
       symm
-      apply (hsl.seesaw_total_eq_right_iff (G.bot_lt_of_lt hlast) I.lt).2
-      exact G.payoff_bot_eq_top_payoff _ hlast
+      apply (IsSlopeLike.seesaw_total_eq_right_iff hsl (G.bot_lt_of_lt hlast) I.lt).2
+      exact JordanHolderFiltration.payoff_bot_eq_top_payoff G _ hlast
     -- The restricted payoff satisfies the hypotheses needed for induction.
     have hfinite_res : (μ.restrict I).FiniteTotalPayoff :=
       ⟨by simpa only [restrict_apply, StrictIntvl.ofSub_top, hpayoff] using hfinite.ne_top⟩
@@ -573,8 +974,9 @@ variable {S : Type*} [CompleteLinearOrder S] {μ : PayoffFunction ℒ S}
 variable [μ.FiniteTotalPayoff] [μ.IsSlopeLike] [μ.IsSemistable]
 variable [μ.EventuallyTopDCC] [μ.IsAffine]
 
-/-- Any two Jordan–Hölder filtrations of a semistable slope-like affine payoff function on a
-modular lattice have the same length. -/
+/-- Remark 4.26: independence of the length, under the modular-lattice hypothesis
+used in the formalization of the join argument. Any two Jordan–Hölder filtrations of a
+semistable slope-like affine payoff function on a modular lattice have the same length. -/
 theorem JordanHolderFiltration.length_eq (F G : μ.JordanHolderFiltration) :
     F.length = G.length :=
   eq_of_le_of_ge
@@ -585,4 +987,24 @@ end LengthEq
 
 end PayoffFunction
 
-end HarderNarasimhan
+end HarderNarasimhan.Impl
+
+namespace HarderNarasimhan.Impl.PayoffFunction
+
+variable {ℒ : Type*} [Nontrivial ℒ] [Lattice ℒ] [BoundedOrder ℒ] [WellFoundedGT ℒ]
+variable {S : Type*} [CompleteLinearOrder S] (μ : PayoffFunction ℒ S)
+variable [μ.FiniteTotalPayoff] [μ.IsSlopeLike] [μ.IsSemistable] [μ.EventuallyTopDCC]
+
+/-- Auxiliary formulation of Theorem 4.25: extract the finite sequence and its step
+conditions from the constructed Jordan–Hölder filtration. -/
+theorem exists_jordanHolder_sequence :
+    ∃ (n : ℕ) (y : ℕ → ℒ), y 0 = ⊤ ∧ y n = ⊥ ∧
+      ∃ hy : StrictAntiOn y (Set.Iic n), ∀ i, (hi : i < n) →
+        μ ⟨y (i + 1), y i, hy hi.le hi (lt_add_one i)⟩ = μ ⊤ ∧
+        ∀ z, (hz : y (i + 1) < z) → z < y i →
+          μ ⟨y (i + 1), z, hz⟩ < μ ⟨y (i + 1), y i, hy hi.le hi (lt_add_one i)⟩ := by
+  obtain ⟨F⟩ := (inferInstance : Nonempty μ.JordanHolderFiltration)
+  exact ⟨F.length, F, F.head_eq_top, F.length_eq_bot, F.strictAntiOn,
+    fun i hi ↦ ⟨F.step_payoff hi, fun _ hz hz' ↦ F.payoff_lt hi hz hz'⟩⟩
+
+end HarderNarasimhan.Impl.PayoffFunction

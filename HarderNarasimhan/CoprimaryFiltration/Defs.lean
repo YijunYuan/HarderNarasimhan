@@ -13,48 +13,23 @@ public import Mathlib.RingTheory.Ideal.AssociatedPrime.Finiteness
 public import Mathlib.RingTheory.Spectrum.Prime.Basic
 
 /-!
-# The coprimary payoff function and coprimary filtrations
+# Coprimary filtrations: definitions (Section 3.4)
 
-For a finitely generated module `M` over a commutative Noetherian ring `R`, the coprimary
-payoff function assigns to a strict inclusion `N₁ < N₂` the associated primes of
-`N₂ ⧸ N₁`.
+The payoff of Proposition 3.11 is the associated-prime set of a subquotient,
+ordered in the Dedekind–MacNeille completion of finite prime sets. `IsCoprimary`
+is the notion in Remark 3.14; `CoprimaryFiltration` packages the chains of
+Theorem 3.15. The linear extension of the prime spectrum is fixed throughout.
 
-A module is *coprimary* if it has exactly one associated prime. A *coprimary filtration*
-is a finite filtration with coprimary successive quotients whose associated primes strictly
-decrease in a fixed linear extension of the prime spectrum. These are the Harder–Narasimhan
-filtrations of the coprimary payoff function; see `HarderNarasimhan/Coprimary/Filtration.lean`.
-
-## Main definitions
-
-* `HarderNarasimhan.Coprimary.subquotientAssociatedPrimes`: the associated primes of a subquotient,
-  viewed in the linear extension of the prime spectrum.
-* `HarderNarasimhan.Coprimary.payoff`: the coprimary payoff function on the submodule lattice.
-* `HarderNarasimhan.IsCoprimary`: the property of having exactly one associated prime.
-* `HarderNarasimhan.CoprimaryFiltration`: a filtration with coprimary successive quotients and
-  strictly decreasing associated primes.
-
-## Implementation notes
-
-The payoff takes values in
-`DedekindCut (Colex (Finset (LinearExtension (PrimeSpectrum R))))`.
-The linear extension orders the prime spectrum, and the colexicographic order on finite sets
-extends inclusion and agrees with this order on singletons. The Dedekind–MacNeille completion
-then gives the complete linear order required by the general theory.
-
-A filtration is represented by a sequence indexed by `ℕ`, constant at `⊤` from its length
-onwards. Its length is determined by the sequence, so
-`HarderNarasimhan.CoprimaryFiltration.ext` only requires equality of the underlying sequences.
-
-## References
-
-* [Huayi Chen & Marion Jeannin, *Harder–Narasimhan Games*][ChenJeannin]
+The small coercion API is kept with the definitions. Proofs and constructions
+are in `Impl`; numbered statements are in `Results`.
 -/
 
 @[expose] public section
 
 namespace HarderNarasimhan
 
-/-- The ideal underlying a point of the linearly extended prime spectrum is prime.
+/-- Auxiliary construction for Theorem 3.15. The ideal underlying a point of the linearly extended
+prime spectrum is prime.
 
 This instance makes primality available without unfolding `LinearExtension`. -/
 instance {R : Type*} [CommRing R] (p : LinearExtension (PrimeSpectrum R)) :
@@ -66,19 +41,22 @@ section SubquotientAssociatedPrimes
 
 variable {R : Type*} [CommRing R] {M : Type*} [AddCommGroup M] [Module R M]
 
-/-- The associated primes of `I.right ⧸ I.left`, viewed in the linearly extended prime
+/-- Section 3.4, the payoff construction preceding Proposition 3.11. The associated primes of
+`I.right ⧸ I.left`, viewed in the linearly extended prime
 spectrum. -/
 def subquotientAssociatedPrimes (I : StrictIntvl (Submodule R M)) :
     Set (LinearExtension (PrimeSpectrum R)) :=
   {q | q.asIdeal ∈ associatedPrimes R (I.right ⧸ I.left.submoduleOf I.right)}
 
+/-- Auxiliary construction for Theorem 3.15: mem subquotientAssociatedPrimes. -/
 @[simp] lemma mem_subquotientAssociatedPrimes {I : StrictIntvl (Submodule R M)}
     {q : LinearExtension (PrimeSpectrum R)} :
     q ∈ subquotientAssociatedPrimes I ↔
       q.asIdeal ∈ associatedPrimes R (I.right ⧸ I.left.submoduleOf I.right) :=
   Iff.rfl
 
-/-- A subquotient of a finitely generated module over a Noetherian ring has finitely many
+/-- Auxiliary construction for Theorem 3.15. A subquotient of a finitely generated module over a
+Noetherian ring has finitely many
 associated primes. -/
 noncomputable instance [IsNoetherianRing R] [Module.Finite R M]
     (I : StrictIntvl (Submodule R M)) : Fintype (subquotientAssociatedPrimes I) :=
@@ -92,7 +70,8 @@ section Payoff
 variable (R : Type*) [CommRing R] [IsNoetherianRing R]
 variable (M : Type*) [AddCommGroup M] [Module R M] [Module.Finite R M]
 
-/-- The coprimary payoff function sends `N₁ < N₂` to the associated primes of `N₂ ⧸ N₁`,
+/-- Section 3.4, the payoff construction of Proposition 3.11. The coprimary payoff function sends
+`N₁ < N₂` to the associated primes of `N₂ ⧸ N₁`,
 ordered colexicographically in the linearly extended prime spectrum and embedded in the
 Dedekind–MacNeille completion. -/
 noncomputable def payoff :
@@ -100,6 +79,7 @@ noncomputable def payoff :
       (DedekindCut (Colex (Finset (LinearExtension (PrimeSpectrum R))))) :=
   ⟨fun I ↦ .principal (toColex (subquotientAssociatedPrimes I).toFinset)⟩
 
+/-- Auxiliary construction for Theorem 3.15: payoff apply. -/
 @[simp] lemma payoff_apply (I : StrictIntvl (Submodule R M)) :
     payoff R M I = .principal (toColex (subquotientAssociatedPrimes I).toFinset) :=
   rfl
@@ -112,38 +92,40 @@ section IsCoprimary
 
 variable (R : Type*) [CommRing R] (M : Type*) [AddCommGroup M] [Module R M]
 
-/-- A module is *coprimary* if it has exactly one associated prime. -/
+/-- Remark 3.14, the coprimary condition. A module is *coprimary* if it has exactly one associated
+prime. -/
 class IsCoprimary : Prop where
-  /-- The module has exactly one associated prime. -/
+  /-- Remark 3.14: The module has exactly one associated prime. -/
   existsUnique_associatedPrime : ∃! p, p ∈ associatedPrimes R M
 
 end IsCoprimary
 
 section CoprimaryFiltration
 
-/-- A coprimary filtration is a finite chain `⊥ = F 0 < ⋯ < F F.length = ⊤` of submodules
+/-- Theorem 3.15, the structure of a coprimary filtration. A coprimary filtration is a finite
+chain `⊥ = F 0 < ⋯ < F F.length = ⊤` of submodules
 whose successive quotients are coprimary and whose associated primes strictly decrease in
 the fixed linear extension of the prime spectrum.
 
 The chain is indexed by `ℕ` and is constant at `⊤` from `F.length` onwards. -/
 structure CoprimaryFiltration (R : Type*) [CommRing R] [IsNoetherianRing R]
     (M : Type*) [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M] where
-  /-- The underlying chain; apply via the coercion, `F n`. -/
+  /-- Theorem 3.15: The underlying chain; apply via the coercion, `F n`. -/
   toFun : ℕ → Submodule R M
-  /-- The number of successive quotients. -/
+  /-- Theorem 3.15: The number of successive quotients. -/
   length : ℕ
-  /-- The chain is monotone. -/
+  /-- Theorem 3.15: The chain is monotone. -/
   monotone : Monotone toFun
-  /-- The chain starts at `⊥`. -/
+  /-- Theorem 3.15: The chain starts at `⊥`. -/
   head_eq_bot : toFun 0 = ⊥
-  /-- The chain reaches `⊤` at index `length`. -/
+  /-- Theorem 3.15: The chain reaches `⊤` at index `length`. -/
   length_eq_top : toFun length = ⊤
-  /-- The chain is strictly increasing up to `length`. -/
+  /-- Theorem 3.15: The chain is strictly increasing up to `length`. -/
   strictMonoOn : StrictMonoOn toFun (Set.Iic length)
-  /-- Each successive subquotient `F (i + 1) ⧸ F i` is coprimary. -/
+  /-- Theorem 3.15: Each successive subquotient `F (i + 1) ⧸ F i` is coprimary. -/
   piecewise_isCoprimary : ∀ i < length,
     IsCoprimary R (toFun (i + 1) ⧸ (toFun i).submoduleOf (toFun (i + 1)))
-  /-- The associated primes of the successive subquotients strictly decrease along the
+  /-- Theorem 3.15: The associated primes of the successive subquotients strictly decrease along the
   chain, in the fixed linear extension of the prime spectrum. -/
   associatedPrime_succ_lt : ∀ i, i + 1 < length → ∀ p q : PrimeSpectrum R,
     p.asIdeal ∈ associatedPrimes R
@@ -157,6 +139,7 @@ namespace CoprimaryFiltration
 variable {R : Type*} [CommRing R] [IsNoetherianRing R]
 variable {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]
 
+/-- Auxiliary construction for Theorem 3.15: the induced instance. -/
 instance : FunLike (CoprimaryFiltration R M) ℕ (Submodule R M) where
   coe := toFun
   coe_injective := by
@@ -174,23 +157,28 @@ instance : FunLike (CoprimaryFiltration R M) ℕ (Submodule R M) where
     subst h; subst hlen
     rfl
 
+/-- Auxiliary construction for Theorem 3.15: toFun eq coe. -/
 @[simp] lemma toFun_eq_coe (F : CoprimaryFiltration R M) : F.toFun = ⇑F := rfl
 
 variable {F G : CoprimaryFiltration R M} {m : ℕ}
 
-/-- Below `F.length` the chain has not yet reached `⊤`. -/
+/-- Auxiliary construction for Theorem 3.15. Below `F.length` the chain has not yet reached `⊤`.
+-/
 lemma ne_top_of_lt (h : m < F.length) : F m ≠ ⊤ := fun hc ↦
   (F.strictMonoOn h.le (Set.mem_Iic.2 le_rfl) h).ne (hc.trans F.length_eq_top.symm)
 
-/-- The length is the least index at which the filtration reaches `⊤`. -/
+/-- Auxiliary construction for Theorem 3.15. The length is the least index at which the filtration
+reaches `⊤`. -/
 lemma length_le_of_eq_top (h : F m = ⊤) : F.length ≤ m :=
   not_lt.1 fun hc ↦ ne_top_of_lt hc h
 
-/-- From `F.length` onwards, the chain is constantly `⊤`. -/
+/-- Auxiliary construction for Theorem 3.15. From `F.length` onwards, the chain is constantly `⊤`.
+-/
 lemma eq_top_of_length_le (h : F.length ≤ m) : F m = ⊤ :=
   top_le_iff.1 <| F.length_eq_top ▸ F.monotone h
 
-/-- Two coprimary filtrations with the same underlying chain are equal. -/
+/-- Auxiliary construction for Theorem 3.15. Two coprimary filtrations with the same underlying
+chain are equal. -/
 @[ext] theorem ext (h : ∀ n, F n = G n) : F = G := DFunLike.ext F G h
 
 end CoprimaryFiltration

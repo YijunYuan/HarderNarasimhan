@@ -6,30 +6,18 @@ Authors: Yijun Yuan
 module
 
 public import HarderNarasimhan.StrictIntvl
-
-public import HarderNarasimhan.PayoffFunction.Convex
 public import HarderNarasimhan.PayoffFunction.Defs
-public import HarderNarasimhan.PayoffFunction.GameValue
-public import HarderNarasimhan.PayoffFunction.NashEquilibrium
 public import HarderNarasimhan.PayoffFunction.Restrict
-public import HarderNarasimhan.PayoffFunction.Semistable.Breakpoints
-public import HarderNarasimhan.PayoffFunction.Semistable.Defs
-public import HarderNarasimhan.PayoffFunction.Slope
-public import HarderNarasimhan.PayoffFunction.SlopeLike
 
-public import HarderNarasimhan.Filtration.Defs
-public import HarderNarasimhan.Filtration.Exists
-public import HarderNarasimhan.Filtration.Unique
+public import HarderNarasimhan.Convexity.Results
+public import HarderNarasimhan.Semistability.Results
+public import HarderNarasimhan.Filtration.Results
+public import HarderNarasimhan.CoprimaryFiltration.Results
 
-public import HarderNarasimhan.JordanHolder.Defs
-public import HarderNarasimhan.JordanHolder.Exists
-public import HarderNarasimhan.JordanHolder.Length
-public import HarderNarasimhan.JordanHolder.Stability
-
-public import HarderNarasimhan.Coprimary.AssociatedPrimes
-public import HarderNarasimhan.Coprimary.Defs
-public import HarderNarasimhan.Coprimary.Filtration
-public import HarderNarasimhan.Coprimary.Semistability
+public import HarderNarasimhan.FirstMoverAdvantage.Results
+public import HarderNarasimhan.SlopeLike.Results
+public import HarderNarasimhan.NashEquilibrium.Results
+public import HarderNarasimhan.JordanHolderFiltration.Results
 
 /-!
 # Harder–Narasimhan games
@@ -56,9 +44,10 @@ coprimary filtrations of nonzero finitely generated modules over Noetherian comm
 * `HarderNarasimhan.CoprimaryFiltration`: filtrations with coprimary subquotients and
   decreasing associated primes in a fixed linear extension of the prime spectrum.
 
-This module imports the whole library. The individual files in `HarderNarasimhan/PayoffFunction/`,
-`HarderNarasimhan/Filtration/`, `HarderNarasimhan/JordanHolder/`, and `HarderNarasimhan/Coprimary/`
-can also be imported separately.
+This module imports the whole library in the order of the paper. Each chapter has
+`Defs` (concepts and essential API), `Impl` (proofs and constructions), and `Results`
+(concise statements with the paper's numbering). The bundled `PayoffFunction` and
+`StrictIntvl` interfaces are shared infrastructure for Definition 2.1 and Definition 2.2.
 
 ## References
 

@@ -5,43 +5,26 @@ Authors: Yijun Yuan
 -/
 module
 
-public import HarderNarasimhan.Coprimary.AssociatedPrimes
-public import HarderNarasimhan.Coprimary.Defs
-public import HarderNarasimhan.PayoffFunction.Convex
-public import HarderNarasimhan.PayoffFunction.Semistable.Defs
+public import HarderNarasimhan.CoprimaryFiltration.CommutativeAlgebra
+public import HarderNarasimhan.CoprimaryFiltration.Defs
+public import HarderNarasimhan.Filtration.Impl
 public import Mathlib.Algebra.Module.Torsion.Basic
+public import Mathlib.Tactic.TFAE
 
 /-!
-# Semistability of the coprimary payoff function
+# Coprimary filtrations: proofs (Section 3.4)
 
-Let `M` be a finitely generated module over a commutative Noetherian ring. This file
-computes the value of the coprimary payoff function when player A moves first. For `M ≠ 0`,
-this payoff function is semistable precisely when `M` is coprimary.
-
-All comparisons of prime ideals use the fixed linear extension of the prime spectrum.
-In particular, the least associated prime below refers to this linear order.
-
-## Main results
-
-* `HarderNarasimhan.Coprimary.A_payoff`: the value when A moves first on `N₁ < N₂` is the
-  singleton containing the least associated prime of `N₂ ⧸ N₁`.
-* `HarderNarasimhan.Coprimary.isSemistable_iff_existsUnique_associatedPrime`: for `M ≠ 0`,
-  semistability is equivalent to having exactly one associated prime.
-* `HarderNarasimhan.Coprimary.isSemistable_restrict_iff_quotient`: semistability of the restriction
-  to an interval is equivalent to semistability of the payoff function of its subquotient.
-
-The coprimary payoff function is convex and satisfies the descending chain condition
-`HarderNarasimhan.PayoffFunction.ADCC`. These instances allow the existence theorem for
-Harder–Narasimhan filtrations to be applied in `HarderNarasimhan/Coprimary/Filtration.lean`.
-
-## References
-
-* [Huayi Chen & Marion Jeannin, *Harder–Narasimhan Games*][ChenJeannin]
+Implementation of Propositions 3.11–3.13, Remark 3.14, Theorem 3.15 and
+Remark 3.16, using the current bundled payoff and filtration interfaces.
+Import `Results` for the statements in paper order.
 -/
 
 @[expose] public section
 
-namespace HarderNarasimhan
+open HarderNarasimhan.PayoffFunction HarderNarasimhan.Coprimary
+open HarderNarasimhan.CoprimaryFiltration
+
+namespace HarderNarasimhan.Impl
 
 namespace Coprimary
 
@@ -49,13 +32,15 @@ section Subquotient
 
 variable {R : Type*} [CommRing R] {M : Type*} [AddCommGroup M] [Module R M]
 
-/-- The subquotient of a strict inclusion of submodules is nontrivial. -/
+/-- Auxiliary lemma for Proposition 3.12. The subquotient of a strict inclusion of submodules is
+nontrivial. -/
 lemma nontrivial_quotient_of_lt {N₁ N₂ : Submodule R M} (hN : N₁ < N₂) :
     Nontrivial (↥N₂ ⧸ N₁.submoduleOf N₂) := by
   rw [Submodule.Quotient.nontrivial_iff, ne_eq, Submodule.submoduleOf_eq_top]
   exact hN.not_ge
 
-/-- If `N₁ < u ≤ N₃`, every associated prime of `u ⧸ N₁` is an associated prime of
+/-- Auxiliary lemma for Proposition 3.12. If `N₁ < u ≤ N₃`, every associated prime of `u ⧸ N₁` is
+an associated prime of
 `N₃ ⧸ N₁`. -/
 lemma subquotientAssociatedPrimes_mono_right {N₁ u N₃ : Submodule R M}
     (h₁ : N₁ < u) (h₂ : u ≤ N₃) :
@@ -63,13 +48,14 @@ lemma subquotientAssociatedPrimes_mono_right {N₁ u N₃ : Submodule R M}
       subquotientAssociatedPrimes ⟨N₁, N₃, h₁.trans_le h₂⟩ :=
   fun _ hi ↦ associatedPrimes_subset_of_submoduleOf_le N₁ u N₃ h₂ hi
 
-/-- The preimage of a submodule of `N₂ / (N₂ ∩ N₁)` under the quotient map, viewed as a
+/-- Auxiliary lemma for Proposition 3.12. The preimage of a submodule of `N₂ / (N₂ ∩ N₁)` under
+the quotient map, viewed as a
 submodule of `M`. -/
 private def liftQuot (N₁ N₂ : Submodule R M) (x : Submodule R (N₂ ⧸ N₁.submoduleOf N₂)) :
     Submodule R M :=
   Submodule.map N₂.subtype (Submodule.comap (N₁.submoduleOf N₂).mkQ x)
 
-/-- If `N₁ ≤ N₂`, then `N₁ ≤ liftQuot N₁ N₂ x ≤ N₂`. -/
+/-- Auxiliary lemma for Proposition 3.12. If `N₁ ≤ N₂`, then `N₁ ≤ liftQuot N₁ N₂ x ≤ N₂`. -/
 private lemma liftQuot_middle (N₁ N₂ : Submodule R M) (hN : N₁ ≤ N₂)
     (x : Submodule R (N₂ ⧸ N₁.submoduleOf N₂)) :
     N₁ ≤ liftQuot N₁ N₂ x ∧ liftQuot N₁ N₂ x ≤ N₂ := by
@@ -78,7 +64,8 @@ private lemma liftQuot_middle (N₁ N₂ : Submodule R M) (hN : N₁ ≤ N₂)
   change N₁ ≤ Submodule.map N₂.subtype (N₁.submoduleOf N₂)
   rw [Submodule.submoduleOf, Submodule.map_comap_subtype, inf_eq_right.2 hN]
 
-/-- The lift of a nonzero submodule of `N₂ / (N₂ ∩ N₁)` differs from `N₁`. -/
+/-- Auxiliary lemma for Proposition 3.12. The lift of a nonzero submodule of `N₂ / (N₂ ∩ N₁)`
+differs from `N₁`. -/
 private lemma liftQuot_ne_left (N₁ N₂ : Submodule R M)
     (x : Submodule R (N₂ ⧸ N₁.submoduleOf N₂)) (hx : x ≠ ⊥) : liftQuot N₁ N₂ x ≠ N₁ := by
   intro hc
@@ -91,7 +78,8 @@ private lemma liftQuot_ne_left (N₁ N₂ : Submodule R M)
   intro a ha
   simpa [← hc] using ⟨a, ha, rfl⟩
 
-/-- The isomorphism between `(N₂ / (N₂ ∩ N₁)) / X` and the quotient of `N₂` by the
+/-- Auxiliary lemma for Proposition 3.12. The isomorphism between `(N₂ / (N₂ ∩ N₁)) / X` and the
+quotient of `N₂` by the
 preimage of `X`, given by the third isomorphism theorem. -/
 private noncomputable def quotLiftQuotEquiv (N₁ N₂ : Submodule R M)
     (X : Submodule R (↥N₂ ⧸ N₁.submoduleOf N₂)) :
@@ -101,7 +89,8 @@ private noncomputable def quotLiftQuotEquiv (N₁ N₂ : Submodule R M)
       (Submodule.quotientQuotientEquivQuotient (N₁.submoduleOf N₂) _
         (Submodule.le_comap_mkQ _ _)).symm)
 
-/-- For `N₁ ≤ W ≤ N₂`, the canonical isomorphism from `W ⧸ N₁` to the image of `W` in
+/-- Auxiliary lemma for Proposition 3.12. For `N₁ ≤ W ≤ N₂`, the canonical isomorphism from `W ⧸
+N₁` to the image of `W` in
 `N₂ ⧸ N₁`. -/
 private noncomputable def quotEquivMapComap {N₁ N₂ W : Submodule R M}
     (_ : N₁ ≤ W) (h₂ : W ≤ N₂) :
@@ -128,7 +117,8 @@ private noncomputable def quotEquivMapComap {N₁ N₂ W : Submodule R M}
     (Submodule.quotEquivOfEq (N₁.submoduleOf W) (LinearMap.ker f) hker.symm).trans
       ((LinearMap.quotKerEquivRange f).trans (LinearEquiv.ofEq _ _ hrange))
 
-/-- The image of `W` in `N₂ ⧸ N₁` is nonzero when `N₁ < W ≤ N₂`. -/
+/-- Auxiliary lemma for Proposition 3.12. The image of `W` in `N₂ ⧸ N₁` is nonzero when `N₁ < W ≤
+N₂`. -/
 lemma map_comap_ne_bot {N₁ N₂ W : Submodule R M} (h₁ : N₁ ≤ W) (h₂ : W ≤ N₂)
     (h₃ : W ≠ N₁) :
     Submodule.map (N₁.submoduleOf N₂).mkQ (Submodule.comap N₂.subtype W) ≠ ⊥ := by
@@ -141,7 +131,8 @@ lemma map_comap_ne_bot {N₁ N₂ W : Submodule R M} (h₁ : N₁ ≤ W) (h₂ :
   change (⟨x, h₂ hx⟩ : N₂) ∈ N₁.submoduleOf N₂
   simpa [hbot, Submodule.Quotient.mk_eq_zero] using hx_image
 
-/-- Associated primes agree under the submodule correspondence for a quotient. -/
+/-- Auxiliary lemma for Proposition 3.12. Associated primes agree under the submodule
+correspondence for a quotient. -/
 private lemma subquotientAssociatedPrimes_eq_quotient {N₁ N₂ W : Submodule R M}
     (h₁ : N₁ ≤ W) (h₂ : W ≤ N₂) (h₃ : W ≠ N₁) :
     subquotientAssociatedPrimes ⟨N₁, W, h₁.lt_of_ne' h₃⟩ =
@@ -168,7 +159,8 @@ section Payoff
 variable {R : Type*} [CommRing R] [IsNoetherianRing R]
 variable {M : Type*} [AddCommGroup M] [Module R M] [Module.Finite R M]
 
-/-- The subquotient of a strict inclusion has an associated prime. -/
+/-- Auxiliary lemma for Proposition 3.12. The subquotient of a strict inclusion has an associated
+prime. -/
 lemma subquotientAssociatedPrimes_nonempty (I : StrictIntvl (Submodule R M)) :
     (subquotientAssociatedPrimes I).toFinset.Nonempty := by
   simp only [Set.toFinset_nonempty]
@@ -176,14 +168,16 @@ lemma subquotientAssociatedPrimes_nonempty (I : StrictIntvl (Submodule R M)) :
   obtain ⟨q, hq⟩ := associatedPrimes.nonempty R (↥I.right ⧸ I.left.submoduleOf I.right)
   exact ⟨⟨q, hq.out.1⟩, hq⟩
 
-/-- The least associated prime of a subquotient belongs to its set of associated primes. -/
+/-- Auxiliary lemma for Proposition 3.12. The least associated prime of a subquotient belongs to
+its set of associated primes. -/
 lemma min'_mem_subquotientAssociatedPrimes (I : StrictIntvl (Submodule R M)) :
     (subquotientAssociatedPrimes I).toFinset.min' (subquotientAssociatedPrimes_nonempty I) ∈
       subquotientAssociatedPrimes I :=
   (Set.mem_toFinset (s := subquotientAssociatedPrimes I)).mp <|
     (subquotientAssociatedPrimes I).toFinset.min'_mem (subquotientAssociatedPrimes_nonempty I)
 
-/-- If a subquotient has exactly one associated prime, that prime is the least element of
+/-- Auxiliary lemma for Proposition 3.12. If a subquotient has exactly one associated prime, that
+prime is the least element of
 its set of associated primes in the linear extension. -/
 lemma toLinearExtension_eq_min' (I : StrictIntvl (Submodule R M))
     (hu : ∃! p, p ∈ associatedPrimes R (I.right ⧸ I.left.submoduleOf I.right))
@@ -193,7 +187,8 @@ lemma toLinearExtension_eq_min' (I : StrictIntvl (Submodule R M))
       (subquotientAssociatedPrimes I).toFinset.min' (subquotientAssociatedPrimes_nonempty I) :=
   PrimeSpectrum.ext (hu.unique hp (min'_mem_subquotientAssociatedPrimes I))
 
-/-- The coprimary payoff function is unchanged by taking the supremum over subintervals
+/-- Section 3.4, the identity preceding Proposition 3.11. The coprimary payoff function is
+unchanged by taking the supremum over subintervals
 with the same left endpoint. -/
 lemma max_payoff : (payoff R M).max = payoff R M := by
   refine PayoffFunction.ext fun I ↦
@@ -202,7 +197,7 @@ lemma max_payoff : (payoff R M).max = payoff R M := by
   exact DedekindCut.principal_le_principal.mpr <| Finset.Colex.toColex_le_toColex_of_subset <|
     Set.toFinset_subset_toFinset.mpr <| subquotientAssociatedPrimes_mono_right hu.1 hu.2
 
-/-- The coprimary payoff function is convex. -/
+/-- Proposition 3.11. The coprimary payoff function is convex. -/
 instance [Nontrivial M] : (payoff R M).IsConvexOn ⊤ := by
   refine { le := fun x y _ _ hxy ↦ ?_ }
   simp only [payoff_apply]
@@ -212,7 +207,8 @@ instance [Nontrivial M] : (payoff R M).IsConvexOn ⊤ := by
   rw [mem_subquotientAssociatedPrimes, AssociatedPrimes.mem_iff] at hw ⊢
   exact (LinearEquiv.isAssociatedPrime_iff (LinearMap.quotientInfEquivSupQuotient x y)).1 hw
 
-/-- The least associated prime of `I.right ⧸ I.left` is a lower bound, in the linear
+/-- Auxiliary lemma for Proposition 3.12. The least associated prime of `I.right ⧸ I.left` is a
+lower bound, in the linear
 extension, for the associated primes of `I.right ⧸ N''` when `I.left ≤ N'' ≤ I.right`. -/
 private lemma min'_le_toLinearExtension (I : StrictIntvl (Submodule R M))
     (N'' : Submodule R M) (ha1 : N'' ∈ I) :
@@ -240,7 +236,8 @@ private lemma min'_le_toLinearExtension (I : StrictIntvl (Submodule R M))
       Module.associatedPrimes.minimalPrimes_annihilator_subset_associatedPrimes _ _ hr) <|
     toLinearExtension.monotone' (hrq : (⟨r, hr.1.1⟩ : PrimeSpectrum R) ≤ p)
 
-/-- For `I.left ≤ N'' < I.right`, the singleton containing the least associated prime of
+/-- Auxiliary lemma for Proposition 3.12. For `I.left ≤ N'' < I.right`, the singleton containing
+the least associated prime of
 `I.right ⧸ I.left` is a lower bound in colexicographic order for the finite set of associated
 primes of `I.right ⧸ N''`. -/
 private lemma singleton_min'_le (I : StrictIntvl (Submodule R M))
@@ -258,7 +255,8 @@ private lemma singleton_min'_le (I : StrictIntvl (Submodule R M))
       Finset.Colex.toColex_le_toColex_of_subset <| Finset.singleton_subset_iff.mpr <|
         (subquotientAssociatedPrimes J).toFinset.min'_mem (subquotientAssociatedPrimes_nonempty J)
 
-/-- The kernel of the localization map of `I.right ⧸ I.left` at its least associated
+/-- Auxiliary lemma for Proposition 3.12. The kernel of the localization map of `I.right ⧸ I.left`
+at its least associated
 prime in the linear extension. -/
 private noncomputable abbrev locKer (I : StrictIntvl (Submodule R M)) :
     Submodule R (↥I.right ⧸ I.left.submoduleOf I.right) :=
@@ -267,7 +265,8 @@ private noncomputable abbrev locKer (I : StrictIntvl (Submodule R M)) :
       (subquotientAssociatedPrimes_nonempty I)).asIdeal.primeCompl)
     (↥I.right ⧸ I.left.submoduleOf I.right))
 
-/-- Quotienting by the lifted localization kernel gives a coprimary module whose associated
+/-- Auxiliary lemma for Proposition 3.12. Quotienting by the lifted localization kernel gives a
+coprimary module whose associated
 prime is the least associated prime of `I.right ⧸ I.left`. -/
 private lemma associatedPrimes_quot_liftQuot_locKer (I : StrictIntvl (Submodule R M)) :
     associatedPrimes R
@@ -290,7 +289,8 @@ private lemma associatedPrimes_quot_liftQuot_locKer (I : StrictIntvl (Submodule 
     simp only [Submodule.carrier_eq_coe, Submonoid.coe_set_mk, Subsemigroup.coe_set_mk,
       Set.inter_compl_self]
 
-/-- The value of the coprimary payoff function on `I` when player A moves first is the singleton
+/-- Proposition 3.12. The value of the coprimary payoff function on `I` when player A moves first
+is the singleton
 containing the least associated prime of `I.right ⧸ I.left` in the fixed linear extension
 of the prime spectrum, embedded in the Dedekind–MacNeille completion. -/
 lemma A_payoff (I : StrictIntvl (Submodule R M)) :
@@ -320,7 +320,7 @@ lemma A_payoff (I : StrictIntvl (Submodule R M)) :
     rw [max_payoff, payoff_apply]
     exact DedekindCut.principal_le_principal.mpr <| singleton_min'_le I a ⟨ha.1, ha.2.le⟩ ha.2.ne
 
-/-- The coprimary payoff function satisfies the descending chain condition
+/-- Proposition 3.13. The coprimary payoff function satisfies the descending chain condition
 `HarderNarasimhan.PayoffFunction.ADCC`. -/
 instance : (payoff R M).ADCC where
   dcc := by
@@ -339,7 +339,8 @@ instance : (payoff R M).ADCC where
       exact associatedPrimes_subset_of_submoduleOf_le N (x i) (x 0) (hx2.antitone i.zero_le)
         (min'_mem_subquotientAssociatedPrimes ⟨N, x i, hx1 i⟩)
 
-/-- Semistability of the coprimary payoff function is equivalent to constancy of the value
+/-- Remark 3.14, the constant-value characterization. Semistability of the coprimary payoff
+function is equivalent to constancy of the value
 when A moves first on the intervals `(⊥, N)`. This value is the singleton containing the
 least associated prime of `M` in the linear extension. -/
 theorem isSemistable_iff_A_const [Nontrivial M] :
@@ -361,7 +362,8 @@ theorem isSemistable_iff_A_const [Nontrivial M] :
     rw [h N hN, A_payoff (⊤ : StrictIntvl (Submodule R M))]
     exact lt_irrefl _
 
-/-- The coprimary payoff function of a nonzero finitely generated module over a Noetherian
+/-- Remark 3.14, semistability is coprimary. The coprimary payoff function of a nonzero finitely
+generated module over a Noetherian
 ring is semistable if and only if the module has exactly one associated prime. -/
 theorem isSemistable_iff_existsUnique_associatedPrime [Nontrivial M] :
     (payoff R M).IsSemistable ↔ ∃! p, p ∈ associatedPrimes R M := by
@@ -411,7 +413,8 @@ theorem isSemistable_iff_existsUnique_associatedPrime [Nontrivial M] :
           (min'_mem_subquotientAssociatedPrimes (⟨⊥, N, hN⟩ : StrictIntvl (Submodule R M)))
     exact PrimeSpectrum.ext ((hp_unique _ hq).trans (hp_unique _ hp0).symm)
 
-/-- For `N₁ < W ≤ N₂`, the value when A moves first on `(N₁, W)` equals the corresponding
+/-- Auxiliary restriction lemma for Remark 3.14. For `N₁ < W ≤ N₂`, the value when A moves first
+on `(N₁, W)` equals the corresponding
 value on `(⊥, W ⧸ N₁)` in the submodule lattice of `N₂ ⧸ N₁`. -/
 lemma A_restrict_eq_quotient {N₁ N₂ W : Submodule R M} (h₁ : N₁ ≤ W) (h₂ : W ≤ N₂)
     (h₃ : W ≠ N₁) :
@@ -423,7 +426,8 @@ lemma A_restrict_eq_quotient {N₁ N₂ W : Submodule R M} (h₁ : N₁ ≤ W) (
   simp only [DedekindCut.principal_inj, toColex_inj, Finset.singleton_inj]
   simp [subquotientAssociatedPrimes_eq_quotient h₁ h₂ h₃]
 
-/-- The coprimary payoff function restricted to `(N₁, N₂)` is semistable if and only if the
+/-- Auxiliary restriction lemma for Remark 3.14 and Theorem 3.15. The coprimary payoff function
+restricted to `(N₁, N₂)` is semistable if and only if the
 coprimary payoff function of `N₂ ⧸ N₁` is semistable. -/
 lemma isSemistable_restrict_iff_quotient (N₁ N₂ : Submodule R M) (hN : N₁ < N₂) :
     ((payoff R M).restrict ⟨N₁, N₂, hN⟩).IsSemistable ↔
@@ -462,4 +466,184 @@ end Payoff
 
 end Coprimary
 
-end HarderNarasimhan
+end HarderNarasimhan.Impl
+
+namespace HarderNarasimhan.Impl
+
+variable {R : Type*} [CommRing R] [IsNoetherianRing R]
+
+/-- Theorem 3.15, the coprimary successive quotients. The successive quotients of a
+Harder–Narasimhan filtration of the coprimary payoff
+function are coprimary. -/
+lemma PayoffFunction.HarderNarasimhanFiltration.piecewise_isCoprimary
+    {M : Type*} [AddCommGroup M] [Module R M] [Module.Finite R M]
+    (F : (Coprimary.payoff R M).HarderNarasimhanFiltration) :
+    ∀ i < F.length, IsCoprimary R (F (i + 1) ⧸ (F i).submoduleOf (F (i + 1))) := by
+  intro i hi
+  have hstep := F.strictMonoOn hi.le hi (lt_add_one i)
+  let := Coprimary.nontrivial_quotient_of_lt hstep
+  exact ⟨Coprimary.isSemistable_iff_existsUnique_associatedPrime.mp <|
+    (Coprimary.isSemistable_restrict_iff_quotient _ _ hstep).mp
+      (F.piecewise_isSemistable i hi)⟩
+
+namespace Coprimary
+
+variable {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]
+
+variable (R M) in
+/-- Theorem 3.15 (Theorem 1.2), the canonical construction. The coprimary filtration of a nonzero
+finitely generated module over a commutative
+Noetherian ring, obtained from the Harder–Narasimhan filtration of its coprimary payoff
+function. -/
+noncomputable def coprimaryFiltration : CoprimaryFiltration R M :=
+  let F := PayoffFunction.hnFiltration (payoff R M)
+  { toFun := ⇑F
+    length := F.length
+    monotone := F.monotone
+    head_eq_bot := F.head_eq_bot
+    length_eq_top := F.length_eq_top
+    strictMonoOn := F.strictMonoOn
+    piecewise_isCoprimary := PayoffFunction.HarderNarasimhanFiltration.piecewise_isCoprimary F
+    associatedPrime_succ_lt := by
+      intro n hn p q hp hq
+      rw [toLinearExtension_eq_min' ⟨F (n + 1), F (n + 2),
+          F.strictMonoOn hn.le hn (lt_add_one (n + 1))⟩
+          (PayoffFunction.HarderNarasimhanFiltration.piecewise_isCoprimary F
+            (n + 1) hn).existsUnique_associatedPrime hp,
+        toLinearExtension_eq_min' ⟨F n, F (n + 1),
+          F.strictMonoOn (Nat.le_of_succ_le hn.le) (Nat.le_of_succ_le hn) (lt_add_one n)⟩
+          (PayoffFunction.HarderNarasimhanFiltration.piecewise_isCoprimary F
+            n (Nat.lt_of_succ_lt hn)).existsUnique_associatedPrime hq]
+      simpa only [A_payoff, DedekindCut.principal_lt_principal,
+        Finset.Colex.singleton_lt_singleton, PayoffFunction.HarderNarasimhanFiltration.toFun_eq_coe]
+        using lt_of_not_ge (F.not_A_le_succ n hn) }
+
+/-- Theorem 3.15. The canonical coprimary filtration is the default coprimary filtration. -/
+noncomputable instance : Inhabited (CoprimaryFiltration R M) := ⟨coprimaryFiltration R M⟩
+
+/-- Theorem 3.15: existence of a coprimary filtration. -/
+instance : Nonempty (CoprimaryFiltration R M) := inferInstance
+
+end Coprimary
+
+namespace CoprimaryFiltration
+
+variable {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]
+
+/-- Auxiliary identification for Theorem 3.15. Every coprimary filtration has the same underlying
+chain as a Harder–Narasimhan
+filtration of the coprimary payoff function. -/
+lemma exists_hnFiltration (a : CoprimaryFiltration R M) :
+    ∃ F : (Coprimary.payoff R M).HarderNarasimhanFiltration, ⇑a = ⇑F :=
+  ⟨{ toFun := ⇑a
+     length := a.length
+     monotone := a.monotone
+     head_eq_bot := a.head_eq_bot
+     length_eq_top := a.length_eq_top
+     strictMonoOn := a.strictMonoOn
+     piecewise_isSemistable := fun i hi ↦ by
+       have hstep := a.strictMonoOn hi.le hi (lt_add_one i)
+       let := Coprimary.nontrivial_quotient_of_lt hstep
+       exact (Coprimary.isSemistable_restrict_iff_quotient _ _ hstep).mpr <|
+         Coprimary.isSemistable_iff_existsUnique_associatedPrime.mpr
+           (a.piecewise_isCoprimary i hi).existsUnique_associatedPrime
+     not_A_le_succ := fun i hi ↦ by
+       rw [Coprimary.A_payoff, Coprimary.A_payoff, not_le,
+         DedekindCut.principal_lt_principal, Finset.Colex.singleton_lt_singleton]
+       exact a.associatedPrime_succ_lt i hi _ _
+         (Coprimary.min'_mem_subquotientAssociatedPrimes ⟨a (i + 1), a (i + 2),
+           a.strictMonoOn hi.le hi (lt_add_one (i + 1))⟩)
+         (Coprimary.min'_mem_subquotientAssociatedPrimes ⟨a i, a (i + 1),
+           a.strictMonoOn (Nat.le_of_succ_le hi.le) (Nat.le_of_succ_le hi)
+             (lt_add_one i)⟩) }, rfl⟩
+
+/-- Auxiliary uniqueness lemma for Theorem 3.15. Every coprimary filtration has the same
+underlying chain as the canonical
+Harder–Narasimhan filtration of the coprimary payoff function. -/
+private lemma coe_eq_hnFiltration (a : CoprimaryFiltration R M) :
+    ⇑a = ⇑(PayoffFunction.hnFiltration (Coprimary.payoff R M)) := by
+  obtain ⟨F, hF⟩ := exists_hnFiltration a
+  rw [hF, Subsingleton.elim F (PayoffFunction.hnFiltration (Coprimary.payoff R M))]
+
+/-- Theorem 3.15. A nonzero finitely generated module over a commutative Noetherian ring has a
+unique
+coprimary filtration for the fixed linear extension of the prime spectrum. -/
+@[no_expose]
+noncomputable instance : Unique (CoprimaryFiltration R M) where
+  uniq a := by
+    ext n
+    rw [coe_eq_hnFiltration a, coe_eq_hnFiltration default]
+
+/-- Remark 3.16. The associated primes of a module are the union of the associated primes of the
+successive quotients of its coprimary filtration. -/
+theorem associatedPrimes_eq_iUnion (F : CoprimaryFiltration R M) :
+    associatedPrimes R M =
+      ⋃ i < F.length, associatedPrimes R (F (i + 1) ⧸ (F i).submoduleOf (F (i + 1))) := by
+  apply subset_antisymm
+  · -- Dévissage along the chain places every associated prime in one of its factors.
+    have key : ∀ k, k ≤ F.length →
+        associatedPrimes R ↥(F k) ⊆
+          ⋃ i < F.length, associatedPrimes R (F (i + 1) ⧸ (F i).submoduleOf (F (i + 1))) := by
+      intro k
+      induction k with
+      | zero =>
+        intro _
+        rw [show F 0 = ⊥ from F.head_eq_bot, associatedPrimes.eq_empty_of_subsingleton]
+        exact Set.empty_subset _
+      | succ k ih =>
+        intro hk q hq
+        rcases associatedPrimes.subset_union_of_exact
+          (Submodule.injective_subtype ((F k).submoduleOf (F (k + 1))))
+          (LinearMap.exact_subtype_mkQ ((F k).submoduleOf (F (k + 1)))) hq with h | h
+        · apply ih ((Nat.le_succ k).trans hk)
+          have hAss : associatedPrimes R ↥((F k).submoduleOf (F (k + 1))) =
+              associatedPrimes R ↥(F k) :=
+            LinearEquiv.AssociatedPrimes.eq
+              (Submodule.comapSubtypeEquivOfLe (F.monotone (Nat.le_succ k)))
+          exact hAss ▸ h
+        · exact Set.mem_iUnion₂.mpr ⟨k, Nat.lt_of_succ_le hk, h⟩
+    intro q hq
+    apply key F.length le_rfl
+    rwa [show F F.length = ⊤ from F.length_eq_top,
+      LinearEquiv.AssociatedPrimes.eq (Submodule.topEquiv (M := M))]
+  · -- For the canonical chain, each factor prime is also the prime of an initial segment.
+    obtain rfl := Subsingleton.elim F (Coprimary.coprimaryFiltration R M)
+    set F := Coprimary.coprimaryFiltration R M
+    refine Set.iUnion₂_subset fun i hi q hq ↦ ?_
+    have hstep : F i < F (i + 1) := F.strictMonoOn hi.le hi (lt_add_one i)
+    have hbot : (⊥ : Submodule R M) < F (i + 1) := bot_le.trans_lt hstep
+    have hchain : (Coprimary.payoff R M).A ⟨⊥, F (i + 1), hbot⟩ =
+        (Coprimary.payoff R M).A ⟨F i, F (i + 1), hstep⟩ :=
+      PayoffFunction.hnFiltration_A_bot_eq_A (μ := Coprimary.payoff R M) (n := i) hstep
+    rw [Coprimary.A_payoff, Coprimary.A_payoff] at hchain
+    simp only [DedekindCut.principal_inj, toColex_inj, Finset.singleton_inj] at hchain
+    change (toLinearExtension (⟨q, hq.out.1⟩ : PrimeSpectrum R)).asIdeal ∈ associatedPrimes R M
+    rw [Coprimary.toLinearExtension_eq_min' ⟨F i, F (i + 1), hstep⟩
+      (F.piecewise_isCoprimary i hi).existsUnique_associatedPrime hq, ← hchain]
+    -- Include that initial segment into `M`, using `⊤ / ⊥ ≃ M`.
+    rw [← LinearEquiv.AssociatedPrimes.eq
+      ((Submodule.quotEquivOfEqBot _ (Submodule.ker_subtype (⊤ : Submodule R M))).trans
+        Submodule.topEquiv)]
+    exact Coprimary.subquotientAssociatedPrimes_mono_right hbot le_top
+      (Coprimary.min'_mem_subquotientAssociatedPrimes ⟨⊥, F (i + 1), hbot⟩)
+
+end CoprimaryFiltration
+
+end HarderNarasimhan.Impl
+
+namespace HarderNarasimhan.Impl.Coprimary
+
+variable {R : Type*} [CommRing R] [IsNoetherianRing R]
+variable {M : Type*} [Nontrivial M] [AddCommGroup M] [Module R M] [Module.Finite R M]
+
+/-- Remark 3.14: assemble its three equivalent descriptions of semistability. -/
+theorem semistability_tfae : List.TFAE [
+    (payoff R M).IsSemistable,
+    ∀ N : Submodule R M, (hN : ⊥ < N) → (payoff R M).A ⟨⊥, N, hN⟩ = (payoff R M).A ⊤,
+    ∃! p, p ∈ associatedPrimes R M] := by
+  tfae_have 1 ↔ 2 := by simpa only [A_payoff (⊤ : StrictIntvl (Submodule R M))]
+    using (isSemistable_iff_A_const (R := R) (M := M))
+  tfae_have 1 ↔ 3 := isSemistable_iff_existsUnique_associatedPrime
+  tfae_finish
+
+end HarderNarasimhan.Impl.Coprimary
