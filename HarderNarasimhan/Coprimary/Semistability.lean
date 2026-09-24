@@ -89,9 +89,7 @@ private lemma liftQuot_ne_left (N₁ N₂ : Submodule R M)
   rw [Submodule.ker_mkQ]
   refine le_antisymm ?_ (Submodule.le_comap_mkQ _ _)
   intro a ha
-  change a.val ∈ N₁
-  rw [← hc]
-  exact ⟨a, ha, rfl⟩
+  simpa [← hc] using ⟨a, ha, rfl⟩
 
 /-- The isomorphism between `(N₂ / (N₂ ∩ N₁)) / X` and the quotient of `N₂` by the
 preimage of `X`, given by the third isomorphism theorem. -/
@@ -110,8 +108,7 @@ private noncomputable def quotEquivMapComap {N₁ N₂ W : Submodule R M}
     (↥W ⧸ N₁.submoduleOf W) ≃ₗ[R]
       Submodule.map (N₁.submoduleOf N₂).mkQ (Submodule.comap N₂.subtype W) := by
   let i : W →ₗ[R] N₂ := Submodule.inclusion h₂
-  let f : W →ₗ[R] (↥N₂ ⧸ N₁.submoduleOf N₂) :=
-    (N₁.submoduleOf N₂).mkQ.comp i
+  let f : W →ₗ[R] (↥N₂ ⧸ N₁.submoduleOf N₂) := (N₁.submoduleOf N₂).mkQ.comp i
   have hker : LinearMap.ker f = N₁.submoduleOf W := by
     ext w
     change ((Submodule.Quotient.mk (i w) : ↥N₂ ⧸ N₁.submoduleOf N₂) = 0) ↔ ↑w ∈ N₁
@@ -237,7 +234,7 @@ private lemma min'_le_toLinearExtension (I : StrictIntvl (Submodule R M))
         = Submodule.factor hle (a • y) := (map_smul _ a y).symm
       _ = 0 := by rw [ha y trivial, map_zero]
   obtain ⟨r, hr, hrq⟩ := Ideal.exists_minimalPrimes_le hann
-  refine le_trans ((subquotientAssociatedPrimes I).toFinset.min'_le
+  exact le_trans ((subquotientAssociatedPrimes I).toFinset.min'_le
     (toLinearExtension ⟨r, hr.1.1⟩) <|
     Set.mem_toFinset.mpr <|
       Module.associatedPrimes.minimalPrimes_annihilator_subset_associatedPrimes _ _ hr) <|
@@ -360,8 +357,7 @@ theorem isSemistable_iff_A_const [Nontrivial M] :
     simp only [DedekindCut.principal_inj, toColex_inj, Finset.singleton_inj]
     exact eq_of_le_of_ge hst' <| Finset.min'_subset (subquotientAssociatedPrimes_nonempty _) <|
       Set.toFinset_subset_toFinset.mpr <| subquotientAssociatedPrimes_mono_right hN le_top
-  · intro h
-    refine { not_lt := fun N hN ↦ ?_ }
+  · refine fun h ↦ { not_lt := fun N hN ↦ ?_ }
     rw [h N hN, A_payoff (⊤ : StrictIntvl (Submodule R M))]
     exact lt_irrefl _
 
@@ -399,8 +395,7 @@ theorem isSemistable_iff_existsUnique_associatedPrime [Nontrivial M] :
       apply PrimeSpectrum.ext
       apply Set.mem_singleton_iff.mp
       rw [← hassN]
-      simpa [LinearEquiv.AssociatedPrimes.eq
-        (Submodule.quotEquivOfEqBot _ (hbot (R ∙ t)))] using
+      simpa [LinearEquiv.AssociatedPrimes.eq (Submodule.quotEquivOfEqBot _ (hbot (R ∙ t)))] using
         min'_mem_subquotientAssociatedPrimes (⟨⊥, R ∙ t, hN⟩ : StrictIntvl (Submodule R M))
     have hs' := hs (R ∙ t) hN
     rw [A_payoff ⟨⊥, R ∙ t, hN⟩] at hs'
@@ -410,8 +405,7 @@ theorem isSemistable_iff_existsUnique_associatedPrime [Nontrivial M] :
     rw [A_payoff ⟨⊥, N, hN⟩]
     simp only [DedekindCut.principal_inj, toColex_inj, Finset.singleton_inj]
     have hq : ((subquotientAssociatedPrimes ⟨⊥, N, hN⟩).toFinset.min'
-        (subquotientAssociatedPrimes_nonempty _)).asIdeal ∈
-        associatedPrimes R M := by
+        (subquotientAssociatedPrimes_nonempty _)).asIdeal ∈ associatedPrimes R M := by
       simpa [LinearEquiv.AssociatedPrimes.eq eTop] using
         subquotientAssociatedPrimes_mono_right hN le_top
           (min'_mem_subquotientAssociatedPrimes (⟨⊥, N, hN⟩ : StrictIntvl (Submodule R M)))
@@ -438,8 +432,7 @@ lemma isSemistable_restrict_iff_quotient (N₁ N₂ : Submodule R M) (hN : N₁ 
   refine ⟨?_, ?_⟩
   · intro h
     let : Nontrivial (↥N₂ ⧸ N₁.submoduleOf N₂) := nontrivial_quotient_of_lt hN
-    refine { not_lt := ?_ }
-    intro X hX
+    refine { not_lt := fun X hX ↦ ?_ }
     -- Lift the proposed destabilizing submodule to the original interval.
     have hmid := liftQuot_middle N₁ N₂ hN.le X
     have hneq : liftQuot N₁ N₂ X ≠ N₁ := liftQuot_ne_left N₁ N₂ X hX.ne'
@@ -452,10 +445,8 @@ lemma isSemistable_restrict_iff_quotient (N₁ N₂ : Submodule R M) (hN : N₁ 
       A_restrict_eq_quotient hN.le le_rfl hN.ne'] at hres
     simpa [liftQuot, Submodule.comap_map_eq, Submodule.ker_subtype,
       Submodule.map_comap_eq_self, Submodule.range_mkQ] using hres
-  · intro h
-    let : Nontrivial (↥N₂ ⧸ N₁.submoduleOf N₂) := nontrivial_quotient_of_lt hN
-    refine { not_lt := ?_ }
-    intro W hW
+  · let : Nontrivial (↥N₂ ⧸ N₁.submoduleOf N₂) := nontrivial_quotient_of_lt hN
+    refine fun h ↦ { not_lt := fun W hW ↦ ?_ }
     have hW' : W.val ≠ N₁ := fun hEq ↦ hW.ne' (Subtype.ext hEq)
     -- Pass the interval submodule to its image in the quotient.
     simp only [PayoffFunction.A_restrict_apply]

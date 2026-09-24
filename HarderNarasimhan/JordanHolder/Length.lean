@@ -98,8 +98,7 @@ private lemma subseqIdx.const_between (f : ℕ → ℒ) (atf : ∃ k, f k = ⊥)
     f m = f (subseqIdx f atf hf i) := by
   by_cases hbot : f (subseqIdx f atf hf i) = ⊥
   · apply le_antisymm (hf hleft)
-    rw [hbot]
-    exact bot_le
+    simp [hbot]
   · apply eq_of_le_of_not_lt (hf hleft)
     intro hdrop
     have hstrict : subseqIdx f atf hf i < m :=
@@ -201,8 +200,7 @@ private lemma subseqIdx_inherit_step_predicate (f : ℕ → ℒ) (atf : ∃ k, f
   have hn_pos : 0 < n := lt_of_le_of_lt (Nat.zero_le _) hn
   have hpred_eq : f (n - 1) = f (subseqIdx f atf hf i) := by
     apply subseqIdx.const_between f atf hf i (n - 1)
-    · omega
-    · omega
+    repeat omega
   have hpred_lt : f ((n - 1) + 1) < f (n - 1) := by
     rw [Nat.sub_add_cancel (Nat.succ_le_of_lt hn_pos), hpred_eq]
     exact subseqIdx_strictAnti f atf hf i (i + 1) (Nat.lt_succ_self i) hi
@@ -310,8 +308,7 @@ private lemma exists_filtration_restrict_last (F : μ.JordanHolderFiltration)
       apply Subtype.ext
       simp [truncated, interval]
     length_eq_bot := by
-      simp only [truncated, le_refl, ↓reduceDIte]
-      rfl
+      simpa only [truncated, le_refl, ↓reduceDIte] using by rfl
     strictAntiOn := by
       intro i _ j hj hij
       rw [Set.mem_Iic] at hj
@@ -508,14 +505,10 @@ private lemma exists_shorter_join_filtration (F G : μ.JordanHolderFiltration)
           payoff_sup_eq_top_payoff F G _ hlast j]
       _ = μ ⊤ := payoff_sup_eq_top_payoff F G _ hlast j
   apply exists_shorter_filtration_of_plateau (μ := μ.restrict I) joined G.length
-  case hf =>
-    exact fun _ _ hij ↦ sup_le_sup_left (G.antitone hij) x
-  case hfirst =>
-    exact Subtype.ext (by simp [joined, I])
-  case hlast =>
-    exact Subtype.ext (by simp [joined, I])
-  case hpayoff =>
-    exact fun j hj ↦ (joined_payoff j hj).trans hpayoff.symm
+  case hf => exact fun _ _ hij ↦ sup_le_sup_left (G.antitone hij) x
+  case hfirst => exact Subtype.ext (by simp [joined, I])
+  case hlast => exact Subtype.ext (by simp [joined, I])
+  case hpayoff => exact fun j hj ↦ (joined_payoff j hj).trans hpayoff.symm
   case hstable =>
     intro j hj w hw₁ hw₂
     have hj_length : j < G.length := by
@@ -523,8 +516,7 @@ private lemma exists_shorter_join_filtration (F G : μ.JordanHolderFiltration)
       intro hbot
       apply hj.not_ge
       change x ⊔ G j ≤ x ⊔ G (j + 1)
-      rw [hbot, sup_bot_eq]
-      exact le_sup_left
+      simp [hbot]
     exact joined_step_stable G hj_length hj (joined_payoff j hj) hw₁ hw₂
   case hplateau =>
     obtain ⟨j, hj, heq⟩ := exists_join_plateau F G

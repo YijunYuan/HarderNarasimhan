@@ -169,11 +169,9 @@ instance : FunLike (CoprimaryFiltration R M) ℕ (Submodule R M) where
       exact lt_irrefl ⊤ h1
     intro F G h
     have hlen : F.length = G.length := le_antisymm (key F G h) (key G F h.symm)
-    cases F
-    cases G
+    cases F; cases G
     dsimp only at h hlen
-    subst h
-    subst hlen
+    subst h; subst hlen
     rfl
 
 @[simp] lemma toFun_eq_coe (F : CoprimaryFiltration R M) : F.toFun = ⇑F := rfl

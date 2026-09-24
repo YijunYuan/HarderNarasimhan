@@ -79,8 +79,7 @@ private lemma JHFil_antitone : Antitone (JHFil μ) :=
       have hempty : ¬ {p : ℒ | ∃ hp : ⊥ < p, p < JHFil μ n ∧ μ ⟨⊥, p, hp⟩ = μ ⊤}.Nonempty := by
         rintro ⟨p, -, hlt, -⟩
         exact not_lt_bot (h ▸ hlt)
-      simp only [JHFil]
-      exact dif_neg hempty
+      simpa only [JHFil] using dif_neg hempty
     · exact (JHFil_anti_mono μ n <| bot_lt_iff_ne_bot.2 h).le
 
 variable [hsl : μ.IsSlopeLike]

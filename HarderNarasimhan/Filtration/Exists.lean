@@ -101,8 +101,7 @@ private lemma HNFil_strictMonoOn : StrictMonoOn (HNFil μ) (Set.Iic (HNlen μ)) 
     exact HNFil_lt_succ μ i ((HNFil_ne_top_iff μ i).2 hj)
   | succ j hij ih =>
     intro hj
-    exact (ih (Nat.le_of_succ_le hj)).trans
-      (HNFil_lt_succ μ j ((HNFil_ne_top_iff μ j).2 hj))
+    exact (ih (Nat.le_of_succ_le hj)).trans (HNFil_lt_succ μ j ((HNFil_ne_top_iff μ j).2 hj))
 
 private lemma HNFil_length_eq_top : HNFil μ (HNlen μ) = ⊤ := by
   classical
