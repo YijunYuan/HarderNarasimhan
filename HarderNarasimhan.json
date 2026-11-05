@@ -4,10 +4,10 @@
   "∀ {ℒ : Type u_1} [Nontrivial ℒ] [inst : Lattice ℒ] [inst_1 : BoundedOrder ℒ] [WellFoundedGT ℒ] {S : Type u_2}\n  [inst_3 : CompleteLattice S] (μ : HarderNarasimhan.PayoffFunction ℒ S) [μ.ADCC] [μ.IsConvex] [μ.Admissible],\n  ∃ s,\n    s.head = ⊥ ∧\n      s.last = ⊤ ∧\n        ∀ (i : ℕ) (hi : i + 1 < s.length),\n          ¬μ.A { left := s.toFun ↑i, right := s.toFun ↑(i + 1), lt := ⋯ } ≤\n              μ.A { left := s.toFun ↑(i + 1), right := s.toFun ↑(i + 2), lt := ⋯ }",
   "constCategory": "Theorem"},
  {"references": [],
-  "name": "HarderNarasimhan.PayoffFunction.rec",
+  "name": "HarderNarasimhan.PayoffFunction.hnFiltration.congr_simp",
   "constType":
-  "{ℒ : Type u_1} →\n  [inst : LT ℒ] →\n    {S : Type u_2} →\n      {motive : HarderNarasimhan.PayoffFunction ℒ S → Sort u} →\n        ((toFun : HarderNarasimhan.StrictIntvl ℒ → S) → motive { toFun := toFun }) →\n          (t : HarderNarasimhan.PayoffFunction ℒ S) → motive t",
-  "constCategory": "Other"},
+  "∀ {ℒ : Type u_1} [inst : Nontrivial ℒ] [inst_1 : Lattice ℒ] [inst_2 : BoundedOrder ℒ] [hwf : WellFoundedGT ℒ]\n  {S : Type u_2} [inst_3 : CompleteLattice S] (μ : HarderNarasimhan.PayoffFunction ℒ S) [inst_4 : μ.ADCC]\n  [inst_5 : μ.IsConvex] [hadm : μ.Admissible], μ.hnFiltration = μ.hnFiltration",
+  "constCategory": "Theorem"},
  {"references":
   ["HarderNarasimhan.StrictIntvl.instBoundedOrderSubtypeMem._proof_4",
    "HarderNarasimhan.StrictIntvl.instBoundedOrderSubtypeMem._proof_2",
@@ -21,10 +21,10 @@
   "{ℒ : Type u_1} → [inst : PartialOrder ℒ] → {I : HarderNarasimhan.StrictIntvl ℒ} → BoundedOrder { x // x ∈ I }",
   "constCategory": "Definition"},
  {"references": [],
-  "name": "HarderNarasimhan.PayoffFunction.hnFiltration.congr_simp",
+  "name": "HarderNarasimhan.PayoffFunction.rec",
   "constType":
-  "∀ {ℒ : Type u_1} [inst : Nontrivial ℒ] [inst_1 : Lattice ℒ] [inst_2 : BoundedOrder ℒ] [hwf : WellFoundedGT ℒ]\n  {S : Type u_2} [inst_3 : CompleteLattice S] (μ : HarderNarasimhan.PayoffFunction ℒ S) [inst_4 : μ.ADCC]\n  [inst_5 : μ.IsConvex] [hadm : μ.Admissible], μ.hnFiltration = μ.hnFiltration",
-  "constCategory": "Theorem"},
+  "{ℒ : Type u_1} →\n  [inst : LT ℒ] →\n    {S : Type u_2} →\n      {motive : HarderNarasimhan.PayoffFunction ℒ S → Sort u} →\n        ((toFun : HarderNarasimhan.StrictIntvl ℒ → S) → motive { toFun := toFun }) →\n          (t : HarderNarasimhan.PayoffFunction ℒ S) → motive t",
+  "constCategory": "Other"},
  {"references": [],
   "name": "HarderNarasimhan.StrictIntvl.lt",
   "constType":
@@ -78,17 +78,17 @@
   "constType":
   "∀ {ℒ : Type u_1} {S : Type u_2} [inst : Lattice ℒ] [inst_1 : CompleteLattice S]\n  {μ : HarderNarasimhan.PayoffFunction ℒ S} [inst_2 : Nontrivial ℒ] [inst_3 : BoundedOrder ℒ] [μ.IsConvexOn ⊤],\n  μ.IsConvex",
   "constCategory": "Theorem"},
+ {"references": [],
+  "name": "HarderNarasimhan.PayoffFunction.IsBreakpoint.rec",
+  "constType":
+  "{ℒ : Type u_1} →\n  {S : Type u_2} →\n    [inst : PartialOrder ℒ] →\n      [inst_1 : CompleteLattice S] →\n        {μ : HarderNarasimhan.PayoffFunction ℒ S} →\n          {I : HarderNarasimhan.StrictIntvl ℒ} →\n            {x : ℒ} →\n              {motive : μ.IsBreakpoint I x → Sort u} →\n                ((mem : x ∈ I) →\n                    (ne_left : I.left ≠ x) →\n                      (not_lt :\n                          ∀ (y : ℒ) (hyI : y ∈ I) (hy : I.left ≠ y),\n                            ¬μ.A { left := I.left, right := x, lt := ⋯ } <\n                                μ.A { left := I.left, right := y, lt := ⋯ }) →\n                        (le_of_eq :\n                            ∀ (y : ℒ) (hyI : y ∈ I) (hy : I.left ≠ y),\n                              μ.A { left := I.left, right := y, lt := ⋯ } =\n                                  μ.A { left := I.left, right := x, lt := ⋯ } →\n                                y ≤ x) →\n                          motive ⋯) →\n                  (t : μ.IsBreakpoint I x) → motive t",
+  "constCategory": "Other"},
  {"references":
   ["id", "heq_of_eq", "HarderNarasimhan.PayoffFunction.noConfusion"],
   "name": "HarderNarasimhan.PayoffFunction.mk.noConfusion",
   "constType":
   "{ℒ : Type u_1} →\n  {inst : LT ℒ} →\n    {S : Type u_2} →\n      {P : Sort u} →\n        {toFun toFun' : HarderNarasimhan.StrictIntvl ℒ → S} →\n          { toFun := toFun } = { toFun := toFun' } → (toFun ≍ toFun' → P) → P",
   "constCategory": "Definition"},
- {"references": [],
-  "name": "HarderNarasimhan.PayoffFunction.IsBreakpoint.rec",
-  "constType":
-  "{ℒ : Type u_1} →\n  {S : Type u_2} →\n    [inst : PartialOrder ℒ] →\n      [inst_1 : CompleteLattice S] →\n        {μ : HarderNarasimhan.PayoffFunction ℒ S} →\n          {I : HarderNarasimhan.StrictIntvl ℒ} →\n            {x : ℒ} →\n              {motive : μ.IsBreakpoint I x → Sort u} →\n                ((mem : x ∈ I) →\n                    (ne_left : I.left ≠ x) →\n                      (not_lt :\n                          ∀ (y : ℒ) (hyI : y ∈ I) (hy : I.left ≠ y),\n                            ¬μ.A { left := I.left, right := x, lt := ⋯ } <\n                                μ.A { left := I.left, right := y, lt := ⋯ }) →\n                        (le_of_eq :\n                            ∀ (y : ℒ) (hyI : y ∈ I) (hy : I.left ≠ y),\n                              μ.A { left := I.left, right := y, lt := ⋯ } =\n                                  μ.A { left := I.left, right := x, lt := ⋯ } →\n                                y ≤ x) →\n                          motive ⋯) →\n                  (t : μ.IsBreakpoint I x) → motive t",
-  "constCategory": "Other"},
  {"references": [],
   "name": "HarderNarasimhan.StrictIntvl.instBoundedOrderSubtypeMem._proof_2",
   "constType":
@@ -110,14 +110,14 @@
   "∀ {ℒ : Type u_3} [inst : Nontrivial ℒ] [inst_1 : Lattice ℒ] [inst_2 : BoundedOrder ℒ] {S : Type u_4}\n  [inst_3 : CompleteLattice S] {μ : HarderNarasimhan.PayoffFunction ℒ S},\n  (∀ (x : ℒ) (hx : x ≠ ⊥), (μ.restrict { left := ⊥, right := x, lt := ⋯ }).WeakACC) →\n    (∀ (x : ℒ) (hx : x ≠ ⊥), (μ.restrict { left := ⊥, right := x, lt := ⋯ }).WeakSlopeLikeAtTop) →\n      μ.HasNashEquilibrium → μ.IsSemistable",
   "constCategory": "Theorem"},
  {"references": [],
-  "name": "HarderNarasimhan.IsCoprimary.existsUnique_associatedPrime",
-  "constType":
-  "∀ {R : Type u_1} {inst : CommRing R} {M : Type u_2} {inst_1 : AddCommGroup M} {inst_2 : _root_.Module R M}\n  [self : HarderNarasimhan.IsCoprimary R M], ∃! p, p ∈ associatedPrimes R M",
-  "constCategory": "Theorem"},
- {"references": [],
   "name": "HarderNarasimhan.PayoffFunction.hasNashEquilibrium_iff_le_max",
   "constType":
   "∀ {ℒ : Type u_1} {S : Type u_2} [inst : Nontrivial ℒ] [inst_1 : PartialOrder ℒ] [inst_2 : BoundedOrder ℒ]\n  [inst_3 : CompleteLattice S] {μ : HarderNarasimhan.PayoffFunction ℒ S} [μ.StrongDCC] [μ.WeakSlopeLikeAtBot],\n  μ.HasNashEquilibrium ↔ ∀ (y : ℒ) (hy : y ≠ ⊤), μ.max ⊤ ≤ μ.max { left := y, right := ⊤, lt := ⋯ }",
+  "constCategory": "Theorem"},
+ {"references": [],
+  "name": "HarderNarasimhan.IsCoprimary.existsUnique_associatedPrime",
+  "constType":
+  "∀ {R : Type u_1} {inst : CommRing R} {M : Type u_2} {inst_1 : AddCommGroup M} {inst_2 : _root_.Module R M}\n  [self : HarderNarasimhan.IsCoprimary R M], ∃! p, p ∈ associatedPrimes R M",
   "constCategory": "Theorem"},
  {"references": ["Set.ofPred", "LE.le"],
   "name": "Set.Iic",
@@ -138,24 +138,15 @@
   "constType":
   "∀ {ℒ : Type u_1} {S : Type u_2} [inst : Nontrivial ℒ] [inst_1 : PartialOrder ℒ] [inst_2 : BoundedOrder ℒ]\n  [inst_3 : CompleteLattice S] {μ : HarderNarasimhan.PayoffFunction ℒ S} (F : μ.JordanHolderFiltration), 0 < F.length",
   "constCategory": "Theorem"},
+ {"references": ["HarderNarasimhan.PayoffFunction.StrongDCC.casesOn"],
+  "name": "HarderNarasimhan.PayoffFunction.StrongDCC.recOn",
+  "constType":
+  "{ℒ : Type u_1} →\n  {S : Type u_2} →\n    [inst : PartialOrder ℒ] →\n      [inst_1 : BoundedOrder ℒ] →\n        [inst_2 : CompleteLattice S] →\n          {μ : HarderNarasimhan.PayoffFunction ℒ S} →\n            {motive : μ.StrongDCC → Sort u} →\n              (t : μ.StrongDCC) →\n                ((exists_le :\n                      ∀ (x : ℕ → ℒ) (saf : StrictAnti x),\n                        ∃ N, μ { left := ⊥, right := x N, lt := ⋯ } ≤ μ { left := x (N + 1), right := x N, lt := ⋯ }) →\n                    motive ⋯) →\n                  motive t",
+  "constCategory": "Definition"},
  {"references": ["LT.lt", "HarderNarasimhan.StrictIntvl.casesOn"],
   "name": "HarderNarasimhan.StrictIntvl.noConfusionType",
   "constType":
   "Sort u →\n  {ℒ : Type u_1} →\n    [inst : LT ℒ] →\n      HarderNarasimhan.StrictIntvl ℒ → {ℒ' : Type u_1} → [inst' : LT ℒ'] → HarderNarasimhan.StrictIntvl ℒ' → Sort u",
-  "constCategory": "Definition"},
- {"references":
-  ["HAdd.hAdd",
-   "StrictAnti",
-   "lt_of_le_of_lt",
-   "LE.le",
-   "bot_le",
-   "Bot.bot",
-   "DFunLike.coe",
-   "Nat.lt_add_one",
-   "OfNat.ofNat"],
-  "name": "HarderNarasimhan.PayoffFunction.StrongDCC.recOn",
-  "constType":
-  "{ℒ : Type u_1} →\n  {S : Type u_2} →\n    [inst : PartialOrder ℒ] →\n      [inst_1 : BoundedOrder ℒ] →\n        [inst_2 : CompleteLattice S] →\n          {μ : HarderNarasimhan.PayoffFunction ℒ S} →\n            {motive : μ.StrongDCC → Sort u} →\n              (t : μ.StrongDCC) →\n                ((exists_le :\n                      ∀ (x : ℕ → ℒ) (saf : StrictAnti x),\n                        ∃ N, μ { left := ⊥, right := x N, lt := ⋯ } ≤ μ { left := x (N + 1), right := x N, lt := ⋯ }) →\n                    motive ⋯) →\n                  motive t",
   "constCategory": "Definition"},
  {"references": [],
   "name": "HarderNarasimhan.Coprimary.toLinearExtension_eq_min'",
@@ -192,26 +183,26 @@
   "{ℒ : Type u_1} →\n  [Nontrivial ℒ] →\n    [inst : Lattice ℒ] →\n      [inst_1 : BoundedOrder ℒ] →\n        [WellFoundedGT ℒ] →\n          {S : Type u_2} →\n            [inst_3 : CompleteLinearOrder S] →\n              {μ : HarderNarasimhan.PayoffFunction ℒ S} → [μ.ADCC] → [μ.IsConvex] → Unique μ.HarderNarasimhanFiltration",
   "constCategory": "Definition"},
  {"references": [],
-  "name": "HarderNarasimhan.PayoffFunction.isConvexOn_top_iff",
+  "name":
+  "HarderNarasimhan.PayoffFunction.JordanHolderFiltration.payoff_bot_eq_top_payoff",
   "constType":
-  "∀ {ℒ : Type u_1} {S : Type u_2} [inst : Lattice ℒ] [inst_1 : CompleteLattice S]\n  {μ : HarderNarasimhan.PayoffFunction ℒ S} [inst_2 : Nontrivial ℒ] [inst_3 : BoundedOrder ℒ],\n  μ.IsConvexOn ⊤ ↔ μ.IsConvex",
+  "∀ {ℒ : Type u_1} {S : Type u_2} [inst : Nontrivial ℒ] [inst_1 : PartialOrder ℒ] [inst_2 : BoundedOrder ℒ]\n  [inst_3 : CompleteLattice S] {μ : HarderNarasimhan.PayoffFunction ℒ S} [hsl : μ.IsSlopeLike]\n  (F : μ.JordanHolderFiltration) (i : ℕ) (hi : i < F.length), μ { left := ⊥, right := F i, lt := ⋯ } = μ ⊤",
   "constCategory": "Theorem"},
- {"references": ["Prod.casesOn"],
-  "name": "HarderNarasimhan.PayoffFunction.semistableRel.match_1",
-  "constType":
-  "{ℒ : Type u_1} → (motive : ℒ × ℒ → Sort u_2) → (x : ℒ × ℒ) → ((x y : ℒ) → motive (x, y)) → motive x",
-  "constCategory": "Definition"},
  {"references":
   ["lt_trans", "LT.lt", "And.right", "LE.le", "DFunLike.coe", "And.left"],
   "name": "HarderNarasimhan.PayoffFunction.IsSlopeLike.mk._flat_ctor",
   "constType":
   "∀ {ℒ : Type u_1} {S : Type u_2} [inst : PartialOrder ℒ] [inst_1 : CompleteLattice S]\n  {μ : HarderNarasimhan.PayoffFunction ℒ S},\n  (∀ (x y z : ℒ) (h : x < y ∧ y < z),\n      (μ { left := x, right := y, lt := ⋯ } ≤ μ { left := x, right := z, lt := ⋯ } ∨\n          μ { left := y, right := z, lt := ⋯ } < μ { left := x, right := z, lt := ⋯ }) ∧\n        (μ { left := x, right := y, lt := ⋯ } < μ { left := x, right := z, lt := ⋯ } ∨\n            μ { left := y, right := z, lt := ⋯ } ≤ μ { left := x, right := z, lt := ⋯ }) ∧\n          (μ { left := x, right := z, lt := ⋯ } < μ { left := x, right := y, lt := ⋯ } ∨\n              μ { left := x, right := z, lt := ⋯ } ≤ μ { left := y, right := z, lt := ⋯ }) ∧\n            (μ { left := x, right := z, lt := ⋯ } ≤ μ { left := x, right := y, lt := ⋯ } ∨\n              μ { left := x, right := z, lt := ⋯ } < μ { left := y, right := z, lt := ⋯ })) →\n    μ.IsSlopeLike",
   "constCategory": "Definition"},
- {"references": [],
-  "name":
-  "HarderNarasimhan.PayoffFunction.JordanHolderFiltration.payoff_bot_eq_top_payoff",
+ {"references": ["Prod.casesOn"],
+  "name": "HarderNarasimhan.PayoffFunction.semistableRel.match_1",
   "constType":
-  "∀ {ℒ : Type u_1} {S : Type u_2} [inst : Nontrivial ℒ] [inst_1 : PartialOrder ℒ] [inst_2 : BoundedOrder ℒ]\n  [inst_3 : CompleteLattice S] {μ : HarderNarasimhan.PayoffFunction ℒ S} [hsl : μ.IsSlopeLike]\n  (F : μ.JordanHolderFiltration) (i : ℕ) (hi : i < F.length), μ { left := ⊥, right := F i, lt := ⋯ } = μ ⊤",
+  "{ℒ : Type u_1} → (motive : ℒ × ℒ → Sort u_2) → (x : ℒ × ℒ) → ((x y : ℒ) → motive (x, y)) → motive x",
+  "constCategory": "Definition"},
+ {"references": [],
+  "name": "HarderNarasimhan.PayoffFunction.isConvexOn_top_iff",
+  "constType":
+  "∀ {ℒ : Type u_1} {S : Type u_2} [inst : Lattice ℒ] [inst_1 : CompleteLattice S]\n  {μ : HarderNarasimhan.PayoffFunction ℒ S} [inst_2 : Nontrivial ℒ] [inst_3 : BoundedOrder ℒ],\n  μ.IsConvexOn ⊤ ↔ μ.IsConvex",
   "constCategory": "Theorem"},
  {"references": [],
   "name": "HarderNarasimhan.CoprimaryFiltration.ne_top_of_lt",
@@ -275,14 +266,14 @@
   "∀ {ℒ : Type u_1} {S : Type u_2} [inst : Nontrivial ℒ] [inst_1 : PartialOrder ℒ] [inst_2 : BoundedOrder ℒ]\n  [inst_3 : CompleteLattice S] {μ : HarderNarasimhan.PayoffFunction ℒ S},\n  (∀ (x : ℒ) (hx : ⊥ < x), ¬μ.A ⊤ < μ.A { left := ⊥, right := x, lt := hx }) → μ.IsSemistable",
   "constCategory": "Other"},
  {"references": [],
-  "name": "HarderNarasimhan.PayoffFunction.HasNashEquilibrium.eq",
-  "constType":
-  "∀ {ℒ : Type u_1} {S : Type u_2} {inst : Nontrivial ℒ} {inst_1 : PartialOrder ℒ} {inst_2 : BoundedOrder ℒ}\n  {inst_3 : CompleteLattice S} {μ : HarderNarasimhan.PayoffFunction ℒ S} [self : μ.HasNashEquilibrium], μ.A ⊤ = μ.B ⊤",
-  "constCategory": "Theorem"},
- {"references": [],
   "name": "HarderNarasimhan.Coprimary.coprimaryFiltration._proof_4",
   "constType":
   "∀ (R : Type u_2) [inst : CommRing R] [inst_1 : IsNoetherianRing R] (M : Type u_1) [Nontrivial M]\n  [inst_3 : AddCommGroup M] [inst_4 : _root_.Module R M] [inst_5 : Module.Finite R M],\n  (HarderNarasimhan.Coprimary.payoff R M).IsConvex",
+  "constCategory": "Theorem"},
+ {"references": [],
+  "name": "HarderNarasimhan.PayoffFunction.HasNashEquilibrium.eq",
+  "constType":
+  "∀ {ℒ : Type u_1} {S : Type u_2} {inst : Nontrivial ℒ} {inst_1 : PartialOrder ℒ} {inst_2 : BoundedOrder ℒ}\n  {inst_3 : CompleteLattice S} {μ : HarderNarasimhan.PayoffFunction ℒ S} [self : μ.HasNashEquilibrium], μ.A ⊤ = μ.B ⊤",
   "constCategory": "Theorem"},
  {"references": [],
   "name": "HarderNarasimhan.StrictIntvl.mk.injEq",
@@ -290,15 +281,15 @@
   "∀ {ℒ : Type u_1} [inst : LT ℒ] (left right : ℒ) (lt : left < right) (left_1 right_1 : ℒ) (lt_1 : left_1 < right_1),\n  ({ left := left, right := right, lt := lt } = { left := left_1, right := right_1, lt := lt_1 }) =\n    (left = left_1 ∧ right = right_1)",
   "constCategory": "Theorem"},
  {"references": [],
-  "name": "HarderNarasimhan.StrictIntvl.val_top",
-  "constType":
-  "∀ {ℒ : Type u_1} [inst : PartialOrder ℒ] {I : HarderNarasimhan.StrictIntvl ℒ}, ↑⊤ = I.right",
-  "constCategory": "Theorem"},
- {"references": [],
   "name":
   "HarderNarasimhan.PayoffFunction.HarderNarasimhanFiltration.ne_top_of_lt",
   "constType":
   "∀ {ℒ : Type u_1} {S : Type u_2} [inst : PartialOrder ℒ] [inst_1 : BoundedOrder ℒ] [inst_2 : CompleteLattice S]\n  {μ : HarderNarasimhan.PayoffFunction ℒ S} {F : μ.HarderNarasimhanFiltration} {m : ℕ}, m < F.length → F m ≠ ⊤",
+  "constCategory": "Theorem"},
+ {"references": [],
+  "name": "HarderNarasimhan.StrictIntvl.val_top",
+  "constType":
+  "∀ {ℒ : Type u_1} [inst : PartialOrder ℒ] {I : HarderNarasimhan.StrictIntvl ℒ}, ↑⊤ = I.right",
   "constCategory": "Theorem"},
  {"references":
   ["IsNoetherianRing",
@@ -374,19 +365,19 @@
   "constType": "{α : Type u_1} → (s : Set α) → [Fintype ↑s] → Finset α",
   "constCategory": "Definition"},
  {"references": [],
-  "name": "HarderNarasimhan.PayoffFunction.dual_apply",
-  "constType":
-  "∀ {ℒ : Type u_1} {S : Type u_2} [inst : LT ℒ] (μ : HarderNarasimhan.PayoffFunction ℒ S)\n  (p : HarderNarasimhan.StrictIntvl ℒᵒᵈ), μ.dual p = OrderDual.toDual (μ { left := p.right, right := p.left, lt := ⋯ })",
-  "constCategory": "Theorem"},
- {"references": [],
   "name": "HarderNarasimhan.PayoffFunction.IsBreakpoint.left_lt",
   "constType":
   "∀ {ℒ : Type u_1} {S : Type u_2} [inst : PartialOrder ℒ] [inst_1 : CompleteLattice S]\n  {μ : HarderNarasimhan.PayoffFunction ℒ S} {I : HarderNarasimhan.StrictIntvl ℒ} {x : ℒ},\n  μ.IsBreakpoint I x → I.left < x",
   "constCategory": "Theorem"},
  {"references": [],
+  "name": "HarderNarasimhan.PayoffFunction.dual_apply",
+  "constType":
+  "∀ {ℒ : Type u_1} {S : Type u_2} [inst : LT ℒ] (μ : HarderNarasimhan.PayoffFunction ℒ S)\n  (p : HarderNarasimhan.StrictIntvl ℒᵒᵈ), μ.dual p = OrderDual.toDual (μ { left := p.right, right := p.left, lt := ⋯ })",
+  "constCategory": "Theorem"},
+ {"references": [],
   "name": "HarderNarasimhan.PayoffFunction.Admissible.mk",
   "constType":
-  "∀ {ℒ : Type u_1} {S : Type u_2} [inst : Preorder ℒ] [inst_1 : CompleteLattice S]\n  {μ : HarderNarasimhan.PayoffFunction ℒ S},\n  ((Std.Total fun x1 x2 ↦ x1 ≤ x2) ∨ ∀ (I : HarderNarasimhan.StrictIntvl ℒ), μ.IsAttained I) → μ.Admissible",
+  "∀ {ℒ : Type u_1} {S : Type u_2} [inst : Preorder ℒ] [inst_1 : CompleteLattice S]\n  {μ : HarderNarasimhan.PayoffFunction ℒ S},\n  ((Total fun x1 x2 ↦ x1 ≤ x2) ∨ ∀ (I : HarderNarasimhan.StrictIntvl ℒ), μ.IsAttained I) → μ.Admissible",
   "constCategory": "Other"},
  {"references": [],
   "name": "HarderNarasimhan.PayoffFunction.relSeries_succ_step_lt",
@@ -398,16 +389,7 @@
   "constType":
   "{ℒ : Type u_1} →\n  {S : Type u_2} →\n    [inst : Nontrivial ℒ] →\n      [inst_1 : PartialOrder ℒ] →\n        [inst_2 : BoundedOrder ℒ] →\n          [inst_3 : CompleteLattice S] →\n            {μ : HarderNarasimhan.PayoffFunction ℒ S} →\n              {motive : μ.IsSemistable → Sort u} →\n                ((not_lt : ∀ (x : ℒ) (hx : ⊥ < x), ¬μ.A ⊤ < μ.A { left := ⊥, right := x, lt := hx }) → motive ⋯) →\n                  (t : μ.IsSemistable) → motive t",
   "constCategory": "Other"},
- {"references":
-  ["LT.lt",
-   "Not",
-   "Max.max",
-   "Min.min",
-   "Iff.mpr",
-   "LE.le",
-   "right_lt_sup",
-   "DFunLike.coe",
-   "inf_lt_left"],
+ {"references": ["HarderNarasimhan.PayoffFunction.IsAffine.casesOn"],
   "name": "HarderNarasimhan.PayoffFunction.IsAffine.recOn",
   "constType":
   "{ℒ : Type u_1} →\n  {S : Type u_2} →\n    [inst : Lattice ℒ] →\n      {μ : HarderNarasimhan.PayoffFunction ℒ S} →\n        {motive : μ.IsAffine → Sort u} →\n          (t : μ.IsAffine) →\n            ((eq :\n                  ∀ (x y : ℒ) (h : ¬x ≤ y),\n                    μ { left := x ⊓ y, right := x, lt := ⋯ } = μ { left := y, right := x ⊔ y, lt := ⋯ }) →\n                motive ⋯) →\n              motive t",
@@ -477,25 +459,25 @@
   "{ℒ : Type u_1} →\n  {S : Type u_2} →\n    [Nontrivial ℒ] →\n      [inst : PartialOrder ℒ] → [BoundedOrder ℒ] → [CompleteLattice S] → HarderNarasimhan.PayoffFunction ℒ S → Prop",
   "constCategory": "Other"},
  {"references": [],
-  "name": "HarderNarasimhan.StrictIntvl.ofSub_left",
-  "constType":
-  "∀ {ℒ : Type u_1} [inst : PartialOrder ℒ] {I : HarderNarasimhan.StrictIntvl ℒ}\n  (J : HarderNarasimhan.StrictIntvl { x // x ∈ I }), (HarderNarasimhan.StrictIntvl.ofSub J).left = ↑J.left",
-  "constCategory": "Theorem"},
- {"references": [],
   "name": "HarderNarasimhan.PayoffFunction.IsConvexOn.mk",
   "constType":
   "∀ {ℒ : Type u_1} {S : Type u_2} [inst : Lattice ℒ] [inst_1 : CompleteLattice S]\n  {μ : HarderNarasimhan.PayoffFunction ℒ S} {I : HarderNarasimhan.StrictIntvl ℒ},\n  (∀ (x y : ℒ),\n      x ∈ I →\n        y ∈ I → ∀ (h : ¬x ≤ y), μ { left := x ⊓ y, right := x, lt := ⋯ } ≤ μ { left := y, right := x ⊔ y, lt := ⋯ }) →\n    μ.IsConvexOn I",
   "constCategory": "Other"},
+ {"references": [],
+  "name": "HarderNarasimhan.StrictIntvl.ofSub_left",
+  "constType":
+  "∀ {ℒ : Type u_1} [inst : PartialOrder ℒ] {I : HarderNarasimhan.StrictIntvl ℒ}\n  (J : HarderNarasimhan.StrictIntvl { x // x ∈ I }), (HarderNarasimhan.StrictIntvl.ofSub J).left = ↑J.left",
+  "constCategory": "Theorem"},
+ {"references": ["LT.lt"],
+  "name": "HarderNarasimhan.StrictIntvl.casesOn",
+  "constType":
+  "{ℒ : Type u_1} →\n  [inst : LT ℒ] →\n    {motive : HarderNarasimhan.StrictIntvl ℒ → Sort u} →\n      (t : HarderNarasimhan.StrictIntvl ℒ) →\n        ((left right : ℒ) → (lt : left < right) → motive { left := left, right := right, lt := lt }) → motive t",
+  "constCategory": "Definition"},
  {"references":
   ["Membership.mem", "HarderNarasimhan.StrictIntvl.ofSub", "DFunLike.coe"],
   "name": "HarderNarasimhan.PayoffFunction.restrict",
   "constType":
   "{ℒ : Type u_1} →\n  {S : Type u_2} →\n    [inst : PartialOrder ℒ] →\n      HarderNarasimhan.PayoffFunction ℒ S →\n        (I : HarderNarasimhan.StrictIntvl ℒ) → HarderNarasimhan.PayoffFunction { x // x ∈ I } S",
-  "constCategory": "Definition"},
- {"references": ["LT.lt"],
-  "name": "HarderNarasimhan.StrictIntvl.casesOn",
-  "constType":
-  "{ℒ : Type u_1} →\n  [inst : LT ℒ] →\n    {motive : HarderNarasimhan.StrictIntvl ℒ → Sort u} →\n      (t : HarderNarasimhan.StrictIntvl ℒ) →\n        ((left right : ℒ) → (lt : left < right) → motive { left := left, right := right, lt := lt }) → motive t",
   "constCategory": "Definition"},
  {"references":
   ["HarderNarasimhan.PayoffFunction.JordanHolderFiltration.noConfusion",
@@ -561,7 +543,7 @@
  {"references": [],
   "name": "HarderNarasimhan.PayoffFunction.breakpoints_total",
   "constType":
-  "∀ {ℒ : Type u_1} {S : Type u_2} [inst : Lattice ℒ] [inst_1 : CompleteLattice S]\n  {μ : HarderNarasimhan.PayoffFunction ℒ S} {I : HarderNarasimhan.StrictIntvl ℒ},\n  μ.IsConvexOn I →\n    ((Std.Total fun x1 x2 ↦ x1 ≤ x2) ∨\n        ∀ (z : ℒ) (hzI : z ∈ I) (hz : I.left ≠ z), μ.IsAttained { left := I.left, right := z, lt := ⋯ }) →\n      Std.Total fun x1 x2 ↦ x1 ≤ x2",
+  "∀ {ℒ : Type u_1} {S : Type u_2} [inst : Lattice ℒ] [inst_1 : CompleteLattice S]\n  {μ : HarderNarasimhan.PayoffFunction ℒ S} {I : HarderNarasimhan.StrictIntvl ℒ},\n  μ.IsConvexOn I →\n    ((Total fun x1 x2 ↦ x1 ≤ x2) ∨\n        ∀ (z : ℒ) (hzI : z ∈ I) (hz : I.left ≠ z), μ.IsAttained { left := I.left, right := z, lt := ⋯ }) →\n      Total fun x1 x2 ↦ x1 ≤ x2",
   "constCategory": "Theorem"},
  {"references": [],
   "name": "HarderNarasimhan.PayoffFunction.relSeries_step_lt",
@@ -694,10 +676,10 @@
   "{ℒ : Type u_1} →\n  {S : Type u_2} →\n    [inst : Preorder ℒ] →\n      [CompleteLattice S] → HarderNarasimhan.PayoffFunction ℒ S → HarderNarasimhan.PayoffFunction ℒ S",
   "constCategory": "Definition"},
  {"references": [],
-  "name": "HarderNarasimhan.PayoffFunction.WeakSlopeLikeAtBot",
+  "name": "HarderNarasimhan.PayoffFunction.isBreakpoint_right_iff",
   "constType":
-  "{ℒ : Type u_1} →\n  {S : Type u_2} →\n    [inst : PartialOrder ℒ] → [BoundedOrder ℒ] → [CompleteLattice S] → HarderNarasimhan.PayoffFunction ℒ S → Prop",
-  "constCategory": "Other"},
+  "∀ {ℒ : Type u_1} {S : Type u_2} [inst : PartialOrder ℒ] [inst_1 : CompleteLattice S]\n  {μ : HarderNarasimhan.PayoffFunction ℒ S} {I : HarderNarasimhan.StrictIntvl ℒ},\n  μ.IsBreakpoint I I.right ↔ (μ.restrict I).IsSemistable",
+  "constCategory": "Theorem"},
  {"references":
   ["HAdd.hAdd",
    "StrictAnti",
@@ -713,10 +695,10 @@
   "∀ {ℒ : Type u_1} {S : Type u_2} [inst : PartialOrder ℒ] [inst_1 : BoundedOrder ℒ] [inst_2 : CompleteLattice S]\n  {μ : HarderNarasimhan.PayoffFunction ℒ S},\n  (∀ (x : ℕ → ℒ) (saf : StrictAnti x),\n      ∃ N, μ { left := ⊥, right := x N, lt := ⋯ } ≤ μ { left := x (N + 1), right := x N, lt := ⋯ }) →\n    μ.StrongDCC",
   "constCategory": "Definition"},
  {"references": [],
-  "name": "HarderNarasimhan.PayoffFunction.isBreakpoint_right_iff",
+  "name": "HarderNarasimhan.PayoffFunction.WeakSlopeLikeAtBot",
   "constType":
-  "∀ {ℒ : Type u_1} {S : Type u_2} [inst : PartialOrder ℒ] [inst_1 : CompleteLattice S]\n  {μ : HarderNarasimhan.PayoffFunction ℒ S} {I : HarderNarasimhan.StrictIntvl ℒ},\n  μ.IsBreakpoint I I.right ↔ (μ.restrict I).IsSemistable",
-  "constCategory": "Theorem"},
+  "{ℒ : Type u_1} →\n  {S : Type u_2} →\n    [inst : PartialOrder ℒ] → [BoundedOrder ℒ] → [CompleteLattice S] → HarderNarasimhan.PayoffFunction ℒ S → Prop",
+  "constCategory": "Other"},
  {"references": [],
   "name": "HarderNarasimhan.CoprimaryFiltration.mk.injEq",
   "constType":
@@ -772,7 +754,7 @@
  {"references": [],
   "name": "HarderNarasimhan.PayoffFunction.Admissible.rec",
   "constType":
-  "{ℒ : Type u_1} →\n  {S : Type u_2} →\n    [inst : Preorder ℒ] →\n      [inst_1 : CompleteLattice S] →\n        {μ : HarderNarasimhan.PayoffFunction ℒ S} →\n          {motive : μ.Admissible → Sort u} →\n            ((total_or_attained :\n                  (Std.Total fun x1 x2 ↦ x1 ≤ x2) ∨ ∀ (I : HarderNarasimhan.StrictIntvl ℒ), μ.IsAttained I) →\n                motive ⋯) →\n              (t : μ.Admissible) → motive t",
+  "{ℒ : Type u_1} →\n  {S : Type u_2} →\n    [inst : Preorder ℒ] →\n      [inst_1 : CompleteLattice S] →\n        {μ : HarderNarasimhan.PayoffFunction ℒ S} →\n          {motive : μ.Admissible → Sort u} →\n            ((total_or_attained :\n                  (Total fun x1 x2 ↦ x1 ≤ x2) ∨ ∀ (I : HarderNarasimhan.StrictIntvl ℒ), μ.IsAttained I) →\n                motive ⋯) →\n              (t : μ.Admissible) → motive t",
   "constCategory": "Other"},
  {"references":
   ["Not",
@@ -801,6 +783,11 @@
   "constType":
   "∀ {ℒ : Type u_1} {S : Type u_2} [inst : Lattice ℒ] [inst_1 : CompleteLattice S]\n  {μ : HarderNarasimhan.PayoffFunction ℒ S} {I : HarderNarasimhan.StrictIntvl ℒ} {x : ℒ} (hx : μ.IsBreakpoint I x),\n  (μ.restrict { left := I.left, right := x, lt := ⋯ }).IsSemistable",
   "constCategory": "Theorem"},
+ {"references": ["LE.le", "HarderNarasimhan.PayoffFunction.IsAttained"],
+  "name": "HarderNarasimhan.PayoffFunction.Admissible.casesOn",
+  "constType":
+  "{ℒ : Type u_1} →\n  {S : Type u_2} →\n    [inst : Preorder ℒ] →\n      [inst_1 : CompleteLattice S] →\n        {μ : HarderNarasimhan.PayoffFunction ℒ S} →\n          {motive : μ.Admissible → Sort u} →\n            (t : μ.Admissible) →\n              ((total_or_attained :\n                    (Total fun x1 x2 ↦ x1 ≤ x2) ∨ ∀ (I : HarderNarasimhan.StrictIntvl ℒ), μ.IsAttained I) →\n                  motive ⋯) →\n                motive t",
+  "constCategory": "Definition"},
  {"references": [],
   "name": "HarderNarasimhan.PayoffFunction.HarderNarasimhanFiltration.length",
   "constType":
@@ -811,11 +798,6 @@
   "constType":
   "∀ {R : Type u_1} [inst : CommRing R] [inst_1 : IsNoetherianRing R] {M : Type u_2} [inst_2 : Nontrivial M]\n  [inst_3 : AddCommGroup M] [inst_4 : _root_.Module R M] [inst_5 : Module.Finite R M]\n  (self : HarderNarasimhan.CoprimaryFiltration R M), self.toFun self.length = ⊤",
   "constCategory": "Theorem"},
- {"references": ["LE.le", "HarderNarasimhan.PayoffFunction.IsAttained"],
-  "name": "HarderNarasimhan.PayoffFunction.Admissible.casesOn",
-  "constType":
-  "{ℒ : Type u_1} →\n  {S : Type u_2} →\n    [inst : Preorder ℒ] →\n      [inst_1 : CompleteLattice S] →\n        {μ : HarderNarasimhan.PayoffFunction ℒ S} →\n          {motive : μ.Admissible → Sort u} →\n            (t : μ.Admissible) →\n              ((total_or_attained :\n                    (Std.Total fun x1 x2 ↦ x1 ≤ x2) ∨ ∀ (I : HarderNarasimhan.StrictIntvl ℒ), μ.IsAttained I) →\n                  motive ⋯) →\n                motive t",
-  "constCategory": "Definition"},
  {"references": [],
   "name":
   "_private.HarderNarasimhan.Filtration.Unique.0.HarderNarasimhan.PayoffFunction.eq_hnFiltration",
@@ -852,15 +834,15 @@
   "∀ {ℒ : Type u_3} [inst : Nontrivial ℒ] [inst_1 : Lattice ℒ] [inst_2 : BoundedOrder ℒ] {S : Type u_4}\n  [inst_3 : CompleteLinearOrder S] {μ : HarderNarasimhan.PayoffFunction ℒ S},\n  μ.IsSemistable → ∀ [μ.WeakACC] [μ.WeakSlopeLikeAtTop], μ.HasNashEquilibrium",
   "constCategory": "Theorem"},
  {"references": [],
-  "name": "HarderNarasimhan.PayoffFunction.adcc_of_exists_A_eq_top",
-  "constType":
-  "∀ {ℒ : Type u_1} {S : Type u_2} [inst : Lattice ℒ] [inst_1 : CompleteLattice S]\n  {μ : HarderNarasimhan.PayoffFunction ℒ S} [inst_2 : Nontrivial ℒ] [inst_3 : BoundedOrder ℒ],\n  μ.IsConvexOn ⊤ →\n    (∀ (f : ℕ → ℒ) (h : StrictAnti f), ∃ N, μ.A { left := f (N + 1), right := f N, lt := ⋯ } = ⊤) → μ.ADCC",
-  "constCategory": "Theorem"},
- {"references": [],
   "name": "HarderNarasimhan.StrictIntvl.right",
   "constType":
   "{ℒ : Type u_1} → [inst : LT ℒ] → HarderNarasimhan.StrictIntvl ℒ → ℒ",
   "constCategory": "Definition"},
+ {"references": [],
+  "name": "HarderNarasimhan.PayoffFunction.adcc_of_exists_A_eq_top",
+  "constType":
+  "∀ {ℒ : Type u_1} {S : Type u_2} [inst : Lattice ℒ] [inst_1 : CompleteLattice S]\n  {μ : HarderNarasimhan.PayoffFunction ℒ S} [inst_2 : Nontrivial ℒ] [inst_3 : BoundedOrder ℒ],\n  μ.IsConvexOn ⊤ →\n    (∀ (f : ℕ → ℒ) (h : StrictAnti f), ∃ N, μ.A { left := f (N + 1), right := f N, lt := ⋯ } = ⊤) → μ.ADCC",
+  "constCategory": "Theorem"},
  {"references": [],
   "name": "LT.lt",
   "constType": "{α : Type u} → [self : LT α] → α → α → Prop",
@@ -896,13 +878,7 @@
   "name": "DedekindCut.principal",
   "constType": "{α : Type u_1} → [inst : Preorder α] → α → DedekindCut α",
   "constCategory": "Definition"},
- {"references":
-  ["LT.lt",
-   "Top.top",
-   "HarderNarasimhan.PayoffFunction.A",
-   "Ne",
-   "DFunLike.coe",
-   "Bot.bot"],
+ {"references": ["HarderNarasimhan.PayoffFunction.IsStable.casesOn"],
   "name": "HarderNarasimhan.PayoffFunction.IsStable.recOn",
   "constType":
   "{ℒ : Type u_1} →\n  {S : Type u_2} →\n    [inst : Nontrivial ℒ] →\n      [inst_1 : PartialOrder ℒ] →\n        [inst_2 : BoundedOrder ℒ] →\n          [inst_3 : CompleteLattice S] →\n            {μ : HarderNarasimhan.PayoffFunction ℒ S} →\n              {motive : μ.IsStable → Sort u} →\n                (t : μ.IsStable) →\n                  ([toIsSemistable : μ.IsSemistable] →\n                      (ne : ∀ (x : ℒ) (hx : ⊥ < x), x < ⊤ → μ.A { left := ⊥, right := x, lt := hx } ≠ μ.A ⊤) →\n                        motive ⋯) →\n                    motive t",
@@ -922,6 +898,11 @@
   "constType":
   "∀ {R : Type u_1} [inst : CommRing R] {M : Type u_2} [inst_1 : AddCommGroup M] [inst_2 : _root_.Module R M]\n  {N₁ N₂ W : Submodule R M},\n  N₁ ≤ W → W ≤ N₂ → W ≠ N₁ → Submodule.map (N₁.submoduleOf N₂).mkQ (Submodule.comap N₂.subtype W) ≠ ⊥",
   "constCategory": "Theorem"},
+ {"references": [],
+  "name": "HarderNarasimhan.PayoffFunction.HarderNarasimhanFiltration.toFun",
+  "constType":
+  "{ℒ : Type u_1} →\n  {S : Type u_2} →\n    [inst : PartialOrder ℒ] →\n      [inst_1 : BoundedOrder ℒ] →\n        [inst_2 : CompleteLattice S] → {μ : HarderNarasimhan.PayoffFunction ℒ S} → μ.HarderNarasimhanFiltration → ℕ → ℒ",
+  "constCategory": "Definition"},
  {"references":
   ["associatedPrimes",
    "LinearExtension",
@@ -949,11 +930,6 @@
   "name": "HarderNarasimhan.CoprimaryFiltration.noConfusion",
   "constType":
   "{P : Sort u} →\n  {R : Type u_1} →\n    {inst : CommRing R} →\n      {inst_1 : IsNoetherianRing R} →\n        {M : Type u_2} →\n          {inst_2 : Nontrivial M} →\n            {inst_3 : AddCommGroup M} →\n              {inst_4 : _root_.Module R M} →\n                {inst_5 : Module.Finite R M} →\n                  {t : HarderNarasimhan.CoprimaryFiltration R M} →\n                    {R' : Type u_1} →\n                      {inst' : CommRing R'} →\n                        {inst'_1 : IsNoetherianRing R'} →\n                          {M' : Type u_2} →\n                            {inst'_2 : Nontrivial M'} →\n                              {inst'_3 : AddCommGroup M'} →\n                                {inst'_4 : _root_.Module R' M'} →\n                                  {inst'_5 : Module.Finite R' M'} →\n                                    {t' : HarderNarasimhan.CoprimaryFiltration R' M'} →\n                                      R = R' →\n                                        inst ≍ inst' →\n                                          inst_1 ≍ inst'_1 →\n                                            M = M' →\n                                              inst_2 ≍ inst'_2 →\n                                                inst_3 ≍ inst'_3 →\n                                                  inst_4 ≍ inst'_4 →\n                                                    inst_5 ≍ inst'_5 →\n                                                      t ≍ t' →\n                                                        HarderNarasimhan.CoprimaryFiltration.noConfusionType P t t'",
-  "constCategory": "Definition"},
- {"references": [],
-  "name": "HarderNarasimhan.PayoffFunction.HarderNarasimhanFiltration.toFun",
-  "constType":
-  "{ℒ : Type u_1} →\n  {S : Type u_2} →\n    [inst : PartialOrder ℒ] →\n      [inst_1 : BoundedOrder ℒ] →\n        [inst_2 : CompleteLattice S] → {μ : HarderNarasimhan.PayoffFunction ℒ S} → μ.HarderNarasimhanFiltration → ℕ → ℒ",
   "constCategory": "Definition"},
  {"references": [],
   "name": "HarderNarasimhan.PayoffFunction.mk.sizeOf_spec",
@@ -1025,14 +1001,14 @@
   "∀ {ℒ : Type u_1} [inst : Preorder ℒ] (I : HarderNarasimhan.StrictIntvl ℒ), I.right ∈ I",
   "constCategory": "Theorem"},
  {"references": [],
-  "name": "HarderNarasimhan.PayoffFunction.IsConvex.le",
-  "constType":
-  "∀ {ℒ : Type u_1} {S : Type u_2} {inst : Lattice ℒ} {inst_1 : CompleteLattice S}\n  {μ : HarderNarasimhan.PayoffFunction ℒ S} [self : μ.IsConvex] (x y : ℒ) (h : ¬x ≤ y),\n  μ { left := x ⊓ y, right := x, lt := ⋯ } ≤ μ { left := y, right := x ⊔ y, lt := ⋯ }",
-  "constCategory": "Theorem"},
- {"references": [],
   "name": "HarderNarasimhan.Coprimary.mem_subquotientAssociatedPrimes._simp_1",
   "constType":
   "∀ {R : Type u_1} [inst : CommRing R] {M : Type u_2} [inst_1 : AddCommGroup M] [inst_2 : _root_.Module R M]\n  {I : HarderNarasimhan.StrictIntvl (Submodule R M)} {q : LinearExtension (PrimeSpectrum R)},\n  (q ∈ HarderNarasimhan.Coprimary.subquotientAssociatedPrimes I) =\n    (q.asIdeal ∈ associatedPrimes R (↥I.right ⧸ I.left.submoduleOf I.right))",
+  "constCategory": "Theorem"},
+ {"references": [],
+  "name": "HarderNarasimhan.PayoffFunction.IsConvex.le",
+  "constType":
+  "∀ {ℒ : Type u_1} {S : Type u_2} {inst : Lattice ℒ} {inst_1 : CompleteLattice S}\n  {μ : HarderNarasimhan.PayoffFunction ℒ S} [self : μ.IsConvex] (x y : ℒ) (h : ¬x ≤ y),\n  μ { left := x ⊓ y, right := x, lt := ⋯ } ≤ μ { left := y, right := x ⊔ y, lt := ⋯ }",
   "constCategory": "Theorem"},
  {"references": [],
   "name": "HarderNarasimhan.PayoffFunction.IsSlopeLike.min_eq_A",
@@ -1055,19 +1031,6 @@
   "∀ {ℒ : Type u_1} [inst : PartialOrder ℒ] (a b : HarderNarasimhan.StrictIntvl ℒ),\n  (fun I J ↦ J.left ≤ I.left ∧ I.right ≤ J.right) a b ∧ ¬(fun I J ↦ J.left ≤ I.left ∧ I.right ≤ J.right) b a ↔\n    (b.left ≤ a.left ∧ a.right ≤ b.right) ∧ ¬(a.left ≤ b.left ∧ b.right ≤ a.right)",
   "constCategory": "Theorem"},
  {"references":
-  ["HarderNarasimhan.CoprimaryFiltration.toFun",
-   "IsNoetherianRing",
-   "HarderNarasimhan.CoprimaryFiltration.instFunLikeNatSubmodule._proof_1"],
-  "name": "HarderNarasimhan.CoprimaryFiltration.instFunLikeNatSubmodule",
-  "constType":
-  "{R : Type u_1} →\n  [inst : CommRing R] →\n    [inst_1 : IsNoetherianRing R] →\n      {M : Type u_2} →\n        [inst_2 : Nontrivial M] →\n          [inst_3 : AddCommGroup M] →\n            [inst_4 : _root_.Module R M] →\n              [inst_5 : Module.Finite R M] → FunLike (HarderNarasimhan.CoprimaryFiltration R M) ℕ (Submodule R M)",
-  "constCategory": "Definition"},
- {"references": [],
-  "name": "HarderNarasimhan.PayoffFunction.A_restrict_apply",
-  "constType":
-  "∀ {ℒ : Type u_1} {S : Type u_2} [inst : PartialOrder ℒ] [inst_1 : CompleteLattice S]\n  {μ : HarderNarasimhan.PayoffFunction ℒ S} {I : HarderNarasimhan.StrictIntvl ℒ}\n  {J : HarderNarasimhan.StrictIntvl { x // x ∈ I }}, (μ.restrict I).A J = μ.A (HarderNarasimhan.StrictIntvl.ofSub J)",
-  "constCategory": "Theorem"},
- {"references":
   ["LT.lt",
    "Not",
    "Max.max",
@@ -1080,6 +1043,19 @@
   "name": "HarderNarasimhan.PayoffFunction.IsAffine.mk._flat_ctor",
   "constType":
   "∀ {ℒ : Type u_1} {S : Type u_2} [inst : Lattice ℒ] {μ : HarderNarasimhan.PayoffFunction ℒ S},\n  (∀ (x y : ℒ) (h : ¬x ≤ y), μ { left := x ⊓ y, right := x, lt := ⋯ } = μ { left := y, right := x ⊔ y, lt := ⋯ }) →\n    μ.IsAffine",
+  "constCategory": "Definition"},
+ {"references": [],
+  "name": "HarderNarasimhan.PayoffFunction.A_restrict_apply",
+  "constType":
+  "∀ {ℒ : Type u_1} {S : Type u_2} [inst : PartialOrder ℒ] [inst_1 : CompleteLattice S]\n  {μ : HarderNarasimhan.PayoffFunction ℒ S} {I : HarderNarasimhan.StrictIntvl ℒ}\n  {J : HarderNarasimhan.StrictIntvl { x // x ∈ I }}, (μ.restrict I).A J = μ.A (HarderNarasimhan.StrictIntvl.ofSub J)",
+  "constCategory": "Theorem"},
+ {"references":
+  ["HarderNarasimhan.CoprimaryFiltration.toFun",
+   "IsNoetherianRing",
+   "HarderNarasimhan.CoprimaryFiltration.instFunLikeNatSubmodule._proof_1"],
+  "name": "HarderNarasimhan.CoprimaryFiltration.instFunLikeNatSubmodule",
+  "constType":
+  "{R : Type u_1} →\n  [inst : CommRing R] →\n    [inst_1 : IsNoetherianRing R] →\n      {M : Type u_2} →\n        [inst_2 : Nontrivial M] →\n          [inst_3 : AddCommGroup M] →\n            [inst_4 : _root_.Module R M] →\n              [inst_5 : Module.Finite R M] → FunLike (HarderNarasimhan.CoprimaryFiltration R M) ℕ (Submodule R M)",
   "constCategory": "Definition"},
  {"references": [],
   "name": "HarderNarasimhan.CoprimaryFiltration.associatedPrime_succ_lt",
@@ -1111,30 +1087,20 @@
   "constType":
   "∀ {ℒ : Type u_1} [inst : LT ℒ] (left left_1 : ℒ) (e_left : left = left_1) (right right_1 : ℒ)\n  (e_right : right = right_1) (lt : left < right),\n  { left := left, right := right, lt := lt } = { left := left_1, right := right_1, lt := ⋯ }",
   "constCategory": "Theorem"},
- {"references":
-  ["LT.lt",
-   "Not",
-   "Max.max",
-   "Min.min",
-   "Iff.mpr",
-   "LE.le",
-   "Membership.mem",
-   "right_lt_sup",
-   "DFunLike.coe",
-   "inf_lt_left"],
+ {"references": ["HarderNarasimhan.PayoffFunction.IsConvexOn.casesOn"],
   "name": "HarderNarasimhan.PayoffFunction.IsConvexOn.recOn",
   "constType":
   "{ℒ : Type u_1} →\n  {S : Type u_2} →\n    [inst : Lattice ℒ] →\n      [inst_1 : CompleteLattice S] →\n        {μ : HarderNarasimhan.PayoffFunction ℒ S} →\n          {I : HarderNarasimhan.StrictIntvl ℒ} →\n            {motive : μ.IsConvexOn I → Sort u} →\n              (t : μ.IsConvexOn I) →\n                ((le :\n                      ∀ (x y : ℒ),\n                        x ∈ I →\n                          y ∈ I →\n                            ∀ (h : ¬x ≤ y),\n                              μ { left := x ⊓ y, right := x, lt := ⋯ } ≤ μ { left := y, right := x ⊔ y, lt := ⋯ }) →\n                    motive ⋯) →\n                  motive t",
   "constCategory": "Definition"},
  {"references": [],
-  "name": "HarderNarasimhan.StrictIntvl.instNontrivialSubtypeMem",
-  "constType":
-  "∀ {ℒ : Type u_1} [inst : PartialOrder ℒ] {I : HarderNarasimhan.StrictIntvl ℒ}, Nontrivial { x // x ∈ I }",
-  "constCategory": "Theorem"},
- {"references": [],
   "name": "HarderNarasimhan.PayoffFunction.max_restrict",
   "constType":
   "∀ {ℒ : Type u_1} {S : Type u_2} [inst : PartialOrder ℒ] [inst_1 : CompleteLattice S]\n  {μ : HarderNarasimhan.PayoffFunction ℒ S} {I : HarderNarasimhan.StrictIntvl ℒ}, (μ.restrict I).max = μ.max.restrict I",
+  "constCategory": "Theorem"},
+ {"references": [],
+  "name": "HarderNarasimhan.StrictIntvl.instNontrivialSubtypeMem",
+  "constType":
+  "∀ {ℒ : Type u_1} [inst : PartialOrder ℒ] {I : HarderNarasimhan.StrictIntvl ℒ}, Nontrivial { x // x ∈ I }",
   "constCategory": "Theorem"},
  {"references": [],
   "name": "HarderNarasimhan.PayoffFunction.le_A",
@@ -1192,17 +1158,16 @@
   "constType":
   "{ℒ : Type u_1} →\n  {S : Type u_2} →\n    [inst : PartialOrder ℒ] →\n      [inst_1 : BoundedOrder ℒ] →\n        [inst_2 : CompleteLattice S] →\n          {μ : HarderNarasimhan.PayoffFunction ℒ S} →\n            {motive : μ.WeakSlopeLikeAtTop → Sort u} →\n              (t : μ.WeakSlopeLikeAtTop) →\n                ((le_or_le :\n                      ∀ (z : HarderNarasimhan.StrictIntvl ℒ) (hz : z.right < ⊤),\n                        μ z ≤ μ { left := z.left, right := ⊤, lt := ⋯ } ∨\n                          μ { left := z.right, right := ⊤, lt := hz } ≤ μ { left := z.left, right := ⊤, lt := ⋯ }) →\n                    motive ⋯) →\n                  motive t",
   "constCategory": "Definition"},
+ {"references": ["HarderNarasimhan.IsCoprimary.casesOn"],
+  "name": "HarderNarasimhan.IsCoprimary.recOn",
+  "constType":
+  "{R : Type u_1} →\n  [inst : CommRing R] →\n    {M : Type u_2} →\n      [inst_1 : AddCommGroup M] →\n        [inst_2 : _root_.Module R M] →\n          {motive : HarderNarasimhan.IsCoprimary R M → Sort u} →\n            (t : HarderNarasimhan.IsCoprimary R M) →\n              ((existsUnique_associatedPrime : ∃! p, p ∈ associatedPrimes R M) → motive ⋯) → motive t",
+  "constCategory": "Definition"},
  {"references": [],
   "name": "HarderNarasimhan.PayoffFunction.IsStable.rec",
   "constType":
   "{ℒ : Type u_1} →\n  {S : Type u_2} →\n    [inst : Nontrivial ℒ] →\n      [inst_1 : PartialOrder ℒ] →\n        [inst_2 : BoundedOrder ℒ] →\n          [inst_3 : CompleteLattice S] →\n            {μ : HarderNarasimhan.PayoffFunction ℒ S} →\n              {motive : μ.IsStable → Sort u} →\n                ([toIsSemistable : μ.IsSemistable] →\n                    (ne : ∀ (x : ℒ) (hx : ⊥ < x), x < ⊤ → μ.A { left := ⊥, right := x, lt := hx } ≠ μ.A ⊤) → motive ⋯) →\n                  (t : μ.IsStable) → motive t",
   "constCategory": "Other"},
- {"references":
-  ["associatedPrimes", "Ideal", "Set", "Membership.mem", "ExistsUnique"],
-  "name": "HarderNarasimhan.IsCoprimary.recOn",
-  "constType":
-  "{R : Type u_1} →\n  [inst : CommRing R] →\n    {M : Type u_2} →\n      [inst_1 : AddCommGroup M] →\n        [inst_2 : _root_.Module R M] →\n          {motive : HarderNarasimhan.IsCoprimary R M → Sort u} →\n            (t : HarderNarasimhan.IsCoprimary R M) →\n              ((existsUnique_associatedPrime : ∃! p, p ∈ associatedPrimes R M) → motive ⋯) → motive t",
-  "constCategory": "Definition"},
  {"references":
   ["LT.lt",
    "HarderNarasimhan.PayoffFunction.semistableRel.match_1",
@@ -1234,14 +1199,14 @@
   "∀ {R : Type u_1} [inst : CommRing R] [inst_1 : IsNoetherianRing R] {M : Type u_2} [inst_2 : Nontrivial M]\n  [inst_3 : AddCommGroup M] [inst_4 : _root_.Module R M] [inst_5 : Module.Finite R M]\n  (F : HarderNarasimhan.CoprimaryFiltration R M), F.toFun = ⇑F",
   "constCategory": "Theorem"},
  {"references": [],
-  "name": "HarderNarasimhan.Coprimary.A_restrict_eq_quotient",
-  "constType":
-  "∀ {R : Type u_1} [inst : CommRing R] [inst_1 : IsNoetherianRing R] {M : Type u_2} [inst_2 : AddCommGroup M]\n  [inst_3 : _root_.Module R M] [inst_4 : Module.Finite R M] {N₁ N₂ W : Submodule R M} (h₁ : N₁ ≤ W) (h₂ : W ≤ N₂)\n  (h₃ : W ≠ N₁),\n  (HarderNarasimhan.Coprimary.payoff R M).A { left := N₁, right := W, lt := ⋯ } =\n    (HarderNarasimhan.Coprimary.payoff R (↥N₂ ⧸ N₁.submoduleOf N₂)).A\n      { left := ⊥, right := Submodule.map (N₁.submoduleOf N₂).mkQ (Submodule.comap N₂.subtype W), lt := ⋯ }",
-  "constCategory": "Theorem"},
- {"references": [],
   "name": "HarderNarasimhan.StrictIntvl.ext_iff",
   "constType":
   "∀ {ℒ : Type u_1} {inst : LT ℒ} {x y : HarderNarasimhan.StrictIntvl ℒ}, x = y ↔ x.left = y.left ∧ x.right = y.right",
+  "constCategory": "Theorem"},
+ {"references": [],
+  "name": "HarderNarasimhan.Coprimary.A_restrict_eq_quotient",
+  "constType":
+  "∀ {R : Type u_1} [inst : CommRing R] [inst_1 : IsNoetherianRing R] {M : Type u_2} [inst_2 : AddCommGroup M]\n  [inst_3 : _root_.Module R M] [inst_4 : Module.Finite R M] {N₁ N₂ W : Submodule R M} (h₁ : N₁ ≤ W) (h₂ : W ≤ N₂)\n  (h₃ : W ≠ N₁),\n  (HarderNarasimhan.Coprimary.payoff R M).A { left := N₁, right := W, lt := ⋯ } =\n    (HarderNarasimhan.Coprimary.payoff R (↥N₂ ⧸ N₁.submoduleOf N₂)).A\n      { left := ⊥, right := Submodule.map (N₁.submoduleOf N₂).mkQ (Submodule.comap N₂.subtype W), lt := ⋯ }",
   "constCategory": "Theorem"},
  {"references":
   ["HAdd.hAdd",
@@ -1256,11 +1221,6 @@
   "constType":
   "{ℒ : Type u_1} →\n  {S : Type u_2} →\n    [inst : Preorder ℒ] →\n      [inst_1 : CompleteLattice S] →\n        {μ : HarderNarasimhan.PayoffFunction ℒ S} →\n          {motive : μ.ADCC → Sort u} →\n            (t : μ.ADCC) →\n              ((dcc :\n                    ∀ (a : ℒ) (f : ℕ → ℒ) (h₁ : ∀ (n : ℕ), f n > a),\n                      StrictAnti f →\n                        ∃ N,\n                          ¬μ.A { left := a, right := f N, lt := ⋯ } < μ.A { left := a, right := f (N + 1), lt := ⋯ }) →\n                  motive ⋯) →\n                motive t",
   "constCategory": "Definition"},
- {"references": [],
-  "name": "HarderNarasimhan.PayoffFunction.le_max",
-  "constType":
-  "∀ {ℒ : Type u_1} {S : Type u_2} [inst : Preorder ℒ] [inst_1 : CompleteLattice S]\n  {μ : HarderNarasimhan.PayoffFunction ℒ S} {I : HarderNarasimhan.StrictIntvl ℒ} {u : ℒ}\n  (hu : u ∈ Set.Ioc I.left I.right), μ { left := I.left, right := u, lt := ⋯ } ≤ μ.max I",
-  "constCategory": "Theorem"},
  {"references":
   ["HAdd.hAdd",
    "LT.lt",
@@ -1274,6 +1234,11 @@
   "constType":
   "∀ {ℒ : Type u_1} {S : Type u_2} [inst : Preorder ℒ] [inst_1 : CompleteLattice S]\n  {μ : HarderNarasimhan.PayoffFunction ℒ S},\n  (∀ (a : ℒ) (f : ℕ → ℒ) (h₁ : ∀ (n : ℕ), f n > a),\n      StrictAnti f → ∃ N, ¬μ.A { left := a, right := f N, lt := ⋯ } < μ.A { left := a, right := f (N + 1), lt := ⋯ }) →\n    μ.ADCC",
   "constCategory": "Definition"},
+ {"references": [],
+  "name": "HarderNarasimhan.PayoffFunction.le_max",
+  "constType":
+  "∀ {ℒ : Type u_1} {S : Type u_2} [inst : Preorder ℒ] [inst_1 : CompleteLattice S]\n  {μ : HarderNarasimhan.PayoffFunction ℒ S} {I : HarderNarasimhan.StrictIntvl ℒ} {u : ℒ}\n  (hu : u ∈ Set.Ioc I.left I.right), μ { left := I.left, right := u, lt := ⋯ } ≤ μ.max I",
+  "constCategory": "Theorem"},
  {"references": [],
   "name": "HarderNarasimhan.PayoffFunction.strongDCC_of_wellOrderedRank",
   "constType":
@@ -1300,27 +1265,16 @@
   "{α : Type u} →\n  {β : Type v} → {motive : α × β → Sort u_1} → (t : α × β) → ((fst : α) → (snd : β) → motive (fst, snd)) → motive t",
   "constCategory": "Definition"},
  {"references": [],
-  "name": "HarderNarasimhan.StrictIntvl.instLatticeSubtypeMem._proof_2",
-  "constType":
-  "∀ {ℒ : Type u_1} [inst : Lattice ℒ] {I : HarderNarasimhan.StrictIntvl ℒ} (x x_1 : ℒ),\n  x ∈ I → x_1 ∈ I → I.left ≤ x ⊓ x_1 ∧ x ⊓ x_1 ≤ I.right",
-  "constCategory": "Theorem"},
- {"references": [],
   "name": "HarderNarasimhan.Coprimary.isSemistable_iff_A_const",
   "constType":
   "∀ {R : Type u_1} [inst : CommRing R] [inst_1 : IsNoetherianRing R] {M : Type u_2} [inst_2 : AddCommGroup M]\n  [inst_3 : _root_.Module R M] [inst_4 : Module.Finite R M] [inst_5 : Nontrivial M],\n  (HarderNarasimhan.Coprimary.payoff R M).IsSemistable ↔\n    ∀ (N : Submodule R M) (hN : ⊥ < N),\n      (HarderNarasimhan.Coprimary.payoff R M).A { left := ⊥, right := N, lt := hN } =\n        DedekindCut.principal (toColex {(HarderNarasimhan.Coprimary.subquotientAssociatedPrimes ⊤).toFinset.min' ⋯})",
   "constCategory": "Theorem"},
- {"references":
-  ["LT.lt",
-   "Not",
-   "HarderNarasimhan.StrictIntvl.left",
-   "HarderNarasimhan.StrictIntvl.right",
-   "LE.le",
-   "Membership.mem",
-   "HarderNarasimhan.PayoffFunction.A",
-   "Ne",
-   "lt_of_le_of_ne",
-   "DFunLike.coe",
-   "And.left"],
+ {"references": [],
+  "name": "HarderNarasimhan.StrictIntvl.instLatticeSubtypeMem._proof_2",
+  "constType":
+  "∀ {ℒ : Type u_1} [inst : Lattice ℒ] {I : HarderNarasimhan.StrictIntvl ℒ} (x x_1 : ℒ),\n  x ∈ I → x_1 ∈ I → I.left ≤ x ⊓ x_1 ∧ x ⊓ x_1 ≤ I.right",
+  "constCategory": "Theorem"},
+ {"references": ["HarderNarasimhan.PayoffFunction.IsBreakpoint.casesOn"],
   "name": "HarderNarasimhan.PayoffFunction.IsBreakpoint.recOn",
   "constType":
   "{ℒ : Type u_1} →\n  {S : Type u_2} →\n    [inst : PartialOrder ℒ] →\n      [inst_1 : CompleteLattice S] →\n        {μ : HarderNarasimhan.PayoffFunction ℒ S} →\n          {I : HarderNarasimhan.StrictIntvl ℒ} →\n            {x : ℒ} →\n              {motive : μ.IsBreakpoint I x → Sort u} →\n                (t : μ.IsBreakpoint I x) →\n                  ((mem : x ∈ I) →\n                      (ne_left : I.left ≠ x) →\n                        (not_lt :\n                            ∀ (y : ℒ) (hyI : y ∈ I) (hy : I.left ≠ y),\n                              ¬μ.A { left := I.left, right := x, lt := ⋯ } <\n                                  μ.A { left := I.left, right := y, lt := ⋯ }) →\n                          (le_of_eq :\n                              ∀ (y : ℒ) (hyI : y ∈ I) (hy : I.left ≠ y),\n                                μ.A { left := I.left, right := y, lt := ⋯ } =\n                                    μ.A { left := I.left, right := x, lt := ⋯ } →\n                                  y ≤ x) →\n                            motive ⋯) →\n                    motive t",
@@ -1337,15 +1291,15 @@
   "∀ {ℒ : Type u_1} {S : Type u_2} [inst : PartialOrder ℒ] [inst_1 : BoundedOrder ℒ] [inst_2 : CompleteLattice S]\n  {μ : HarderNarasimhan.PayoffFunction ℒ S} (self : μ.HarderNarasimhanFiltration), self.toFun self.length = ⊤",
   "constCategory": "Theorem"},
  {"references": [],
-  "name": "HarderNarasimhan.PayoffFunction.JordanHolderFiltration.payoff_lt",
-  "constType":
-  "∀ {ℒ : Type u_1} {S : Type u_2} [inst : Nontrivial ℒ] [inst_1 : PartialOrder ℒ] [inst_2 : BoundedOrder ℒ]\n  [inst_3 : CompleteLattice S] {μ : HarderNarasimhan.PayoffFunction ℒ S} (F : μ.JordanHolderFiltration) {i : ℕ}\n  (hi : i < F.length) {z : ℒ} (h' : F (i + 1) < z),\n  z < F i → μ { left := F (i + 1), right := z, lt := h' } < μ { left := F (i + 1), right := F i, lt := ⋯ }",
-  "constCategory": "Theorem"},
- {"references": [],
   "name": "HarderNarasimhan.PayoffFunction.WeakSlopeLikeAtBot.mk",
   "constType":
   "∀ {ℒ : Type u_1} {S : Type u_2} [inst : PartialOrder ℒ] [inst_1 : BoundedOrder ℒ] [inst_2 : CompleteLattice S]\n  {μ : HarderNarasimhan.PayoffFunction ℒ S},\n  (∀ (z : HarderNarasimhan.StrictIntvl ℒ) (hz : ⊥ < z.left),\n      μ { left := ⊥, right := z.right, lt := ⋯ } ≤ μ z ∨\n        μ { left := ⊥, right := z.right, lt := ⋯ } ≤ μ { left := ⊥, right := z.left, lt := hz }) →\n    μ.WeakSlopeLikeAtBot",
   "constCategory": "Other"},
+ {"references": [],
+  "name": "HarderNarasimhan.PayoffFunction.JordanHolderFiltration.payoff_lt",
+  "constType":
+  "∀ {ℒ : Type u_1} {S : Type u_2} [inst : Nontrivial ℒ] [inst_1 : PartialOrder ℒ] [inst_2 : BoundedOrder ℒ]\n  [inst_3 : CompleteLattice S] {μ : HarderNarasimhan.PayoffFunction ℒ S} (F : μ.JordanHolderFiltration) {i : ℕ}\n  (hi : i < F.length) {z : ℒ} (h' : F (i + 1) < z),\n  z < F i → μ { left := F (i + 1), right := z, lt := h' } < μ { left := F (i + 1), right := F i, lt := ⋯ }",
+  "constCategory": "Theorem"},
  {"references": [],
   "name": "HarderNarasimhan.PayoffFunction.JordanHolderFiltration.apply_lt_top",
   "constType":
@@ -1368,14 +1322,14 @@
   "∀ {α : Type u} [inst : SemilatticeInf α] {a b : α}, a ⊓ b < a ↔ ¬a ≤ b",
   "constCategory": "Theorem"},
  {"references": [],
-  "name": "HarderNarasimhan.PayoffFunction.WeakSlopeLikeAtTop.rec",
-  "constType":
-  "{ℒ : Type u_1} →\n  {S : Type u_2} →\n    [inst : PartialOrder ℒ] →\n      [inst_1 : BoundedOrder ℒ] →\n        [inst_2 : CompleteLattice S] →\n          {μ : HarderNarasimhan.PayoffFunction ℒ S} →\n            {motive : μ.WeakSlopeLikeAtTop → Sort u} →\n              ((le_or_le :\n                    ∀ (z : HarderNarasimhan.StrictIntvl ℒ) (hz : z.right < ⊤),\n                      μ z ≤ μ { left := z.left, right := ⊤, lt := ⋯ } ∨\n                        μ { left := z.right, right := ⊤, lt := hz } ≤ μ { left := z.left, right := ⊤, lt := ⋯ }) →\n                  motive ⋯) →\n                (t : μ.WeakSlopeLikeAtTop) → motive t",
-  "constCategory": "Other"},
- {"references": [],
   "name": "HarderNarasimhan.PayoffFunction.HasNashEquilibrium.rec",
   "constType":
   "{ℒ : Type u_1} →\n  {S : Type u_2} →\n    [inst : Nontrivial ℒ] →\n      [inst_1 : PartialOrder ℒ] →\n        [inst_2 : BoundedOrder ℒ] →\n          [inst_3 : CompleteLattice S] →\n            {μ : HarderNarasimhan.PayoffFunction ℒ S} →\n              {motive : μ.HasNashEquilibrium → Sort u} →\n                ((eq : μ.A ⊤ = μ.B ⊤) → motive ⋯) → (t : μ.HasNashEquilibrium) → motive t",
+  "constCategory": "Other"},
+ {"references": [],
+  "name": "HarderNarasimhan.PayoffFunction.WeakSlopeLikeAtTop.rec",
+  "constType":
+  "{ℒ : Type u_1} →\n  {S : Type u_2} →\n    [inst : PartialOrder ℒ] →\n      [inst_1 : BoundedOrder ℒ] →\n        [inst_2 : CompleteLattice S] →\n          {μ : HarderNarasimhan.PayoffFunction ℒ S} →\n            {motive : μ.WeakSlopeLikeAtTop → Sort u} →\n              ((le_or_le :\n                    ∀ (z : HarderNarasimhan.StrictIntvl ℒ) (hz : z.right < ⊤),\n                      μ z ≤ μ { left := z.left, right := ⊤, lt := ⋯ } ∨\n                        μ { left := z.right, right := ⊤, lt := hz } ≤ μ { left := z.left, right := ⊤, lt := ⋯ }) →\n                  motive ⋯) →\n                (t : μ.WeakSlopeLikeAtTop) → motive t",
   "constCategory": "Other"},
  {"references": [],
   "name":
@@ -1394,29 +1348,29 @@
   "∀ {ℒ : Type u_1} {S : Type u_2} [inst : Nontrivial ℒ] [inst_1 : PartialOrder ℒ] [inst_2 : BoundedOrder ℒ]\n  [inst_3 : CompleteLattice S] {μ : HarderNarasimhan.PayoffFunction ℒ S} (F : μ.JordanHolderFiltration) {i : ℕ}\n  (hi : i < F.length), μ { left := F (i + 1), right := F i, lt := ⋯ } = μ ⊤",
   "constCategory": "Theorem"},
  {"references": [],
-  "name": "HarderNarasimhan.PayoffFunction.IsSlopeLike",
-  "constType":
-  "{ℒ : Type u_1} →\n  {S : Type u_2} → [inst : PartialOrder ℒ] → [CompleteLattice S] → HarderNarasimhan.PayoffFunction ℒ S → Prop",
-  "constCategory": "Other"},
- {"references": [],
   "name": "HarderNarasimhan.PayoffFunction.le_B",
   "constType":
   "∀ {ℒ : Type u_1} {S : Type u_2} [inst : Preorder ℒ] [inst_1 : CompleteLattice S]\n  {μ : HarderNarasimhan.PayoffFunction ℒ S} {I : HarderNarasimhan.StrictIntvl ℒ} {b : ℒ}\n  (hb : b ∈ Set.Ioc I.left I.right), μ.min { left := I.left, right := b, lt := ⋯ } ≤ μ.B I",
   "constCategory": "Theorem"},
+ {"references": [],
+  "name": "HarderNarasimhan.PayoffFunction.IsSlopeLike",
+  "constType":
+  "{ℒ : Type u_1} →\n  {S : Type u_2} → [inst : PartialOrder ℒ] → [CompleteLattice S] → HarderNarasimhan.PayoffFunction ℒ S → Prop",
+  "constCategory": "Other"},
  {"references": [],
   "name": "HarderNarasimhan.PayoffFunction.JordanHolderFiltration.toFun",
   "constType":
   "{ℒ : Type u_1} →\n  {S : Type u_2} →\n    [inst : Nontrivial ℒ] →\n      [inst_1 : PartialOrder ℒ] →\n        [inst_2 : BoundedOrder ℒ] →\n          [inst_3 : CompleteLattice S] → {μ : HarderNarasimhan.PayoffFunction ℒ S} → μ.JordanHolderFiltration → ℕ → ℒ",
   "constCategory": "Definition"},
  {"references": [],
-  "name": "HarderNarasimhan.PayoffFunction.max_top_eq_apply_iff",
-  "constType":
-  "∀ {ℒ : Type u_1} {S : Type u_2} [inst : Nontrivial ℒ] [inst_1 : PartialOrder ℒ] [inst_2 : BoundedOrder ℒ]\n  [inst_3 : CompleteLattice S] {μ : HarderNarasimhan.PayoffFunction ℒ S} [hμ : μ.IsSlopeLike],\n  μ.max ⊤ = μ ⊤ ↔ μ.min ⊤ = μ.max ⊤",
-  "constCategory": "Theorem"},
- {"references": [],
   "name": "HarderNarasimhan.PayoffFunction.IsConvexOn.inf_A_le_A_sup",
   "constType":
   "∀ {ℒ : Type u_1} {S : Type u_2} [inst : Lattice ℒ] [inst_1 : CompleteLattice S]\n  {μ : HarderNarasimhan.PayoffFunction ℒ S} {I : HarderNarasimhan.StrictIntvl ℒ},\n  μ.IsConvexOn I →\n    ∀ {x y u : ℒ},\n      x ∈ I →\n        y ∈ I →\n          u ∈ I →\n            ∀ (h₁ : u < x) (h₂ : u < y),\n              μ.A { left := u, right := x, lt := h₁ } ⊓ μ.A { left := u, right := y, lt := h₂ } ≤\n                μ.A { left := u, right := x ⊔ y, lt := ⋯ }",
+  "constCategory": "Theorem"},
+ {"references": [],
+  "name": "HarderNarasimhan.PayoffFunction.max_top_eq_apply_iff",
+  "constType":
+  "∀ {ℒ : Type u_1} {S : Type u_2} [inst : Nontrivial ℒ] [inst_1 : PartialOrder ℒ] [inst_2 : BoundedOrder ℒ]\n  [inst_3 : CompleteLattice S] {μ : HarderNarasimhan.PayoffFunction ℒ S} [hμ : μ.IsSlopeLike],\n  μ.max ⊤ = μ ⊤ ↔ μ.min ⊤ = μ.max ⊤",
   "constCategory": "Theorem"},
  {"references": [],
   "name": "HarderNarasimhan.PayoffFunction.IsSlopeLike.seesaw",
@@ -1438,7 +1392,12 @@
   "constType":
   "∀ {ℒ : Type u_1} {S : Type u_2} [inst : Nontrivial ℒ] [inst_1 : PartialOrder ℒ] [inst_2 : BoundedOrder ℒ]\n  [inst_3 : CompleteLattice S] {μ : HarderNarasimhan.PayoffFunction ℒ S}, μ.A ⊤ = μ.B ⊤ → μ.HasNashEquilibrium",
   "constCategory": "Other"},
- {"references": ["Not", "Decidable.casesOn"],
+ {"references":
+  ["Not",
+   "Bool.casesOn",
+   "Decidable.reflects_decide",
+   "Decidable.decide",
+   "Bool.Reflects"],
   "name": "dite",
   "constType":
   "{α : Sort u} → (c : Prop) → [h : Decidable c] → (c → α) → (¬c → α) → α",
@@ -1518,8 +1477,7 @@
   "constType":
   "{ℒ : Type u_1} →\n  {S : Type u_2} →\n    [inst : Nontrivial ℒ] →\n      [inst_1 : PartialOrder ℒ] →\n        [inst_2 : BoundedOrder ℒ] →\n          [inst_3 : CompleteLattice S] →\n            {μ : HarderNarasimhan.PayoffFunction ℒ S} →\n              {motive : μ.IsStable → Sort u} →\n                (t : μ.IsStable) →\n                  ([toIsSemistable : μ.IsSemistable] →\n                      (ne : ∀ (x : ℒ) (hx : ⊥ < x), x < ⊤ → μ.A { left := ⊥, right := x, lt := hx } ≠ μ.A ⊤) →\n                        motive ⋯) →\n                    motive t",
   "constCategory": "Definition"},
- {"references":
-  ["lt_trans", "LT.lt", "And.right", "LE.le", "DFunLike.coe", "And.left"],
+ {"references": ["HarderNarasimhan.PayoffFunction.IsSlopeLike.casesOn"],
   "name": "HarderNarasimhan.PayoffFunction.IsSlopeLike.recOn",
   "constType":
   "{ℒ : Type u_1} →\n  {S : Type u_2} →\n    [inst : PartialOrder ℒ] →\n      [inst_1 : CompleteLattice S] →\n        {μ : HarderNarasimhan.PayoffFunction ℒ S} →\n          {motive : μ.IsSlopeLike → Sort u} →\n            (t : μ.IsSlopeLike) →\n              ((slopelike :\n                    ∀ (x y z : ℒ) (h : x < y ∧ y < z),\n                      (μ { left := x, right := y, lt := ⋯ } ≤ μ { left := x, right := z, lt := ⋯ } ∨\n                          μ { left := y, right := z, lt := ⋯ } < μ { left := x, right := z, lt := ⋯ }) ∧\n                        (μ { left := x, right := y, lt := ⋯ } < μ { left := x, right := z, lt := ⋯ } ∨\n                            μ { left := y, right := z, lt := ⋯ } ≤ μ { left := x, right := z, lt := ⋯ }) ∧\n                          (μ { left := x, right := z, lt := ⋯ } < μ { left := x, right := y, lt := ⋯ } ∨\n                              μ { left := x, right := z, lt := ⋯ } ≤ μ { left := y, right := z, lt := ⋯ }) ∧\n                            (μ { left := x, right := z, lt := ⋯ } ≤ μ { left := x, right := y, lt := ⋯ } ∨\n                              μ { left := x, right := z, lt := ⋯ } < μ { left := y, right := z, lt := ⋯ })) →\n                  motive ⋯) →\n                motive t",
@@ -1605,17 +1563,17 @@
  {"references": [],
   "name": "HarderNarasimhan.PayoffFunction.Admissible.total_or_attained",
   "constType":
-  "∀ {ℒ : Type u_1} {S : Type u_2} {inst : Preorder ℒ} {inst_1 : CompleteLattice S}\n  {μ : HarderNarasimhan.PayoffFunction ℒ S} [self : μ.Admissible],\n  (Std.Total fun x1 x2 ↦ x1 ≤ x2) ∨ ∀ (I : HarderNarasimhan.StrictIntvl ℒ), μ.IsAttained I",
-  "constCategory": "Theorem"},
- {"references": [],
-  "name": "HarderNarasimhan.PayoffFunction.JordanHolderFiltration.ext_iff",
-  "constType":
-  "∀ {ℒ : Type u_1} {S : Type u_2} [inst : Nontrivial ℒ] [inst_1 : PartialOrder ℒ] [inst_2 : BoundedOrder ℒ]\n  [inst_3 : CompleteLattice S] {μ : HarderNarasimhan.PayoffFunction ℒ S} {F G : μ.JordanHolderFiltration},\n  F = G ↔ ∀ (n : ℕ), F n = G n",
+  "∀ {ℒ : Type u_1} {S : Type u_2} {inst : Preorder ℒ} {inst_1 : CompleteLattice S}\n  {μ : HarderNarasimhan.PayoffFunction ℒ S} [self : μ.Admissible],\n  (Total fun x1 x2 ↦ x1 ≤ x2) ∨ ∀ (I : HarderNarasimhan.StrictIntvl ℒ), μ.IsAttained I",
   "constCategory": "Theorem"},
  {"references": [],
   "name": "HarderNarasimhan.PayoffFunction.B_top_dual",
   "constType":
   "∀ {ℒ : Type u_1} {S : Type u_2} [inst : Nontrivial ℒ] [inst_1 : PartialOrder ℒ] [inst_2 : BoundedOrder ℒ]\n  [inst_3 : CompleteLattice S] {μ : HarderNarasimhan.PayoffFunction ℒ S}, OrderDual.ofDual (μ.dual.B ⊤) = μ.A ⊤",
+  "constCategory": "Theorem"},
+ {"references": [],
+  "name": "HarderNarasimhan.PayoffFunction.JordanHolderFiltration.ext_iff",
+  "constType":
+  "∀ {ℒ : Type u_1} {S : Type u_2} [inst : Nontrivial ℒ] [inst_1 : PartialOrder ℒ] [inst_2 : BoundedOrder ℒ]\n  [inst_3 : CompleteLattice S] {μ : HarderNarasimhan.PayoffFunction ℒ S} {F G : μ.JordanHolderFiltration},\n  F = G ↔ ∀ (n : ℕ), F n = G n",
   "constCategory": "Theorem"},
  {"references":
   ["IsNoetherianRing", "HarderNarasimhan.CoprimaryFiltration._sizeOf_1"],
@@ -1623,11 +1581,6 @@
   "constType":
   "(R : Type u_1) →\n  {inst : CommRing R} →\n    {inst_1 : IsNoetherianRing R} →\n      (M : Type u_2) →\n        {inst_2 : Nontrivial M} →\n          {inst_3 : AddCommGroup M} →\n            {inst_4 : _root_.Module R M} →\n              {inst_5 : Module.Finite R M} → [SizeOf R] → [SizeOf M] → SizeOf (HarderNarasimhan.CoprimaryFiltration R M)",
   "constCategory": "Definition"},
- {"references": [],
-  "name": "HarderNarasimhan.PayoffFunction.JordanHolderFiltration.rec",
-  "constType":
-  "{ℒ : Type u_1} →\n  {S : Type u_2} →\n    [inst : Nontrivial ℒ] →\n      [inst_1 : PartialOrder ℒ] →\n        [inst_2 : BoundedOrder ℒ] →\n          [inst_3 : CompleteLattice S] →\n            {μ : HarderNarasimhan.PayoffFunction ℒ S} →\n              {motive : μ.JordanHolderFiltration → Sort u} →\n                ((toFun : ℕ → ℒ) →\n                    (length : ℕ) →\n                      (antitone : Antitone toFun) →\n                        (head_eq_top : toFun 0 = ⊤) →\n                          (length_eq_bot : toFun length = ⊥) →\n                            (strictAntiOn : StrictAntiOn toFun (Set.Iic length)) →\n                              (step_payoff_eq :\n                                  ∀ (i : ℕ) (hi : i < length),\n                                    μ { left := toFun (i + 1), right := toFun i, lt := ⋯ } = μ ⊤) →\n                                (payoff_lt_of_between :\n                                    ∀ (i : ℕ) (hi : i < length) (z : ℒ) (h' : toFun (i + 1) < z),\n                                      z < toFun i →\n                                        μ { left := toFun (i + 1), right := z, lt := h' } <\n                                          μ { left := toFun (i + 1), right := toFun i, lt := ⋯ }) →\n                                  motive\n                                    { toFun := toFun, length := length, antitone := antitone,\n                                      head_eq_top := head_eq_top, length_eq_bot := length_eq_bot,\n                                      strictAntiOn := strictAntiOn, step_payoff_eq := step_payoff_eq,\n                                      payoff_lt_of_between := payoff_lt_of_between }) →\n                  (t : μ.JordanHolderFiltration) → motive t",
-  "constCategory": "Other"},
  {"references":
   ["HarderNarasimhan.PayoffFunction.hnFiltration", "WellFoundedGT"],
   "name":
@@ -1635,6 +1588,11 @@
   "constType":
   "{ℒ : Type u_1} →\n  [Nontrivial ℒ] →\n    [inst : Lattice ℒ] →\n      [inst_1 : BoundedOrder ℒ] →\n        [hwf : WellFoundedGT ℒ] →\n          {S : Type u_2} →\n            [inst_2 : CompleteLattice S] →\n              (μ : HarderNarasimhan.PayoffFunction ℒ S) →\n                [μ.ADCC] → [μ.IsConvex] → [hadm : μ.Admissible] → Inhabited μ.HarderNarasimhanFiltration",
   "constCategory": "Definition"},
+ {"references": [],
+  "name": "HarderNarasimhan.PayoffFunction.JordanHolderFiltration.rec",
+  "constType":
+  "{ℒ : Type u_1} →\n  {S : Type u_2} →\n    [inst : Nontrivial ℒ] →\n      [inst_1 : PartialOrder ℒ] →\n        [inst_2 : BoundedOrder ℒ] →\n          [inst_3 : CompleteLattice S] →\n            {μ : HarderNarasimhan.PayoffFunction ℒ S} →\n              {motive : μ.JordanHolderFiltration → Sort u} →\n                ((toFun : ℕ → ℒ) →\n                    (length : ℕ) →\n                      (antitone : Antitone toFun) →\n                        (head_eq_top : toFun 0 = ⊤) →\n                          (length_eq_bot : toFun length = ⊥) →\n                            (strictAntiOn : StrictAntiOn toFun (Set.Iic length)) →\n                              (step_payoff_eq :\n                                  ∀ (i : ℕ) (hi : i < length),\n                                    μ { left := toFun (i + 1), right := toFun i, lt := ⋯ } = μ ⊤) →\n                                (payoff_lt_of_between :\n                                    ∀ (i : ℕ) (hi : i < length) (z : ℒ) (h' : toFun (i + 1) < z),\n                                      z < toFun i →\n                                        μ { left := toFun (i + 1), right := z, lt := h' } <\n                                          μ { left := toFun (i + 1), right := toFun i, lt := ⋯ }) →\n                                  motive\n                                    { toFun := toFun, length := length, antitone := antitone,\n                                      head_eq_top := head_eq_top, length_eq_bot := length_eq_bot,\n                                      strictAntiOn := strictAntiOn, step_payoff_eq := step_payoff_eq,\n                                      payoff_lt_of_between := payoff_lt_of_between }) →\n                  (t : μ.JordanHolderFiltration) → motive t",
+  "constCategory": "Other"},
  {"references": [],
   "name":
   "HarderNarasimhan.PayoffFunction.hnFiltration_succ_isGreatest_breakpoints",
@@ -1652,6 +1610,11 @@
   "constType":
   "∀ {ℒ : Type u_1} {S : Type u_2} [inst : PartialOrder ℒ] [inst_1 : CompleteLattice S]\n  {μ : HarderNarasimhan.PayoffFunction ℒ S},\n  μ.IsSlopeLike →\n    ∀ {x y z : ℒ} (h₁ : x < y) (h₂ : y < z),\n      μ { left := x, right := z, lt := ⋯ } < μ { left := y, right := z, lt := h₂ } ↔\n        μ { left := x, right := y, lt := h₁ } < μ { left := x, right := z, lt := ⋯ }",
   "constCategory": "Theorem"},
+ {"references": [],
+  "name": "HarderNarasimhan.PayoffFunction.JordanHolderFiltration.mk.inj",
+  "constType":
+  "∀ {ℒ : Type u_1} {S : Type u_2} {inst : Nontrivial ℒ} {inst_1 : PartialOrder ℒ} {inst_2 : BoundedOrder ℒ}\n  {inst_3 : CompleteLattice S} {μ : HarderNarasimhan.PayoffFunction ℒ S} {toFun : ℕ → ℒ} {length : ℕ}\n  {antitone : Antitone toFun} {head_eq_top : toFun 0 = ⊤} {length_eq_bot : toFun length = ⊥}\n  {strictAntiOn : StrictAntiOn toFun (Set.Iic length)}\n  {step_payoff_eq : ∀ (i : ℕ) (hi : i < length), μ { left := toFun (i + 1), right := toFun i, lt := ⋯ } = μ ⊤}\n  {payoff_lt_of_between :\n    ∀ (i : ℕ) (hi : i < length) (z : ℒ) (h' : toFun (i + 1) < z),\n      z < toFun i →\n        μ { left := toFun (i + 1), right := z, lt := h' } < μ { left := toFun (i + 1), right := toFun i, lt := ⋯ }}\n  {toFun_1 : ℕ → ℒ} {length_1 : ℕ} {antitone_1 : Antitone toFun_1} {head_eq_top_1 : toFun_1 0 = ⊤}\n  {length_eq_bot_1 : toFun_1 length_1 = ⊥} {strictAntiOn_1 : StrictAntiOn toFun_1 (Set.Iic length_1)}\n  {step_payoff_eq_1 : ∀ (i : ℕ) (hi : i < length_1), μ { left := toFun_1 (i + 1), right := toFun_1 i, lt := ⋯ } = μ ⊤}\n  {payoff_lt_of_between_1 :\n    ∀ (i : ℕ) (hi : i < length_1) (z : ℒ) (h' : toFun_1 (i + 1) < z),\n      z < toFun_1 i →\n        μ { left := toFun_1 (i + 1), right := z, lt := h' } <\n          μ { left := toFun_1 (i + 1), right := toFun_1 i, lt := ⋯ }},\n  { toFun := toFun, length := length, antitone := antitone, head_eq_top := head_eq_top, length_eq_bot := length_eq_bot,\n        strictAntiOn := strictAntiOn, step_payoff_eq := step_payoff_eq, payoff_lt_of_between := payoff_lt_of_between } =\n      { toFun := toFun_1, length := length_1, antitone := antitone_1, head_eq_top := head_eq_top_1,\n        length_eq_bot := length_eq_bot_1, strictAntiOn := strictAntiOn_1, step_payoff_eq := step_payoff_eq_1,\n        payoff_lt_of_between := payoff_lt_of_between_1 } →\n    toFun = toFun_1 ∧ length = length_1",
+  "constCategory": "Theorem"},
  {"references":
   ["HarderNarasimhan.StrictIntvl.left",
    "iSup",
@@ -1666,11 +1629,6 @@
   "{ℒ : Type u_1} →\n  {S : Type u_2} →\n    [inst : Preorder ℒ] →\n      [CompleteLattice S] → HarderNarasimhan.PayoffFunction ℒ S → HarderNarasimhan.PayoffFunction ℒ S",
   "constCategory": "Definition"},
  {"references": [],
-  "name": "HarderNarasimhan.PayoffFunction.JordanHolderFiltration.mk.inj",
-  "constType":
-  "∀ {ℒ : Type u_1} {S : Type u_2} {inst : Nontrivial ℒ} {inst_1 : PartialOrder ℒ} {inst_2 : BoundedOrder ℒ}\n  {inst_3 : CompleteLattice S} {μ : HarderNarasimhan.PayoffFunction ℒ S} {toFun : ℕ → ℒ} {length : ℕ}\n  {antitone : Antitone toFun} {head_eq_top : toFun 0 = ⊤} {length_eq_bot : toFun length = ⊥}\n  {strictAntiOn : StrictAntiOn toFun (Set.Iic length)}\n  {step_payoff_eq : ∀ (i : ℕ) (hi : i < length), μ { left := toFun (i + 1), right := toFun i, lt := ⋯ } = μ ⊤}\n  {payoff_lt_of_between :\n    ∀ (i : ℕ) (hi : i < length) (z : ℒ) (h' : toFun (i + 1) < z),\n      z < toFun i →\n        μ { left := toFun (i + 1), right := z, lt := h' } < μ { left := toFun (i + 1), right := toFun i, lt := ⋯ }}\n  {toFun_1 : ℕ → ℒ} {length_1 : ℕ} {antitone_1 : Antitone toFun_1} {head_eq_top_1 : toFun_1 0 = ⊤}\n  {length_eq_bot_1 : toFun_1 length_1 = ⊥} {strictAntiOn_1 : StrictAntiOn toFun_1 (Set.Iic length_1)}\n  {step_payoff_eq_1 : ∀ (i : ℕ) (hi : i < length_1), μ { left := toFun_1 (i + 1), right := toFun_1 i, lt := ⋯ } = μ ⊤}\n  {payoff_lt_of_between_1 :\n    ∀ (i : ℕ) (hi : i < length_1) (z : ℒ) (h' : toFun_1 (i + 1) < z),\n      z < toFun_1 i →\n        μ { left := toFun_1 (i + 1), right := z, lt := h' } <\n          μ { left := toFun_1 (i + 1), right := toFun_1 i, lt := ⋯ }},\n  { toFun := toFun, length := length, antitone := antitone, head_eq_top := head_eq_top, length_eq_bot := length_eq_bot,\n        strictAntiOn := strictAntiOn, step_payoff_eq := step_payoff_eq, payoff_lt_of_between := payoff_lt_of_between } =\n      { toFun := toFun_1, length := length_1, antitone := antitone_1, head_eq_top := head_eq_top_1,\n        length_eq_bot := length_eq_bot_1, strictAntiOn := strictAntiOn_1, step_payoff_eq := step_payoff_eq_1,\n        payoff_lt_of_between := payoff_lt_of_between_1 } →\n    toFun = toFun_1 ∧ length = length_1",
-  "constCategory": "Theorem"},
- {"references": [],
   "name": "HarderNarasimhan.PayoffFunction.IsAffine.eq",
   "constType":
   "∀ {ℒ : Type u_1} {S : Type u_2} {inst : Lattice ℒ} {μ : HarderNarasimhan.PayoffFunction ℒ S} [self : μ.IsAffine]\n  (x y : ℒ) (h : ¬x ≤ y), μ { left := x ⊓ y, right := x, lt := ⋯ } = μ { left := y, right := x ⊔ y, lt := ⋯ }",
@@ -1680,7 +1638,7 @@
   "constType":
   "∀ {ℒ : Type u_1} {S : Type u_2} [inst : Nontrivial ℒ] [inst_1 : PartialOrder ℒ] [inst_2 : BoundedOrder ℒ]\n  [inst_3 : CompleteLattice S] {μ : HarderNarasimhan.PayoffFunction ℒ S} [toIsSemistable : μ.IsSemistable],\n  (∀ (x : ℒ) (hx : ⊥ < x), x < ⊤ → μ.A { left := ⊥, right := x, lt := hx } ≠ μ.A ⊤) → μ.IsStable",
   "constCategory": "Other"},
- {"references": ["Top.top", "Ne", "DFunLike.coe"],
+ {"references": ["HarderNarasimhan.PayoffFunction.FiniteTotalPayoff.casesOn"],
   "name": "HarderNarasimhan.PayoffFunction.FiniteTotalPayoff.recOn",
   "constType":
   "{ℒ : Type u_1} →\n  {S : Type u_2} →\n    [inst : Nontrivial ℒ] →\n      [inst_1 : PartialOrder ℒ] →\n        [inst_2 : BoundedOrder ℒ] →\n          [inst_3 : CompleteLattice S] →\n            {μ : HarderNarasimhan.PayoffFunction ℒ S} →\n              {motive : μ.FiniteTotalPayoff → Sort u} →\n                (t : μ.FiniteTotalPayoff) → ((ne_top : μ ⊤ ≠ ⊤) → motive ⋯) → motive t",
@@ -1707,21 +1665,17 @@
   "constCategory": "Theorem"},
  {"references": [],
   "name":
-  "HarderNarasimhan.PayoffFunction.HarderNarasimhanFiltration.piecewise_isCoprimary",
-  "constType":
-  "∀ {R : Type u_1} [inst : CommRing R] [inst_1 : IsNoetherianRing R] {M : Type u_2} [inst_2 : AddCommGroup M]\n  [inst_3 : _root_.Module R M] [inst_4 : Module.Finite R M]\n  (F : (HarderNarasimhan.Coprimary.payoff R M).HarderNarasimhanFiltration),\n  ∀ i < F.length, HarderNarasimhan.IsCoprimary R (↥(F (i + 1)) ⧸ (F i).submoduleOf (F (i + 1)))",
-  "constCategory": "Theorem"},
- {"references": [],
-  "name":
   "HarderNarasimhan.PayoffFunction.IsSlopeLike.seesaw_left_lt_right_iff",
   "constType":
   "∀ {ℒ : Type u_1} {S : Type u_2} [inst : PartialOrder ℒ] [inst_1 : CompleteLattice S]\n  {μ : HarderNarasimhan.PayoffFunction ℒ S},\n  μ.IsSlopeLike →\n    ∀ {x y z : ℒ} (h₁ : x < y) (h₂ : y < z),\n      μ { left := x, right := y, lt := h₁ } < μ { left := y, right := z, lt := h₂ } ↔\n        μ { left := x, right := y, lt := h₁ } < μ { left := x, right := z, lt := ⋯ }",
   "constCategory": "Theorem"},
- {"references":
-  ["HarderNarasimhan.PayoffFunction.B",
-   "Top.top",
-   "HarderNarasimhan.PayoffFunction.A",
-   "DFunLike.coe"],
+ {"references": [],
+  "name":
+  "HarderNarasimhan.PayoffFunction.HarderNarasimhanFiltration.piecewise_isCoprimary",
+  "constType":
+  "∀ {R : Type u_1} [inst : CommRing R] [inst_1 : IsNoetherianRing R] {M : Type u_2} [inst_2 : AddCommGroup M]\n  [inst_3 : _root_.Module R M] [inst_4 : Module.Finite R M]\n  (F : (HarderNarasimhan.Coprimary.payoff R M).HarderNarasimhanFiltration),\n  ∀ i < F.length, HarderNarasimhan.IsCoprimary R (↥(F (i + 1)) ⧸ (F i).submoduleOf (F (i + 1)))",
+  "constCategory": "Theorem"},
+ {"references": ["HarderNarasimhan.PayoffFunction.HasNashEquilibrium.casesOn"],
   "name": "HarderNarasimhan.PayoffFunction.HasNashEquilibrium.recOn",
   "constType":
   "{ℒ : Type u_1} →\n  {S : Type u_2} →\n    [inst : Nontrivial ℒ] →\n      [inst_1 : PartialOrder ℒ] →\n        [inst_2 : BoundedOrder ℒ] →\n          [inst_3 : CompleteLattice S] →\n            {μ : HarderNarasimhan.PayoffFunction ℒ S} →\n              {motive : μ.HasNashEquilibrium → Sort u} →\n                (t : μ.HasNashEquilibrium) → ((eq : μ.A ⊤ = μ.B ⊤) → motive ⋯) → motive t",
@@ -1752,6 +1706,11 @@
   "∀ {ℒ : Type u_1} {S : Type u_2} [inst : Nontrivial ℒ] [inst_1 : Lattice ℒ] [inst_2 : BoundedOrder ℒ] [WellFoundedGT ℒ]\n  [inst_4 : CompleteLinearOrder S] {μ : HarderNarasimhan.PayoffFunction ℒ S} [hftp : μ.FiniteTotalPayoff]\n  [μ.IsSlopeLike] [hst : μ.IsSemistable] [μ.EventuallyTopDCC] {x : ℒ} {hx : ⊥ < x},\n  (μ.restrict { left := ⊥, right := x, lt := hx }).FiniteTotalPayoff",
   "constCategory": "Theorem"},
  {"references": [],
+  "name": "HarderNarasimhan.PayoffFunction.IsBreakpoint.A_eq_A_of_lt",
+  "constType":
+  "∀ {ℒ : Type u_1} {S : Type u_2} [inst : Lattice ℒ] [inst_1 : CompleteLattice S]\n  {μ : HarderNarasimhan.PayoffFunction ℒ S} {I : HarderNarasimhan.StrictIntvl ℒ} {x : ℒ} (hx : μ.IsBreakpoint I x),\n  μ.IsConvexOn I →\n    ((Total fun x1 x2 ↦ x1 ≤ x2) ∨\n        ∀ (z : ℒ) (hzI : z ∈ I) (hz : I.left ≠ z), μ.IsAttained { left := I.left, right := z, lt := ⋯ }) →\n      ∀ {y : ℒ},\n        y ∈ I → ∀ (hxy : x < y), μ.A { left := I.left, right := y, lt := ⋯ } = μ.A { left := x, right := y, lt := hxy }",
+  "constCategory": "Theorem"},
+ {"references": [],
   "name": "HarderNarasimhan.PayoffFunction.B_top_eq_max_top",
   "constType":
   "∀ {ℒ : Type u_1} {S : Type u_2} [inst : Nontrivial ℒ] [inst_1 : PartialOrder ℒ] [inst_2 : BoundedOrder ℒ]\n  [inst_3 : CompleteLattice S] {μ : HarderNarasimhan.PayoffFunction ℒ S} [μ.StrongDCC] [μ.WeakSlopeLikeAtBot],\n  μ.B ⊤ = μ.max ⊤",
@@ -1767,11 +1726,6 @@
   "constType":
   "{ℒ : Type u_1} →\n  {S : Type u_2} → [inst : LT ℒ] → HarderNarasimhan.PayoffFunction ℒ S → HarderNarasimhan.PayoffFunction ℒᵒᵈ Sᵒᵈ",
   "constCategory": "Definition"},
- {"references": [],
-  "name": "HarderNarasimhan.PayoffFunction.IsBreakpoint.A_eq_A_of_lt",
-  "constType":
-  "∀ {ℒ : Type u_1} {S : Type u_2} [inst : Lattice ℒ] [inst_1 : CompleteLattice S]\n  {μ : HarderNarasimhan.PayoffFunction ℒ S} {I : HarderNarasimhan.StrictIntvl ℒ} {x : ℒ} (hx : μ.IsBreakpoint I x),\n  μ.IsConvexOn I →\n    ((Std.Total fun x1 x2 ↦ x1 ≤ x2) ∨\n        ∀ (z : ℒ) (hzI : z ∈ I) (hz : I.left ≠ z), μ.IsAttained { left := I.left, right := z, lt := ⋯ }) →\n      ∀ {y : ℒ},\n        y ∈ I → ∀ (hxy : x < y), μ.A { left := I.left, right := y, lt := ⋯ } = μ.A { left := x, right := y, lt := hxy }",
-  "constCategory": "Theorem"},
  {"references": [],
   "name": "HarderNarasimhan.Coprimary.max_payoff",
   "constType":
@@ -1833,15 +1787,15 @@
   "∀ {R : Type u_1} [inst : CommRing R] {M : Type u_2} [inst_1 : AddCommGroup M] [inst_2 : _root_.Module R M]\n  (S : Submonoid R) {p : Ideal R}, p ∈ associatedPrimes R (LocalizedModule S M) → p.carrier ∩ ↑S = ∅",
   "constCategory": "Theorem"},
  {"references": [],
-  "name": "HarderNarasimhan.StrictIntvl.le_def",
-  "constType":
-  "∀ {ℒ : Type u_1} [inst : PartialOrder ℒ] {I J : HarderNarasimhan.StrictIntvl ℒ},\n  I ≤ J ↔ J.left ≤ I.left ∧ I.right ≤ J.right",
-  "constCategory": "Theorem"},
- {"references": [],
   "name":
   "HarderNarasimhan.PayoffFunction.HarderNarasimhanFiltration.strictMonoOn",
   "constType":
   "∀ {ℒ : Type u_1} {S : Type u_2} [inst : PartialOrder ℒ] [inst_1 : BoundedOrder ℒ] [inst_2 : CompleteLattice S]\n  {μ : HarderNarasimhan.PayoffFunction ℒ S} (self : μ.HarderNarasimhanFiltration),\n  StrictMonoOn self.toFun (Set.Iic self.length)",
+  "constCategory": "Theorem"},
+ {"references": [],
+  "name": "HarderNarasimhan.StrictIntvl.le_def",
+  "constType":
+  "∀ {ℒ : Type u_1} [inst : PartialOrder ℒ] {I J : HarderNarasimhan.StrictIntvl ℒ},\n  I ≤ J ↔ J.left ≤ I.left ∧ I.right ≤ J.right",
   "constCategory": "Theorem"},
  {"references": [],
   "name":
@@ -1883,6 +1837,11 @@
   "constType":
   "{ℒ : Type u_1} →\n  {S : Type u_2} →\n    [inst : PartialOrder ℒ] →\n      [CompleteLattice S] → HarderNarasimhan.PayoffFunction ℒ S → HarderNarasimhan.StrictIntvl ℒ → Set ℒ",
   "constCategory": "Definition"},
+ {"references": [],
+  "name": "HarderNarasimhan.PayoffFunction.WeakACC.exists_le",
+  "constType":
+  "∀ {ℒ : Type u_1} {S : Type u_2} {inst : PartialOrder ℒ} {inst_1 : BoundedOrder ℒ} {inst_2 : CompleteLattice S}\n  {μ : HarderNarasimhan.PayoffFunction ℒ S} [self : μ.WeakACC] (x : ℕ → ℒ) (smf : StrictMono x),\n  ∃ N, μ { left := x N, right := x (N + 1), lt := ⋯ } ≤ μ { left := x N, right := ⊤, lt := ⋯ }",
+  "constCategory": "Theorem"},
  {"references":
   ["HarderNarasimhan.Coprimary.coprimaryFiltration._proof_1",
    "LinearExtension",
@@ -1908,11 +1867,6 @@
   "(R : Type u_1) →\n  [inst : CommRing R] →\n    [inst_1 : IsNoetherianRing R] →\n      (M : Type u_2) →\n        [inst_2 : Nontrivial M] →\n          [inst_3 : AddCommGroup M] →\n            [inst_4 : _root_.Module R M] → [inst_5 : Module.Finite R M] → HarderNarasimhan.CoprimaryFiltration R M",
   "constCategory": "Definition"},
  {"references": [],
-  "name": "HarderNarasimhan.PayoffFunction.WeakACC.exists_le",
-  "constType":
-  "∀ {ℒ : Type u_1} {S : Type u_2} {inst : PartialOrder ℒ} {inst_1 : BoundedOrder ℒ} {inst_2 : CompleteLattice S}\n  {μ : HarderNarasimhan.PayoffFunction ℒ S} [self : μ.WeakACC] (x : ℕ → ℒ) (smf : StrictMono x),\n  ∃ N, μ { left := x N, right := x (N + 1), lt := ⋯ } ≤ μ { left := x N, right := ⊤, lt := ⋯ }",
-  "constCategory": "Theorem"},
- {"references": [],
   "name": "HarderNarasimhan.associatedPrimes_subset_of_submoduleOf_le",
   "constType":
   "∀ {R : Type u_1} [inst : CommRing R] {M : Type u_2} [inst_1 : AddCommGroup M] [inst_2 : _root_.Module R M]\n  (N A B : Submodule R M), A ≤ B → associatedPrimes R (↥A ⧸ N.submoduleOf A) ⊆ associatedPrimes R (↥B ⧸ N.submoduleOf B)",
@@ -1931,18 +1885,18 @@
  {"references": [],
   "name": "HarderNarasimhan.StrictIntvl.instWellFoundedGTSubtypeMem",
   "constType":
-  "∀ {ℒ : Type u_1} [inst : PartialOrder ℒ] {I : HarderNarasimhan.StrictIntvl ℒ} [hw : WellFoundedGT ℒ],\n  WellFoundedGT { x // x ∈ I }",
+  "∀ {ℒ : Type u_1} [inst : PartialOrder ℒ] {I : HarderNarasimhan.StrictIntvl ℒ} [WellFoundedGT ℒ],\n  WellFoundedGT { x // x ∈ I }",
+  "constCategory": "Theorem"},
+ {"references": [],
+  "name": "HarderNarasimhan.CoprimaryFiltration.head_eq_bot",
+  "constType":
+  "∀ {R : Type u_1} [inst : CommRing R] [inst_1 : IsNoetherianRing R] {M : Type u_2} [inst_2 : Nontrivial M]\n  [inst_3 : AddCommGroup M] [inst_4 : _root_.Module R M] [inst_5 : Module.Finite R M]\n  (self : HarderNarasimhan.CoprimaryFiltration R M), self.toFun 0 = ⊥",
   "constCategory": "Theorem"},
  {"references": [],
   "name": "HarderNarasimhan.PayoffFunction.FiniteTotalPayoff.mk",
   "constType":
   "∀ {ℒ : Type u_1} {S : Type u_2} [inst : Nontrivial ℒ] [inst_1 : PartialOrder ℒ] [inst_2 : BoundedOrder ℒ]\n  [inst_3 : CompleteLattice S] {μ : HarderNarasimhan.PayoffFunction ℒ S}, μ ⊤ ≠ ⊤ → μ.FiniteTotalPayoff",
   "constCategory": "Other"},
- {"references": [],
-  "name": "HarderNarasimhan.CoprimaryFiltration.head_eq_bot",
-  "constType":
-  "∀ {R : Type u_1} [inst : CommRing R] [inst_1 : IsNoetherianRing R] {M : Type u_2} [inst_2 : Nontrivial M]\n  [inst_3 : AddCommGroup M] [inst_4 : _root_.Module R M] [inst_5 : Module.Finite R M]\n  (self : HarderNarasimhan.CoprimaryFiltration R M), self.toFun 0 = ⊥",
-  "constCategory": "Theorem"},
  {"references": [],
   "name": "HarderNarasimhan.PayoffFunction.IsConvexOn.A_eq_or_lt",
   "constType":
@@ -1970,14 +1924,14 @@
   "{ℒ : Type u_1} →\n  {S : Type u_2} →\n    [inst : Nontrivial ℒ] →\n      [inst_1 : PartialOrder ℒ] →\n        [inst_2 : BoundedOrder ℒ] →\n          [inst_3 : CompleteLattice S] →\n            {μ : HarderNarasimhan.PayoffFunction ℒ S} →\n              {motive : μ.JordanHolderFiltration → Sort u} →\n                (t : μ.JordanHolderFiltration) →\n                  ((toFun : ℕ → ℒ) →\n                      (length : ℕ) →\n                        (antitone : Antitone toFun) →\n                          (head_eq_top : toFun 0 = ⊤) →\n                            (length_eq_bot : toFun length = ⊥) →\n                              (strictAntiOn : StrictAntiOn toFun (Set.Iic length)) →\n                                (step_payoff_eq :\n                                    ∀ (i : ℕ) (hi : i < length),\n                                      μ { left := toFun (i + 1), right := toFun i, lt := ⋯ } = μ ⊤) →\n                                  (payoff_lt_of_between :\n                                      ∀ (i : ℕ) (hi : i < length) (z : ℒ) (h' : toFun (i + 1) < z),\n                                        z < toFun i →\n                                          μ { left := toFun (i + 1), right := z, lt := h' } <\n                                            μ { left := toFun (i + 1), right := toFun i, lt := ⋯ }) →\n                                    motive\n                                      { toFun := toFun, length := length, antitone := antitone,\n                                        head_eq_top := head_eq_top, length_eq_bot := length_eq_bot,\n                                        strictAntiOn := strictAntiOn, step_payoff_eq := step_payoff_eq,\n                                        payoff_lt_of_between := payoff_lt_of_between }) →\n                    motive t",
   "constCategory": "Definition"},
  {"references": [],
-  "name": "HarderNarasimhan.PayoffFunction.instWeakACCOrderDualDualOfStrongDCC",
-  "constType":
-  "∀ {ℒ : Type u_1} {S : Type u_2} [inst : PartialOrder ℒ] [inst_1 : BoundedOrder ℒ] [inst_2 : CompleteLattice S]\n  {μ : HarderNarasimhan.PayoffFunction ℒ S} [h₁ : μ.StrongDCC], μ.dual.WeakACC",
-  "constCategory": "Theorem"},
- {"references": [],
   "name": "HarderNarasimhan.PayoffFunction.IsSlopeLike.slopelike",
   "constType":
   "∀ {ℒ : Type u_1} {S : Type u_2} {inst : PartialOrder ℒ} {inst_1 : CompleteLattice S}\n  {μ : HarderNarasimhan.PayoffFunction ℒ S} [self : μ.IsSlopeLike] (x y z : ℒ) (h : x < y ∧ y < z),\n  (μ { left := x, right := y, lt := ⋯ } ≤ μ { left := x, right := z, lt := ⋯ } ∨\n      μ { left := y, right := z, lt := ⋯ } < μ { left := x, right := z, lt := ⋯ }) ∧\n    (μ { left := x, right := y, lt := ⋯ } < μ { left := x, right := z, lt := ⋯ } ∨\n        μ { left := y, right := z, lt := ⋯ } ≤ μ { left := x, right := z, lt := ⋯ }) ∧\n      (μ { left := x, right := z, lt := ⋯ } < μ { left := x, right := y, lt := ⋯ } ∨\n          μ { left := x, right := z, lt := ⋯ } ≤ μ { left := y, right := z, lt := ⋯ }) ∧\n        (μ { left := x, right := z, lt := ⋯ } ≤ μ { left := x, right := y, lt := ⋯ } ∨\n          μ { left := x, right := z, lt := ⋯ } < μ { left := y, right := z, lt := ⋯ })",
+  "constCategory": "Theorem"},
+ {"references": [],
+  "name": "HarderNarasimhan.PayoffFunction.instWeakACCOrderDualDualOfStrongDCC",
+  "constType":
+  "∀ {ℒ : Type u_1} {S : Type u_2} [inst : PartialOrder ℒ] [inst_1 : BoundedOrder ℒ] [inst_2 : CompleteLattice S]\n  {μ : HarderNarasimhan.PayoffFunction ℒ S} [h₁ : μ.StrongDCC], μ.dual.WeakACC",
   "constCategory": "Theorem"},
  {"references": ["LT.lt", "Set.ofPred", "LE.le"],
   "name": "Set.Ioc",
@@ -2060,33 +2014,21 @@
   "constType":
   "{R : Type u_1} →\n  [inst : CommRing R] →\n    [inst_1 : IsNoetherianRing R] →\n      {M : Type u_2} →\n        [inst_2 : Nontrivial M] →\n          [inst_3 : AddCommGroup M] →\n            [inst_4 : _root_.Module R M] → [inst_5 : Module.Finite R M] → HarderNarasimhan.CoprimaryFiltration R M → ℕ",
   "constCategory": "Definition"},
- {"references":
-  ["Not",
-   "LT.lt",
-   "Top.top",
-   "HarderNarasimhan.PayoffFunction.A",
-   "DFunLike.coe",
-   "Bot.bot"],
+ {"references": ["HarderNarasimhan.PayoffFunction.IsSemistable.casesOn"],
   "name": "HarderNarasimhan.PayoffFunction.IsSemistable.recOn",
   "constType":
   "{ℒ : Type u_1} →\n  {S : Type u_2} →\n    [inst : Nontrivial ℒ] →\n      [inst_1 : PartialOrder ℒ] →\n        [inst_2 : BoundedOrder ℒ] →\n          [inst_3 : CompleteLattice S] →\n            {μ : HarderNarasimhan.PayoffFunction ℒ S} →\n              {motive : μ.IsSemistable → Sort u} →\n                (t : μ.IsSemistable) →\n                  ((not_lt : ∀ (x : ℒ) (hx : ⊥ < x), ¬μ.A ⊤ < μ.A { left := ⊥, right := x, lt := hx }) → motive ⋯) →\n                    motive t",
-  "constCategory": "Definition"},
- {"references":
-  ["HAdd.hAdd",
-   "StrictAnti",
-   "lt_add_one",
-   "Top.top",
-   "DFunLike.coe",
-   "OfNat.ofNat"],
-  "name": "HarderNarasimhan.PayoffFunction.EventuallyTopDCC.recOn",
-  "constType":
-  "{ℒ : Type u_1} →\n  {S : Type u_2} →\n    [inst : PartialOrder ℒ] →\n      [inst_1 : CompleteLattice S] →\n        {μ : HarderNarasimhan.PayoffFunction ℒ S} →\n          {motive : μ.EventuallyTopDCC → Sort u} →\n            (t : μ.EventuallyTopDCC) →\n              ((exists_eq_top :\n                    ∀ (x : ℕ → ℒ) (hx : StrictAnti x), ∃ N, μ { left := x (N + 1), right := x N, lt := ⋯ } = ⊤) →\n                  motive ⋯) →\n                motive t",
   "constCategory": "Definition"},
  {"references": [],
   "name": "HarderNarasimhan.StrictIntvl.mem_top",
   "constType":
   "∀ {ℒ : Type u_1} [inst : Nontrivial ℒ] [inst_1 : PartialOrder ℒ] [inst_2 : BoundedOrder ℒ] (x : ℒ), x ∈ ⊤",
   "constCategory": "Theorem"},
+ {"references": ["HarderNarasimhan.PayoffFunction.EventuallyTopDCC.casesOn"],
+  "name": "HarderNarasimhan.PayoffFunction.EventuallyTopDCC.recOn",
+  "constType":
+  "{ℒ : Type u_1} →\n  {S : Type u_2} →\n    [inst : PartialOrder ℒ] →\n      [inst_1 : CompleteLattice S] →\n        {μ : HarderNarasimhan.PayoffFunction ℒ S} →\n          {motive : μ.EventuallyTopDCC → Sort u} →\n            (t : μ.EventuallyTopDCC) →\n              ((exists_eq_top :\n                    ∀ (x : ℕ → ℒ) (hx : StrictAnti x), ∃ N, μ { left := x (N + 1), right := x N, lt := ⋯ } = ⊤) →\n                  motive ⋯) →\n                motive t",
+  "constCategory": "Definition"},
  {"references": [],
   "name": "HarderNarasimhan.PayoffFunction.IsConvexOn.A_le_A_sup",
   "constType":
@@ -2100,7 +2042,7 @@
  {"references": [],
   "name": "HarderNarasimhan.PayoffFunction.exists_isGreatest_breakpoints",
   "constType":
-  "∀ {ℒ : Type u_1} {S : Type u_2} [inst : Lattice ℒ] [inst_1 : CompleteLattice S]\n  {μ : HarderNarasimhan.PayoffFunction ℒ S} {I : HarderNarasimhan.StrictIntvl ℒ} [hwf : WellFoundedGT ℒ] [μ.ADCC],\n  μ.IsConvexOn I →\n    ((Std.Total fun x1 x2 ↦ x1 ≤ x2) ∨\n        ∀ (z : ℒ) (hzI : z ∈ I) (hz : I.left ≠ z), μ.IsAttained { left := I.left, right := z, lt := ⋯ }) →\n      ∃ s, IsGreatest (μ.breakpoints I) s",
+  "∀ {ℒ : Type u_1} {S : Type u_2} [inst : Lattice ℒ] [inst_1 : CompleteLattice S]\n  {μ : HarderNarasimhan.PayoffFunction ℒ S} {I : HarderNarasimhan.StrictIntvl ℒ} [hwf : WellFoundedGT ℒ] [μ.ADCC],\n  μ.IsConvexOn I →\n    ((Total fun x1 x2 ↦ x1 ≤ x2) ∨\n        ∀ (z : ℒ) (hzI : z ∈ I) (hz : I.left ≠ z), μ.IsAttained { left := I.left, right := z, lt := ⋯ }) →\n      ∃ s, IsGreatest (μ.breakpoints I) s",
   "constCategory": "Theorem"},
  {"references": [],
   "name": "HarderNarasimhan.PayoffFunction.isSlopeLike_slope",
@@ -2239,14 +2181,19 @@
   "{ℒ : Type u_1} → [Nontrivial ℒ] → [inst : PartialOrder ℒ] → [BoundedOrder ℒ] → OrderTop (HarderNarasimhan.StrictIntvl ℒ)",
   "constCategory": "Definition"},
  {"references": [],
+  "name": "HarderNarasimhan.PayoffFunction.EventuallyTopDCC.mk",
+  "constType":
+  "∀ {ℒ : Type u_1} {S : Type u_2} [inst : PartialOrder ℒ] [inst_1 : CompleteLattice S]\n  {μ : HarderNarasimhan.PayoffFunction ℒ S},\n  (∀ (x : ℕ → ℒ) (hx : StrictAnti x), ∃ N, μ { left := x (N + 1), right := x N, lt := ⋯ } = ⊤) → μ.EventuallyTopDCC",
+  "constCategory": "Other"},
+ {"references": [],
   "name": "HarderNarasimhan.PayoffFunction.IsBreakpoint.isBreakpoint_left",
   "constType":
   "∀ {ℒ : Type u_1} {S : Type u_2} [inst : Lattice ℒ] [inst_1 : CompleteLattice S]\n  {μ : HarderNarasimhan.PayoffFunction ℒ S} {I : HarderNarasimhan.StrictIntvl ℒ} {x : ℒ} (hx : μ.IsBreakpoint I x),\n  μ.IsBreakpoint { left := I.left, right := x, lt := ⋯ } x",
   "constCategory": "Theorem"},
  {"references": [],
-  "name": "HarderNarasimhan.PayoffFunction.EventuallyTopDCC.mk",
+  "name": "HarderNarasimhan.PayoffFunction.StrongDCC.rec",
   "constType":
-  "∀ {ℒ : Type u_1} {S : Type u_2} [inst : PartialOrder ℒ] [inst_1 : CompleteLattice S]\n  {μ : HarderNarasimhan.PayoffFunction ℒ S},\n  (∀ (x : ℕ → ℒ) (hx : StrictAnti x), ∃ N, μ { left := x (N + 1), right := x N, lt := ⋯ } = ⊤) → μ.EventuallyTopDCC",
+  "{ℒ : Type u_1} →\n  {S : Type u_2} →\n    [inst : PartialOrder ℒ] →\n      [inst_1 : BoundedOrder ℒ] →\n        [inst_2 : CompleteLattice S] →\n          {μ : HarderNarasimhan.PayoffFunction ℒ S} →\n            {motive : μ.StrongDCC → Sort u} →\n              ((exists_le :\n                    ∀ (x : ℕ → ℒ) (saf : StrictAnti x),\n                      ∃ N, μ { left := ⊥, right := x N, lt := ⋯ } ≤ μ { left := x (N + 1), right := x N, lt := ⋯ }) →\n                  motive ⋯) →\n                (t : μ.StrongDCC) → motive t",
   "constCategory": "Other"},
  {"references": [],
   "name":
@@ -2254,11 +2201,6 @@
   "constType":
   "∀ {ℒ : Type u_1} {S : Type u_2} [inst : PartialOrder ℒ] [inst_1 : BoundedOrder ℒ] [inst_2 : CompleteLattice S]\n  {μ : HarderNarasimhan.PayoffFunction ℒ S} (self : μ.HarderNarasimhanFiltration) (i : ℕ) (hi : i < self.length),\n  (μ.restrict { left := self.toFun i, right := self.toFun (i + 1), lt := ⋯ }).IsSemistable",
   "constCategory": "Theorem"},
- {"references": [],
-  "name": "HarderNarasimhan.PayoffFunction.StrongDCC.rec",
-  "constType":
-  "{ℒ : Type u_1} →\n  {S : Type u_2} →\n    [inst : PartialOrder ℒ] →\n      [inst_1 : BoundedOrder ℒ] →\n        [inst_2 : CompleteLattice S] →\n          {μ : HarderNarasimhan.PayoffFunction ℒ S} →\n            {motive : μ.StrongDCC → Sort u} →\n              ((exists_le :\n                    ∀ (x : ℕ → ℒ) (saf : StrictAnti x),\n                      ∃ N, μ { left := ⊥, right := x N, lt := ⋯ } ≤ μ { left := x (N + 1), right := x N, lt := ⋯ }) →\n                  motive ⋯) →\n                (t : μ.StrongDCC) → motive t",
-  "constCategory": "Other"},
  {"references":
   ["LT.lt",
    "Not",
@@ -2280,15 +2222,15 @@
   "constType":
   "∀ {ℒ : Type u_1} {S : Type u_2} [inst : Nontrivial ℒ] [inst_1 : PartialOrder ℒ] [inst_2 : BoundedOrder ℒ]\n  [inst_3 : CompleteLattice S] {μ : HarderNarasimhan.PayoffFunction ℒ S} {F : μ.JordanHolderFiltration} {i j : ℕ},\n  i < j → j ≤ F.length → F j < F i",
   "constCategory": "Theorem"},
+ {"references": ["LE.le", "HarderNarasimhan.PayoffFunction.IsAttained"],
+  "name": "HarderNarasimhan.PayoffFunction.Admissible.mk._flat_ctor",
+  "constType":
+  "∀ {ℒ : Type u_1} {S : Type u_2} [inst : Preorder ℒ] [inst_1 : CompleteLattice S]\n  {μ : HarderNarasimhan.PayoffFunction ℒ S},\n  ((Total fun x1 x2 ↦ x1 ≤ x2) ∨ ∀ (I : HarderNarasimhan.StrictIntvl ℒ), μ.IsAttained I) → μ.Admissible",
+  "constCategory": "Definition"},
  {"references": [],
   "name": "HarderNarasimhan.PayoffFunction.JordanHolderFiltration.ctorIdx",
   "constType":
   "{ℒ : Type u_1} →\n  {S : Type u_2} →\n    {inst : Nontrivial ℒ} →\n      {inst_1 : PartialOrder ℒ} →\n        {inst_2 : BoundedOrder ℒ} →\n          {inst_3 : CompleteLattice S} → {μ : HarderNarasimhan.PayoffFunction ℒ S} → μ.JordanHolderFiltration → ℕ",
-  "constCategory": "Definition"},
- {"references": ["LE.le", "HarderNarasimhan.PayoffFunction.IsAttained"],
-  "name": "HarderNarasimhan.PayoffFunction.Admissible.mk._flat_ctor",
-  "constType":
-  "∀ {ℒ : Type u_1} {S : Type u_2} [inst : Preorder ℒ] [inst_1 : CompleteLattice S]\n  {μ : HarderNarasimhan.PayoffFunction ℒ S},\n  ((Std.Total fun x1 x2 ↦ x1 ≤ x2) ∨ ∀ (I : HarderNarasimhan.StrictIntvl ℒ), μ.IsAttained I) → μ.Admissible",
   "constCategory": "Definition"},
  {"references": [],
   "name": "HarderNarasimhan.PayoffFunction.min_restrict_apply",
@@ -2305,15 +2247,7 @@
   "constType":
   "∀ {ℒ : Type u_1} {S : Type u_2} [inst : Nontrivial ℒ] [inst_1 : PartialOrder ℒ] [inst_2 : BoundedOrder ℒ]\n  [inst_3 : CompleteLattice S] {μ : HarderNarasimhan.PayoffFunction ℒ S} (self : μ.JordanHolderFiltration),\n  StrictAntiOn self.toFun (Set.Iic self.length)",
   "constCategory": "Theorem"},
- {"references":
-  ["HAdd.hAdd",
-   "LT.lt",
-   "Not",
-   "StrictAnti",
-   "HarderNarasimhan.PayoffFunction.A",
-   "GT.gt",
-   "DFunLike.coe",
-   "OfNat.ofNat"],
+ {"references": ["HarderNarasimhan.PayoffFunction.ADCC.casesOn"],
   "name": "HarderNarasimhan.PayoffFunction.ADCC.recOn",
   "constType":
   "{ℒ : Type u_1} →\n  {S : Type u_2} →\n    [inst : Preorder ℒ] →\n      [inst_1 : CompleteLattice S] →\n        {μ : HarderNarasimhan.PayoffFunction ℒ S} →\n          {motive : μ.ADCC → Sort u} →\n            (t : μ.ADCC) →\n              ((dcc :\n                    ∀ (a : ℒ) (f : ℕ → ℒ) (h₁ : ∀ (n : ℕ), f n > a),\n                      StrictAnti f →\n                        ∃ N,\n                          ¬μ.A { left := a, right := f N, lt := ⋯ } < μ.A { left := a, right := f (N + 1), lt := ⋯ }) →\n                  motive ⋯) →\n                motive t",
@@ -2422,14 +2356,14 @@
   "∀ {ℒ : Type u_1} {S : Type u_2} [inst : Nontrivial ℒ] [inst_1 : PartialOrder ℒ] [inst_2 : BoundedOrder ℒ]\n  [inst_3 : CompleteLattice S] {μ : HarderNarasimhan.PayoffFunction ℒ S} [μ.WeakACC] [μ.WeakSlopeLikeAtTop],\n  μ.A ⊤ ≤ μ.B ⊤",
   "constCategory": "Theorem"},
  {"references": [],
-  "name": "HarderNarasimhan.PayoffFunction.JordanHolderFiltration.apply_zero",
-  "constType":
-  "∀ {ℒ : Type u_1} {S : Type u_2} [inst : Nontrivial ℒ] [inst_1 : PartialOrder ℒ] [inst_2 : BoundedOrder ℒ]\n  [inst_3 : CompleteLattice S] {μ : HarderNarasimhan.PayoffFunction ℒ S} (F : μ.JordanHolderFiltration), F 0 = ⊤",
-  "constCategory": "Theorem"},
- {"references": [],
   "name": "HarderNarasimhan.PayoffFunction.A_restrict",
   "constType":
   "∀ {ℒ : Type u_1} {S : Type u_2} [inst : PartialOrder ℒ] [inst_1 : CompleteLattice S]\n  {μ : HarderNarasimhan.PayoffFunction ℒ S} {I : HarderNarasimhan.StrictIntvl ℒ}, (μ.restrict I).A = μ.A.restrict I",
+  "constCategory": "Theorem"},
+ {"references": [],
+  "name": "HarderNarasimhan.PayoffFunction.JordanHolderFiltration.apply_zero",
+  "constType":
+  "∀ {ℒ : Type u_1} {S : Type u_2} [inst : Nontrivial ℒ] [inst_1 : PartialOrder ℒ] [inst_2 : BoundedOrder ℒ]\n  [inst_3 : CompleteLattice S] {μ : HarderNarasimhan.PayoffFunction ℒ S} (F : μ.JordanHolderFiltration), F 0 = ⊤",
   "constCategory": "Theorem"},
  {"references":
   ["Subtype.lattice._proof_3",
@@ -2570,14 +2504,14 @@
   "∀ {α : Type u_1} [inst : PartialOrder α] {a b : α}, a ≤ b → a ≠ b → a < b",
   "constCategory": "Theorem"},
  {"references": [],
-  "name": "HarderNarasimhan.PayoffFunction.isConvexOn_top_iff._simp_1",
-  "constType":
-  "∀ {ℒ : Type u_1} {S : Type u_2} [inst : Lattice ℒ] [inst_1 : CompleteLattice S]\n  {μ : HarderNarasimhan.PayoffFunction ℒ S} [inst_2 : Nontrivial ℒ] [inst_3 : BoundedOrder ℒ],\n  μ.IsConvexOn ⊤ = μ.IsConvex",
-  "constCategory": "Theorem"},
- {"references": [],
   "name": "HarderNarasimhan.PayoffFunction.IsAffine.toIsConvex",
   "constType":
   "∀ {ℒ : Type u_1} {S : Type u_2} [inst : Lattice ℒ] [inst_1 : CompleteLattice S]\n  {μ : HarderNarasimhan.PayoffFunction ℒ S} [haff : μ.IsAffine], μ.IsConvex",
+  "constCategory": "Theorem"},
+ {"references": [],
+  "name": "HarderNarasimhan.PayoffFunction.isConvexOn_top_iff._simp_1",
+  "constType":
+  "∀ {ℒ : Type u_1} {S : Type u_2} [inst : Lattice ℒ] [inst_1 : CompleteLattice S]\n  {μ : HarderNarasimhan.PayoffFunction ℒ S} [inst_2 : Nontrivial ℒ] [inst_3 : BoundedOrder ℒ],\n  μ.IsConvexOn ⊤ = μ.IsConvex",
   "constCategory": "Theorem"},
  {"references": [],
   "name": "HarderNarasimhan.Coprimary.isSemistable_restrict_iff_quotient",
@@ -2588,13 +2522,6 @@
   "name": "DFunLike.coe",
   "constType":
   "{F : Sort u_1} → {α : outParam (Sort u_2)} → {β : outParam (α → Sort u_3)} → [self : DFunLike F α β] → F → (a : α) → β a",
-  "constCategory": "Definition"},
- {"references":
-  ["HarderNarasimhan.PayoffFunction.HarderNarasimhanFiltration._sizeOf_1"],
-  "name":
-  "HarderNarasimhan.PayoffFunction.HarderNarasimhanFiltration._sizeOf_inst",
-  "constType":
-  "{ℒ : Type u_1} →\n  {S : Type u_2} →\n    {inst : PartialOrder ℒ} →\n      {inst_1 : BoundedOrder ℒ} →\n        {inst_2 : CompleteLattice S} →\n          (μ : HarderNarasimhan.PayoffFunction ℒ S) → [SizeOf ℒ] → [SizeOf S] → SizeOf μ.HarderNarasimhanFiltration",
   "constCategory": "Definition"},
  {"references":
   ["Not",
@@ -2622,10 +2549,18 @@
   "constType":
   "{ℒ : Type u_1} →\n  {S : Type u_2} →\n    {inst : PartialOrder ℒ} →\n      {inst_1 : BoundedOrder ℒ} →\n        {inst_2 : CompleteLattice S} →\n          {μ : HarderNarasimhan.PayoffFunction ℒ S} →\n            {P : Sort u} →\n              {toFun : ℕ → ℒ} →\n                {length : ℕ} →\n                  {monotone : Monotone toFun} →\n                    {head_eq_bot : toFun 0 = ⊥} →\n                      {length_eq_top : toFun length = ⊤} →\n                        {strictMonoOn : StrictMonoOn toFun (Set.Iic length)} →\n                          {piecewise_isSemistable :\n                              ∀ (i : ℕ) (hi : i < length),\n                                (μ.restrict { left := toFun i, right := toFun (i + 1), lt := ⋯ }).IsSemistable} →\n                            {not_A_le_succ :\n                                ∀ (i : ℕ) (hi : i + 1 < length),\n                                  ¬μ.A { left := toFun i, right := toFun (i + 1), lt := ⋯ } ≤\n                                      μ.A { left := toFun (i + 1), right := toFun (i + 2), lt := ⋯ }} →\n                              {toFun' : ℕ → ℒ} →\n                                {length' : ℕ} →\n                                  {monotone' : Monotone toFun'} →\n                                    {head_eq_bot' : toFun' 0 = ⊥} →\n                                      {length_eq_top' : toFun' length' = ⊤} →\n                                        {strictMonoOn' : StrictMonoOn toFun' (Set.Iic length')} →\n                                          {piecewise_isSemistable' :\n                                              ∀ (i : ℕ) (hi : i < length'),\n                                                (μ.restrict\n                                                    { left := toFun' i, right := toFun' (i + 1),\n                                                      lt := ⋯ }).IsSemistable} →\n                                            {not_A_le_succ' :\n                                                ∀ (i : ℕ) (hi : i + 1 < length'),\n                                                  ¬μ.A { left := toFun' i, right := toFun' (i + 1), lt := ⋯ } ≤\n                                                      μ.A\n                                                        { left := toFun' (i + 1), right := toFun' (i + 2), lt := ⋯ }} →\n                                              { toFun := toFun, length := length, monotone := monotone,\n                                                    head_eq_bot := head_eq_bot, length_eq_top := length_eq_top,\n                                                    strictMonoOn := strictMonoOn,\n                                                    piecewise_isSemistable := piecewise_isSemistable,\n                                                    not_A_le_succ := not_A_le_succ } =\n                                                  { toFun := toFun', length := length', monotone := monotone',\n                                                    head_eq_bot := head_eq_bot', length_eq_top := length_eq_top',\n                                                    strictMonoOn := strictMonoOn',\n                                                    piecewise_isSemistable := piecewise_isSemistable',\n                                                    not_A_le_succ := not_A_le_succ' } →\n                                                (toFun ≍ toFun' → length = length' → P) → P",
   "constCategory": "Definition"},
- {"references": [],
-  "name": "HarderNarasimhan.StrictIntvl.instPartialOrder._proof_4",
+ {"references":
+  ["HarderNarasimhan.PayoffFunction.HarderNarasimhanFiltration._sizeOf_1"],
+  "name":
+  "HarderNarasimhan.PayoffFunction.HarderNarasimhanFiltration._sizeOf_inst",
   "constType":
-  "∀ {ℒ : Type u_1} [inst : PartialOrder ℒ] (x x_1 : HarderNarasimhan.StrictIntvl ℒ),\n  x_1.left ≤ x.left ∧ x.right ≤ x_1.right → x.left ≤ x_1.left ∧ x_1.right ≤ x.right → x = x_1",
+  "{ℒ : Type u_1} →\n  {S : Type u_2} →\n    {inst : PartialOrder ℒ} →\n      {inst_1 : BoundedOrder ℒ} →\n        {inst_2 : CompleteLattice S} →\n          (μ : HarderNarasimhan.PayoffFunction ℒ S) → [SizeOf ℒ] → [SizeOf S] → SizeOf μ.HarderNarasimhanFiltration",
+  "constCategory": "Definition"},
+ {"references": [],
+  "name":
+  "HarderNarasimhan.PayoffFunction.JordanHolderFiltration.succ_lt_of_ne_bot",
+  "constType":
+  "∀ {ℒ : Type u_1} {S : Type u_2} [inst : Nontrivial ℒ] [inst_1 : PartialOrder ℒ] [inst_2 : BoundedOrder ℒ]\n  [inst_3 : CompleteLattice S] {μ : HarderNarasimhan.PayoffFunction ℒ S} {F : μ.JordanHolderFiltration} {m : ℕ},\n  F m ≠ ⊥ → F (m + 1) < F m",
   "constCategory": "Theorem"},
  {"references": [],
   "name": "HarderNarasimhan.PayoffFunction.WeakACC.rec",
@@ -2633,10 +2568,9 @@
   "{ℒ : Type u_1} →\n  {S : Type u_2} →\n    [inst : PartialOrder ℒ] →\n      [inst_1 : BoundedOrder ℒ] →\n        [inst_2 : CompleteLattice S] →\n          {μ : HarderNarasimhan.PayoffFunction ℒ S} →\n            {motive : μ.WeakACC → Sort u} →\n              ((exists_le :\n                    ∀ (x : ℕ → ℒ) (smf : StrictMono x),\n                      ∃ N, μ { left := x N, right := x (N + 1), lt := ⋯ } ≤ μ { left := x N, right := ⊤, lt := ⋯ }) →\n                  motive ⋯) →\n                (t : μ.WeakACC) → motive t",
   "constCategory": "Other"},
  {"references": [],
-  "name":
-  "HarderNarasimhan.PayoffFunction.JordanHolderFiltration.succ_lt_of_ne_bot",
+  "name": "HarderNarasimhan.StrictIntvl.instPartialOrder._proof_4",
   "constType":
-  "∀ {ℒ : Type u_1} {S : Type u_2} [inst : Nontrivial ℒ] [inst_1 : PartialOrder ℒ] [inst_2 : BoundedOrder ℒ]\n  [inst_3 : CompleteLattice S] {μ : HarderNarasimhan.PayoffFunction ℒ S} {F : μ.JordanHolderFiltration} {m : ℕ},\n  F m ≠ ⊥ → F (m + 1) < F m",
+  "∀ {ℒ : Type u_1} [inst : PartialOrder ℒ] (x x_1 : HarderNarasimhan.StrictIntvl ℒ),\n  x_1.left ≤ x.left ∧ x.right ≤ x_1.right → x.left ≤ x_1.left ∧ x_1.right ≤ x.right → x = x_1",
   "constCategory": "Theorem"},
  {"references": [],
   "name": "HarderNarasimhan.PayoffFunction.ext",
@@ -2745,25 +2679,6 @@
   "constCategory": "Theorem"},
  {"references":
   ["LT.lt",
-   "Not",
-   "Max.max",
-   "Min.min",
-   "Iff.mpr",
-   "LE.le",
-   "right_lt_sup",
-   "DFunLike.coe",
-   "inf_lt_left"],
-  "name": "HarderNarasimhan.PayoffFunction.IsConvex.recOn",
-  "constType":
-  "{ℒ : Type u_1} →\n  {S : Type u_2} →\n    [inst : Lattice ℒ] →\n      [inst_1 : CompleteLattice S] →\n        {μ : HarderNarasimhan.PayoffFunction ℒ S} →\n          {motive : μ.IsConvex → Sort u} →\n            (t : μ.IsConvex) →\n              ((le :\n                    ∀ (x y : ℒ) (h : ¬x ≤ y),\n                      μ { left := x ⊓ y, right := x, lt := ⋯ } ≤ μ { left := y, right := x ⊔ y, lt := ⋯ }) →\n                  motive ⋯) →\n                motive t",
-  "constCategory": "Definition"},
- {"references": [],
-  "name": "HarderNarasimhan.Coprimary.coprimaryFiltration._proof_7",
-  "constType":
-  "∀ (R : Type u_2) [inst : CommRing R] [inst_1 : IsNoetherianRing R] (M : Type u_1) [inst_2 : Nontrivial M]\n  [inst_3 : AddCommGroup M] [inst_4 : _root_.Module R M] [inst_5 : Module.Finite R M],\n  (HarderNarasimhan.Coprimary.payoff R M).hnFiltration.toFun 0 = ⊥",
-  "constCategory": "Theorem"},
- {"references":
-  ["LT.lt",
    "Set.ofPred",
    "HarderNarasimhan.PayoffFunction.jordanHolderRel.match_1",
    "Top.top",
@@ -2771,6 +2686,16 @@
   "name": "HarderNarasimhan.PayoffFunction.jordanHolderRel",
   "constType":
   "{ℒ : Type u_1} →\n  {S : Type u_2} →\n    [Nontrivial ℒ] →\n      [inst : PartialOrder ℒ] →\n        [BoundedOrder ℒ] → [CompleteLattice S] → HarderNarasimhan.PayoffFunction ℒ S → SetRel ℒ ℒ",
+  "constCategory": "Definition"},
+ {"references": [],
+  "name": "HarderNarasimhan.Coprimary.coprimaryFiltration._proof_7",
+  "constType":
+  "∀ (R : Type u_2) [inst : CommRing R] [inst_1 : IsNoetherianRing R] (M : Type u_1) [inst_2 : Nontrivial M]\n  [inst_3 : AddCommGroup M] [inst_4 : _root_.Module R M] [inst_5 : Module.Finite R M],\n  (HarderNarasimhan.Coprimary.payoff R M).hnFiltration.toFun 0 = ⊥",
+  "constCategory": "Theorem"},
+ {"references": ["HarderNarasimhan.PayoffFunction.IsConvex.casesOn"],
+  "name": "HarderNarasimhan.PayoffFunction.IsConvex.recOn",
+  "constType":
+  "{ℒ : Type u_1} →\n  {S : Type u_2} →\n    [inst : Lattice ℒ] →\n      [inst_1 : CompleteLattice S] →\n        {μ : HarderNarasimhan.PayoffFunction ℒ S} →\n          {motive : μ.IsConvex → Sort u} →\n            (t : μ.IsConvex) →\n              ((le :\n                    ∀ (x y : ℒ) (h : ¬x ≤ y),\n                      μ { left := x ⊓ y, right := x, lt := ⋯ } ≤ μ { left := y, right := x ⊔ y, lt := ⋯ }) →\n                  motive ⋯) →\n                motive t",
   "constCategory": "Definition"},
  {"references": [],
   "name": "HarderNarasimhan.PayoffFunction.JordanHolderFiltration.mk",
@@ -2864,6 +2789,11 @@
   "constType":
   "{ℒ : Type u_1} →\n  {S : Type u_2} →\n    [inst : PartialOrder ℒ] →\n      [inst_1 : BoundedOrder ℒ] →\n        [inst_2 : CompleteLattice S] →\n          {μ : HarderNarasimhan.PayoffFunction ℒ S} →\n            {motive : μ.WeakSlopeLikeAtBot → Sort u} →\n              (t : μ.WeakSlopeLikeAtBot) →\n                ((le_or_le :\n                      ∀ (z : HarderNarasimhan.StrictIntvl ℒ) (hz : ⊥ < z.left),\n                        μ { left := ⊥, right := z.right, lt := ⋯ } ≤ μ z ∨\n                          μ { left := ⊥, right := z.right, lt := ⋯ } ≤ μ { left := ⊥, right := z.left, lt := hz }) →\n                    motive ⋯) →\n                  motive t",
   "constCategory": "Definition"},
+ {"references": [],
+  "name": "HarderNarasimhan.Coprimary.subquotientAssociatedPrimes_nonempty",
+  "constType":
+  "∀ {R : Type u_1} [inst : CommRing R] [inst_1 : IsNoetherianRing R] {M : Type u_2} [inst_2 : AddCommGroup M]\n  [inst_3 : _root_.Module R M] [inst_4 : Module.Finite R M] (I : HarderNarasimhan.StrictIntvl (Submodule R M)),\n  (HarderNarasimhan.Coprimary.subquotientAssociatedPrimes I).toFinset.Nonempty",
+  "constCategory": "Theorem"},
  {"references":
   ["Not",
    "LT.lt",
@@ -2875,11 +2805,6 @@
   "constType":
   "∀ {ℒ : Type u_1} {S : Type u_2} [inst : Nontrivial ℒ] [inst_1 : PartialOrder ℒ] [inst_2 : BoundedOrder ℒ]\n  [inst_3 : CompleteLattice S] {μ : HarderNarasimhan.PayoffFunction ℒ S},\n  (∀ (x : ℒ) (hx : ⊥ < x), ¬μ.A ⊤ < μ.A { left := ⊥, right := x, lt := hx }) → μ.IsSemistable",
   "constCategory": "Definition"},
- {"references": [],
-  "name": "HarderNarasimhan.Coprimary.subquotientAssociatedPrimes_nonempty",
-  "constType":
-  "∀ {R : Type u_1} [inst : CommRing R] [inst_1 : IsNoetherianRing R] {M : Type u_2} [inst_2 : AddCommGroup M]\n  [inst_3 : _root_.Module R M] [inst_4 : Module.Finite R M] (I : HarderNarasimhan.StrictIntvl (Submodule R M)),\n  (HarderNarasimhan.Coprimary.subquotientAssociatedPrimes I).toFinset.Nonempty",
-  "constCategory": "Theorem"},
  {"references": [],
   "name":
   "_private.HarderNarasimhan.Filtration.Unique.0.HarderNarasimhan.PayoffFunction.instUniqueHarderNarasimhanFiltration._proof_1",
@@ -2932,15 +2857,7 @@
   "constType":
   "{α : Sort u2} → {a : α} → {motive : α → Sort u1} → motive a → {b : α} → a = b → motive b",
   "constCategory": "Definition"},
- {"references":
-  ["lt_trans",
-   "LT.lt",
-   "HarderNarasimhan.StrictIntvl.lt",
-   "HarderNarasimhan.StrictIntvl.left",
-   "HarderNarasimhan.StrictIntvl.right",
-   "LE.le",
-   "DFunLike.coe",
-   "Bot.bot"],
+ {"references": ["HarderNarasimhan.PayoffFunction.WeakSlopeLikeAtBot.casesOn"],
   "name": "HarderNarasimhan.PayoffFunction.WeakSlopeLikeAtBot.recOn",
   "constType":
   "{ℒ : Type u_1} →\n  {S : Type u_2} →\n    [inst : PartialOrder ℒ] →\n      [inst_1 : BoundedOrder ℒ] →\n        [inst_2 : CompleteLattice S] →\n          {μ : HarderNarasimhan.PayoffFunction ℒ S} →\n            {motive : μ.WeakSlopeLikeAtBot → Sort u} →\n              (t : μ.WeakSlopeLikeAtBot) →\n                ((le_or_le :\n                      ∀ (z : HarderNarasimhan.StrictIntvl ℒ) (hz : ⊥ < z.left),\n                        μ { left := ⊥, right := z.right, lt := ⋯ } ≤ μ z ∨\n                          μ { left := ⊥, right := z.right, lt := ⋯ } ≤ μ { left := ⊥, right := z.left, lt := hz }) →\n                    motive ⋯) →\n                  motive t",
@@ -2950,17 +2867,17 @@
   "constType":
   "∀ {ℒ : Type u_3} [inst : Nontrivial ℒ] [inst_1 : Lattice ℒ] [inst_2 : BoundedOrder ℒ] {S : Type u_4}\n  [inst_3 : CompleteLinearOrder S] {μ : HarderNarasimhan.PayoffFunction ℒ S}, μ.IsSemistable → μ.B ⊤ ≤ μ.A ⊤",
   "constCategory": "Theorem"},
+ {"references": ["OfNat.ofNat"],
+  "name": "HarderNarasimhan.PayoffFunction._sizeOf_1",
+  "constType":
+  "{ℒ : Type u_1} → {inst : LT ℒ} → {S : Type u_2} → [SizeOf ℒ] → [SizeOf S] → HarderNarasimhan.PayoffFunction ℒ S → ℕ",
+  "constCategory": "Definition"},
  {"references": [],
   "name":
   "HarderNarasimhan.PayoffFunction.IsSlopeLike.seesaw_right_lt_total_iff",
   "constType":
   "∀ {ℒ : Type u_1} {S : Type u_2} [inst : PartialOrder ℒ] [inst_1 : CompleteLattice S]\n  {μ : HarderNarasimhan.PayoffFunction ℒ S},\n  μ.IsSlopeLike →\n    ∀ {x y z : ℒ} (h₁ : x < y) (h₂ : y < z),\n      μ { left := y, right := z, lt := h₂ } < μ { left := x, right := z, lt := ⋯ } ↔\n        μ { left := x, right := z, lt := ⋯ } < μ { left := x, right := y, lt := h₁ }",
   "constCategory": "Theorem"},
- {"references": ["OfNat.ofNat"],
-  "name": "HarderNarasimhan.PayoffFunction._sizeOf_1",
-  "constType":
-  "{ℒ : Type u_1} → {inst : LT ℒ} → {S : Type u_2} → [SizeOf ℒ] → [SizeOf S] → HarderNarasimhan.PayoffFunction ℒ S → ℕ",
-  "constCategory": "Definition"},
  {"references": [],
   "name":
   "HarderNarasimhan.PayoffFunction.HarderNarasimhanFiltration.ne_top_iff_lt_length",
@@ -3006,6 +2923,17 @@
   "∀ {ℒ : Type u_1} {S : Type u_2} [inst : PartialOrder ℒ] [inst_1 : CompleteLattice S]\n  {μ : HarderNarasimhan.PayoffFunction ℒ S} {I : HarderNarasimhan.StrictIntvl ℒ} {x : ℒ},\n  (x ∈ μ.breakpoints I) = μ.IsBreakpoint I x",
   "constCategory": "Theorem"},
  {"references": [],
+  "name":
+  "HarderNarasimhan.PayoffFunction.existsUnique_relSeries_semistableRel",
+  "constType":
+  "∀ {ℒ : Type u_1} [Nontrivial ℒ] [inst : Lattice ℒ] [inst_1 : BoundedOrder ℒ] [WellFoundedGT ℒ] {S : Type u_2}\n  [inst_3 : CompleteLinearOrder S] (μ : HarderNarasimhan.PayoffFunction ℒ S) [μ.ADCC] [μ.IsConvex],\n  ∃! s,\n    s.head = ⊥ ∧\n      s.last = ⊤ ∧\n        ∀ (i : ℕ) (hi : i + 1 < s.length),\n          ¬μ.A { left := s.toFun ↑i, right := s.toFun ↑(i + 1), lt := ⋯ } ≤\n              μ.A { left := s.toFun ↑(i + 1), right := s.toFun ↑(i + 2), lt := ⋯ }",
+  "constCategory": "Theorem"},
+ {"references": [],
+  "name": "HarderNarasimhan.PayoffFunction.IsConvexOn",
+  "constType":
+  "{ℒ : Type u_1} →\n  {S : Type u_2} →\n    [inst : Lattice ℒ] →\n      [CompleteLattice S] → HarderNarasimhan.PayoffFunction ℒ S → HarderNarasimhan.StrictIntvl ℒ → Prop",
+  "constCategory": "Other"},
+ {"references": [],
   "name": "HarderNarasimhan.IsCoprimary",
   "constType":
   "(R : Type u_1) → [inst : CommRing R] → (M : Type u_2) → [inst_1 : AddCommGroup M] → [_root_.Module R M] → Prop",
@@ -3016,17 +2944,6 @@
   "constType":
   "∀ {R : Type u_1} [inst : CommRing R] {M : Type u_2} [inst_1 : AddCommGroup M] [inst_2 : _root_.Module R M],\n  (∃! p, p ∈ associatedPrimes R M) → HarderNarasimhan.IsCoprimary R M",
   "constCategory": "Definition"},
- {"references": [],
-  "name": "HarderNarasimhan.PayoffFunction.IsConvexOn",
-  "constType":
-  "{ℒ : Type u_1} →\n  {S : Type u_2} →\n    [inst : Lattice ℒ] →\n      [CompleteLattice S] → HarderNarasimhan.PayoffFunction ℒ S → HarderNarasimhan.StrictIntvl ℒ → Prop",
-  "constCategory": "Other"},
- {"references": [],
-  "name":
-  "HarderNarasimhan.PayoffFunction.existsUnique_relSeries_semistableRel",
-  "constType":
-  "∀ {ℒ : Type u_1} [Nontrivial ℒ] [inst : Lattice ℒ] [inst_1 : BoundedOrder ℒ] [WellFoundedGT ℒ] {S : Type u_2}\n  [inst_3 : CompleteLinearOrder S] (μ : HarderNarasimhan.PayoffFunction ℒ S) [μ.ADCC] [μ.IsConvex],\n  ∃! s,\n    s.head = ⊥ ∧\n      s.last = ⊤ ∧\n        ∀ (i : ℕ) (hi : i + 1 < s.length),\n          ¬μ.A { left := s.toFun ↑i, right := s.toFun ↑(i + 1), lt := ⋯ } ≤\n              μ.A { left := s.toFun ↑(i + 1), right := s.toFun ↑(i + 2), lt := ⋯ }",
-  "constCategory": "Theorem"},
  {"references": [],
   "name": "HarderNarasimhan.inter_eq_empty_of_mem_associatedPrimes_quot_ker",
   "constType":
@@ -3073,15 +2990,15 @@
   "∀ {ℒ : Type u_1} [inst : PartialOrder ℒ] {I : HarderNarasimhan.StrictIntvl ℒ}\n  (J : HarderNarasimhan.StrictIntvl { x // x ∈ I }), ↑J.left < ↑J.right",
   "constCategory": "Theorem"},
  {"references": [],
+  "name": "HarderNarasimhan.PayoffFunction.instStrongDCCOfEventuallyTopDCC",
+  "constType":
+  "∀ {ℒ : Type u_1} {S : Type u_2} [inst : PartialOrder ℒ] [inst_1 : BoundedOrder ℒ] [inst_2 : CompleteLattice S]\n  {μ : HarderNarasimhan.PayoffFunction ℒ S} [h : μ.EventuallyTopDCC], μ.StrongDCC",
+  "constCategory": "Theorem"},
+ {"references": [],
   "name":
   "HarderNarasimhan.Coprimary.instADCCSubmoduleDedekindCutColexFinsetLinearExtensionPrimeSpectrumPayoff",
   "constType":
   "∀ {R : Type u_1} [inst : CommRing R] [inst_1 : IsNoetherianRing R] {M : Type u_2} [inst_2 : AddCommGroup M]\n  [inst_3 : _root_.Module R M] [inst_4 : Module.Finite R M], (HarderNarasimhan.Coprimary.payoff R M).ADCC",
-  "constCategory": "Theorem"},
- {"references": [],
-  "name": "HarderNarasimhan.PayoffFunction.instStrongDCCOfEventuallyTopDCC",
-  "constType":
-  "∀ {ℒ : Type u_1} {S : Type u_2} [inst : PartialOrder ℒ] [inst_1 : BoundedOrder ℒ] [inst_2 : CompleteLattice S]\n  {μ : HarderNarasimhan.PayoffFunction ℒ S} [h : μ.EventuallyTopDCC], μ.StrongDCC",
   "constCategory": "Theorem"},
  {"references":
   ["LT.lt",
@@ -3117,6 +3034,12 @@
   "constType":
   "{ℒ : Type u_1} →\n  {S : Type u_2} → [inst : LT ℒ] → FunLike (HarderNarasimhan.PayoffFunction ℒ S) (HarderNarasimhan.StrictIntvl ℒ) S",
   "constCategory": "Definition"},
+ {"references": [],
+  "name":
+  "HarderNarasimhan.CoprimaryFiltration.instFunLikeNatSubmodule._proof_1",
+  "constType":
+  "∀ {R : Type u_2} [inst : CommRing R] [inst_1 : IsNoetherianRing R] {M : Type u_1} [inst_2 : Nontrivial M]\n  [inst_3 : AddCommGroup M] [inst_4 : _root_.Module R M] [inst_5 : Module.Finite R M],\n  Function.Injective HarderNarasimhan.CoprimaryFiltration.toFun",
+  "constCategory": "Theorem"},
  {"references":
   ["Not",
    "LT.lt",
@@ -3132,19 +3055,13 @@
   "constType":
   "{ℒ : Type u_1} →\n  [inst : PartialOrder ℒ] →\n    {V : Type u_2} →\n      [inst_1 : AddCommGroup V] →\n        [_root_.Module ℝ V] →\n          [inst_3 : LinearOrder V] →\n            (HarderNarasimhan.StrictIntvl ℒ → NNReal) →\n              (HarderNarasimhan.StrictIntvl ℒ → V) → HarderNarasimhan.PayoffFunction ℒ (DedekindCut V)",
   "constCategory": "Definition"},
- {"references": [],
-  "name":
-  "HarderNarasimhan.CoprimaryFiltration.instFunLikeNatSubmodule._proof_1",
-  "constType":
-  "∀ {R : Type u_2} [inst : CommRing R] [inst_1 : IsNoetherianRing R] {M : Type u_1} [inst_2 : Nontrivial M]\n  [inst_3 : AddCommGroup M] [inst_4 : _root_.Module R M] [inst_5 : Module.Finite R M],\n  Function.Injective HarderNarasimhan.CoprimaryFiltration.toFun",
-  "constCategory": "Theorem"},
- {"references": ["InfSet.sInf", "Set.range"],
-  "name": "iInf",
-  "constType": "{α : Type u} → {ι : Sort v} → [InfSet α] → (ι → α) → α",
-  "constCategory": "Definition"},
  {"references": ["LT.lt"],
   "name": "WellFoundedGT",
   "constType": "(α : Type u_1) → [LT α] → Prop",
+  "constCategory": "Definition"},
+ {"references": ["InfSet.sInf", "Set.range"],
+  "name": "iInf",
+  "constType": "{α : Type u} → {ι : Sort v} → [InfSet α] → (ι → α) → α",
   "constCategory": "Definition"},
  {"references":
   ["HAdd.hAdd",
@@ -3222,24 +3139,16 @@
   "constType":
   "{ℒ : Type u_1} →\n  {S : Type u_2} →\n    [inst : Nontrivial ℒ] →\n      [inst_1 : PartialOrder ℒ] →\n        [inst_2 : BoundedOrder ℒ] →\n          [inst_3 : CompleteLattice S] →\n            {μ : HarderNarasimhan.PayoffFunction ℒ S} →\n              {motive : μ.JordanHolderFiltration → Sort u} →\n                (t : μ.JordanHolderFiltration) →\n                  ((toFun : ℕ → ℒ) →\n                      (length : ℕ) →\n                        (antitone : Antitone toFun) →\n                          (head_eq_top : toFun 0 = ⊤) →\n                            (length_eq_bot : toFun length = ⊥) →\n                              (strictAntiOn : StrictAntiOn toFun (Set.Iic length)) →\n                                (step_payoff_eq :\n                                    ∀ (i : ℕ) (hi : i < length),\n                                      μ { left := toFun (i + 1), right := toFun i, lt := ⋯ } = μ ⊤) →\n                                  (payoff_lt_of_between :\n                                      ∀ (i : ℕ) (hi : i < length) (z : ℒ) (h' : toFun (i + 1) < z),\n                                        z < toFun i →\n                                          μ { left := toFun (i + 1), right := z, lt := h' } <\n                                            μ { left := toFun (i + 1), right := toFun i, lt := ⋯ }) →\n                                    motive\n                                      { toFun := toFun, length := length, antitone := antitone,\n                                        head_eq_top := head_eq_top, length_eq_bot := length_eq_bot,\n                                        strictAntiOn := strictAntiOn, step_payoff_eq := step_payoff_eq,\n                                        payoff_lt_of_between := payoff_lt_of_between }) →\n                    motive t",
   "constCategory": "Definition"},
- {"references":
-  ["lt_trans",
-   "LT.lt",
-   "HarderNarasimhan.StrictIntvl.lt",
-   "HarderNarasimhan.StrictIntvl.left",
-   "HarderNarasimhan.StrictIntvl.right",
-   "LE.le",
-   "Top.top",
-   "DFunLike.coe"],
-  "name": "HarderNarasimhan.PayoffFunction.WeakSlopeLikeAtTop.recOn",
-  "constType":
-  "{ℒ : Type u_1} →\n  {S : Type u_2} →\n    [inst : PartialOrder ℒ] →\n      [inst_1 : BoundedOrder ℒ] →\n        [inst_2 : CompleteLattice S] →\n          {μ : HarderNarasimhan.PayoffFunction ℒ S} →\n            {motive : μ.WeakSlopeLikeAtTop → Sort u} →\n              (t : μ.WeakSlopeLikeAtTop) →\n                ((le_or_le :\n                      ∀ (z : HarderNarasimhan.StrictIntvl ℒ) (hz : z.right < ⊤),\n                        μ z ≤ μ { left := z.left, right := ⊤, lt := ⋯ } ∨\n                          μ { left := z.right, right := ⊤, lt := hz } ≤ μ { left := z.left, right := ⊤, lt := ⋯ }) →\n                    motive ⋯) →\n                  motive t",
-  "constCategory": "Definition"},
  {"references": [],
   "name": "HarderNarasimhan.PayoffFunction.min_apply",
   "constType":
   "∀ {ℒ : Type u_1} {S : Type u_2} [inst : Preorder ℒ] [inst_1 : CompleteLattice S]\n  (μ : HarderNarasimhan.PayoffFunction ℒ S) (I : HarderNarasimhan.StrictIntvl ℒ),\n  μ.min I = ⨅ u, ⨅ (hu : u ∈ Set.Ico I.left I.right), μ { left := u, right := I.right, lt := ⋯ }",
   "constCategory": "Theorem"},
+ {"references": ["HarderNarasimhan.PayoffFunction.WeakSlopeLikeAtTop.casesOn"],
+  "name": "HarderNarasimhan.PayoffFunction.WeakSlopeLikeAtTop.recOn",
+  "constType":
+  "{ℒ : Type u_1} →\n  {S : Type u_2} →\n    [inst : PartialOrder ℒ] →\n      [inst_1 : BoundedOrder ℒ] →\n        [inst_2 : CompleteLattice S] →\n          {μ : HarderNarasimhan.PayoffFunction ℒ S} →\n            {motive : μ.WeakSlopeLikeAtTop → Sort u} →\n              (t : μ.WeakSlopeLikeAtTop) →\n                ((le_or_le :\n                      ∀ (z : HarderNarasimhan.StrictIntvl ℒ) (hz : z.right < ⊤),\n                        μ z ≤ μ { left := z.left, right := ⊤, lt := ⋯ } ∨\n                          μ { left := z.right, right := ⊤, lt := hz } ≤ μ { left := z.left, right := ⊤, lt := ⋯ }) →\n                    motive ⋯) →\n                  motive t",
+  "constCategory": "Definition"},
  {"references":
   ["_private.HarderNarasimhan.Filtration.Exists.0.HarderNarasimhan.PayoffFunction.HNFil_monotone",
    "_private.HarderNarasimhan.Filtration.Exists.0.HarderNarasimhan.PayoffFunction.HNFil_not_A_le_succ",
@@ -3301,11 +3210,6 @@
   "name": "Max.max",
   "constType": "{α : Type u} → [self : Max α] → α → α → α",
   "constCategory": "Definition"},
- {"references": [],
-  "name": "HarderNarasimhan.PayoffFunction.IsConvexOn.A_max",
-  "constType":
-  "∀ {ℒ : Type u_1} {S : Type u_2} [inst : Lattice ℒ] [inst_1 : CompleteLattice S]\n  {μ : HarderNarasimhan.PayoffFunction ℒ S} {I : HarderNarasimhan.StrictIntvl ℒ}, μ.IsConvexOn I → μ.max.A I = μ.A I",
-  "constCategory": "Theorem"},
  {"references":
   ["Not",
    "StrictMonoOn",
@@ -3333,6 +3237,11 @@
   "constType":
   "{P : Sort u} →\n  {ℒ : Type u_1} →\n    {S : Type u_2} →\n      {inst : PartialOrder ℒ} →\n        {inst_1 : BoundedOrder ℒ} →\n          {inst_2 : CompleteLattice S} →\n            {μ : HarderNarasimhan.PayoffFunction ℒ S} →\n              {t : μ.HarderNarasimhanFiltration} →\n                {ℒ' : Type u_1} →\n                  {S' : Type u_2} →\n                    {inst' : PartialOrder ℒ'} →\n                      {inst'_1 : BoundedOrder ℒ'} →\n                        {inst'_2 : CompleteLattice S'} →\n                          {μ' : HarderNarasimhan.PayoffFunction ℒ' S'} →\n                            {t' : μ'.HarderNarasimhanFiltration} →\n                              ℒ = ℒ' →\n                                S = S' →\n                                  inst ≍ inst' →\n                                    inst_1 ≍ inst'_1 →\n                                      inst_2 ≍ inst'_2 →\n                                        μ ≍ μ' →\n                                          t ≍ t' →\n                                            HarderNarasimhan.PayoffFunction.HarderNarasimhanFiltration.noConfusionType P\n                                              t t'",
   "constCategory": "Definition"},
+ {"references": [],
+  "name": "HarderNarasimhan.PayoffFunction.IsConvexOn.A_max",
+  "constType":
+  "∀ {ℒ : Type u_1} {S : Type u_2} [inst : Lattice ℒ] [inst_1 : CompleteLattice S]\n  {μ : HarderNarasimhan.PayoffFunction ℒ S} {I : HarderNarasimhan.StrictIntvl ℒ}, μ.IsConvexOn I → μ.max.A I = μ.A I",
+  "constCategory": "Theorem"},
  {"references": [],
   "name": "Nat.le_of_succ_le",
   "constType": "∀ {n m : ℕ}, n.succ ≤ m → n ≤ m",
@@ -3429,15 +3338,15 @@
   "{ℒ : Type u_1} →\n  {S : Type u_2} →\n    [inst : PartialOrder ℒ] →\n      [inst_1 : BoundedOrder ℒ] →\n        [inst_2 : CompleteLattice S] →\n          {μ : HarderNarasimhan.PayoffFunction ℒ S} →\n            {motive : μ.HarderNarasimhanFiltration → Sort u} →\n              ((toFun : ℕ → ℒ) →\n                  (length : ℕ) →\n                    (monotone : Monotone toFun) →\n                      (head_eq_bot : toFun 0 = ⊥) →\n                        (length_eq_top : toFun length = ⊤) →\n                          (strictMonoOn : StrictMonoOn toFun (Set.Iic length)) →\n                            (piecewise_isSemistable :\n                                ∀ (i : ℕ) (hi : i < length),\n                                  (μ.restrict { left := toFun i, right := toFun (i + 1), lt := ⋯ }).IsSemistable) →\n                              (not_A_le_succ :\n                                  ∀ (i : ℕ) (hi : i + 1 < length),\n                                    ¬μ.A { left := toFun i, right := toFun (i + 1), lt := ⋯ } ≤\n                                        μ.A { left := toFun (i + 1), right := toFun (i + 2), lt := ⋯ }) →\n                                motive\n                                  { toFun := toFun, length := length, monotone := monotone, head_eq_bot := head_eq_bot,\n                                    length_eq_top := length_eq_top, strictMonoOn := strictMonoOn,\n                                    piecewise_isSemistable := piecewise_isSemistable,\n                                    not_A_le_succ := not_A_le_succ }) →\n                (t : μ.HarderNarasimhanFiltration) → motive t",
   "constCategory": "Other"},
  {"references": [],
-  "name": "HarderNarasimhan.PayoffFunction.IsStable.toIsSemistable",
-  "constType":
-  "∀ {ℒ : Type u_1} {S : Type u_2} {inst : Nontrivial ℒ} {inst_1 : PartialOrder ℒ} {inst_2 : BoundedOrder ℒ}\n  {inst_3 : CompleteLattice S} {μ : HarderNarasimhan.PayoffFunction ℒ S} [self : μ.IsStable], μ.IsSemistable",
-  "constCategory": "Theorem"},
- {"references": [],
   "name": "HarderNarasimhan.StrictIntvl.ctorIdx",
   "constType":
   "{ℒ : Type u_1} → {inst : LT ℒ} → HarderNarasimhan.StrictIntvl ℒ → ℕ",
   "constCategory": "Definition"},
+ {"references": [],
+  "name": "HarderNarasimhan.PayoffFunction.IsStable.toIsSemistable",
+  "constType":
+  "∀ {ℒ : Type u_1} {S : Type u_2} {inst : Nontrivial ℒ} {inst_1 : PartialOrder ℒ} {inst_2 : BoundedOrder ℒ}\n  {inst_3 : CompleteLattice S} {μ : HarderNarasimhan.PayoffFunction ℒ S} [self : μ.IsStable], μ.IsSemistable",
+  "constCategory": "Theorem"},
  {"references": [],
   "name": "HarderNarasimhan.PayoffFunction.A_le_max_inf",
   "constType":
@@ -3449,14 +3358,14 @@
   "{ℒ : Type u_1} →\n  {S : Type u_2} →\n    [inst : PartialOrder ℒ] →\n      [inst_1 : CompleteLattice S] →\n        {μ : HarderNarasimhan.PayoffFunction ℒ S} →\n          {motive : μ.IsSlopeLike → Sort u} →\n            ((slopelike :\n                  ∀ (x y z : ℒ) (h : x < y ∧ y < z),\n                    (μ { left := x, right := y, lt := ⋯ } ≤ μ { left := x, right := z, lt := ⋯ } ∨\n                        μ { left := y, right := z, lt := ⋯ } < μ { left := x, right := z, lt := ⋯ }) ∧\n                      (μ { left := x, right := y, lt := ⋯ } < μ { left := x, right := z, lt := ⋯ } ∨\n                          μ { left := y, right := z, lt := ⋯ } ≤ μ { left := x, right := z, lt := ⋯ }) ∧\n                        (μ { left := x, right := z, lt := ⋯ } < μ { left := x, right := y, lt := ⋯ } ∨\n                            μ { left := x, right := z, lt := ⋯ } ≤ μ { left := y, right := z, lt := ⋯ }) ∧\n                          (μ { left := x, right := z, lt := ⋯ } ≤ μ { left := x, right := y, lt := ⋯ } ∨\n                            μ { left := x, right := z, lt := ⋯ } < μ { left := y, right := z, lt := ⋯ })) →\n                motive ⋯) →\n              (t : μ.IsSlopeLike) → motive t",
   "constCategory": "Other"},
  {"references": [],
-  "name": "HarderNarasimhan.PayoffFunction.IsBreakpoint.not_lt",
-  "constType":
-  "∀ {ℒ : Type u_1} {S : Type u_2} [inst : PartialOrder ℒ] [inst_1 : CompleteLattice S]\n  {μ : HarderNarasimhan.PayoffFunction ℒ S} {I : HarderNarasimhan.StrictIntvl ℒ} {x : ℒ} (self : μ.IsBreakpoint I x)\n  (y : ℒ) (hyI : y ∈ I) (hy : I.left ≠ y),\n  ¬μ.A { left := I.left, right := x, lt := ⋯ } < μ.A { left := I.left, right := y, lt := ⋯ }",
-  "constCategory": "Theorem"},
- {"references": [],
   "name": "HarderNarasimhan.PayoffFunction.B_le",
   "constType":
   "∀ {ℒ : Type u_1} {S : Type u_2} [inst : Preorder ℒ] [inst_1 : CompleteLattice S]\n  {μ : HarderNarasimhan.PayoffFunction ℒ S} {I : HarderNarasimhan.StrictIntvl ℒ} {s : S},\n  (∀ (b : ℒ) (hb : b ∈ Set.Ioc I.left I.right), μ.min { left := I.left, right := b, lt := ⋯ } ≤ s) → μ.B I ≤ s",
+  "constCategory": "Theorem"},
+ {"references": [],
+  "name": "HarderNarasimhan.PayoffFunction.IsBreakpoint.not_lt",
+  "constType":
+  "∀ {ℒ : Type u_1} {S : Type u_2} [inst : PartialOrder ℒ] [inst_1 : CompleteLattice S]\n  {μ : HarderNarasimhan.PayoffFunction ℒ S} {I : HarderNarasimhan.StrictIntvl ℒ} {x : ℒ} (self : μ.IsBreakpoint I x)\n  (y : ℒ) (hyI : y ∈ I) (hy : I.left ≠ y),\n  ¬μ.A { left := I.left, right := x, lt := ⋯ } < μ.A { left := I.left, right := y, lt := ⋯ }",
   "constCategory": "Theorem"},
  {"references": [],
   "name": "HarderNarasimhan.PayoffFunction.dual._proof_1",
@@ -3549,7 +3458,7 @@
   ["Submodule.comap", "RingHom.id", "Membership.mem", "Submodule.subtype"],
   "name": "Submodule.submoduleOf",
   "constType":
-  "{R : Type u_1} →\n  {M : Type u_5} →\n    [inst : Semiring R] →\n      [inst_1 : AddCommMonoid M] → [inst_2 : _root_.Module R M] → Submodule R M → (q : Submodule R M) → Submodule R ↥q",
+  "{R : Type u_1} →\n  {M : Type u_4} →\n    [inst : Semiring R] →\n      [inst_1 : AddCommMonoid M] → [inst_2 : _root_.Module R M] → Submodule R M → (q : Submodule R M) → Submodule R ↥q",
   "constCategory": "Definition"},
  {"references": [],
   "name": "HarderNarasimhan.PayoffFunction.HarderNarasimhanFiltration.mk.injEq",
@@ -3566,19 +3475,6 @@
   "constType":
   "{ℒ : Type u_1} → {S : Type u_2} → [inst : Lattice ℒ] → [CompleteLattice S] → HarderNarasimhan.PayoffFunction ℒ S → Prop",
   "constCategory": "Other"},
- {"references":
-  ["Not",
-   "HarderNarasimhan.StrictIntvl.instPartialOrder._proof_3",
-   "HarderNarasimhan.StrictIntvl.left",
-   "HarderNarasimhan.StrictIntvl.right",
-   "LE.le",
-   "HarderNarasimhan.StrictIntvl.instPartialOrder._proof_2",
-   "HarderNarasimhan.StrictIntvl.instPartialOrder._proof_1",
-   "HarderNarasimhan.StrictIntvl.instPartialOrder._proof_4"],
-  "name": "HarderNarasimhan.StrictIntvl.instPartialOrder",
-  "constType":
-  "{ℒ : Type u_1} → [inst : PartialOrder ℒ] → PartialOrder (HarderNarasimhan.StrictIntvl ℒ)",
-  "constCategory": "Definition"},
  {"references":
   ["Not",
    "StrictMonoOn",
@@ -3601,16 +3497,23 @@
   "constType":
   "{ℒ : Type u_1} →\n  {S : Type u_2} →\n    [inst : PartialOrder ℒ] →\n      [inst_1 : BoundedOrder ℒ] →\n        [inst_2 : CompleteLattice S] →\n          {μ : HarderNarasimhan.PayoffFunction ℒ S} →\n            {motive : μ.HarderNarasimhanFiltration → Sort u} →\n              (t : μ.HarderNarasimhanFiltration) →\n                ((toFun : ℕ → ℒ) →\n                    (length : ℕ) →\n                      (monotone : Monotone toFun) →\n                        (head_eq_bot : toFun 0 = ⊥) →\n                          (length_eq_top : toFun length = ⊤) →\n                            (strictMonoOn : StrictMonoOn toFun (Set.Iic length)) →\n                              (piecewise_isSemistable :\n                                  ∀ (i : ℕ) (hi : i < length),\n                                    (μ.restrict { left := toFun i, right := toFun (i + 1), lt := ⋯ }).IsSemistable) →\n                                (not_A_le_succ :\n                                    ∀ (i : ℕ) (hi : i + 1 < length),\n                                      ¬μ.A { left := toFun i, right := toFun (i + 1), lt := ⋯ } ≤\n                                          μ.A { left := toFun (i + 1), right := toFun (i + 2), lt := ⋯ }) →\n                                  motive\n                                    { toFun := toFun, length := length, monotone := monotone,\n                                      head_eq_bot := head_eq_bot, length_eq_top := length_eq_top,\n                                      strictMonoOn := strictMonoOn, piecewise_isSemistable := piecewise_isSemistable,\n                                      not_A_le_succ := not_A_le_succ }) →\n                  motive t",
   "constCategory": "Definition"},
+ {"references":
+  ["Not",
+   "HarderNarasimhan.StrictIntvl.instPartialOrder._proof_3",
+   "HarderNarasimhan.StrictIntvl.left",
+   "HarderNarasimhan.StrictIntvl.right",
+   "LE.le",
+   "HarderNarasimhan.StrictIntvl.instPartialOrder._proof_2",
+   "HarderNarasimhan.StrictIntvl.instPartialOrder._proof_1",
+   "HarderNarasimhan.StrictIntvl.instPartialOrder._proof_4"],
+  "name": "HarderNarasimhan.StrictIntvl.instPartialOrder",
+  "constType":
+  "{ℒ : Type u_1} → [inst : PartialOrder ℒ] → PartialOrder (HarderNarasimhan.StrictIntvl ℒ)",
+  "constCategory": "Definition"},
  {"references": [],
   "name": "HarderNarasimhan.PayoffFunction.restrict_apply",
   "constType":
   "∀ {ℒ : Type u_1} {S : Type u_2} [inst : PartialOrder ℒ] (μ : HarderNarasimhan.PayoffFunction ℒ S)\n  (I : HarderNarasimhan.StrictIntvl ℒ) (J : HarderNarasimhan.StrictIntvl { x // x ∈ I }),\n  (μ.restrict I) J = μ (HarderNarasimhan.StrictIntvl.ofSub J)",
-  "constCategory": "Theorem"},
- {"references": [],
-  "name":
-  "HarderNarasimhan.PayoffFunction.HarderNarasimhanFiltration.head_eq_bot",
-  "constType":
-  "∀ {ℒ : Type u_1} {S : Type u_2} [inst : PartialOrder ℒ] [inst_1 : BoundedOrder ℒ] [inst_2 : CompleteLattice S]\n  {μ : HarderNarasimhan.PayoffFunction ℒ S} (self : μ.HarderNarasimhanFiltration), self.toFun 0 = ⊥",
   "constCategory": "Theorem"},
  {"references": ["LT.lt"],
   "name": "HarderNarasimhan.StrictIntvl.mk._flat_ctor",
@@ -3618,14 +3521,20 @@
   "{ℒ : Type u_1} → [inst : LT ℒ] → (left right : ℒ) → left < right → HarderNarasimhan.StrictIntvl ℒ",
   "constCategory": "Definition"},
  {"references": [],
-  "name": "HarderNarasimhan.PayoffFunction.max_apply",
+  "name":
+  "HarderNarasimhan.PayoffFunction.HarderNarasimhanFiltration.head_eq_bot",
   "constType":
-  "∀ {ℒ : Type u_1} {S : Type u_2} [inst : Preorder ℒ] [inst_1 : CompleteLattice S]\n  (μ : HarderNarasimhan.PayoffFunction ℒ S) (I : HarderNarasimhan.StrictIntvl ℒ),\n  μ.max I = ⨆ u, ⨆ (hu : u ∈ Set.Ioc I.left I.right), μ { left := I.left, right := u, lt := ⋯ }",
+  "∀ {ℒ : Type u_1} {S : Type u_2} [inst : PartialOrder ℒ] [inst_1 : BoundedOrder ℒ] [inst_2 : CompleteLattice S]\n  {μ : HarderNarasimhan.PayoffFunction ℒ S} (self : μ.HarderNarasimhanFiltration), self.toFun 0 = ⊥",
   "constCategory": "Theorem"},
  {"references": [],
   "name": "HarderNarasimhan.Coprimary.coprimaryFiltration._proof_8",
   "constType":
   "∀ (R : Type u_2) [inst : CommRing R] [inst_1 : IsNoetherianRing R] (M : Type u_1) [inst_2 : Nontrivial M]\n  [inst_3 : AddCommGroup M] [inst_4 : _root_.Module R M] [inst_5 : Module.Finite R M],\n  (HarderNarasimhan.Coprimary.payoff R M).hnFiltration.toFun\n      (HarderNarasimhan.Coprimary.payoff R M).hnFiltration.length =\n    ⊤",
+  "constCategory": "Theorem"},
+ {"references": [],
+  "name": "HarderNarasimhan.PayoffFunction.max_apply",
+  "constType":
+  "∀ {ℒ : Type u_1} {S : Type u_2} [inst : Preorder ℒ] [inst_1 : CompleteLattice S]\n  (μ : HarderNarasimhan.PayoffFunction ℒ S) (I : HarderNarasimhan.StrictIntvl ℒ),\n  μ.max I = ⨆ u, ⨆ (hu : u ∈ Set.Ioc I.left I.right), μ { left := I.left, right := u, lt := ⋯ }",
   "constCategory": "Theorem"},
  {"references": [],
   "name":
@@ -3645,11 +3554,6 @@
  {"references": [],
   "name": "LT.lt.le",
   "constType": "∀ {α : Type u_1} [inst : Preorder α] {a b : α}, a < b → a ≤ b",
-  "constCategory": "Theorem"},
- {"references": [],
-  "name": "HarderNarasimhan.PayoffFunction.JordanHolderFiltration.toFun_eq_coe",
-  "constType":
-  "∀ {ℒ : Type u_1} {S : Type u_2} [inst : Nontrivial ℒ] [inst_1 : PartialOrder ℒ] [inst_2 : BoundedOrder ℒ]\n  [inst_3 : CompleteLattice S] {μ : HarderNarasimhan.PayoffFunction ℒ S} (F : μ.JordanHolderFiltration), F.toFun = ⇑F",
   "constCategory": "Theorem"},
  {"references":
   ["Bot.bot",
@@ -3671,6 +3575,11 @@
   "constType":
   "{P : Sort u} →\n  {ℒ : Type u_1} →\n    {S : Type u_2} →\n      {inst : Nontrivial ℒ} →\n        {inst_1 : PartialOrder ℒ} →\n          {inst_2 : BoundedOrder ℒ} →\n            {inst_3 : CompleteLattice S} →\n              {μ : HarderNarasimhan.PayoffFunction ℒ S} →\n                {t : μ.JordanHolderFiltration} →\n                  {ℒ' : Type u_1} →\n                    {S' : Type u_2} →\n                      {inst' : Nontrivial ℒ'} →\n                        {inst'_1 : PartialOrder ℒ'} →\n                          {inst'_2 : BoundedOrder ℒ'} →\n                            {inst'_3 : CompleteLattice S'} →\n                              {μ' : HarderNarasimhan.PayoffFunction ℒ' S'} →\n                                {t' : μ'.JordanHolderFiltration} →\n                                  ℒ = ℒ' →\n                                    S = S' →\n                                      inst ≍ inst' →\n                                        inst_1 ≍ inst'_1 →\n                                          inst_2 ≍ inst'_2 →\n                                            inst_3 ≍ inst'_3 →\n                                              μ ≍ μ' →\n                                                t ≍ t' →\n                                                  HarderNarasimhan.PayoffFunction.JordanHolderFiltration.noConfusionType\n                                                    P t t'",
   "constCategory": "Definition"},
+ {"references": [],
+  "name": "HarderNarasimhan.PayoffFunction.JordanHolderFiltration.toFun_eq_coe",
+  "constType":
+  "∀ {ℒ : Type u_1} {S : Type u_2} [inst : Nontrivial ℒ] [inst_1 : PartialOrder ℒ] [inst_2 : BoundedOrder ℒ]\n  [inst_3 : CompleteLattice S] {μ : HarderNarasimhan.PayoffFunction ℒ S} (F : μ.JordanHolderFiltration), F.toFun = ⇑F",
+  "constCategory": "Theorem"},
  {"references": [],
   "name": "HarderNarasimhan.PayoffFunction.slope.eq_1",
   "constType":
@@ -3704,35 +3613,35 @@
   "∀ {ℒ : Type u_1} {S : Type u_2} [inst : PartialOrder ℒ] [inst_1 : BoundedOrder ℒ] [inst_2 : CompleteLattice S]\n  {μ : HarderNarasimhan.PayoffFunction ℒ S} (F : μ.HarderNarasimhanFiltration), F.toFun = ⇑F",
   "constCategory": "Theorem"},
  {"references": [],
-  "name": "HarderNarasimhan.PayoffFunction.instWeakACCOfWellFoundedGT",
-  "constType":
-  "∀ {ℒ : Type u_1} {S : Type u_2} [inst : PartialOrder ℒ] [inst_1 : BoundedOrder ℒ] [inst_2 : CompleteLattice S]\n  {μ : HarderNarasimhan.PayoffFunction ℒ S} [WellFoundedGT ℒ], μ.WeakACC",
-  "constCategory": "Theorem"},
- {"references": [],
   "name": "HarderNarasimhan.PayoffFunction.instFunLikeStrictIntvl._proof_1",
   "constType":
   "∀ {ℒ : Type u_1} {S : Type u_2} [inst : LT ℒ] (μ ν : HarderNarasimhan.PayoffFunction ℒ S), μ.toFun = ν.toFun → μ = ν",
+  "constCategory": "Theorem"},
+ {"references": [],
+  "name": "HarderNarasimhan.PayoffFunction.instWeakACCOfWellFoundedGT",
+  "constType":
+  "∀ {ℒ : Type u_1} {S : Type u_2} [inst : PartialOrder ℒ] [inst_1 : BoundedOrder ℒ] [inst_2 : CompleteLattice S]\n  {μ : HarderNarasimhan.PayoffFunction ℒ S} [WellFoundedGT ℒ], μ.WeakACC",
   "constCategory": "Theorem"},
  {"references": [],
   "name": "HarderNarasimhan.PayoffFunction.min_le_apply",
   "constType":
   "∀ {ℒ : Type u_1} {S : Type u_2} [inst : Preorder ℒ] [inst_1 : CompleteLattice S]\n  {μ : HarderNarasimhan.PayoffFunction ℒ S} {I : HarderNarasimhan.StrictIntvl ℒ}, μ.min I ≤ μ I",
   "constCategory": "Theorem"},
- {"references": ["LE.le", "HarderNarasimhan.PayoffFunction.IsAttained"],
+ {"references": ["HarderNarasimhan.PayoffFunction.Admissible.casesOn"],
   "name": "HarderNarasimhan.PayoffFunction.Admissible.recOn",
   "constType":
-  "{ℒ : Type u_1} →\n  {S : Type u_2} →\n    [inst : Preorder ℒ] →\n      [inst_1 : CompleteLattice S] →\n        {μ : HarderNarasimhan.PayoffFunction ℒ S} →\n          {motive : μ.Admissible → Sort u} →\n            (t : μ.Admissible) →\n              ((total_or_attained :\n                    (Std.Total fun x1 x2 ↦ x1 ≤ x2) ∨ ∀ (I : HarderNarasimhan.StrictIntvl ℒ), μ.IsAttained I) →\n                  motive ⋯) →\n                motive t",
+  "{ℒ : Type u_1} →\n  {S : Type u_2} →\n    [inst : Preorder ℒ] →\n      [inst_1 : CompleteLattice S] →\n        {μ : HarderNarasimhan.PayoffFunction ℒ S} →\n          {motive : μ.Admissible → Sort u} →\n            (t : μ.Admissible) →\n              ((total_or_attained :\n                    (Total fun x1 x2 ↦ x1 ≤ x2) ∨ ∀ (I : HarderNarasimhan.StrictIntvl ℒ), μ.IsAttained I) →\n                  motive ⋯) →\n                motive t",
   "constCategory": "Definition"},
- {"references": [],
-  "name": "HarderNarasimhan.PayoffFunction.WeakACC.mk",
-  "constType":
-  "∀ {ℒ : Type u_1} {S : Type u_2} [inst : PartialOrder ℒ] [inst_1 : BoundedOrder ℒ] [inst_2 : CompleteLattice S]\n  {μ : HarderNarasimhan.PayoffFunction ℒ S},\n  (∀ (x : ℕ → ℒ) (smf : StrictMono x),\n      ∃ N, μ { left := x N, right := x (N + 1), lt := ⋯ } ≤ μ { left := x N, right := ⊤, lt := ⋯ }) →\n    μ.WeakACC",
-  "constCategory": "Other"},
  {"references": [],
   "name": "HarderNarasimhan.Coprimary.coprimaryFiltration._proof_9",
   "constType":
   "∀ (R : Type u_2) [inst : CommRing R] [inst_1 : IsNoetherianRing R] (M : Type u_1) [inst_2 : Nontrivial M]\n  [inst_3 : AddCommGroup M] [inst_4 : _root_.Module R M] [inst_5 : Module.Finite R M],\n  StrictMonoOn (HarderNarasimhan.Coprimary.payoff R M).hnFiltration.toFun\n    (Set.Iic (HarderNarasimhan.Coprimary.payoff R M).hnFiltration.length)",
   "constCategory": "Theorem"},
+ {"references": [],
+  "name": "HarderNarasimhan.PayoffFunction.WeakACC.mk",
+  "constType":
+  "∀ {ℒ : Type u_1} {S : Type u_2} [inst : PartialOrder ℒ] [inst_1 : BoundedOrder ℒ] [inst_2 : CompleteLattice S]\n  {μ : HarderNarasimhan.PayoffFunction ℒ S},\n  (∀ (x : ℕ → ℒ) (smf : StrictMono x),\n      ∃ N, μ { left := x N, right := x (N + 1), lt := ⋯ } ≤ μ { left := x N, right := ⊤, lt := ⋯ }) →\n    μ.WeakACC",
+  "constCategory": "Other"},
  {"references": ["LT.lt"],
   "name": "StrictAnti",
   "constType":
@@ -3776,16 +3685,7 @@
   "constType":
   "∀ {R : Type u_1} [inst : CommRing R] {M : Type u_2} [inst_1 : AddCommGroup M] [inst_2 : _root_.Module R M]\n  (S : Submonoid R) {p : Ideal R},\n  p ∈ associatedPrimes R ↥(LocalizedModule.mkLinearMap S M).ker → (p.carrier ∩ ↑S).Nonempty",
   "constCategory": "Theorem"},
- {"references":
-  ["HAdd.hAdd",
-   "le_top",
-   "LE.le",
-   "Top.top",
-   "DFunLike.coe",
-   "Nat.lt_add_one",
-   "OfNat.ofNat",
-   "lt_of_lt_of_le",
-   "StrictMono"],
+ {"references": ["HarderNarasimhan.PayoffFunction.WeakACC.casesOn"],
   "name": "HarderNarasimhan.PayoffFunction.WeakACC.recOn",
   "constType":
   "{ℒ : Type u_1} →\n  {S : Type u_2} →\n    [inst : PartialOrder ℒ] →\n      [inst_1 : BoundedOrder ℒ] →\n        [inst_2 : CompleteLattice S] →\n          {μ : HarderNarasimhan.PayoffFunction ℒ S} →\n            {motive : μ.WeakACC → Sort u} →\n              (t : μ.WeakACC) →\n                ((exists_le :\n                      ∀ (x : ℕ → ℒ) (smf : StrictMono x),\n                        ∃ N, μ { left := x N, right := x (N + 1), lt := ⋯ } ≤ μ { left := x N, right := ⊤, lt := ⋯ }) →\n                    motive ⋯) →\n                  motive t",
