@@ -139,8 +139,8 @@ instance : BoundedOrder ↥I where
 @[simp] lemma val_top : (⊤ : ↥I).val = I.right := rfl
 
 /-- If `>` is well-founded on `ℒ`, then it is well-founded on the points of any interval. -/
-instance [hw : WellFoundedGT ℒ] : WellFoundedGT ↥I :=
-  ⟨Subrelation.wf (fun h ↦ Subtype.coe_lt_coe.mpr h) (InvImage.wf Subtype.val hw.wf)⟩
+instance [WellFoundedGT ℒ] : WellFoundedGT ↥I :=
+  Subtype.wellFoundedGT _
 
 /-- A strict interval of `↥I`, viewed as a strict interval of `ℒ`.
 

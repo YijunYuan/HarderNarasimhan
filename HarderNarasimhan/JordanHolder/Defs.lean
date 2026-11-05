@@ -7,7 +7,7 @@ module
 
 public import HarderNarasimhan.PayoffFunction.NashEquilibrium
 public import HarderNarasimhan.PayoffFunction.SlopeLike
-public import Mathlib.Data.Rel
+public import Mathlib.Basic.Rel
 
 /-!
 # Jordan–Hölder filtrations

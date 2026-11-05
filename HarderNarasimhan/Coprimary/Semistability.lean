@@ -117,13 +117,7 @@ private noncomputable def quotEquivMapComap {N₁ N₂ W : Submodule R M}
   have hrange :
       LinearMap.range f =
         Submodule.map (N₁.submoduleOf N₂).mkQ (Submodule.comap N₂.subtype W) := by
-    ext x
-    constructor
-    · rintro ⟨w, -, rfl⟩
-      exact Submodule.mem_map_of_mem <| show i w ∈ Submodule.comap N₂.subtype W by
-        simp [i]
-    · rintro ⟨y, hy, rfl⟩
-      exact ⟨⟨y, hy⟩, rfl⟩
+    rw [LinearMap.range_comp, Submodule.range_inclusion]
   exact
     (Submodule.quotEquivOfEq (N₁.submoduleOf W) (LinearMap.ker f) hker.symm).trans
       ((LinearMap.quotKerEquivRange f).trans (LinearEquiv.ofEq _ _ hrange))
@@ -224,15 +218,9 @@ private lemma min'_le_toLinearExtension (I : StrictIntvl (Submodule R M))
   have hle : I.left.submoduleOf I.right ≤ N''.submoduleOf I.right :=
     Submodule.comap_mono ha1.1
   have hann : Module.annihilator R (I.right ⧸ I.left.submoduleOf I.right) ≤ p.asIdeal := by
-    rw [← Submodule.annihilator_top]
-    refine le_trans ?_ hp.out.annihilator_le
-    intro a ha
-    rw [Submodule.mem_annihilator] at ha ⊢
-    intro x _
-    obtain ⟨y, rfl⟩ := Submodule.factor_surjective hle x
-    calc a • Submodule.factor hle y
-        = Submodule.factor hle (a • y) := (map_smul _ a y).symm
-      _ = 0 := by rw [ha y trivial, map_zero]
+    exact ((Submodule.factor hle).annihilator_le_of_surjective
+      (Submodule.factor_surjective hle)).trans
+        (by simpa only [Submodule.annihilator_top] using hp.out.annihilator_le)
   obtain ⟨r, hr, hrq⟩ := Ideal.exists_minimalPrimes_le hann
   exact le_trans ((subquotientAssociatedPrimes I).toFinset.min'_le
     (toLinearExtension ⟨r, hr.1.1⟩) <|
@@ -245,13 +233,13 @@ private lemma min'_le_toLinearExtension (I : StrictIntvl (Submodule R M))
 primes of `I.right ⧸ N''`. -/
 private lemma singleton_min'_le (I : StrictIntvl (Submodule R M))
     (N'' : Submodule R M) (ha1 : N'' ∈ I) (ha2 : N'' ≠ I.right) :
-    toColex {(subquotientAssociatedPrimes I).toFinset.min'
-        (subquotientAssociatedPrimes_nonempty I)} ≤
+    toColex {((subquotientAssociatedPrimes I).toFinset.min'
+        (subquotientAssociatedPrimes_nonempty I))} ≤
       toColex (subquotientAssociatedPrimes ⟨N'', I.right, lt_of_le_of_ne ha1.2 ha2⟩).toFinset := by
   let J : StrictIntvl (Submodule R M) := ⟨N'', I.right, lt_of_le_of_ne ha1.2 ha2⟩
   calc
-    _ ≤ toColex {(subquotientAssociatedPrimes J).toFinset.min'
-        (subquotientAssociatedPrimes_nonempty J)} := by
+    _ ≤ toColex {((subquotientAssociatedPrimes J).toFinset.min'
+        (subquotientAssociatedPrimes_nonempty J))} := by
       rw [Finset.Colex.singleton_le_singleton]
       exact min'_le_toLinearExtension I N'' ha1 _ (min'_mem_subquotientAssociatedPrimes J)
     _ ≤ toColex (subquotientAssociatedPrimes J).toFinset :=
@@ -295,8 +283,8 @@ containing the least associated prime of `I.right ⧸ I.left` in the fixed linea
 of the prime spectrum, embedded in the Dedekind–MacNeille completion. -/
 lemma A_payoff (I : StrictIntvl (Submodule R M)) :
     (payoff R M).A I =
-      .principal (toColex {(subquotientAssociatedPrimes I).toFinset.min'
-        (subquotientAssociatedPrimes_nonempty I)}) := by
+      .principal (toColex {((subquotientAssociatedPrimes I).toFinset.min'
+        (subquotientAssociatedPrimes_nonempty I))}) := by
   apply le_antisymm
   · -- The lifted localization kernel realizes the upper bound.
     obtain ⟨hleft, hright⟩ := liftQuot_middle I.left I.right I.lt.le (locKer I)
@@ -345,9 +333,9 @@ least associated prime of `M` in the linear extension. -/
 theorem isSemistable_iff_A_const [Nontrivial M] :
     (payoff R M).IsSemistable ↔ ∀ N : Submodule R M, (hN : ⊥ < N) →
       (payoff R M).A ⟨⊥, N, hN⟩ =
-        .principal (toColex {(subquotientAssociatedPrimes
+        .principal (toColex {((subquotientAssociatedPrimes
           (⊤ : StrictIntvl (Submodule R M))).toFinset.min'
-          (subquotientAssociatedPrimes_nonempty ⊤)}) := by
+          (subquotientAssociatedPrimes_nonempty ⊤))}) := by
   constructor
   · intro hst N hN
     have hst' : ¬ (payoff R M).A ⊤ < (payoff R M).A ⟨⊥, N, hN⟩ := hst.not_lt N hN

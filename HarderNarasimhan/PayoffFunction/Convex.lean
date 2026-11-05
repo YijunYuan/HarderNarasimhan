@@ -166,13 +166,9 @@ lemma IsConvexOn.max_max (hμcvx : μ.IsConvexOn I) : μ.max.max I = μ.max I :=
 
 /-- Replacing `μ` by `μ.max` does not change the value when A moves first on intervals
 on which `μ` is convex. -/
-lemma IsConvexOn.A_max (hμcvx : μ.IsConvexOn I) : μ.max.A I = μ.A I := by
-  have key : ∀ a, I.left ≤ a → ∀ h : a < I.right,
-      μ.max.max ⟨a, I.right, h⟩ = μ.max ⟨a, I.right, h⟩ :=
-    fun a ha h ↦ (hμcvx.mono (I₂ := ⟨a, I.right, h⟩) ⟨ha, le_rfl⟩).max_max
-  apply eq_of_le_of_ge
-  · exact le_A fun a ha ↦ (A_le ha).trans (key a ha.1 ha.2).le
-  · exact le_A fun a ha ↦ (A_le ha).trans (key a ha.1 ha.2).ge
+lemma IsConvexOn.A_max (hμcvx : μ.IsConvexOn I) : μ.max.A I = μ.A I :=
+  iInf_congr fun a ↦ iInf_congr fun ha ↦
+    (hμcvx.mono (I₂ := ⟨a, I.right, ha.2⟩) ⟨ha.1, le_rfl⟩).max_max
 
 /-! ### Game values along a chain -/
 

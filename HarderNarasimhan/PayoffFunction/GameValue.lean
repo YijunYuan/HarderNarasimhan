@@ -6,7 +6,7 @@ Authors: Yijun Yuan
 module
 
 public import HarderNarasimhan.PayoffFunction.SlopeLike
-public import Mathlib.Data.Real.Basic
+public import Mathlib.Basic.Real.Basic
 public import Mathlib.Order.OrderIsoNat
 
 /-!
@@ -169,20 +169,14 @@ instance [h₂ : μ.WeakSlopeLikeAtBot] : μ.dual.WeakSlopeLikeAtTop :=
 /-- Duality exchanges the game values: player A's value of `μ.dual` is player B's value of
 `μ`. -/
 theorem A_top_dual : OrderDual.ofDual (μ.dual.A ⊤) = μ.B ⊤ :=
-  le_antisymm
-    (iSup₂_le fun a ha ↦ le_iSup₂_of_le (OrderDual.ofDual a) ⟨ha.2, ha.1⟩
-      (le_iInf₂ fun b hb ↦ iInf₂_le b ⟨hb.2, hb.1⟩))
-    (iSup₂_le fun a ha ↦ le_iSup₂_of_le (OrderDual.toDual a) ⟨ha.2, ha.1⟩
-      (le_iInf₂ fun b hb ↦ iInf₂_le b ⟨hb.2, hb.1⟩))
+  iSup_congr fun _ ↦ iSup_congr_Prop and_comm fun _ ↦
+    iInf_congr fun _ ↦ iInf_congr_Prop and_comm fun _ ↦ rfl
 
 /-- Duality exchanges the game values: player B's value of `μ.dual` is player A's value of
 `μ`. -/
 theorem B_top_dual : OrderDual.ofDual (μ.dual.B ⊤) = μ.A ⊤ :=
-  le_antisymm
-    (le_iInf₂ fun a ha ↦ iInf₂_le_of_le (OrderDual.toDual a) ⟨ha.2, ha.1⟩
-      (iSup₂_le fun b hb ↦ le_iSup₂_of_le b ⟨hb.2, hb.1⟩ le_rfl))
-    (le_iInf₂ fun a ha ↦ iInf₂_le_of_le (OrderDual.ofDual a) ⟨ha.2, ha.1⟩
-      (iSup₂_le fun b hb ↦ le_iSup₂_of_le b ⟨hb.2, hb.1⟩ le_rfl))
+  iInf_congr fun _ ↦ iInf_congr_Prop and_comm fun _ ↦
+    iSup_congr fun _ ↦ iSup_congr_Prop and_comm fun _ ↦ rfl
 
 private lemma iSup_bot_eq_max_top (μ : PayoffFunction ℒ S) :
     ⨆ (y : ℒ) (hy : ⊥ < y), μ ⟨⊥, y, hy⟩ = μ.max ⊤ :=

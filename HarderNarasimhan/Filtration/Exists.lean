@@ -7,6 +7,9 @@ module
 
 public import HarderNarasimhan.Filtration.Defs
 
+import Mathlib.Order.Interval.Set.Monotone
+import Mathlib.Order.SuccPred.Nat
+
 /-!
 # Existence of Harder–Narasimhan filtrations
 
@@ -78,7 +81,7 @@ private lemma HNFil_lt_succ (n : ℕ) (hn : HNFil μ n ≠ ⊤) : HNFil μ n < H
 /-- `HNFil` reaches `⊤` in finite time, by well-foundedness of `>`. -/
 private lemma HNFil_exists_eq_top : ∃ N : ℕ, HNFil μ N = ⊤ := by
   by_contra!
-  exact (wellFounded_iff_isEmpty_descending_chain.1 hwf.wf).elim
+  exact (wellFounded_iff_isEmpty_descending_chain.1 hwf).elim
     ⟨fun n ↦ HNFil μ n, fun n ↦ HNFil_lt_succ μ n (this n)⟩
 
 open Classical in
@@ -92,16 +95,8 @@ private lemma HNFil_ne_top_iff (n : ℕ) : HNFil μ n ≠ ⊤ ↔ n < HNlen μ :
   exact hn (Nat.le_induction (Nat.find_spec (HNFil_exists_eq_top μ))
     (fun k _ hk' ↦ by simp only [HNFil, hk', ↓reduceDIte]) n this)
 
-private lemma HNFil_strictMonoOn : StrictMonoOn (HNFil μ) (Set.Iic (HNlen μ)) := by
-  intro i _ j hj hij
-  revert hj
-  induction j, hij using Nat.le_induction with
-  | base =>
-    intro hj
-    exact HNFil_lt_succ μ i ((HNFil_ne_top_iff μ i).2 hj)
-  | succ j hij ih =>
-    intro hj
-    exact (ih (Nat.le_of_succ_le hj)).trans (HNFil_lt_succ μ j ((HNFil_ne_top_iff μ j).2 hj))
+private lemma HNFil_strictMonoOn : StrictMonoOn (HNFil μ) (Set.Iic (HNlen μ)) :=
+  strictMonoOn_Iic_of_lt_succ fun n hn ↦ HNFil_lt_succ μ n ((HNFil_ne_top_iff μ n).2 hn)
 
 private lemma HNFil_length_eq_top : HNFil μ (HNlen μ) = ⊤ := by
   classical

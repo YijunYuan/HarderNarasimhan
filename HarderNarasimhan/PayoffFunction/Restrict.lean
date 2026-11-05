@@ -58,25 +58,17 @@ lemma min_restrict_apply {J : StrictIntvl ↥I} : (μ.restrict I).min J = μ.min
 @[simp] lemma min_restrict : (μ.restrict I).min = μ.min.restrict I :=
   ext fun _ ↦ min_restrict_apply
 
-lemma A_restrict_apply {J : StrictIntvl ↥I} : (μ.restrict I).A J = μ.A ↑J :=
-  le_antisymm
-    (le_iInf₂ fun a ha ↦ iInf₂_le_of_le
-      ⟨a, le_trans J.left.prop.1 ha.1, le_trans ha.2.le J.right.prop.2⟩ ⟨ha.1, ha.2⟩
-      max_restrict_apply.le)
-    (le_iInf₂ fun u hu ↦ iInf₂_le_of_le u.val ⟨hu.1, hu.2⟩
-      (max_restrict_apply (J := ⟨u, J.right, hu.2⟩)).ge)
+lemma A_restrict_apply {J : StrictIntvl ↥I} : (μ.restrict I).A J = μ.A ↑J := by
+  change (μ.restrict I).max.min J = μ.max.min ↑J
+  rw [max_restrict, min_restrict_apply]
 
 /-- Restriction commutes with `A`. -/
 @[simp] lemma A_restrict : (μ.restrict I).A = μ.A.restrict I :=
   ext fun _ ↦ A_restrict_apply
 
-lemma B_restrict_apply {J : StrictIntvl ↥I} : (μ.restrict I).B J = μ.B ↑J :=
-  le_antisymm
-    (iSup₂_le fun u hu ↦ le_iSup₂_of_le u.val ⟨hu.1, hu.2⟩ min_restrict_apply.le)
-    (iSup₂_le fun a ha ↦
-      have hmem : a ∈ I := ⟨le_trans J.left.prop.1 ha.1.le, le_trans ha.2 J.right.prop.2⟩
-      le_iSup₂_of_le ⟨a, hmem⟩ ⟨ha.1, ha.2⟩
-        (min_restrict_apply (J := ⟨J.left, ⟨a, hmem⟩, ha.1⟩)).ge)
+lemma B_restrict_apply {J : StrictIntvl ↥I} : (μ.restrict I).B J = μ.B ↑J := by
+  change (μ.restrict I).min.max J = μ.min.max ↑J
+  rw [min_restrict, max_restrict_apply]
 
 /-- Restriction commutes with `B`. -/
 @[simp] lemma B_restrict : (μ.restrict I).B = μ.B.restrict I :=

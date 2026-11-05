@@ -6,7 +6,7 @@ Authors: Yijun Yuan
 module
 
 public import HarderNarasimhan.PayoffFunction.Semistable.Breakpoints
-public import Mathlib.Data.Rel
+public import Mathlib.Basic.Rel
 public import Mathlib.Order.RelSeries
 
 /-!

@@ -7,8 +7,8 @@ module
 
 public import HarderNarasimhan.PayoffFunction.SlopeLike
 public import Mathlib.Algebra.Module.Defs
-public import Mathlib.Data.NNReal.Basic
-public import Mathlib.Data.Real.Basic
+public import Mathlib.Basic.NNReal.Basic
+public import Mathlib.Basic.Real.Basic
 public import Mathlib.Order.Completion
 
 /-!
@@ -59,7 +59,7 @@ omit [IsOrderedAddMonoid V] [PosSMulStrictMono ℝ V] in
 private lemma slope_pos {r : StrictIntvl ℒ → ℝ≥0} {d : StrictIntvl ℒ → V}
     {I : StrictIntvl ℒ} (h : 0 < r I) :
     ∃ v : V, slope r d I = DedekindCut.principal v ∧ r I • v = d I :=
-  ⟨(r I)⁻¹ • d I, dif_pos h, smul_inv_smul₀ h.ne' (d I)⟩
+  ⟨(r I)⁻¹ • d I, dite_eq_left h, smul_inv_smul₀ h.ne' (d I)⟩
 
 /-- The slope of an additive degree by an additive rank is slope-like, provided the degree
 is positive on intervals of rank zero. -/
@@ -74,7 +74,7 @@ theorem isSlopeLike_slope [Nontrivial V] (r : StrictIntvl ℒ → ℝ≥0) (d : 
   have hdegree := hd x y z h₁ h₂
   have hrank := hr x y z h₁ h₂
   have etop : ∀ w : StrictIntvl ℒ, r w = 0 → slope r d w = ⊤ :=
-    fun w hw ↦ dif_neg (by simp [hw])
+    fun w hw ↦ dite_eq_right (by simp [hw])
   rcases eq_zero_or_pos (r ⟨x, z, h₁.trans h₂⟩) with htotal | htotal
   · -- all ranks vanish: all three slopes are `⊤`, the constant pattern
     obtain ⟨hxy, hyz⟩ := add_eq_zero.1 <| hrank ▸ htotal
@@ -117,9 +117,7 @@ theorem isSlopeLike_slope [Nontrivial V] (r : StrictIntvl ℒ → ℝ≥0) (d : 
             _ = r ⟨x, y, h₁⟩ • μxy + r ⟨y, z, h₂⟩ • μyz := hweighted
         · refine Or.inr (Or.inr ⟨heq, ?_⟩)
           rw [heq] at hweighted
-          have hright := (add_right_inj _).mp hweighted
-          exact le_antisymm ((smul_le_smul_iff_of_pos_left hyz).1 hright.le)
-            ((smul_le_smul_iff_of_pos_left hyz).1 hright.ge)
+          exact smul_right_injective V hyz.ne' ((add_right_inj _).mp hweighted)
         · refine Or.inr (Or.inl ⟨hgt, ?_⟩)
           apply (smul_lt_smul_iff_of_pos_left hyz).1
           apply (add_lt_add_iff_left (r ⟨x, y, h₁⟩ • μxy)).1

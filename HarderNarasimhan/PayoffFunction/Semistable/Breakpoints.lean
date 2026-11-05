@@ -98,8 +98,8 @@ private noncomputable def breakpointAux (μ : PayoffFunction ℒ S) (I : StrictI
       ⟨I.left, I.left_mem⟩
     else
       if hne : (improvingSet μ I prev hbot).Nonempty then
-        ⟨hwf.wf.min (improvingSet μ I prev hbot) hne,
-          (hwf.wf.min_mem (improvingSet μ I prev hbot) hne).out.choose⟩
+        ⟨hwf.min (improvingSet μ I prev hbot) hne,
+          (hwf.min_mem (improvingSet μ I prev hbot) hne).out.choose⟩
       else
         ⟨I.left, I.left_mem⟩
 
@@ -121,7 +121,7 @@ private lemma breakpointAux_defprop1 (μ : PayoffFunction ℒ S) (I : StrictIntv
     simp only [breakpointAux, breakpointAux_helper μ I i hi, hcontra, ↓reduceDIte, ne_eq,
       not_true_eq_false] at hi
   simpa only [breakpointAux, breakpointAux_helper μ I i hi, hne, ↓reduceDIte] using
-    (hwf.wf.min_mem (improvingSet μ I (breakpointAux μ I i) <|
+    (hwf.min_mem (improvingSet μ I (breakpointAux μ I i) <|
       breakpointAux_helper μ I i hi) hne).out.choose_spec.choose_spec
 
 private lemma breakpointAux_defprop2 (μ : PayoffFunction ℒ S) (I : StrictIntvl ℒ)
@@ -136,11 +136,11 @@ private lemma breakpointAux_defprop2 (μ : PayoffFunction ℒ S) (I : StrictIntv
     by_contra hempty
     simp only [breakpointAux, hprev, hempty, ↓reduceDIte, ne_eq, not_true_eq_false] at hi
   obtain ⟨hminI, hmin_bounds, hmin_improves⟩ :=
-    hwf.wf.min_mem (improvingSet μ I (breakpointAux μ I i) hprev) hne
+    hwf.min_mem (improvingSet μ I (breakpointAux μ I i) hprev) hne
   simp only [breakpointAux, hprev, hne, ↓reduceDIte] at hz ⊢
   intro hdominates
   -- A point above the chosen maximal element with at least its value is a candidate.
-  apply hwf.wf.not_lt_min (improvingSet μ I (breakpointAux μ I i) hprev) ?_ hz.1
+  apply hwf.not_lt_min (improvingSet μ I (breakpointAux μ I i) hprev) ?_ hz.1
   have hz_left : I.left < z := hminI.1.trans_lt hz.1
   refine ⟨⟨hz_left.le, hz.2.trans (breakpointAux μ I i).prop.2⟩,
     ⟨hz_left.ne, ?_⟩, hmin_improves.trans_le hdominates⟩
@@ -155,7 +155,7 @@ private lemma breakpointAux_strict_decreasing (μ : PayoffFunction ℒ S) (I : S
   intro i hi
   by_cases hne : (improvingSet μ I (breakpointAux μ I i) hi).Nonempty
   · simpa only [breakpointAux, hi, hne, ↓reduceDIte] using
-      (hwf.wf.min_mem (improvingSet μ I (breakpointAux μ I i) hi) hne).out.choose_spec.choose.2
+      (hwf.min_mem (improvingSet μ I (breakpointAux μ I i) hi) hne).out.choose_spec.choose.2
   · simpa only [breakpointAux, hi, hne, ↓reduceDIte] using
       lt_of_le_of_ne (breakpointAux μ I i).prop.1 hi
 
@@ -216,7 +216,7 @@ private lemma breakpointAux_defprop3 (μ : PayoffFunction ℒ S) (I : StrictIntv
       Nat.sub_one_add_one (breakpointAux_len_nonzero μ I hμDCC)
     rw [← hlen] at hfinished
     simp only [breakpointAux, hlast.ne, hne, ↓reduceDIte] at hfinished
-    exact (hwf.wf.min_mem (improvingSet μ I (breakpointAux μ I (len - 1)) hlast.ne)
+    exact (hwf.min_mem (improvingSet μ I (breakpointAux μ I (len - 1)) hlast.ne)
       hne).out.choose_spec.choose.1 hfinished.symm
 
 /-- If `>` is well-founded on `ℒ`, a payoff function satisfying `ADCC` and convexity on `I`
@@ -356,7 +356,7 @@ lemma exists_isGreatest_breakpoints [hwf : WellFoundedGT ℒ] [μ.ADCC] (hμcvx 
       ∀ z : ℒ, (hzI : z ∈ I) → (hz : I.left ≠ z) →
         μ.IsAttained ⟨I.left, z, lt_of_le_of_ne hzI.left hz⟩) :
     ∃ s : ℒ, IsGreatest (μ.breakpoints I) s := by
-  obtain ⟨M, hM⟩ := hwf.wf.has_min (μ.breakpoints I) (breakpoints_nonempty hμcvx)
+  obtain ⟨M, hM⟩ := hwf.has_min (μ.breakpoints I) (breakpoints_nonempty hμcvx)
   refine ⟨M, hM.1, mem_upperBounds.2 fun x hx ↦ ?_⟩
   exact ((breakpoints_total hμcvx h).total ⟨x, hx⟩ ⟨M, hM.1⟩).elim id
     fun c2 ↦ le_of_eq <| eq_of_le_of_not_lt' c2 (hM.2 x hx)

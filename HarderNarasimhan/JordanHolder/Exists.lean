@@ -54,7 +54,7 @@ private noncomputable def JHFil (k : ℕ) : ℒ :=
   | n + 1 =>
     let 𝒮 := {p : ℒ | ∃ h : ⊥ < p, p < JHFil n ∧ μ ⟨⊥, p, h⟩ = μ ⊤}
     if h𝒮 : 𝒮.Nonempty then
-      (hacc.wf.has_min 𝒮 h𝒮).choose
+      WellFoundedGT.max 𝒮 h𝒮
     else
       ⊥
 
@@ -66,7 +66,7 @@ private lemma JHFil_anti_mono :
   simp only [JHFil]
   by_cases h : {p : ℒ | ∃ h : ⊥ < p, p < JHFil μ k ∧ μ ⟨⊥, p, h⟩ = μ ⊤}.Nonempty
   · simp only [h]
-    exact (hacc.wf.has_min _ h).choose_spec.1.2.1
+    exact (hacc.min_mem _ h).2.1
   · simpa only [h]
 
 omit [CompleteLinearOrder S] in
@@ -79,7 +79,7 @@ private lemma JHFil_antitone : Antitone (JHFil μ) :=
       have hempty : ¬ {p : ℒ | ∃ hp : ⊥ < p, p < JHFil μ n ∧ μ ⟨⊥, p, hp⟩ = μ ⊤}.Nonempty := by
         rintro ⟨p, -, hlt, -⟩
         exact not_lt_bot (h ▸ hlt)
-      simpa only [JHFil] using dif_neg hempty
+      simpa only [JHFil] using dite_eq_right hempty
     · exact (JHFil_anti_mono μ n <| bot_lt_iff_ne_bot.2 h).le
 
 variable [hsl : μ.IsSlopeLike]
@@ -99,7 +99,7 @@ private lemma JHFil_step_payoff_eq_tot :
       by_cases hchoices : {p : ℒ | ∃ h : ⊥ < p,
           p < JHFil μ n ∧ μ ⟨⊥, p, h⟩ = μ ⊤}.Nonempty
       · simpa only [JHFil, hchoices, ↓reduceDIte] using
-          (hacc.wf.has_min _ hchoices).choose_spec.1.2.2
+          (hacc.min_mem _ hchoices).2.2
       · simp only [JHFil, hchoices, ↓reduceDIte, lt_self_iff_false] at hn
   intro k hk
   by_cases hbot : JHFil μ (k + 1) = ⊥
@@ -161,7 +161,8 @@ private lemma JHFil_refine_lt_step_payoff :
     have hchoices : {p : ℒ | ∃ h : ⊥ < p,
         p < JHFil μ k ∧ μ ⟨⊥, p, h⟩ = μ ⊤}.Nonempty :=
       ⟨z, hzbot, h'', heq⟩
-    have hminimal := (hacc.wf.has_min _ hchoices).choose_spec.2 z ⟨hzbot, h'', heq⟩
+    have hminimal := hacc.not_lt_min
+      {p : ℒ | ∃ h : ⊥ < p, p < JHFil μ k ∧ μ ⟨⊥, p, h⟩ = μ ⊤} ⟨hzbot, h'', heq⟩
     exact hminimal (by simpa only [JHFil, hchoices, ↓reduceDIte] using h')
   rw [JHFil_step_payoff_eq_tot μ k hk]
   by_cases hbot : JHFil μ (k + 1) = ⊥
@@ -171,7 +172,7 @@ private lemma JHFil_refine_lt_step_payoff :
       by_cases hchoices : {p : ℒ | ∃ h : ⊥ < p,
           p < JHFil μ k ∧ μ ⟨⊥, p, h⟩ = μ ⊤}.Nonempty
       · simpa only [JHFil, hchoices, ↓reduceDIte] using
-          (hacc.wf.has_min _ hchoices).choose_spec.1.2.2
+          (hacc.min_mem _ hchoices).2.2
       · simp only [JHFil, hchoices, ↓reduceDIte, not_true_eq_false] at hbot
     calc
       μ ⟨JHFil μ (k + 1), z, h'⟩ < μ ⟨⊥, z, hzbot⟩ := by
